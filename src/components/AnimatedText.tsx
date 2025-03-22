@@ -45,11 +45,11 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
     };
   }, [delay]);
 
-  const Tag = tag as keyof JSX.IntrinsicElements;
+  const Component = tag as keyof JSX.IntrinsicElements;
   
   return (
-    <Tag
-      ref={elementRef as React.RefObject<HTMLHeadingElement>}
+    <Component
+      ref={elementRef}
       className={cn(
         'opacity-0 transition-transform duration-700',
         highlight && 'text-highlight',
@@ -57,7 +57,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
       )}
     >
       {text}
-    </Tag>
+    </Component>
   );
 };
 

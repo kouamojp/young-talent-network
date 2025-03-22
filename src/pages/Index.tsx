@@ -1,10 +1,10 @@
 
 import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
-import HeroSection from '@/components/HeroSection';
-import AboutSection from '@/components/AboutSection';
-import CategorySection from '@/components/CategorySection';
 import Footer from '@/components/Footer';
+import SocialSidebar from '@/components/SocialSidebar';
+import Feed from '@/components/Feed';
+import RightSidebar from '@/components/RightSidebar';
 
 const Index: React.FC = () => {
   useEffect(() => {
@@ -34,11 +34,15 @@ const Index: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <CategorySection />
+      <div className="container mx-auto flex">
+        <SocialSidebar />
+        <main className="flex-1 min-h-screen">
+          <Feed />
+        </main>
+        <RightSidebar />
+      </div>
       <Footer />
     </div>
   );
