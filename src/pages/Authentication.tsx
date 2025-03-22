@@ -1,0 +1,108 @@
+
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import GlassMorphism from '@/components/GlassMorphism';
+import AnimatedText from '@/components/AnimatedText';
+
+const Authentication: React.FC = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate login process
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate registration process
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-purple-50 p-4">
+      <GlassMorphism className="w-full max-w-md p-6">
+        <AnimatedText text="Welcome to Y&T" tag="h1" className="text-2xl font-bold text-center mb-6" />
+        <Tabs defaultValue="login" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Register</TabsTrigger>
+          </TabsList>
+          <TabsContent value="login">
+            <Card>
+              <CardHeader>
+                <CardTitle>Login</CardTitle>
+                <CardDescription>
+                  Sign in to your Y&T account
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <form onSubmit={handleLogin}>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" type="email" placeholder="your@email.com" required />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" type="password" required />
+                  </div>
+                  <Button className="w-full mt-6" type="submit" disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Login"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="register">
+            <Card>
+              <CardHeader>
+                <CardTitle>Register</CardTitle>
+                <CardDescription>
+                  Create your Y&T account
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <form onSubmit={handleRegister}>
+                  <div className="space-y-2">
+                    <Label htmlFor="reg-name">Full Name</Label>
+                    <Input id="reg-name" placeholder="John Doe" required />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="reg-email">Email</Label>
+                    <Input id="reg-email" type="email" placeholder="your@email.com" required />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="reg-password">Password</Label>
+                    <Input id="reg-password" type="password" required />
+                  </div>
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="account-type">Account Type</Label>
+                    <select 
+                      id="account-type" 
+                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="participant">Participant (Talent)</option>
+                      <option value="agent">Agent/Mentor</option>
+                      <option value="organization">Organization</option>
+                    </select>
+                  </div>
+                  <Button className="w-full mt-6" type="submit" disabled={isLoading}>
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </GlassMorphism>
+    </div>
+  );
+};
+
+export default Authentication;

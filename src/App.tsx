@@ -7,6 +7,18 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import News from "./pages/News";
+import Messages from "./pages/Messages";
+import Categories from "./pages/Categories";
+import Participants from "./pages/Participants";
+import Communities from "./pages/Communities";
+import Organizations from "./pages/Organizations";
+import AptitudeTest from "./pages/AptitudeTest";
+import Events from "./pages/Events";
+import OnlineTV from "./pages/OnlineTV";
+import Work from "./pages/Work";
+import Search from "./pages/Search";
+import Authentication from "./pages/Authentication";
 
 const queryClient = new QueryClient();
 
@@ -19,16 +31,18 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/messages" element={<Index />} />
-          <Route path="/news" element={<Index />} />
-          <Route path="/categories" element={<Index />} />
-          <Route path="/participants" element={<Index />} />
-          <Route path="/communities" element={<Index />} />
-          <Route path="/organizations" element={<Index />} />
-          <Route path="/test" element={<Index />} />
-          <Route path="/events" element={<Index />} />
-          <Route path="/tv" element={<Index />} />
-          <Route path="/work" element={<Index />} />
+          <Route path="/auth" element={<Authentication />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/participants" element={<Participants />} />
+          <Route path="/communities" element={<Communities />} />
+          <Route path="/organizations" element={<Organizations />} />
+          <Route path="/test" element={<AptitudeTest />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/tv" element={<OnlineTV />} />
+          <Route path="/work" element={<Work />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
