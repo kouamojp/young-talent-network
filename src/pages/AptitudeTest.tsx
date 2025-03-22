@@ -52,7 +52,7 @@ const AptitudeTest: React.FC = () => {
       options: [
         { id: 'a', text: 'Specific, actionable suggestions for improvement' },
         { id: 'b', text: 'Recognition of your strengths and achievements' },
-        { id: 'c', text: 'Honest critique, even if it's difficult to hear' },
+        { id: 'c', text: "Honest critique, even if it's difficult to hear" },
         { id: 'd', text: 'A balanced perspective that considers context' },
       ]
     },

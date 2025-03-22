@@ -22,9 +22,9 @@ const Messages: React.FC = () => {
   
   const messages = [
     { id: 1, text: 'Hi there! I saw your portfolio and I was really impressed with your work.', sender: 'them', time: '10:05 AM' },
-    { id: 2, text: 'Thank you! I appreciate that. I've been working hard on improving my skills.', sender: 'me', time: '10:07 AM' },
-    { id: 3, text: 'Are you available for the audition next week? We're looking for someone with your talents.', sender: 'them', time: '10:10 AM' },
-    { id: 4, text: 'Yes, I'm interested! Can you share more details about it?', sender: 'me', time: '10:30 AM' },
+    { id: 2, text: "Thank you! I appreciate that. I've been working hard on improving my skills.", sender: 'me', time: '10:07 AM' },
+    { id: 3, text: "Are you available for the audition next week? We're looking for someone with your talents.", sender: 'them', time: '10:10 AM' },
+    { id: 4, text: "Yes, I'm interested! Can you share more details about it?", sender: 'me', time: '10:30 AM' },
   ];
 
   const handleSendMessage = () => {
