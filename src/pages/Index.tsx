@@ -36,7 +36,7 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <div className="container mx-auto flex">
+      <div className="container mx-auto flex flex-col md:flex-row">
         <SocialSidebar />
         <main className="flex-1 min-h-screen">
           <Feed />

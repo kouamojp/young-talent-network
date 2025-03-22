@@ -17,7 +17,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
   highlight = false,
   delay = 0
 }) => {
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -25,7 +25,9 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setTimeout(() => {
-              entry.target.classList.add('animate-fade-in');
+              if (elementRef.current) {
+                elementRef.current.classList.add('animate-fade-in');
+              }
             }, delay);
             observer.unobserve(entry.target);
           }
@@ -45,19 +47,25 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({
     };
   }, [delay]);
 
-  const Component = tag as keyof JSX.IntrinsicElements;
+  const getComponent = () => {
+    const Component = tag;
+    return (
+      <Component
+        className={cn(
+          'transition-transform duration-700',
+          highlight && 'text-highlight',
+          className
+        )}
+      >
+        {text}
+      </Component>
+    );
+  };
   
   return (
-    <Component
-      ref={elementRef}
-      className={cn(
-        'opacity-0 transition-transform duration-700',
-        highlight && 'text-highlight',
-        className
-      )}
-    >
-      {text}
-    </Component>
+    <div ref={elementRef} className="opacity-0">
+      {getComponent()}
+    </div>
   );
 };
 
