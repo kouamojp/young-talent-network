@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -10,7 +9,7 @@ import {
   Search,
   Star,
   PhoneCall,
-  Circus,
+  Citrus,
   Image,
   Music,
   Video,
@@ -54,7 +53,7 @@ const SocialSidebar: React.FC = () => {
       description: 'Your talent network' 
     },
     { 
-      icon: Circus, 
+      icon: Citrus, 
       label: 'Communities', 
       path: '/communities',
       description: 'Groups by interest' 
