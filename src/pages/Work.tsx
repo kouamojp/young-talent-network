@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,7 +19,8 @@ import {
   FileText,
   Filter,
   Building,
-  Calendar
+  Calendar,
+  Play
 } from 'lucide-react';
 
 const Work: React.FC = () => {

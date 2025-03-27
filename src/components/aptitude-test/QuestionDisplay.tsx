@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { RadioGroup, RadioItem, RadioIndicator } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 type Option = {
   id: string;
@@ -31,9 +32,9 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
       >
         {options.map(option => (
           <div key={option.id} className="flex items-start">
-            <RadioItem value={option.id} id={`option-${option.id}`} className="mt-1">
-              <RadioIndicator />
-            </RadioItem>
+            <div className="flex h-5 w-5 items-center justify-center">
+              <RadioGroupItem value={option.id} id={`option-${option.id}`} className="mt-1" />
+            </div>
             <label 
               htmlFor={`option-${option.id}`} 
               className="ml-2 text-gray-700 cursor-pointer"
