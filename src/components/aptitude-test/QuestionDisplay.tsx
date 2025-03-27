@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { RadioGroup } from '@/components/ui/radio-group';
-import { RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup, RadioItem, RadioIndicator } from '@/components/ui/radio-group';
 
 type Option = {
   id: string;
@@ -15,24 +14,26 @@ type QuestionDisplayProps = {
   onSelectAnswer: (value: string) => void;
 };
 
-const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
-  question,
-  options,
-  selectedAnswer,
-  onSelectAnswer,
+const QuestionDisplay: React.FC<QuestionDisplayProps> = ({ 
+  question, 
+  options, 
+  selectedAnswer, 
+  onSelectAnswer 
 }) => {
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">{question}</h2>
       
       <RadioGroup 
-        value={selectedAnswer || ''} 
+        value={selectedAnswer} 
         onValueChange={onSelectAnswer}
         className="space-y-3"
       >
         {options.map(option => (
           <div key={option.id} className="flex items-start">
-            <RadioGroupItem value={option.id} id={`option-${option.id}`} className="mt-1" />
+            <RadioItem value={option.id} id={`option-${option.id}`} className="mt-1">
+              <RadioIndicator />
+            </RadioItem>
             <label 
               htmlFor={`option-${option.id}`} 
               className="ml-2 text-gray-700 cursor-pointer"

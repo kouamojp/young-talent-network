@@ -1,13 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
-
-type TalentArea = {
-  area: string;
-  score: number;
-  description: string;
-};
+import { Button } from '@/components/ui/button';
+import { TalentArea } from './testData';
 
 type ResultsDisplayProps = {
   talentAreas: TalentArea[];
