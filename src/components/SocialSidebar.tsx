@@ -19,8 +19,20 @@ import {
   ShoppingBag,
   Facebook,
   Instagram,
+  Twitter,
 } from 'lucide-react';
 import GlassMorphism from './GlassMorphism';
+
+// Define a type for the social link icons to properly handle both component and function types
+type IconComponent = React.ComponentType<{ className?: string }>;
+type IconRenderer = () => JSX.Element;
+type IconType = IconComponent | IconRenderer;
+
+interface SocialLink {
+  icon: IconType;
+  label: string;
+  url: string;
+}
 
 const SocialSidebar: React.FC = () => {
   const menuItems = [
@@ -86,7 +98,7 @@ const SocialSidebar: React.FC = () => {
     },
   ];
 
-  const socialLinks = [
+  const socialLinks: SocialLink[] = [
     { icon: Facebook, label: 'Facebook', url: 'https://facebook.com' },
     { icon: Instagram, label: 'Instagram', url: 'https://instagram.com' },
     { 
@@ -135,11 +147,31 @@ const SocialSidebar: React.FC = () => {
     }
   ];
 
+  const renderIcon = (icon: IconType) => {
+    if (typeof icon === 'function') {
+      // Check if it's a function that returns JSX directly
+      if ((icon as IconRenderer).length === 0) {
+        return (icon as IconRenderer)();
+      }
+      // It's a React component
+      const IconComponent = icon as IconComponent;
+      return <IconComponent className="h-5 w-5 text-blue-600" />;
+    }
+    return null;
+  };
+
   return (
     <GlassMorphism className="w-64 p-4 h-screen sticky top-0 hidden md:block">
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Y&T Network</h2>
-        <div className="relative">
+        <Link to="/" className="flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" 
+            alt="Y&T Network Logo" 
+            className="h-8 w-8"
+          />
+          <h2 className="text-xl font-bold">Y&T Network</h2>
+        </Link>
+        <div className="relative mt-4">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
           <input 
             type="text" 
@@ -179,10 +211,7 @@ const SocialSidebar: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/30 transition-colors"
               >
-                {typeof item.icon === 'function' ? 
-                  <item.icon /> : 
-                  <item.icon className="h-5 w-5 text-blue-600" />
-                }
+                {renderIcon(item.icon)}
                 <span>{item.label}</span>
               </a>
             </li>
