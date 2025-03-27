@@ -2,25 +2,87 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Home, 
+  User, 
   Users, 
   MessageCircle, 
   Bell, 
   Settings, 
   Search,
-  User,
+  Star,
+  PhoneCall,
+  Circus,
+  Image,
+  Music,
+  Video,
+  Zap,
+  Gamepad,
+  ShoppingBag,
   Facebook
 } from 'lucide-react';
 import GlassMorphism from './GlassMorphism';
 
 const SocialSidebar: React.FC = () => {
   const menuItems = [
-    { icon: Home, label: 'Home', path: '/' },
-    { icon: Users, label: 'Friends', path: '/friends' },
-    { icon: MessageCircle, label: 'Messages', path: '/messages' },
-    { icon: Bell, label: 'Notifications', path: '/notifications' },
-    { icon: User, label: 'Profile', path: '/profile' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { 
+      icon: User, 
+      label: 'Profile', 
+      path: '/profile',
+      description: 'Your digital talent hub' 
+    },
+    { 
+      icon: Star, 
+      label: 'Feed', 
+      path: '/',
+      description: 'Talent & opportunity stream' 
+    },
+    { 
+      icon: MessageCircle, 
+      label: 'Messenger', 
+      path: '/messages',
+      description: 'Secure chats & connections' 
+    },
+    { 
+      icon: PhoneCall, 
+      label: 'Calls', 
+      path: '/calls',
+      description: 'Voice/video meetings' 
+    },
+    { 
+      icon: Users, 
+      label: 'Friends', 
+      path: '/friends',
+      description: 'Your talent network' 
+    },
+    { 
+      icon: Circus, 
+      label: 'Communities', 
+      path: '/communities',
+      description: 'Groups by interest' 
+    },
+    { 
+      icon: Image, 
+      label: 'Media Hub', 
+      path: '/media',
+      description: 'Photos, music & videos' 
+    },
+    { 
+      icon: Gamepad, 
+      label: 'Games', 
+      path: '/games',
+      description: 'Skill-based challenges' 
+    },
+    { 
+      icon: ShoppingBag, 
+      label: 'Market', 
+      path: '/market',
+      description: 'Talent economy' 
+    },
+    { 
+      icon: Settings, 
+      label: 'Settings', 
+      path: '/settings',
+      description: 'Customize your experience' 
+    },
   ];
 
   const socialLinks = [
@@ -42,15 +104,18 @@ const SocialSidebar: React.FC = () => {
       </div>
       
       <nav>
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.label}>
               <Link 
                 to={item.path}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/30 transition-colors"
+                className="flex flex-col gap-1 p-3 rounded-lg hover:bg-white/30 transition-colors"
               >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
+                <div className="flex items-center gap-3">
+                  <item.icon className="h-5 w-5" />
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                <span className="text-xs text-gray-600 pl-8">{item.description}</span>
               </Link>
             </li>
           ))}
