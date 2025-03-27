@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import GlassMorphism from '@/components/GlassMorphism';
 import AnimatedText from '@/components/AnimatedText';
+import { Facebook } from 'lucide-react';
 
 const Authentication: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -22,6 +23,13 @@ const Authentication: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     // Simulate registration process
+    setTimeout(() => setIsLoading(false), 1500);
+  };
+
+  const handleFacebookLogin = () => {
+    setIsLoading(true);
+    // Simulate Facebook login process
+    console.log("Facebook login initiated");
     setTimeout(() => setIsLoading(false), 1500);
   };
 
@@ -56,6 +64,25 @@ const Authentication: React.FC = () => {
                     {isLoading ? "Logging in..." : "Login"}
                   </Button>
                 </form>
+                
+                <div className="relative mt-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2">Or continue with</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4" 
+                  onClick={handleFacebookLogin}
+                  disabled={isLoading}
+                >
+                  <Facebook className="mr-2 h-4 w-4" />
+                  Facebook
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -96,6 +123,25 @@ const Authentication: React.FC = () => {
                     {isLoading ? "Creating Account..." : "Create Account"}
                   </Button>
                 </form>
+                
+                <div className="relative mt-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2">Or continue with</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4" 
+                  onClick={handleFacebookLogin}
+                  disabled={isLoading}
+                >
+                  <Facebook className="mr-2 h-4 w-4" />
+                  Facebook
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

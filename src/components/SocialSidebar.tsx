@@ -8,7 +8,8 @@ import {
   Bell, 
   Settings, 
   Search,
-  User
+  User,
+  Facebook
 } from 'lucide-react';
 import GlassMorphism from './GlassMorphism';
 
@@ -20,6 +21,10 @@ const SocialSidebar: React.FC = () => {
     { icon: Bell, label: 'Notifications', path: '/notifications' },
     { icon: User, label: 'Profile', path: '/profile' },
     { icon: Settings, label: 'Settings', path: '/settings' },
+  ];
+
+  const socialLinks = [
+    { icon: Facebook, label: 'Facebook', url: 'https://facebook.com' }
   ];
 
   return (
@@ -51,6 +56,25 @@ const SocialSidebar: React.FC = () => {
           ))}
         </ul>
       </nav>
+      
+      <div className="mt-6 pt-4 border-t border-white/20">
+        <h3 className="font-medium mb-2">Connect</h3>
+        <ul className="space-y-1">
+          {socialLinks.map((item) => (
+            <li key={item.label}>
+              <a 
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/30 transition-colors"
+              >
+                <item.icon className="h-5 w-5 text-blue-600" />
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
       
       <div className="mt-auto pt-4 border-t border-white/20 mt-8">
         <h3 className="font-medium mb-2">Trending Talents</h3>
