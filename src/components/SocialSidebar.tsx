@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -16,7 +17,8 @@ import {
   Zap,
   Gamepad,
   ShoppingBag,
-  Facebook
+  Facebook,
+  Instagram,
 } from 'lucide-react';
 import GlassMorphism from './GlassMorphism';
 
@@ -85,7 +87,52 @@ const SocialSidebar: React.FC = () => {
   ];
 
   const socialLinks = [
-    { icon: Facebook, label: 'Facebook', url: 'https://facebook.com' }
+    { icon: Facebook, label: 'Facebook', url: 'https://facebook.com' },
+    { icon: Instagram, label: 'Instagram', url: 'https://instagram.com' },
+    { 
+      icon: () => (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="lucide lucide-x"
+        >
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      ), 
+      label: 'X (Twitter)', 
+      url: 'https://x.com' 
+    },
+    { 
+      icon: () => (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          className="lucide"
+        >
+          <path d="M17 5H7a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4Z" />
+          <path d="M12 12a2 2 0 1 0 0 4 2 2 0 1 0 0-4z" />
+          <path d="M17 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+          <path d="m14.5 16.5-2.5-4-3 3" />
+        </svg>
+      ), 
+      label: 'TikTok', 
+      url: 'https://tiktok.com' 
+    }
   ];
 
   return (
@@ -132,7 +179,10 @@ const SocialSidebar: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/30 transition-colors"
               >
-                <item.icon className="h-5 w-5 text-blue-600" />
+                {typeof item.icon === 'function' ? 
+                  <item.icon /> : 
+                  <item.icon className="h-5 w-5 text-blue-600" />
+                }
                 <span>{item.label}</span>
               </a>
             </li>
