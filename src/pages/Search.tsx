@@ -1,136 +1,143 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
-import GlassMorphism from '@/components/GlassMorphism';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search as SearchIcon, Filter, Users, Building, Calendar, HighFive } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Search as SearchIcon, UserPlus, MapPin, HandMetal } from 'lucide-react';
+
+// Mock data for users
+const users = [
+  {
+    id: 1,
+    name: 'Emma Watson',
+    username: 'emmaw',
+    avatar: '/placeholder.svg',
+    skill: 'Acting',
+    distance: 5,
+    location: 'Los Angeles'
+  },
+  {
+    id: 2,
+    name: 'John Smith',
+    username: 'johnsmith',
+    avatar: '/placeholder.svg',
+    skill: 'Photography',
+    distance: 12,
+    location: 'New York'
+  },
+  {
+    id: 3,
+    name: 'Sophie Chen',
+    username: 'sophiec',
+    avatar: '/placeholder.svg',
+    skill: 'Dance',
+    distance: 8,
+    location: 'Chicago'
+  },
+  {
+    id: 4,
+    name: 'Miguel Rodriguez',
+    username: 'miguelr',
+    avatar: '/placeholder.svg',
+    skill: 'Music Production',
+    distance: 15,
+    location: 'Miami'
+  }
+];
 
 const Search: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  
+  const [query, setQuery] = React.useState('');
+  const [results, setResults] = React.useState(users);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Filter users based on query (simple implementation)
+    const filteredResults = users.filter(user => 
+      user.name.toLowerCase().includes(query.toLowerCase()) || 
+      user.skill.toLowerCase().includes(query.toLowerCase()) ||
+      user.location.toLowerCase().includes(query.toLowerCase())
+    );
+    setResults(filteredResults);
+  };
+
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
         <Navbar />
-        <div className="container mx-auto flex flex-col md:flex-row">
-          <SocialSidebar />
-          <main className="flex-1 p-4">
-            <GlassMorphism className="p-6 mb-6">
-              <h1 className="text-2xl font-bold mb-4">Y&T Search & Database</h1>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    className="pl-10" 
-                    placeholder="Find someone who makes your talent heart beat faster..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <Button>
-                  Search
-                </Button>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="outline">
-                      <Filter className="h-4 w-4 mr-2" />
-                      Filters
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Fine-tune your talent discovery!</p>
-                  </TooltipContent>
-                </Tooltip>
+        
+        <div className="container mx-auto py-8 px-4">
+          <h1 className="text-3xl font-bold mb-6 text-center">Find Your Tribe</h1>
+          
+          <div className="max-w-2xl mx-auto mb-10">
+            <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+              <Input 
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Find someone who makes your talent heart beat faster..."
+                className="flex-1"
+              />
+              <Button type="submit">
+                <SearchIcon className="mr-2 h-4 w-4" /> Search
+              </Button>
+            </form>
+            
+            {results.length === 0 && (
+              <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+                <div className="text-5xl mb-4">🔍</div>
+                <h3 className="text-xl font-medium mb-2">Hmm... no matches yet.</h3>
+                <p className="text-gray-600">Try whispering the skill name softer? (Or broaden filters!)</p>
               </div>
-              
-              <Tabs defaultValue="talents" className="mt-6">
-                <TabsList className="grid grid-cols-4 mb-4">
-                  <TabsTrigger value="talents">Talents</TabsTrigger>
-                  <TabsTrigger value="agents">Agents</TabsTrigger>
-                  <TabsTrigger value="organizations">Organizations</TabsTrigger>
-                  <TabsTrigger value="events">Events</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="talents" className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    <h2 className="text-lg font-medium">Talent Search</h2>
-                  </div>
-                  
-                  {searchQuery && searchQuery.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {[1, 2, 3, 4, 5, 6].map((item) => (
-                        <GlassMorphism key={item} className="p-4">
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src="/placeholder.svg" alt={`Talent ${item}`} />
-                                <AvatarFallback>T{item}</AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <h3 className="font-medium">Talent Name {item}</h3>
-                                <p className="text-sm text-gray-600">Musician, Singer</p>
-                              </div>
-                            </div>
-                            <p className="text-sm">is mastering piano just 5km from you!</p>
-                            <div className="flex justify-end">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button size="sm">
-                                    Send a talent high-five ✋
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Start a connection that could change both your futures!</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </div>
-                        </GlassMorphism>
-                      ))}
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {results.map(user => (
+                <Card key={user.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="p-4 flex gap-4">
+                      <Avatar className="h-14 w-14">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <h3 className="font-medium">{user.name}</h3>
+                        <p className="text-sm text-purple-700 font-medium">{user.skill}</p>
+                        
+                        <div className="flex items-center mt-1 text-xs text-gray-600">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          <span>{user.location} ({user.distance} km away)</span>
+                        </div>
+                        
+                        <p className="mt-2 text-sm">
+                          {user.name.split(' ')[0]} is mastering {user.skill} just {user.distance} km from you!
+                        </p>
+                      </div>
                     </div>
-                  ) : (
-                    <GlassMorphism className="p-8 text-center">
-                      <p className="text-gray-600 italic">
-                        Hmm... no matches yet. Try whispering the skill name softer? (Or broaden filters!)
-                      </p>
-                    </GlassMorphism>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="agents" className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    <h2 className="text-lg font-medium">Agent Search</h2>
-                  </div>
-                  <p>Search for agents and mentors here...</p>
-                </TabsContent>
-                
-                <TabsContent value="organizations" className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    <h2 className="text-lg font-medium">Organization Search</h2>
-                  </div>
-                  <p>Search for organizations and agencies here...</p>
-                </TabsContent>
-                
-                <TabsContent value="events" className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    <h2 className="text-lg font-medium">Event Search</h2>
-                  </div>
-                  <p>Search for events and activities here...</p>
-                </TabsContent>
-              </Tabs>
-            </GlassMorphism>
-          </main>
+                    
+                    <div className="border-t p-3 flex justify-end bg-gray-50">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button size="sm" variant="outline" className="gap-1">
+                            <HandMetal className="h-4 w-4" />
+                            <span>Send a talent high-five</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Make the first move toward collaboration!</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
+        
         <Footer />
       </div>
     </TooltipProvider>
