@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GlassMorphism from '@/components/GlassMorphism';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import PostCard from '@/components/PostCard';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import SocialUniverse from './SocialUniverse';
 
 interface Post {
   id: string;
@@ -31,6 +31,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userPosts }) => {
         <TabsTrigger value="posts">Posts</TabsTrigger>
         <TabsTrigger value="media">Media</TabsTrigger>
         <TabsTrigger value="about">About</TabsTrigger>
+        <TabsTrigger value="social">Social Universe</TabsTrigger>
       </TabsList>
       
       <TabsContent value="posts" className="space-y-6">
@@ -107,6 +108,27 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userPosts }) => {
               </CardContent>
             </Card>
           </div>
+        </GlassMorphism>
+      </TabsContent>
+      
+      <TabsContent value="social">
+        <GlassMorphism className="p-6">
+          <SocialUniverse initialLinks={[
+            {
+              platform: 'instagram',
+              url: 'instagram.com/alexjohnson_piano',
+              verified: true,
+              lastActivity: {
+                type: 'post',
+                value: '328 likes'
+              }
+            },
+            {
+              platform: 'youtube',
+              url: 'youtube.com/c/alexjohnsonpiano',
+              verified: true
+            }
+          ]} />
         </GlassMorphism>
       </TabsContent>
     </Tabs>

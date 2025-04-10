@@ -17,7 +17,23 @@ export const user = {
   followers: 1240,
   following: 350,
   mentors: 3,
-  status: 'Carnegie Hall, here I come!'
+  status: 'Carnegie Hall, here I come!',
+  socialLinks: [
+    {
+      platform: 'instagram',
+      url: 'instagram.com/alexjohnson_piano',
+      verified: true,
+      lastActivity: {
+        type: 'post',
+        value: '328 likes'
+      }
+    },
+    {
+      platform: 'youtube',
+      url: 'youtube.com/c/alexjohnsonpiano',
+      verified: true
+    }
+  ]
 };
 
 // Sample posts
