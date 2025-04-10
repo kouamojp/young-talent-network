@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Search as SearchIcon, UserPlus, MapPin, HandMetal } from 'lucide-react';
+import { Search as SearchIcon, UserPlus, MapPin, HandMetal, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Mock data for users
 const users = [
@@ -72,7 +73,7 @@ const Search: React.FC = () => {
         <div className="container mx-auto py-8 px-4">
           <h1 className="text-3xl font-bold mb-6 text-center">Find Your Tribe</h1>
           
-          <div className="max-w-2xl mx-auto mb-10">
+          <div className="max-w-2xl mx-auto mb-8">
             <form onSubmit={handleSearch} className="flex gap-2 mb-6">
               <Input 
                 value={query}
@@ -84,6 +85,25 @@ const Search: React.FC = () => {
                 <SearchIcon className="mr-2 h-4 w-4" /> Search
               </Button>
             </form>
+            
+            <Card className="bg-gradient-to-r from-purple-100 to-blue-100 mb-6 overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-white/80 p-3 rounded-full">
+                    <Sparkles className="h-6 w-6 text-purple-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-lg">Discover Talents Around You</h3>
+                    <p className="text-sm mb-3">Find amazing talents right in your neighborhood!</p>
+                    <Link to="/talents-around-me">
+                      <Button size="sm" variant="default" className="rounded-full">
+                        Explore Nearby Talents
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
             {results.length === 0 && (
               <div className="text-center p-8 bg-white rounded-lg shadow-sm">
