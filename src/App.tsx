@@ -17,6 +17,7 @@ import AptitudeTest from "./pages/AptitudeTest";
 import Events from "./pages/Events";
 import OnlineTV from "./pages/OnlineTV";
 import Work from "./pages/Work";
+import Learning from "./pages/Learning";
 import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/events" element={<Events />} />
           <Route path="/tv" element={<OnlineTV />} />
           <Route path="/work" element={<Work />} />
+          <Route path="/learning" element={<Learning />} />
           <Route path="/talents-around-me" element={<TalentsAroundMe />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
