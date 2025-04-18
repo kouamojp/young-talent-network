@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
-import { Calendar, MapPin, Clock, Users, Filter, Search } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Filter, Search, Ticket, PartyPopper, MessageCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,18 +12,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 const Events: React.FC = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   
-  // Mock data
   const events = [
     {
       id: 1,
-      title: 'Young Musicians Showcase',
+      title: 'Young Innovators Fair',
       date: 'June 15, 2023',
-      time: '7:00 PM - 10:00 PM',
-      location: 'Concert Hall, New York',
-      category: 'Music',
-      attendees: 120,
+      time: '10:00 AM - 6:00 PM',
+      location: 'Online & Central Park, New York',
+      category: 'Innovation',
+      attendees: 250,
       image: '/placeholder.svg',
-      description: 'A showcase of the most talented young musicians from across the country, featuring live performances and networking opportunities.'
+      perks: 'Free cotton candy for all participants!',
+      description: "Join us for a day of creativity and innovation! Whether you're a beginner or experienced creator, this is your chance to shine. PS. Come even if your project isn't perfect - we love works in progress! 🌟",
+      tags: ['beginner-friendly', 'free-snacks', 'hybrid-event']
     },
     {
       id: 2,
@@ -91,8 +91,11 @@ const Events: React.FC = () => {
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6 mb-6">
             <div className="flex items-center gap-3 mb-6">
-              <Calendar className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">Events & Activities</h1>
+              <PartyPopper className="h-6 w-6 text-purple-500" />
+              <div>
+                <h1 className="text-2xl font-bold">Events & Activities</h1>
+                <p className="text-gray-600 mt-1">Where stars are born and friendships spark! ✨</p>
+              </div>
             </div>
             
             <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -157,45 +160,64 @@ const Events: React.FC = () => {
                   {upcomingEvents.map(event => (
                     <Dialog key={event.id}>
                       <DialogTrigger asChild>
-                        <div className="cursor-pointer">
-                          <GlassMorphism className="overflow-hidden hover:shadow-md transition-shadow">
-                            <div className="h-48 overflow-hidden">
+                        <div className="cursor-pointer transform hover:scale-105 transition-transform duration-200">
+                          <GlassMorphism className="overflow-hidden hover:shadow-lg border border-purple-100">
+                            <div className="h-48 overflow-hidden relative">
                               <img 
                                 src={event.image} 
                                 alt={event.title} 
                                 className="w-full h-full object-cover"
                               />
+                              {event.perks && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-500/90 to-purple-500/0 p-3">
+                                  <div className="flex items-center text-white">
+                                    <Ticket className="h-4 w-4 mr-2" />
+                                    <p className="text-sm">{event.perks}</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             <div className="p-4">
-                              <span className="inline-block px-2 py-1 text-xs bg-primary/10 text-primary rounded-full mb-2">
+                              <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-600 rounded-full mb-2">
                                 {event.category}
                               </span>
-                              <h3 className="font-semibold text-lg mb-2">{event.title}</h3>
-                              <div className="flex items-center text-sm text-gray-600 mb-1">
-                                <Calendar className="h-4 w-4 mr-1" />
-                                <span>{event.date}</span>
+                              <h3 className="font-semibold text-lg mb-2 text-purple-900">{event.title}</h3>
+                              <div className="space-y-2 text-gray-600">
+                                <div className="flex items-center text-sm">
+                                  <Calendar className="h-4 w-4 mr-1 text-purple-400" />
+                                  <span>{event.date}</span>
+                                </div>
+                                <div className="flex items-center text-sm">
+                                  <Clock className="h-4 w-4 mr-1 text-purple-400" />
+                                  <span>{event.time}</span>
+                                </div>
+                                <div className="flex items-center text-sm">
+                                  <MapPin className="h-4 w-4 mr-1 text-purple-400" />
+                                  <span>{event.location}</span>
+                                </div>
+                                <div className="flex items-center text-sm">
+                                  <Users className="h-4 w-4 mr-1 text-purple-400" />
+                                  <span>{event.attendees} attending</span>
+                                </div>
                               </div>
-                              <div className="flex items-center text-sm text-gray-600 mb-1">
-                                <Clock className="h-4 w-4 mr-1" />
-                                <span>{event.time}</span>
-                              </div>
-                              <div className="flex items-center text-sm text-gray-600">
-                                <MapPin className="h-4 w-4 mr-1" />
-                                <span>{event.location}</span>
-                              </div>
-                              <div className="flex items-center text-sm text-gray-600 mt-2">
-                                <Users className="h-4 w-4 mr-1" />
-                                <span>{event.attendees} attending</span>
-                              </div>
+                              {event.tags && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {event.tags.map(tag => (
+                                    <span key={tag} className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
+                                      #{tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </GlassMorphism>
                         </div>
                       </DialogTrigger>
                       <DialogContent className="max-w-2xl">
                         <DialogHeader>
-                          <DialogTitle>{event.title}</DialogTitle>
+                          <DialogTitle className="text-2xl text-purple-900">{event.title}</DialogTitle>
                         </DialogHeader>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                           <div className="md:col-span-1">
                             <img 
                               src={event.image} 
@@ -205,30 +227,41 @@ const Events: React.FC = () => {
                           </div>
                           <div className="md:col-span-2">
                             <div className="space-y-4">
-                              <p>{event.description}</p>
+                              <p className="text-gray-700">{event.description}</p>
                               
-                              <div className="space-y-2">
+                              <div className="space-y-3">
                                 <div className="flex items-center text-gray-600">
-                                  <Calendar className="h-4 w-4 mr-2" />
+                                  <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                                   <span>{event.date}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                  <Clock className="h-4 w-4 mr-2" />
+                                  <Clock className="h-4 w-4 mr-2 text-purple-400" />
                                   <span>{event.time}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                  <MapPin className="h-4 w-4 mr-2" />
+                                  <MapPin className="h-4 w-4 mr-2 text-purple-400" />
                                   <span>{event.location}</span>
                                 </div>
                                 <div className="flex items-center text-gray-600">
-                                  <Users className="h-4 w-4 mr-2" />
-                                  <span>{event.attendees} attending</span>
+                                  <Users className="h-4 w-4 mr-2 text-purple-400" />
+                                  <span>{event.attendees} amazing talents attending</span>
                                 </div>
+                                {event.perks && (
+                                  <div className="flex items-center text-purple-600">
+                                    <Ticket className="h-4 w-4 mr-2" />
+                                    <span>{event.perks}</span>
+                                  </div>
+                                )}
                               </div>
                               
                               <div className="flex gap-3 pt-4">
-                                <Button>Register</Button>
-                                <Button variant="outline">Save Event</Button>
+                                <Button className="bg-purple-600 hover:bg-purple-700">
+                                  Join the Fun!
+                                </Button>
+                                <Button variant="outline" className="border-purple-200 text-purple-600">
+                                  <MessageCircle className="h-4 w-4 mr-2" />
+                                  Ask Questions
+                                </Button>
                               </div>
                             </div>
                           </div>
