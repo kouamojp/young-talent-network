@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -20,10 +19,12 @@ import {
   Facebook,
   Instagram,
   Twitter,
+  FileText,
+  Image as ImageIcon,
+  Link as LinkIcon
 } from 'lucide-react';
 import GlassMorphism from './GlassMorphism';
 
-// Define a type for the social link icons to properly handle both component and function types
 type IconComponent = React.ComponentType<{ className?: string }>;
 type IconRenderer = () => JSX.Element;
 type IconType = IconComponent | IconRenderer;
@@ -96,6 +97,30 @@ const SocialSidebar: React.FC = () => {
       path: '/settings',
       description: 'Customize your experience' 
     },
+    { 
+      icon: FileText, 
+      label: 'Posts', 
+      path: '/profile?tab=posts',
+      description: 'Your talent stories' 
+    },
+    { 
+      icon: ImageIcon, 
+      label: 'Media', 
+      path: '/profile?tab=media',
+      description: 'Photos & videos' 
+    },
+    { 
+      icon: User, 
+      label: 'About', 
+      path: '/profile?tab=about',
+      description: 'Your talent journey' 
+    },
+    { 
+      icon: LinkIcon, 
+      label: 'Social Universe', 
+      path: '/profile?tab=social',
+      description: 'Your online talent network' 
+    },
   ];
 
   const socialLinks: SocialLink[] = [
@@ -149,11 +174,9 @@ const SocialSidebar: React.FC = () => {
 
   const renderIcon = (icon: IconType) => {
     if (typeof icon === 'function') {
-      // Check if it's a function that returns JSX directly
       if ((icon as IconRenderer).length === 0) {
         return (icon as IconRenderer)();
       }
-      // It's a React component
       const IconComponent = icon as IconComponent;
       return <IconComponent className="h-5 w-5 text-blue-600" />;
     }
