@@ -1,0 +1,38 @@
+
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Play } from 'lucide-react';
+
+const SuccessStories = () => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {[1, 2, 3].map((item) => (
+        <div key={item} className="bg-white/40 rounded-lg overflow-hidden">
+          <div className="aspect-video bg-gray-200 relative">
+            <img 
+              src="/placeholder.svg" 
+              alt="Success story" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <Button variant="outline" className="rounded-full bg-white/20 border-white text-white">
+                <Play className="h-6 w-6" />
+              </Button>
+            </div>
+          </div>
+          <div className="p-4">
+            <h3 className="font-bold">From Y&T to Broadway</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              How I landed my dream role after connecting with a casting director on the platform.
+            </p>
+            <Button variant="link" className="px-0 mt-2">
+              Read Full Story
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default SuccessStories;
