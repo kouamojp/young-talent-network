@@ -1,4 +1,3 @@
-
 import { 
   User, 
   Star, 
@@ -13,7 +12,11 @@ import {
   Settings,
   FileText,
   Image as ImageIcon,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Facebook,
+  Instagram,
+  X,
+  CircleUser
 } from 'lucide-react';
 
 export const menuItems = [
@@ -111,88 +114,22 @@ export const menuItems = [
 
 export const socialLinks = [
   { 
-    icon: () => (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="lucide lucide-facebook"
-      >
-        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-      </svg>
-    ),
+    icon: Facebook,
     label: 'Facebook', 
     url: 'https://facebook.com' 
   },
   { 
-    icon: () => (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="lucide lucide-instagram"
-      >
-        <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-      </svg>
-    ),
+    icon: Instagram,
     label: 'Instagram', 
     url: 'https://instagram.com' 
   },
   { 
-    icon: () => (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="lucide lucide-x"
-      >
-        <path d="M18 6 6 18"/>
-        <path d="m6 6 12 12"/>
-      </svg>
-    ),
+    icon: X,
     label: 'X (Twitter)', 
     url: 'https://x.com' 
   },
   { 
-    icon: () => (
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        className="lucide"
-      >
-        <path d="M17 5H7a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V9a4 4 0 0 0-4-4Z" />
-        <path d="M12 12a2 2 0 1 0 0 4 2 2 0 1 0 0-4z" />
-        <path d="M17 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
-        <path d="m14.5 16.5-2.5-4-3 3" />
-      </svg>
-    ),
+    icon: CircleUser,
     label: 'TikTok', 
     url: 'https://tiktok.com' 
   }
