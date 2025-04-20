@@ -74,6 +74,12 @@ const SocialSidebar: React.FC = () => {
       description: 'Groups by interest' 
     },
     { 
+      icon: Video, 
+      label: 'Live', 
+      path: '/live',
+      description: 'Real-time talent streams' 
+    },
+    { 
       icon: Image, 
       label: 'Media Hub', 
       path: '/media',

@@ -18,6 +18,7 @@ import Events from "./pages/Events";
 import OnlineTV from "./pages/OnlineTV";
 import Work from "./pages/Work";
 import Learning from "./pages/Learning";
+import Live from "./pages/Live";
 import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/test" element={<AptitudeTest />} />
           <Route path="/events" element={<Events />} />
           <Route path="/tv" element={<OnlineTV />} />
+          <Route path="/live" element={<Live />} />
           <Route path="/work" element={<Work />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="/talents-around-me" element={<TalentsAroundMe />} />
