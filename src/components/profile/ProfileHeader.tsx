@@ -62,7 +62,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   type="text" 
                   value={statusText} 
                   onChange={handleStatusChange} 
-                  placeholder="Tell us your dream in 5 words..." 
+                  placeholder="Share your dream in 5 words..." 
                   className="border rounded px-2 py-1 text-sm flex-1"
                   maxLength={50}
                 />
@@ -89,7 +89,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Join Alex's cheerleaders!</p>
+                <p>Join {user.name.split(' ')[0]}'s fan club!</p>
               </TooltipContent>
             </Tooltip>
             
@@ -101,7 +101,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Start your legendary duo journey!</p>
+                <p>Start your legendary collaboration journey!</p>
               </TooltipContent>
             </Tooltip>
             
@@ -111,7 +111,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   <Button variant="outline" className="gap-2" onClick={() => setIsEditMode(true)}>
                     <Edit size={16} />
                     <Sparkles className="h-3 w-3" />
-                    Polish your sparkle
+                    Enhance Profile
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

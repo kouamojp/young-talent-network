@@ -28,11 +28,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1">
                 <MapPin size={16} />
-                <span>🌍 Talent spotted near {user.location.split(',')[0]}! Send a wave 👋</span>
+                <span>🌍 Talent discovered near {user.location.split(',')[0]}! Send a wave 👋</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>The world should know where this talent shines from!</p>
+              <p>See where this talent is making waves!</p>
             </TooltipContent>
           </Tooltip>
           
@@ -57,7 +57,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
         <Card>
           <CardContent className="p-4">
             <h3 className="font-medium flex items-center gap-2 mb-2">
-              <span>When I'm not being amazing at piano, I love...</span>
+              <span>When I'm not performing, I love...</span>
             </h3>
             <div className="flex flex-wrap gap-2">
               {user.hobbies.map((hobby, index) => (
@@ -79,11 +79,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
           <CardContent className="p-4">
             <h3 className="font-medium flex items-center gap-2 mb-2">
               <BookOpen size={16} className="text-purple-600" />
-              <span>📚 Learning the secrets of music at {user.education}</span>
+              <span>📚 Learning the art of music at {user.education}</span>
             </h3>
             <h3 className="font-medium flex items-center gap-2 mt-3">
               <Briefcase size={16} className="text-purple-600" />
-              <span>💡 Currently: {user.work}. (But destined for bigger stages!)</span>
+              <span>💡 Currently: {user.work}. (Destined for greater stages!)</span>
             </h3>
           </CardContent>
         </Card>
@@ -93,11 +93,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
             <div className="flex justify-between">
               <div>
                 <span className="font-bold">{user.followers.toLocaleString()}</span> 
-                <span className="text-gray-600 ml-1">👥 cheerleaders in your fan club</span>
+                <span className="text-gray-600 ml-1">👥 supporters in your fan network</span>
               </div>
               <div>
                 <span className="font-bold">{user.mentors}</span> 
-                <span className="text-gray-600 ml-1">🎓 wise mentors guiding your journey</span>
+                <span className="text-gray-600 ml-1">🎓 mentors guiding your journey</span>
               </div>
             </div>
           </CardContent>

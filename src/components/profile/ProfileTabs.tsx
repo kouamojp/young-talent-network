@@ -39,7 +39,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ userPosts }) => {
           <GlassMorphism className="p-4">
             <textarea 
               className="w-full p-3 rounded bg-white/50 resize-none"
-              placeholder="What's your talent heart singing today? Share it with your future fans!"
+              placeholder="What is your talent heart singing today? Share it with your future fans!"
               rows={3}
             ></textarea>
             <div className="flex justify-end mt-2">

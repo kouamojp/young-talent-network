@@ -1,4 +1,3 @@
-
 // Sample user data
 export const user = {
   name: 'Alex Johnson',
@@ -6,18 +5,18 @@ export const user = {
   username: 'alexj',
   avatar: '/placeholder.svg',
   coverPhoto: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070',
-  bio: 'Professional pianist | Music teacher | Looking for opportunities to perform internationally',
+  bio: 'Professional pianist | Music educator | Seeking international performance opportunities',
   location: 'New York, USA',
   website: 'alexjohnson.music',
   joined: 'January 2023',
   birthday: 'May 15',
   education: 'Juilliard School of Music',
-  work: 'Piano Teacher at NYC Music Academy',
-  hobbies: ['Photography 📸', 'Hiking in nature 🌲', 'Cooking Italian cuisine 🍝'],
+  work: 'Piano Instructor at NYC Music Academy',
+  hobbies: ['Photography 📸', 'Nature Hiking 🌲', 'Cooking Italian Cuisine 🍝'],
   followers: 1240,
   following: 350,
   mentors: 3,
-  status: 'Carnegie Hall, here I come!',
+  status: 'Heading to Carnegie Hall!',
   socialLinks: [
     {
       platform: 'instagram',
