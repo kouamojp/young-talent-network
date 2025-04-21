@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -5,7 +6,7 @@ import SocialSidebar from '@/components/SocialSidebar';
 import Feed from '@/components/Feed';
 import RightSidebar from '@/components/RightSidebar';
 import { Button } from '@/components/ui/button';
-import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users } from 'lucide-react';
+import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users, Facebook } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Expanded main categories to show on the home page
