@@ -124,31 +124,12 @@ const Index: React.FC = () => {
       <div className="container mx-auto flex flex-col md:flex-row">
         <SocialSidebar />
         <main className="flex-1 min-h-screen">
-          {/* MAIN CATEGORIES SECTION */}
-          <section className="mt-24 pb-8 animate-section">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900">Welcome to Young &amp; Talented</h1>
-              <p className="text-lg text-gray-600">
-                Explore everything Y&amp;T has to offer! Choose your path below.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-6 px-2">
-              {mainCategories.map((cat) => (
-                <Link to={cat.link} key={cat.key} className={`flex flex-col items-center rounded-xl shadow-sm hover:shadow-md transition-all p-6 ${cat.color} group hover-scale`}>
-                  <div className="mb-2">{cat.icon}</div>
-                  <h3 className="text-lg font-semibold group-hover:underline">{cat.label}</h3>
-                  <p className="text-sm text-gray-500 mb-4 text-center">{cat.description}</p>
-                  <Button variant="outline" className="w-full mt-auto group-hover:bg-primary group-hover:text-white transition-colors">
-                    Go to {cat.label}
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </section>
           {/* FACEBOOK CONNECT SECTION */}
-          <div className="bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-md mb-6 animate-section">
+          <div className="bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-md mb-6 animate-section mt-24">
             <h2 className="text-2xl font-bold mb-4">Connect with Facebook</h2>
-            <p className="mb-4">Link your Facebook account to find friends, share achievements, and expand your network.</p>
+            <p className="mb-4">
+              Link your Facebook account to find friends, share achievements, and expand your network.
+            </p>
             <Link to="/auth">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 {/* Removed Facebook icon */}
@@ -156,6 +137,36 @@ const Index: React.FC = () => {
               </Button>
             </Link>
           </div>
+          {/* MAIN CATEGORIES SECTION */}
+          <section className="pb-8 animate-section">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900">
+                Welcome to Young &amp; Talented
+              </h1>
+              <p className="text-lg text-gray-600">
+                Explore everything Y&amp;T has to offer! Choose your path below.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-6 px-2">
+              {mainCategories.map((cat) => (
+                <Link
+                  to={cat.link}
+                  key={cat.key}
+                  className={`flex flex-col items-center rounded-xl shadow-sm hover:shadow-md transition-all p-6 ${cat.color} group hover-scale`}
+                >
+                  <div className="mb-2">{cat.icon}</div>
+                  <h3 className="text-lg font-semibold group-hover:underline">{cat.label}</h3>
+                  <p className="text-sm text-gray-500 mb-4 text-center">{cat.description}</p>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-auto group-hover:bg-primary group-hover:text-white transition-colors"
+                  >
+                    Go to {cat.label}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </section>
           <Feed />
         </main>
         <RightSidebar />
