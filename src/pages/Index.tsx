@@ -6,7 +6,7 @@ import SocialSidebar from '@/components/SocialSidebar';
 import Feed from '@/components/Feed';
 import RightSidebar from '@/components/RightSidebar';
 import { Button } from '@/components/ui/button';
-import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users, Facebook } from 'lucide-react';
+import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users, LayoutGrid } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Expanded main categories to show on the home page
@@ -127,12 +127,12 @@ const Index: React.FC = () => {
           {/* MAIN CATEGORIES SECTION */}
           <section className="mt-24 pb-8 animate-section">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900">Welcome to Young & Talented</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900">Welcome to Young &amp; Talented</h1>
               <p className="text-lg text-gray-600">
-                Explore everything Y&T has to offer! Choose your path below.
+                Explore everything Y&amp;T has to offer! Choose your path below.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5 mb-6 px-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-6 px-2">
               {mainCategories.map((cat) => (
                 <Link to={cat.link} key={cat.key} className={`flex flex-col items-center rounded-xl shadow-sm hover:shadow-md transition-all p-6 ${cat.color} group hover-scale`}>
                   <div className="mb-2">{cat.icon}</div>
@@ -151,7 +151,7 @@ const Index: React.FC = () => {
             <p className="mb-4">Link your Facebook account to find friends, share achievements, and expand your network.</p>
             <Link to="/auth">
               <Button className="bg-blue-600 hover:bg-blue-700">
-                <Facebook className="mr-2 h-5 w-5" />
+                {/* Removed Facebook icon */}
                 Connect with Facebook
               </Button>
             </Link>
@@ -166,3 +166,4 @@ const Index: React.FC = () => {
 };
 
 export default Index;
+
