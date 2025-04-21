@@ -5,11 +5,19 @@ import SocialSidebar from '@/components/SocialSidebar';
 import Feed from '@/components/Feed';
 import RightSidebar from '@/components/RightSidebar';
 import { Button } from '@/components/ui/button';
-import { Facebook, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video } from 'lucide-react';
+import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-// Main categories to show on the home page
+// Expanded main categories to show on the home page
 const mainCategories = [
+  {
+    key: 'news',
+    label: 'News',
+    icon: <Newspaper className="h-8 w-8 text-emerald-600" />,
+    description: 'Read the latest updates, stories, and announcements.',
+    link: '/news',
+    color: 'bg-emerald-50',
+  },
   {
     key: 'categories',
     label: 'Categories',
@@ -66,6 +74,22 @@ const mainCategories = [
     link: '/live',
     color: 'bg-indigo-50',
   },
+  {
+    key: 'organizations',
+    label: 'Organizations',
+    icon: <Building className="h-8 w-8 text-fuchsia-600" />,
+    description: 'Connect with organizations and agencies worldwide.',
+    link: '/organizations',
+    color: 'bg-fuchsia-50',
+  },
+  {
+    key: 'communities',
+    label: 'Communities',
+    icon: <Users className="h-8 w-8 text-cyan-600" />,
+    description: 'Join communities and connect with like-minded talents.',
+    link: '/communities',
+    color: 'bg-cyan-50',
+  },
 ];
 
 const Index: React.FC = () => {
@@ -107,7 +131,7 @@ const Index: React.FC = () => {
                 Explore everything Y&T has to offer! Choose your path below.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6 px-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5 mb-6 px-2">
               {mainCategories.map((cat) => (
                 <Link to={cat.link} key={cat.key} className={`flex flex-col items-center rounded-xl shadow-sm hover:shadow-md transition-all p-6 ${cat.color} group hover-scale`}>
                   <div className="mb-2">{cat.icon}</div>
