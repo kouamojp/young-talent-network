@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -6,7 +5,7 @@ import SocialSidebar from '@/components/SocialSidebar';
 import Feed from '@/components/Feed';
 import RightSidebar from '@/components/RightSidebar';
 import { Button } from '@/components/ui/button';
-import { Facebook, Category, CalendarDays, Tv, TestTube, Briefcase, Book, Video } from 'lucide-react';
+import { Facebook, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 // Main categories to show on the home page
@@ -14,7 +13,7 @@ const mainCategories = [
   {
     key: 'categories',
     label: 'Categories',
-    icon: <Category className="h-8 w-8 text-purple-600" />,
+    icon: <Grid className="h-8 w-8 text-purple-600" />,
     description: 'Explore all talent categories and specializations.',
     link: '/categories',
     color: 'bg-purple-50',
@@ -142,4 +141,3 @@ const Index: React.FC = () => {
 };
 
 export default Index;
-
