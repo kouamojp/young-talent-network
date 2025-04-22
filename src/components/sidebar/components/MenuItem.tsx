@@ -18,10 +18,14 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon: Icon, label, description, pat
         className="flex flex-col gap-1 p-3 rounded-lg hover:bg-[#F0F2F5] transition-colors"
       >
         <div className="flex items-center gap-3">
-          <Icon className="h-5 w-5 text-[#65676B]" />
+          <div className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full bg-[#E4E6EB]">
+            <Icon className="h-5 w-5 text-[#65676B]" />
+          </div>
           <span className="font-medium text-[#050505]">{label}</span>
         </div>
-        <span className="text-xs text-[#65676B] pl-8">{description}</span>
+        {description && (
+          <span className="text-xs text-[#65676B] pl-12">{description}</span>
+        )}
       </Link>
     </li>
   );
