@@ -45,16 +45,39 @@ const AboutSection: React.FC = () => {
           </div>
           
           <AnimatedText 
-            text="What is Young & Talented?" 
+            text="The best way to find talented people all over the world" 
             tag="h2" 
             highlight={true}
             className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
           />
           
+          <p className="text-lg text-black/70 mb-6">
+            Thousands of young talented sportsmen, musicians, vocalists, inventors, dancers search 
+            for their place in the world. The resources they find for their development are no longer enough.
+          </p>
+          
           <p className="text-lg text-black/70">
-            Y&T (I AM A TALENT) is a platform where talented individuals can showcase themselves 
-            to the world. We believe in breaking down barriers that limit the development of talent, 
-            whether they're financial, geographical, or social.
+            There are no limits for self-improvement, but there are boundaries for the development of talents—they 
+            can depend on money, time, and human nature. Y&T breaks down these boundaries.
+          </p>
+        </div>
+        
+        <div className="max-w-4xl mx-auto bg-white/30 backdrop-blur-sm p-8 rounded-xl mb-16 shadow-sm">
+          <h3 className="text-2xl font-semibold mb-4 text-center">About the Project</h3>
+          <p className="mb-4">
+            YAT (I AM A TALENT) is a platform where you can find all information about young talented people. 
+            There are so many talents in many countries, parts of the world and all over the world. Some talented 
+            people have no chance to show themselves on an international level, not even in their country, city, 
+            town, or neighborhood.
+          </p>
+          <p className="mb-4">
+            YAT is a development, a baby of a sportsman, a showman, a coach, a programmer, and an agent, 
+            an entrepreneur, an undertaker, who has passed that way with no global services and is ready 
+            to give it to you, friends.
+          </p>
+          <p>
+            YAT is a service for those talented persons who have just started their careers and those 
+            who search for young new talents.
           </p>
         </div>
         
@@ -71,8 +94,8 @@ const AboutSection: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-4">Complete Information</h3>
             <p className="text-black/70">
-              Y&T provides comprehensive profiles that include CVs, application forms, photos, 
-              videos, and statistics - everything needed to showcase your talents effectively.
+              YAT is all information about a person who wants to achieve something in their field—a CV, 
+              an application form, photos, videos, and statistics.
             </p>
           </GlassMorphism>
           
@@ -88,8 +111,8 @@ const AboutSection: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-4">Global Reach</h3>
             <p className="text-black/70">
-              Whether you're from a bustling city or a small town, Y&T gives you the opportunity 
-              to be discovered on the international stage regardless of your location.
+              YAT is a platform where talented people from any corner of the world can showcase 
+              themselves, regardless of geographical or financial limitations.
             </p>
           </GlassMorphism>
           
@@ -105,8 +128,8 @@ const AboutSection: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold mb-4">Career Development</h3>
             <p className="text-black/70">
-              Y&T is a service for both emerging talents who have just started their careers and 
-              established professionals who are seeking fresh new talent to work with.
+              YAT bridges the gap between emerging talents who have just started their careers and 
+              established professionals who are seeking fresh new talent to collaborate with.
             </p>
           </GlassMorphism>
         </div>
