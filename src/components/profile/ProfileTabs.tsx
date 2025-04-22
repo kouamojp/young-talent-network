@@ -3,12 +3,26 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare, MapPin, Bell, FileText, Users } from 'lucide-react';
-import { ResumesTab } from './ResumesTab';
-import { GeolocationTab } from './GeolocationTab';
-import { NotificationsTab } from './NotificationsTab';
-import { MessagingTab } from './MessagingTab';
-import { FriendsTab } from './FriendsTab';
-import { Post } from './ProfileData';
+import ResumesTab from './ResumesTab';
+import GeolocationTab from './GeolocationTab';
+import NotificationsTab from './NotificationsTab';
+import MessagingTab from './MessagingTab';
+import FriendsTab from './FriendsTab';
+import { userPosts } from './ProfileData';
+
+// Define the Post interface here since it's not exported from ProfileData
+interface Post {
+  id: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  content: string;
+  timestamp: string;
+  likes: number;
+  comments: number;
+  shares: number;
+}
 
 interface ProfileTabsProps {
   userPosts: Post[];
