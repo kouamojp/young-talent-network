@@ -20,40 +20,35 @@ const Profile: React.FC = () => {
   };
 
   const saveStatus = () => {
+    // Here you would save the status to your backend
     setIsEditingStatus(false);
   };
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-[#1a1f2c] text-white">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
         <Navbar />
         
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="flex gap-6">
-            <aside className="w-64 hidden lg:block">
-              <SocialSidebar />
-            </aside>
-            
-            <main className="flex-1">
-              <GlassMorphism className="rounded-xl bg-[#242938]/50">
-                <ProfileHeader 
-                  user={user}
-                  statusText={statusText}
-                  isEditingStatus={isEditingStatus}
-                  isEditMode={isEditMode}
-                  handleStatusChange={handleStatusChange}
-                  saveStatus={saveStatus}
-                  setIsEditingStatus={setIsEditingStatus}
-                  setIsEditMode={setIsEditMode}
-                />
-                
-                <ProfileInfo user={user} />
-                
-                <div className="mt-6">
-                  <ProfileTabs userPosts={userPosts} />
-                </div>
-              </GlassMorphism>
-            </main>
+        <div className="container mx-auto max-w-5xl pb-10">
+          {/* Cover Photo & Profile Info */}
+          <ProfileHeader 
+            user={user}
+            statusText={statusText}
+            isEditingStatus={isEditingStatus}
+            isEditMode={isEditMode}
+            handleStatusChange={handleStatusChange}
+            saveStatus={saveStatus}
+            setIsEditingStatus={setIsEditingStatus}
+            setIsEditMode={setIsEditMode}
+          />
+          
+          <GlassMorphism className="mx-4 p-6">
+            <ProfileInfo user={user} />
+          </GlassMorphism>
+          
+          {/* Tabs */}
+          <div className="px-4">
+            <ProfileTabs userPosts={userPosts} />
           </div>
         </div>
         

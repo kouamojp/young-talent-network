@@ -10,6 +10,7 @@ import MessagingTab from './MessagingTab';
 import FriendsTab from './FriendsTab';
 import { userPosts } from './ProfileData';
 
+// Define the Post interface here since it's not exported from ProfileData
 interface Post {
   id: string;
   author: {
@@ -31,90 +32,69 @@ export function ProfileTabs({ userPosts }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState("resumes");
 
   return (
-    <Tabs 
-      defaultValue="resumes" 
-      className="w-full" 
-      onValueChange={setActiveTab}
-    >
-      <TabsList className="w-full grid grid-cols-5 h-auto p-1 bg-[#2a303c]/50">
-        <TabsTrigger 
-          value="resumes" 
-          className="flex items-center gap-2 py-4 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#2a303c]"
-        >
+    <Tabs defaultValue="resumes" className="my-6" onValueChange={setActiveTab}>
+      <TabsList className="grid grid-cols-5 h-auto p-1 mb-8">
+        <TabsTrigger value="resumes" className="flex items-center gap-2 py-3">
           <FileText className="h-4 w-4" />
           <span className="hidden sm:inline">Resumes</span>
         </TabsTrigger>
-        <TabsTrigger 
-          value="location" 
-          className="flex items-center gap-2 py-4 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#2a303c]"
-        >
+        <TabsTrigger value="location" className="flex items-center gap-2 py-3">
           <MapPin className="h-4 w-4" />
           <span className="hidden sm:inline">Location</span>
         </TabsTrigger>
-        <TabsTrigger 
-          value="notifications" 
-          className="flex items-center gap-2 py-4 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#2a303c]"
-        >
+        <TabsTrigger value="notifications" className="flex items-center gap-2 py-3">
           <Bell className="h-4 w-4" />
           <span className="hidden sm:inline">Notifications</span>
         </TabsTrigger>
-        <TabsTrigger 
-          value="messages" 
-          className="flex items-center gap-2 py-4 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#2a303c]"
-        >
+        <TabsTrigger value="messages" className="flex items-center gap-2 py-3">
           <MessageSquare className="h-4 w-4" />
           <span className="hidden sm:inline">Messages</span>
         </TabsTrigger>
-        <TabsTrigger 
-          value="friends" 
-          className="flex items-center gap-2 py-4 text-gray-400 data-[state=active]:text-white data-[state=active]:bg-[#2a303c]"
-        >
+        <TabsTrigger value="friends" className="flex items-center gap-2 py-3">
           <Users className="h-4 w-4" />
           <span className="hidden sm:inline">Friends</span>
         </TabsTrigger>
       </TabsList>
 
-      <div className="mt-6 px-4">
-        <TabsContent value="resumes">
-          <Card className="bg-[#242938] border-none">
-            <CardContent className="p-4">
-              <ResumesTab />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <TabsContent value="resumes">
+        <Card>
+          <CardContent className="p-4 sm:p-6">
+            <ResumesTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        <TabsContent value="location">
-          <Card className="bg-[#242938] border-none">
-            <CardContent className="p-4">
-              <GeolocationTab />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <TabsContent value="location">
+        <Card>
+          <CardContent className="p-4 sm:p-6">
+            <GeolocationTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        <TabsContent value="notifications">
-          <Card className="bg-[#242938] border-none">
-            <CardContent className="p-4">
-              <NotificationsTab />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <TabsContent value="notifications">
+        <Card>
+          <CardContent className="p-4 sm:p-6">
+            <NotificationsTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        <TabsContent value="messages">
-          <Card className="bg-[#242938] border-none">
-            <CardContent className="p-4">
-              <MessagingTab />
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <TabsContent value="messages">
+        <Card>
+          <CardContent className="p-4 sm:p-6">
+            <MessagingTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-        <TabsContent value="friends">
-          <Card className="bg-[#242938] border-none">
-            <CardContent className="p-4">
-              <FriendsTab />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </div>
+      <TabsContent value="friends">
+        <Card>
+          <CardContent className="p-4 sm:p-6">
+            <FriendsTab />
+          </CardContent>
+        </Card>
+      </TabsContent>
     </Tabs>
   );
 }
