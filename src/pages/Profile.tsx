@@ -7,7 +7,7 @@ import GlassMorphism from '@/components/GlassMorphism';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileInfo from '@/components/profile/ProfileInfo';
-import ProfileTabs from '@/components/profile/ProfileTabs';
+import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import { user, userPosts } from '@/components/profile/ProfileData';
 
 const Profile: React.FC = () => {
