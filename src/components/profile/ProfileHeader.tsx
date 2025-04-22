@@ -2,9 +2,7 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import GlassMorphism from '@/components/GlassMorphism';
-import { UserPlus, Mail, Edit, Sparkles } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Edit, MessageSquare, UserPlus } from 'lucide-react';
 
 interface ProfileHeaderProps {
   user: {
@@ -35,93 +33,48 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   setIsEditMode
 }) => {
   return (
-    <div className="relative mb-6">
-      <div className="h-64 w-full overflow-hidden rounded-b-xl">
-        <img 
-          src={user.coverPhoto} 
-          alt="Cover" 
-          className="w-full h-full object-cover"
-        />
-      </div>
-      
-      <GlassMorphism className="relative mx-4 -mt-20 p-6">
-        <div className="flex flex-col md:flex-row items-center md:items-end gap-4">
-          <Avatar className="w-32 h-32 border-4 border-white">
-            <AvatarImage src={user.avatar} alt={user.name} />
+    <div className="mb-4 bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="relative">
+        <div className="h-96 overflow-hidden">
+          <img 
+            src={user.coverPhoto} 
+            alt="Cover" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        <div className="absolute bottom-4 left-4 flex items-end gap-4">
+          <Avatar className="w-40 h-40 border-4 border-white rounded-full">
+            <AvatarImage src={user.avatar} alt={user.name} className="object-cover" />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl font-bold">
-              Meet {user.name.split(' ')[0]} "{user.nickname}" {user.name.split(' ')[1]} – the future of music!
-            </h1>
-            
-            {isEditingStatus ? (
-              <div className="flex mt-2 items-center">
-                <input 
-                  type="text" 
-                  value={statusText} 
-                  onChange={handleStatusChange} 
-                  placeholder="Share your dream in 5 words..." 
-                  className="border rounded px-2 py-1 text-sm flex-1"
-                  maxLength={50}
-                />
-                <Button size="sm" onClick={saveStatus} className="ml-2">Save</Button>
-              </div>
-            ) : (
-              <p 
-                className="text-gray-600 cursor-pointer hover:text-gray-800" 
-                onClick={() => setIsEditingStatus(true)}
-              >
-                "{statusText}" <span className="text-xs">(click to edit)</span>
-              </p>
-            )}
-            
-            <p className="mt-2 max-w-md">{user.bio}</p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button className="gap-2">
-                  <UserPlus size={16} />
-                  Follow
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Join {user.name.split(' ')[0]}'s fan club!</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Mail size={16} />
-                  Message
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Start your legendary collaboration journey!</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            {!isEditMode && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" className="gap-2" onClick={() => setIsEditMode(true)}>
-                    <Edit size={16} />
-                    <Sparkles className="h-3 w-3" />
-                    Enhance Profile
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Make your profile shine brighter!</p>
-                </TooltipContent>
-              </Tooltip>
-            )}
+          <div className="mb-4 text-white">
+            <h1 className="text-3xl font-bold drop-shadow-lg">{user.name}</h1>
+            <p className="text-lg drop-shadow-md">@{user.nickname}</p>
           </div>
         </div>
-      </GlassMorphism>
+      </div>
+      
+      <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+        <div className="flex gap-2">
+          <Button className="bg-[#1877F2] hover:bg-[#166FE5]">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Follow
+          </Button>
+          <Button variant="outline" className="text-[#1877F2]">
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Message
+          </Button>
+        </div>
+        
+        {!isEditMode && (
+          <Button variant="outline" onClick={() => setIsEditMode(true)}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Profile
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

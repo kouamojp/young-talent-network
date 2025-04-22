@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SocialSidebar from '@/components/SocialSidebar';
-import GlassMorphism from '@/components/GlassMorphism';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileInfo from '@/components/profile/ProfileInfo';
@@ -20,39 +19,40 @@ const Profile: React.FC = () => {
   };
 
   const saveStatus = () => {
-    // Here you would save the status to your backend
     setIsEditingStatus(false);
   };
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
+      <div className="min-h-screen bg-[#F0F2F5]">
         <Navbar />
-        
-        <div className="container mx-auto max-w-5xl pb-10">
-          {/* Cover Photo & Profile Info */}
-          <ProfileHeader 
-            user={user}
-            statusText={statusText}
-            isEditingStatus={isEditingStatus}
-            isEditMode={isEditMode}
-            handleStatusChange={handleStatusChange}
-            saveStatus={saveStatus}
-            setIsEditingStatus={setIsEditingStatus}
-            setIsEditMode={setIsEditMode}
-          />
-          
-          <GlassMorphism className="mx-4 p-6">
-            <ProfileInfo user={user} />
-          </GlassMorphism>
-          
-          {/* Tabs */}
-          <div className="px-4">
-            <ProfileTabs userPosts={userPosts} />
-          </div>
+        <div className="flex">
+          <SocialSidebar />
+          <main className="flex-1 pt-16">
+            <div className="max-w-[940px] mx-auto">
+              {/* Cover Photo & Profile Info */}
+              <ProfileHeader 
+                user={user}
+                statusText={statusText}
+                isEditingStatus={isEditingStatus}
+                isEditMode={isEditMode}
+                handleStatusChange={handleStatusChange}
+                saveStatus={saveStatus}
+                setIsEditingStatus={setIsEditingStatus}
+                setIsEditMode={setIsEditMode}
+              />
+              
+              <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+                <ProfileInfo user={user} />
+              </div>
+              
+              {/* Tabs */}
+              <div className="bg-white rounded-lg shadow-sm">
+                <ProfileTabs userPosts={userPosts} />
+              </div>
+            </div>
+          </main>
         </div>
-        
-        <Footer />
       </div>
     </TooltipProvider>
   );

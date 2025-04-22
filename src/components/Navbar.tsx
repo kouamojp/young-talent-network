@@ -1,123 +1,49 @@
-
-import React, { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
-import GlassMorphism from './GlassMorphism';
-import { Menu, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Search, MessageSquare, Bell, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      setIsScrolled(offset > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        isScrolled 
-          ? 'py-4' 
-          : 'py-6'
-      )}
-    >
-      <GlassMorphism 
-        className={cn(
-          'mx-auto container max-w-7xl px-4 sm:px-6 transition-all duration-500',
-          isScrolled 
-            ? 'rounded-full' 
-            : 'rounded-3xl'
-        )} 
-        intensity={isScrolled ? 'medium' : 'light'}
-      >
-        <div className="flex items-center justify-between h-12">
-          <div className="flex items-center">
-            <a href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold tracking-tight">Y&T</span>
-            </a>
+    <header className="fixed top-0 left-0 right-0 h-14 bg-white shadow-sm z-50">
+      <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-full">
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" 
+              alt="Logo" 
+              className="h-9 w-9"
+            />
+          </Link>
+          <div className="relative hidden md:flex items-center">
+            <Search className="absolute left-3 h-4 w-4 text-gray-400" />
+            <input 
+              type="text"
+              placeholder="Search Y&T"
+              className="h-10 w-60 bg-[#F0F2F5] pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-[#1877F2]"
+            />
           </div>
+        </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#about" className="text-sm font-medium hover:opacity-70 transition-opacity">
-              About
-            </a>
-            <a href="#talents" className="text-sm font-medium hover:opacity-70 transition-opacity">
-              Talents
-            </a>
-            <a href="#categories" className="text-sm font-medium hover:opacity-70 transition-opacity">
-              Categories
-            </a>
-            <a 
-              href="#contact" 
-              className="text-sm font-medium bg-black text-white px-4 py-2 rounded-full hover:bg-black/80 transition-colors"
-            >
-              Join Now
-            </a>
-          </nav>
-
-          {/* Mobile Navigation Toggle */}
-          <button 
-            className="md:hidden flex items-center" 
-            onClick={toggleMenu}
-            aria-label="Toggle Menu"
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+        <div className="flex items-center gap-2">
+          <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
+            <MessageSquare className="h-5 w-5 text-[#65676B]" />
+          </button>
+          <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
+            <Bell className="h-5 w-5 text-[#65676B]" />
+          </button>
+          <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
+            <User className="h-5 w-5 text-[#65676B]" />
           </button>
         </div>
-      </GlassMorphism>
-
+      </div>
+      
       {/* Mobile Menu */}
-      <div 
-        className={cn(
-          'fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-apple pt-24',
-          isMenuOpen ? 'translate-y-0' : 'translate-y-full'
-        )}
-      >
-        <nav className="container flex flex-col items-center space-y-8 px-4 pt-10">
-          <a 
-            href="#about" 
-            className="text-xl font-medium" 
-            onClick={() => setIsMenuOpen(false)}
-          >
-            About
-          </a>
-          <a 
-            href="#talents" 
-            className="text-xl font-medium" 
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Talents
-          </a>
-          <a 
-            href="#categories" 
-            className="text-xl font-medium" 
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Categories
-          </a>
-          <a 
-            href="#contact" 
-            className="text-xl font-medium bg-black text-white px-6 py-3 rounded-full"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Join Now
-          </a>
-        </nav>
+      <div className={`md:hidden fixed inset-0 bg-white z-40 transform transition-transform duration-300 ${
+        isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        {/* Mobile menu content */}
       </div>
     </header>
   );
