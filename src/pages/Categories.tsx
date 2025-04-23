@@ -1,8 +1,6 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Grid, Music, Film, Palette, Users, Code, Briefcase, Trophy, Theater, Mic, Dumbbell } from 'lucide-react';
 
@@ -24,7 +22,6 @@ const Categories: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6 mb-6">
             <div className="flex items-center gap-3 mb-6">

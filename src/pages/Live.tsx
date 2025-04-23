@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import LiveDiscovery from '@/components/live/LiveDiscovery';
 import LivePopular from '@/components/live/LivePopular';
@@ -19,7 +17,6 @@ const Live: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
         <main className="flex-1 p-4 mb-16">
           <GlassMorphism className="p-6">
             <div className="flex items-center gap-2 mb-6">

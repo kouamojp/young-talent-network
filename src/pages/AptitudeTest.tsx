@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
 import { BrainCircuit, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -42,7 +40,6 @@ const AptitudeTest: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6 max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-6">

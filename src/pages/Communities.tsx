@@ -1,8 +1,6 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Users, Globe, Settings, Plus, MessageSquare, UserPlus, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -75,7 +73,6 @@ const Communities: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6 mb-6">
             <div className="flex items-center justify-between mb-6">

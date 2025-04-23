@@ -1,180 +1,28 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
-import Feed from '@/components/Feed';
-import RightSidebar from '@/components/RightSidebar';
-import { Button } from '@/components/ui/button';
-import { Newspaper, Grid, CalendarDays, Tv, TestTube, Briefcase, Book, Video, Building, Users, LayoutGrid } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-// Expanded main categories to show on the home page
-const mainCategories = [
-  {
-    key: 'news',
-    label: 'News',
-    icon: <Newspaper className="h-8 w-8 text-emerald-600" />,
-    description: 'Read the latest updates, stories, and announcements.',
-    link: '/news',
-    color: 'bg-emerald-50',
-  },
-  {
-    key: 'categories',
-    label: 'Categories',
-    icon: <Grid className="h-8 w-8 text-purple-600" />,
-    description: 'Explore all talent categories and specializations.',
-    link: '/categories',
-    color: 'bg-purple-50',
-  },
-  {
-    key: 'events',
-    label: 'Events',
-    icon: <CalendarDays className="h-8 w-8 text-blue-600" />,
-    description: 'Find and join upcoming events and competitions.',
-    link: '/events',
-    color: 'bg-blue-50',
-  },
-  {
-    key: 'tv',
-    label: 'TV',
-    icon: <Tv className="h-8 w-8 text-pink-600" />,
-    description: 'Watch inspiring stories and shows on Y&T TV.',
-    link: '/tv',
-    color: 'bg-pink-50',
-  },
-  {
-    key: 'test',
-    label: 'Test',
-    icon: <TestTube className="h-8 w-8 text-green-600" />,
-    description: 'Take the Aptitude Test and discover your strengths.',
-    link: '/test',
-    color: 'bg-green-50',
-  },
-  {
-    key: 'work',
-    label: 'Work',
-    icon: <Briefcase className="h-8 w-8 text-orange-600" />,
-    description: 'Find opportunities, jobs, and team up with organizations.',
-    link: '/work',
-    color: 'bg-orange-50',
-  },
-  {
-    key: 'learning',
-    label: 'Learning',
-    icon: <Book className="h-8 w-8 text-yellow-600" />,
-    description: 'Grow your skills through courses, trainings, and lessons.',
-    link: '/learning',
-    color: 'bg-yellow-50',
-  },
-  {
-    key: 'live',
-    label: 'Live',
-    icon: <Video className="h-8 w-8 text-indigo-600" />,
-    description: 'Join real-time events, streams, and more.',
-    link: '/live',
-    color: 'bg-indigo-50',
-  },
-  {
-    key: 'organizations',
-    label: 'Organizations',
-    icon: <Building className="h-8 w-8 text-fuchsia-600" />,
-    description: 'Connect with organizations and agencies worldwide.',
-    link: '/organizations',
-    color: 'bg-fuchsia-50',
-  },
-  {
-    key: 'communities',
-    label: 'Communities',
-    icon: <Users className="h-8 w-8 text-cyan-600" />,
-    description: 'Join communities and connect with like-minded talents.',
-    link: '/communities',
-    color: 'bg-cyan-50',
-  },
-];
+import Hero from '@/components/index/Hero';
+import CategoriesSection from '@/components/index/CategoriesSection';
+import TalentsSection from '@/components/index/TalentsSection';
+import OpportunitiesSection from '@/components/index/OpportunitiesSection';
+import EventsSection from '@/components/index/EventsSection';
+import NewsSection from '@/components/index/NewsSection';
 
 const Index: React.FC = () => {
-  useEffect(() => {
-    // Intersection Observer for animations
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    document.querySelectorAll('.animate-section').forEach((element) => {
-      observer.observe(element);
-    });
-
-    return () => {
-      document.querySelectorAll('.animate-section').forEach((element) => {
-        observer.unobserve(element);
-      });
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-blue-50 to-purple-50">
+    <div>
       <Navbar />
-      <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
-        <main className="flex-1 min-h-screen">
-          {/* FACEBOOK CONNECT SECTION */}
-          <div className="bg-white/80 backdrop-blur-md p-6 rounded-lg shadow-md mb-6 animate-section mt-24">
-            <h2 className="text-2xl font-bold mb-4">Connect with Facebook</h2>
-            <p className="mb-4">
-              Link your Facebook account to find friends, share achievements, and expand your network.
-            </p>
-            <Link to="/auth">
-              <Button className="bg-blue-600 hover:bg-blue-700">
-                {/* Removed Facebook icon */}
-                Connect with Facebook
-              </Button>
-            </Link>
-          </div>
-          {/* MAIN CATEGORIES SECTION */}
-          <section className="pb-8 animate-section">
-            <div className="mb-8 text-center">
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-2 text-gray-900">
-                Welcome to Young &amp; Talented
-              </h1>
-              <p className="text-lg text-gray-600">
-                Explore everything Y&amp;T has to offer! Choose your path below.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-6 px-2">
-              {mainCategories.map((cat) => (
-                <Link
-                  to={cat.link}
-                  key={cat.key}
-                  className={`flex flex-col items-center rounded-xl shadow-sm hover:shadow-md transition-all p-6 ${cat.color} group hover-scale`}
-                >
-                  <div className="mb-2">{cat.icon}</div>
-                  <h3 className="text-lg font-semibold group-hover:underline">{cat.label}</h3>
-                  <p className="text-sm text-gray-500 mb-4 text-center">{cat.description}</p>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-auto group-hover:bg-primary group-hover:text-white transition-colors"
-                  >
-                    Go to {cat.label}
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </section>
-          <Feed />
-        </main>
-        <RightSidebar />
-      </div>
+      <main>
+        <Hero />
+        <CategoriesSection />
+        <TalentsSection />
+        <OpportunitiesSection />
+        <EventsSection />
+        <NewsSection />
+      </main>
       <Footer />
     </div>
   );
 };
 
 export default Index;
-

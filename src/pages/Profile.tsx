@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileInfo from '@/components/profile/ProfileInfo';
@@ -27,7 +25,6 @@ const Profile: React.FC = () => {
       <div className="min-h-screen bg-[#F0F2F5]">
         <Navbar />
         <div className="flex">
-          <SocialSidebar />
           <main className="flex-1 pt-16">
             <div className="max-w-[940px] mx-auto">
               {/* Cover Photo & Profile Info */}

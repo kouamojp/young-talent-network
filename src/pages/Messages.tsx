@@ -1,6 +1,4 @@
-
 import React, { useState } from 'react';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -215,7 +213,6 @@ const Messages: React.FC = () => {
             </GlassMorphism>
           </div>
         </main>
-        <Footer />
       </div>
     </TooltipProvider>
   );

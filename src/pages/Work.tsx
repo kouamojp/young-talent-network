@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import WorkHubEntry from '@/components/work/WorkHubEntry';
 import TalentView from '@/components/work/TalentView';
@@ -43,7 +41,6 @@ const Work: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
         <Navbar />
         <div className="container mx-auto flex flex-col md:flex-row">
-          <SocialSidebar />
           <main className="flex-1 p-4">
             <WorkHubEntry />
           </main>
@@ -57,7 +54,6 @@ const Work: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6 mb-6">
             <SearchHeader
