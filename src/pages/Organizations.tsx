@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Building, MapPin, Star, Globe, Users, Award } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -72,52 +71,49 @@ const Organizations: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
-        <main className="flex-1 p-4">
-          <GlassMorphism className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Building className="h-6 w-6" />
-                <h1 className="text-2xl font-bold">Organizations & Agencies</h1>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  onClick={() => setViewMode('list')}
-                >
-                  List View
-                </Button>
-                <Button
-                  variant={viewMode === 'map' ? 'default' : 'outline'}
-                  onClick={() => setViewMode('map')}
-                >
-                  Map View
-                </Button>
-              </div>
+      <main className="container mx-auto px-4 py-12">
+        <GlassMorphism className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Building className="h-6 w-6" />
+              <h1 className="text-2xl font-bold">Organizations & Agencies</h1>
             </div>
-
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1">
-                <Input placeholder="Search organizations, agencies, institutions..." />
-              </div>
-              <Button>
-                Search
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                onClick={() => setViewMode('list')}
+              >
+                List View
+              </Button>
+              <Button
+                variant={viewMode === 'map' ? 'default' : 'outline'}
+                onClick={() => setViewMode('map')}
+              >
+                Map View
               </Button>
             </div>
+          </div>
 
-            {viewMode === 'map' ? (
-              <OrganizationMapView
-                organizations={organizations}
-                selectedOrg={selectedOrg}
-                setSelectedOrg={setSelectedOrg}
-              />
-            ) : (
-              <OrganizationListView organizations={organizations} />
-            )}
-          </GlassMorphism>
-        </main>
-      </div>
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <Input placeholder="Search organizations, agencies, institutions..." />
+            </div>
+            <Button>
+              Search
+            </Button>
+          </div>
+
+          {viewMode === 'map' ? (
+            <OrganizationMapView
+              organizations={organizations}
+              selectedOrg={selectedOrg}
+              setSelectedOrg={setSelectedOrg}
+            />
+          ) : (
+            <OrganizationListView organizations={organizations} />
+          )}
+        </GlassMorphism>
+      </main>
       <Footer />
     </div>
   );

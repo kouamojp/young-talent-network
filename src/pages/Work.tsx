@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import WorkHubEntry from '@/components/work/WorkHubEntry';
 import TalentView from '@/components/work/TalentView';
@@ -42,12 +40,9 @@ const Work: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
         <Navbar />
-        <div className="container mx-auto flex flex-col md:flex-row">
-          <SocialSidebar />
-          <main className="flex-1 p-4">
-            <WorkHubEntry />
-          </main>
-        </div>
+        <main className="container mx-auto px-4 py-12">
+          <WorkHubEntry />
+        </main>
         <Footer />
       </div>
     );
@@ -56,40 +51,37 @@ const Work: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
-        <main className="flex-1 p-4">
-          <GlassMorphism className="p-6 mb-6">
-            <SearchHeader
-              path={path}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              onBack={handleBack}
-            />
-            
-            {path === 'talent' ? (
-              <TalentView
-                selectedTab={selectedTab}
-                onTabChange={setSelectedTab}
-                handleApplyClick={handleApplyClick}
-                handleCardClick={handleCardClick}
-              />
-            ) : (
-              <OrganizationView
-                selectedTab={selectedTab}
-                onTabChange={setSelectedTab}
-                handleApplyClick={handleApplyClick}
-                handleCardClick={handleCardClick}
-              />
-            )}
-          </GlassMorphism>
+      <main className="container mx-auto px-4 py-12">
+        <GlassMorphism className="p-6 mb-6">
+          <SearchHeader
+            path={path}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onBack={handleBack}
+          />
           
-          <GlassMorphism className="p-6">
-            <h2 className="text-xl font-bold mb-4">Success Stories</h2>
-            <SuccessStories />
-          </GlassMorphism>
-        </main>
-      </div>
+          {path === 'talent' ? (
+            <TalentView
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              handleApplyClick={handleApplyClick}
+              handleCardClick={handleCardClick}
+            />
+          ) : (
+            <OrganizationView
+              selectedTab={selectedTab}
+              onTabChange={setSelectedTab}
+              handleApplyClick={handleApplyClick}
+              handleCardClick={handleCardClick}
+            />
+          )}
+        </GlassMorphism>
+        
+        <GlassMorphism className="p-6">
+          <h2 className="text-xl font-bold mb-4">Success Stories</h2>
+          <SuccessStories />
+        </GlassMorphism>
+      </main>
       <Footer />
     </div>
   );

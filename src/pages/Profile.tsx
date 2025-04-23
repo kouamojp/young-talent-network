@@ -1,8 +1,6 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileInfo from '@/components/profile/ProfileInfo';
@@ -26,33 +24,28 @@ const Profile: React.FC = () => {
     <TooltipProvider>
       <div className="min-h-screen bg-[#F0F2F5]">
         <Navbar />
-        <div className="flex">
-          <SocialSidebar />
-          <main className="flex-1 pt-16">
-            <div className="max-w-[940px] mx-auto">
-              {/* Cover Photo & Profile Info */}
-              <ProfileHeader 
-                user={user}
-                statusText={statusText}
-                isEditingStatus={isEditingStatus}
-                isEditMode={isEditMode}
-                handleStatusChange={handleStatusChange}
-                saveStatus={saveStatus}
-                setIsEditingStatus={setIsEditingStatus}
-                setIsEditMode={setIsEditMode}
-              />
-              
-              <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-                <ProfileInfo user={user} />
-              </div>
-              
-              {/* Tabs */}
-              <div className="bg-white rounded-lg shadow-sm">
-                <ProfileTabs userPosts={userPosts} />
-              </div>
+        <main className="pt-16">
+          <div className="max-w-[940px] mx-auto">
+            <ProfileHeader 
+              user={user}
+              statusText={statusText}
+              isEditingStatus={isEditingStatus}
+              isEditMode={isEditMode}
+              handleStatusChange={handleStatusChange}
+              saveStatus={saveStatus}
+              setIsEditingStatus={setIsEditingStatus}
+              setIsEditMode={setIsEditMode}
+            />
+            
+            <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
+              <ProfileInfo user={user} />
             </div>
-          </main>
-        </div>
+            
+            <div className="bg-white rounded-lg shadow-sm">
+              <ProfileTabs userPosts={userPosts} />
+            </div>
+          </div>
+        </main>
       </div>
     </TooltipProvider>
   );
