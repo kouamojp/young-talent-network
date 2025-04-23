@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import LearningHubEntry from '@/components/learning/LearningHubEntry';
 import LearningExplore from '@/components/learning/LearningExplore';
@@ -20,6 +22,7 @@ const Learning: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
         <Navbar />
         <div className="container mx-auto flex flex-col md:flex-row">
+          <SocialSidebar />
           <main className="flex-1 p-4">
             <LearningHubEntry />
           </main>
@@ -33,6 +36,7 @@ const Learning: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
+        <SocialSidebar />
         <main className="flex-1 p-4">
           <GlassMorphism className="p-6">
             {path === 'explore' ? (

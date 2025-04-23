@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,7 +22,7 @@ import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-// Removed SocialSidebar import
+import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
 import Navbar from "./components/Navbar";
 import React from "react";
@@ -43,7 +42,12 @@ const App = () => {
         <SidebarProvider>
           <div className="flex min-h-screen w-full">
             <div>
-              {/* Removed SidebarTrigger and SocialSidebar */}
+              <div className="md:hidden fixed top-3 left-3 z-50">
+                <SidebarTrigger />
+              </div>
+              <div className="hidden md:block animate-fade-in animate-scale-in">
+                <SocialSidebar />
+              </div>
             </div>
 
             <div className="flex-1 flex flex-col min-h-screen">
