@@ -1,24 +1,17 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import Hero from '@/components/index/Hero';
-import CategoriesSection from '@/components/index/CategoriesSection';
-import TalentsSection from '@/components/index/TalentsSection';
-import OpportunitiesSection from '@/components/index/OpportunitiesSection';
-import EventsSection from '@/components/index/EventsSection';
-import NewsSection from '@/components/index/NewsSection';
+import HeroSection from '@/components/HeroSection';
+import CategorySection from '@/components/CategorySection';
 
 const Index: React.FC = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
       <main>
-        <Hero />
-        <CategoriesSection />
-        <TalentsSection />
-        <OpportunitiesSection />
-        <EventsSection />
-        <NewsSection />
+        <HeroSection />
+        <CategorySection />
       </main>
       <Footer />
     </div>
