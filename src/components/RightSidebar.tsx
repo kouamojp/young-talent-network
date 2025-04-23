@@ -20,7 +20,7 @@ const suggestions = [
 
 const RightSidebar: React.FC = () => {
   return (
-    <div className="w-64 py-8 px-4 hidden lg:block">
+    <div className="w-full max-w-xs mx-auto space-y-6 animate-fade-in animate-scale-in">
       <GlassMorphism className="p-4 mb-6">
         <h3 className="font-medium mb-3">Contacts</h3>
         <ul className="space-y-3">
