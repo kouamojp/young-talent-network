@@ -14,43 +14,43 @@ export interface Opportunity {
 export const opportunities = [
   {
     id: 1,
-    title: "Junior Dancer for Music Video",
+    title: "Danseur Junior pour Clip Vidéo",
     company: "Elite Productions",
     location: "Los Angeles, CA",
-    type: "Contract",
-    postedDate: "2 days ago",
-    description: "Seeking talented dancers aged 16-25 for an upcoming music video shoot. Previous performance experience required.",
-    tags: ["Dance", "Performance", "Music Video"],
+    type: "Contrat",
+    postedDate: "Il y a 2 jours",
+    description: "À la recherche de danseurs talentueux âgés de 16 à 25 ans pour un prochain tournage de clip vidéo. Expérience préalable en performance requise.",
+    tags: ["Danse", "Performance", "Clip Vidéo"],
     isFeatured: true
   },
   {
     id: 2,
-    title: "Voice Actor for Animation Series",
+    title: "Doubleur Vocal pour Série d'Animation",
     company: "Creative Media Studios",
-    location: "Remote",
+    location: "À distance",
     type: "Freelance",
-    postedDate: "1 week ago",
-    description: "Looking for voice actors with diverse vocal ranges for an animated youth series. Recording equipment required.",
-    tags: ["Voice Acting", "Animation", "Remote"]
+    postedDate: "Il y a 1 semaine",
+    description: "Recherche de doubleurs vocaux avec diverses gammes vocales pour une série animée jeunesse. Équipement d'enregistrement requis.",
+    tags: ["Doublage", "Animation", "À distance"]
   },
   {
     id: 3,
-    title: "Junior Graphic Designer",
+    title: "Designer Graphique Junior",
     company: "ArtSpace Agency",
     location: "New York, NY",
-    type: "Internship",
-    postedDate: "3 days ago",
-    description: "Design internship opportunity for creative individuals with portfolio showcasing digital art skills.",
-    tags: ["Design", "Digital Art", "Internship"]
+    type: "Stage",
+    postedDate: "Il y a 3 jours",
+    description: "Opportunité de stage en design pour les personnes créatives avec un portfolio démontrant des compétences en art numérique.",
+    tags: ["Design", "Art Numérique", "Stage"]
   },
   {
     id: 4,
-    title: "Young Musician for Restaurant Gigs",
+    title: "Jeune Musicien pour Concerts en Restaurant",
     company: "The Grand Restaurant",
     location: "Chicago, IL",
-    type: "Part-time",
-    postedDate: "5 days ago",
-    description: "Weekend performances for talented musicians. Piano, violin, or acoustic guitar preferred.",
-    tags: ["Music", "Performance", "Part-time"]
+    type: "Temps partiel",
+    postedDate: "Il y a 5 jours",
+    description: "Performances de weekend pour musiciens talentueux. Piano, violon ou guitare acoustique préférés.",
+    tags: ["Musique", "Performance", "Temps partiel"]
   }
 ];

@@ -10,7 +10,7 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-xl font-bold mb-6">Y&T</h3>
             <p className="text-white/70 mb-6">
-              The best way to find talented people all over the world.
+              La meilleure façon de trouver des talents partout dans le monde.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-white/70 hover:text-white transition-colors" aria-label="Twitter">
@@ -34,27 +34,27 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6">Navigation</h3>
             <ul className="space-y-4">
-              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Home</a></li>
-              <li><a href="#about" className="text-white/70 hover:text-white transition-colors">About</a></li>
+              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Accueil</a></li>
+              <li><a href="#about" className="text-white/70 hover:text-white transition-colors">À propos</a></li>
               <li><a href="#talents" className="text-white/70 hover:text-white transition-colors">Talents</a></li>
-              <li><a href="#categories" className="text-white/70 hover:text-white transition-colors">Categories</a></li>
+              <li><a href="#categories" className="text-white/70 hover:text-white transition-colors">Catégories</a></li>
               <li><a href="#contact" className="text-white/70 hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-6">Categories</h3>
+            <h3 className="text-lg font-semibold mb-6">Catégories</h3>
             <ul className="space-y-4">
               <li><a href="#" className="text-white/70 hover:text-white transition-colors">Sports</a></li>
-              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Music</a></li>
-              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Dance</a></li>
-              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Acting</a></li>
+              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Musique</a></li>
+              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Danse</a></li>
+              <li><a href="#" className="text-white/70 hover:text-white transition-colors">Théâtre</a></li>
               <li><a href="#" className="text-white/70 hover:text-white transition-colors">Innovation</a></li>
             </ul>
           </div>
           
           <div>
-            <h3 className="text-lg font-semibold mb-6">Join Our Community</h3>
+            <h3 className="text-lg font-semibold mb-6">Rejoignez Notre Communauté</h3>
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
               <div>
                 <label htmlFor="email" className="block text-white/70 text-sm mb-2">Email</label>
@@ -62,14 +62,14 @@ const Footer: React.FC = () => {
                   type="email"
                   id="email"
                   className="w-full px-4 py-2 bg-white/10 rounded-md border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 text-white"
-                  placeholder="you@example.com"
+                  placeholder="vous@exemple.com"
                 />
               </div>
               <button
                 type="submit"
                 className="w-full px-4 py-2 bg-white text-black font-medium rounded-md hover:bg-white/90 transition-colors"
               >
-                Subscribe
+                S'abonner
               </button>
             </form>
           </div>
@@ -77,12 +77,12 @@ const Footer: React.FC = () => {
         
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/60 text-sm">
-            © {new Date().getFullYear()} Young & Talented. All rights reserved.
+            © {new Date().getFullYear()} Young & Talented. Tous droits réservés.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Privacy Policy</a>
-            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Terms of Service</a>
-            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Cookie Policy</a>
+            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Politique de Confidentialité</a>
+            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Conditions d'Utilisation</a>
+            <a href="#" className="text-white/60 hover:text-white text-sm transition-colors">Politique des Cookies</a>
           </div>
         </div>
       </div>

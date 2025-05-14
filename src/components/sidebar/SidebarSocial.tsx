@@ -5,7 +5,7 @@ import { socialLinks } from './sidebarData';
 const SidebarSocial: React.FC = () => {
   return (
     <div className="mt-6 pt-4 border-t border-white/20">
-      <h3 className="font-medium mb-2">Connect</h3>
+      <h3 className="font-medium mb-2">Connecter</h3>
       <ul className="space-y-1">
         {socialLinks.map((item) => (
           <li key={item.label}>

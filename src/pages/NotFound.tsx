@@ -8,7 +8,7 @@ const NotFound = () => {
 
   useEffect(() => {
     console.error(
-      "404 Error: User attempted to access non-existent route:",
+      "404 Erreur: L'utilisateur a tenté d'accéder à un itinéraire inexistant:",
       location.pathname
     );
   }, [location.pathname]);
@@ -27,14 +27,14 @@ const NotFound = () => {
           </div>
           <h1 className="text-5xl font-bold mb-4">404</h1>
           <p className="text-xl text-black/70 mb-8">
-            Even stars sometimes wander off course. Let's bring you back to your galaxy!
+            Même les étoiles s'égarent parfois. Revenons à votre galaxie!
           </p>
         </div>
         <Link 
           to="/" 
           className="inline-block px-6 py-3 bg-black text-white rounded-full hover:bg-black/80 transition-colors"
         >
-          Return to Your Universe
+          Retour à Votre Univers
         </Link>
       </GlassMorphism>
     </div>

@@ -14,35 +14,35 @@ export interface Talent {
 export const talents = [
   {
     id: 1,
-    name: "Emily Chen",
+    name: "Émilie Chen",
     avatar: "/placeholder.svg",
-    skills: ["Piano", "Composition", "Vocals"],
-    experience: "5 years",
+    skills: ["Piano", "Composition", "Chant"],
+    experience: "5 ans",
     location: "New York, NY",
-    availability: "Part-time",
-    portfolio: "View Portfolio",
-    description: "Classically trained pianist with a passion for contemporary composition and vocal arrangements."
+    availability: "Temps partiel",
+    portfolio: "Voir le Portfolio",
+    description: "Pianiste formée classiquement avec une passion pour la composition contemporaine et les arrangements vocaux."
   },
   {
     id: 2,
     name: "Jordan Smith",
     avatar: "/placeholder.svg",
-    skills: ["Guitar", "Songwriting", "Production"],
-    experience: "3 years",
+    skills: ["Guitare", "Écriture de chansons", "Production"],
+    experience: "3 ans",
     location: "Los Angeles, CA",
     availability: "Freelance",
-    portfolio: "View Portfolio",
-    description: "Self-taught guitarist and songwriter with a unique style blending folk and electronic elements."
+    portfolio: "Voir le Portfolio",
+    description: "Guitariste et auteur-compositeur autodidacte avec un style unique mélangeant des éléments folk et électroniques."
   },
   {
     id: 3,
     name: "Maya Johnson",
     avatar: "/placeholder.svg",
-    skills: ["Dance", "Choreography", "Teaching"],
-    experience: "7 years",
+    skills: ["Danse", "Chorégraphie", "Enseignement"],
+    experience: "7 ans",
     location: "Chicago, IL",
-    availability: "Full-time",
-    portfolio: "View Portfolio",
-    description: "Contemporary dancer with experience in ballet and hip-hop, passionate about teaching youth."
+    availability: "Temps plein",
+    portfolio: "Voir le Portfolio",
+    description: "Danseuse contemporaine avec une expérience en ballet et hip-hop, passionnée par l'enseignement aux jeunes."
   }
 ];

@@ -8,7 +8,7 @@ const SidebarSearch: React.FC = () => {
       <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
       <input 
         type="text" 
-        placeholder="Search Y&T"
+        placeholder="Rechercher Y&T"
         className="w-full pl-8 pr-3 py-2 bg-white/50 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
       />
     </div>

@@ -18,7 +18,7 @@ const SocialSidebar: React.FC = () => {
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <span className="ml-3 font-medium">Your Profile</span>
+          <span className="ml-3 font-medium">Votre Profil</span>
         </Link>
         <SidebarSearch />
         <SidebarMenu />
