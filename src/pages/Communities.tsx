@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -150,16 +151,17 @@ const Communities: React.FC = () => {
                             </Button>
                           </div>
                         </div>
-                      </GlassMorphism>
-                    ))}
-                </div>
-              </TabsContent>
+                      </div>
+                    </GlassMorphism>
+                  ))}
+              </div>
+            </TabsContent>
               
-              <TabsContent value="recommended">
-                <p>Communities recommended based on your interests and activities.</p>
-              </TabsContent>
-            </Tabs>
-          </GlassMorphism>
+            <TabsContent value="recommended">
+              <p>Communities recommended based on your interests and activities.</p>
+            </TabsContent>
+          </Tabs>
+        </GlassMorphism>
         
         <GlassMorphism className="p-6">
           <h2 className="text-xl font-semibold mb-4">Community Posts</h2>
