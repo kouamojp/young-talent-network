@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import SidebarMenu from './sidebar/SidebarMenu';
 import SidebarSocial from './sidebar/SidebarSocial';
+import SidebarSearch from './sidebar/SidebarSearch';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const SocialSidebar: React.FC = () => {
@@ -19,6 +20,7 @@ const SocialSidebar: React.FC = () => {
           </Avatar>
           <span className="ml-3 font-medium">Your Profile</span>
         </Link>
+        <SidebarSearch />
         <SidebarMenu />
         <div className="border-t border-gray-200 my-2" />
         <SidebarSocial />

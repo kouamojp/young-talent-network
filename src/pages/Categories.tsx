@@ -2,7 +2,6 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Grid, Music, Film, Palette, Users, Code, Briefcase, Trophy, Theater, Mic, Dumbbell } from 'lucide-react';
 
@@ -23,56 +22,53 @@ const Categories: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <div className="container mx-auto flex flex-col md:flex-row">
-        <SocialSidebar />
-        <main className="flex-1 p-4">
-          <GlassMorphism className="p-6 mb-6">
-            <div className="flex items-center gap-3 mb-6">
-              <Grid className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">Categories & Thematic Sections</h1>
-            </div>
-            
-            <p className="text-gray-600 mb-8">
-              Browse and explore different talent categories and thematic sections. Find your area of interest and connect with like-minded talents.
+      <main className="container mx-auto px-4 py-12">
+        <GlassMorphism className="p-6 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Grid className="h-6 w-6" />
+            <h1 className="text-2xl font-bold">Categories & Thematic Sections</h1>
+          </div>
+          
+          <p className="text-gray-600 mb-8">
+            Browse and explore different talent categories and thematic sections. Find your area of interest and connect with like-minded talents.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {categories.map(category => (
+              <GlassMorphism key={category.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <category.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{category.name}</h3>
+                    <p className="text-sm text-gray-500">{category.count} members</p>
+                  </div>
+                </div>
+              </GlassMorphism>
+            ))}
+          </div>
+        </GlassMorphism>
+        
+        <GlassMorphism className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Featured Thematic Section</h2>
+          
+          <div className="bg-primary/5 p-4 rounded-lg">
+            <h3 className="font-medium text-lg mb-2">Music Production Workshop Series</h3>
+            <p className="text-gray-600 mb-3">
+              Join our music production workshop series featuring industry professionals who will guide you through the process of creating and producing music.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {categories.map(category => (
-                <GlassMorphism key={category.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-full bg-primary/10">
-                      <category.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{category.name}</h3>
-                      <p className="text-sm text-gray-500">{category.count} members</p>
-                    </div>
-                  </div>
-                </GlassMorphism>
-              ))}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Music</span>
+              <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Production</span>
+              <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Workshop</span>
             </div>
-          </GlassMorphism>
-          
-          <GlassMorphism className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Featured Thematic Section</h2>
             
-            <div className="bg-primary/5 p-4 rounded-lg">
-              <h3 className="font-medium text-lg mb-2">Music Production Workshop Series</h3>
-              <p className="text-gray-600 mb-3">
-                Join our music production workshop series featuring industry professionals who will guide you through the process of creating and producing music.
-              </p>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Music</span>
-                <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Production</span>
-                <span className="text-xs px-2 py-1 bg-primary/10 rounded-full">Workshop</span>
-              </div>
-              
-              <button className="text-primary hover:underline text-sm">Learn more</button>
-            </div>
-          </GlassMorphism>
-        </main>
-      </div>
+            <button className="text-primary hover:underline text-sm">Learn more</button>
+          </div>
+        </GlassMorphism>
+      </main>
       <Footer />
     </div>
   );
