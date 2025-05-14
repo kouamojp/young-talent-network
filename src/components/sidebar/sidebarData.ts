@@ -1,3 +1,4 @@
+
 import { 
   User, 
   Star, 
@@ -116,21 +117,29 @@ export const socialLinks = [
   { 
     icon: Facebook,
     label: 'Facebook', 
+    path: '#',
+    description: 'Connect on Facebook',
     url: 'https://facebook.com' 
   },
   { 
     icon: Instagram,
     label: 'Instagram', 
+    path: '#',
+    description: 'Follow on Instagram',
     url: 'https://instagram.com' 
   },
   { 
     icon: X,
     label: 'X (Twitter)', 
+    path: '#',
+    description: 'Follow on X',
     url: 'https://x.com' 
   },
   { 
     icon: CircleUser,
     label: 'TikTok', 
+    path: '#',
+    description: 'Follow on TikTok',
     url: 'https://tiktok.com' 
   }
 ];

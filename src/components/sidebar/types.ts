@@ -6,4 +6,5 @@ export interface MenuSectionItem {
   label: string;
   path: string;
   description: string;
+  url?: string; // For external links
 }
