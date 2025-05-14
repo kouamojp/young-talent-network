@@ -25,7 +25,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         </Button>
         <Briefcase className="h-6 w-6" />
         <h1 className="text-2xl font-bold">
-          {path === 'talent' ? "Trouvez Votre Scène de Rêve" : "Trouvez Votre Équipe de Rêve"}
+          {path === 'talent' ? "Find Your Dream Stage" : "Find Your Dream Team"}
         </h1>
       </div>
       
@@ -34,17 +34,17 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <Input 
             className="pl-10" 
-            placeholder={path === 'talent' ? "Rechercher des emplois, bourses..." : "Rechercher des talents, compétences..."} 
+            placeholder={path === 'talent' ? "Search for jobs, scholarships..." : "Search for talents, skills..."} 
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
         <Button>
-          Rechercher
+          Search
         </Button>
         <Button variant="outline">
           <Filter className="h-4 w-4 mr-2" />
-          Filtres
+          Filters
         </Button>
       </div>
     </div>

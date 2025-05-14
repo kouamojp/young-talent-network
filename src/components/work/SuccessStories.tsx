@@ -11,7 +11,7 @@ const SuccessStories = () => {
           <div className="aspect-video bg-gray-200 relative">
             <img 
               src="/placeholder.svg" 
-              alt="Histoire de réussite" 
+              alt="Success story" 
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -21,12 +21,12 @@ const SuccessStories = () => {
             </div>
           </div>
           <div className="p-4">
-            <h3 className="font-bold">De Y&T à Broadway</h3>
+            <h3 className="font-bold">From Y&T to Broadway</h3>
             <p className="text-sm text-gray-600 mt-1">
-              Comment j'ai décroché mon rôle de rêve après avoir rencontré un directeur de casting sur la plateforme.
+              How I landed my dream role after connecting with a casting director on the platform.
             </p>
             <Button variant="link" className="px-0 mt-2">
-              Lire l'Histoire Complète
+              Read Full Story
             </Button>
           </div>
         </div>

@@ -40,18 +40,18 @@ const HeroSection: React.FC = () => {
       <div className="container mx-auto px-4 py-12 md:py-24 flex flex-col lg:flex-row items-center">
         <div ref={heroRef} className="w-full lg:w-1/2 mb-12 lg:mb-0 stagger-animation">
           <div className="inline-block px-3 py-1 mb-4 bg-black/5 rounded-full">
-            <span className="text-xs tracking-wide font-medium">Réseau Young & Talented</span>
+            <span className="text-xs tracking-wide font-medium">Young & Talented Network</span>
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-            La meilleure façon de trouver des 
-            <span className="text-highlight"> personnes talentueuses </span>
-            partout dans le monde
+            The best way to find 
+            <span className="text-highlight"> talented people </span>
+            all over the world
           </h1>
           
           <p className="text-lg text-black/70 mb-8 max-w-xl">
-            Connecter des milliers de jeunes talents du sport, de la musique, du chant,
-            de l'invention et de la danse avec les opportunités qu'ils méritent.
+            Connecting thousands of young talented sportsmen, musicians, vocalists, 
+            inventors, and dancers with the opportunities they deserve.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
@@ -59,13 +59,13 @@ const HeroSection: React.FC = () => {
               href="#join"
               className="px-8 py-3 bg-black text-white rounded-full transition-transform hover:scale-105 text-center"
             >
-              Rejoindre la Plateforme
+              Join the Platform
             </a>
             <a
               href="#learn"
               className="px-8 py-3 border border-black/20 rounded-full hover:bg-black/5 transition-colors text-center"
             >
-              En Savoir Plus
+              Learn More
             </a>
           </div>
         </div>
@@ -74,7 +74,7 @@ const HeroSection: React.FC = () => {
           <div className="aspect-[4/3] rounded-2xl overflow-hidden shadow-glass">
             <img 
               src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81" 
-              alt="Jeunes talents collaborant" 
+              alt="Young talents collaborating" 
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -83,20 +83,20 @@ const HeroSection: React.FC = () => {
           <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-soft max-w-xs animate-fade-in opacity-0" style={{ animationDelay: '0.8s' }}>
             <div className="flex items-center gap-3 mb-2">
               <div className="h-2 w-2 rounded-full bg-green-500"></div>
-              <p className="text-sm font-medium">Découvrir des Opportunités</p>
+              <p className="text-sm font-medium">Discover Opportunities</p>
             </div>
             <p className="text-xs text-black/60">
-              Connectez-vous avec des mentors et des sponsors à la recherche de la prochaine génération de talents
+              Connect with mentors and sponsors looking for the next generation of talent
             </p>
           </div>
           
           <div className="absolute -top-6 -right-6 bg-white rounded-xl p-4 shadow-soft max-w-xs animate-fade-in opacity-0" style={{ animationDelay: '1s' }}>
             <div className="flex items-center gap-3 mb-2">
               <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-              <p className="text-sm font-medium">Visibilité Mondiale</p>
+              <p className="text-sm font-medium">Global Visibility</p>
             </div>
             <p className="text-xs text-black/60">
-              Présentez vos talents à un public mondial sans frontières
+              Showcase your talents to a worldwide audience without borders
             </p>
           </div>
         </div>

@@ -12,29 +12,29 @@ export interface Mentorship {
 export const mentorships = [
   {
     id: 1,
-    title: "Programme de Mentorat dans l'Industrie de la Mode",
-    mentor: "Lisa Chen, Designer de Mode",
-    duration: "3 mois",
-    commitment: "4 heures/semaine",
-    applicationDeadline: "20 juin 2023",
-    description: "Guidance personnalisée d'un designer de mode établi pour vous aider à développer votre portfolio et vos connexions dans l'industrie."
+    title: "Fashion Industry Mentorship Program",
+    mentor: "Lisa Chen, Fashion Designer",
+    duration: "3 months",
+    commitment: "4 hours/week",
+    applicationDeadline: "Jun 20, 2023",
+    description: "Personalized guidance from an established fashion designer to help develop your portfolio and industry connections."
   },
   {
     id: 2,
-    title: "Mentorat en Production Musicale",
-    mentor: "DJ Maximus, Producteur nominé aux Grammy",
-    duration: "6 mois",
-    commitment: "2 heures/semaine",
-    applicationDeadline: "5 juil. 2023",
-    description: "Apprenez les techniques de production musicale, le flux de travail en studio et les perspectives de l'industrie auprès d'un producteur expérimenté."
+    title: "Music Production Mentorship",
+    mentor: "DJ Maximus, Grammy-nominated Producer",
+    duration: "6 months",
+    commitment: "2 hours/week",
+    applicationDeadline: "Jul 5, 2023",
+    description: "Learn music production techniques, studio workflow, and industry insights from an experienced producer."
   },
   {
     id: 3,
-    title: "Programme des Jeunes Écrivains",
-    mentor: "Divers Auteurs Publiés",
-    duration: "4 mois",
-    commitment: "3 heures/semaine",
-    applicationDeadline: "25 juil. 2023",
-    description: "Développez vos compétences d'écriture grâce à des sessions de feedback et des conseils personnalisés d'auteurs publiés."
+    title: "Young Writers Program",
+    mentor: "Various Published Authors",
+    duration: "4 months",
+    commitment: "3 hours/week",
+    applicationDeadline: "Jul 25, 2023",
+    description: "Develop your writing skills through feedback sessions and personalized guidance from published authors."
   }
 ];
