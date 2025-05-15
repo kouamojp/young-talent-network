@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Menu, Search, MessageSquare, User } from 'lucide-react';
+import { Menu, Search, MessageSquare, Bell, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
@@ -30,6 +29,9 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-2">
           <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
             <MessageSquare className="h-5 w-5 text-[#65676B]" />
+          </button>
+          <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
+            <Bell className="h-5 w-5 text-[#65676B]" />
           </button>
           <button className="p-2.5 hover:bg-[#F0F2F5] rounded-full">
             <User className="h-5 w-5 text-[#65676B]" />
