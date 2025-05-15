@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { 
   Sidebar, 
-  SidebarContent,
+  SidebarHeader, 
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -34,7 +34,7 @@ const SidebarMain: React.FC = () => {
 
   return (
     <Sidebar>
-      <SidebarContent>
+      <SidebarHeader>
         {/* Search */}
         <div className="relative w-full px-2 py-3">
           <Search className="absolute left-4 top-5 h-4 w-4 text-gray-500" />
@@ -81,7 +81,7 @@ const SidebarMain: React.FC = () => {
             <SidebarMenuSection items={socialLinks} currentPath={currentPath} />
           </SidebarGroupContent>
         </SidebarGroup>
-      </SidebarContent>
+      </SidebarHeader>
     </Sidebar>
   );
 };
