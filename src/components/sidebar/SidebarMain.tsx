@@ -45,7 +45,7 @@ const SidebarMain: React.FC = () => {
         </div>
         
         {/* Main Navigation */}
-        <SidebarGroup defaultOpen={isFeedSection}>
+        <SidebarGroup>
           <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenuSection items={mainMenuItems} currentPath={currentPath} />
@@ -55,7 +55,7 @@ const SidebarMain: React.FC = () => {
         <SidebarSeparator />
         
         {/* Communities & Content */}
-        <SidebarGroup defaultOpen={false}>
+        <SidebarGroup>
           <SidebarGroupLabel>Communities & Content</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenuSection items={communityItems} currentPath={currentPath} />
@@ -65,7 +65,7 @@ const SidebarMain: React.FC = () => {
         <SidebarSeparator />
         
         {/* Profile */}
-        <SidebarGroup defaultOpen={isProfileSection}>
+        <SidebarGroup>
           <SidebarGroupLabel>Your Talent Profile</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenuSection items={profileItems} currentPath={currentPath} />
