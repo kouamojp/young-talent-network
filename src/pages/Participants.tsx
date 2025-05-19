@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -29,11 +30,6 @@ const Participants: React.FC = () => {
       <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Users className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">Participants & Mentors</h1>
-          </div>
-          
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
               <Input placeholder="Search participants or mentors..." />
