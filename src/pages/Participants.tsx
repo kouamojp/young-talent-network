@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const Participants: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const participants = [
     { id: 1, name: 'Emma Thompson', location: 'New York, USA', type: 'Musician', avatar: '/placeholder.svg', rating: 4.8, featured: true },
     { id: 2, name: 'Daniel Lee', location: 'Los Angeles, USA', type: 'Actor', avatar: '/placeholder.svg', rating: 4.7, featured: false },
@@ -26,117 +28,135 @@ const Participants: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-blue-50">
       <Navbar />
       <main className="container mx-auto px-4 py-12">
-        <GlassMorphism className="p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <Input placeholder="Search participants or mentors..." />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-              <Button variant="outline">
-                <MapPin className="h-4 w-4 mr-2" />
-                Location
-              </Button>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Discover Talented People</h1>
           
-          <Tabs defaultValue="participants">
-            <TabsList className="mb-4">
-              <TabsTrigger value="participants">Participants</TabsTrigger>
-              <TabsTrigger value="mentors">Mentors</TabsTrigger>
-              <TabsTrigger value="featured">Featured Talents</TabsTrigger>
-            </TabsList>
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <Input 
+                  placeholder="Search by name, skill or location..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-white border-gray-200"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" className="bg-white hover:bg-gray-50">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filters
+                </Button>
+                <Button variant="outline" className="bg-white hover:bg-gray-50">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Location
+                </Button>
+              </div>
+            </div>
             
-            <TabsContent value="participants" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {participants.map(participant => (
-                  <GlassMorphism key={participant.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={participant.avatar} alt={participant.name} />
-                        <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{participant.name}</h3>
-                        <p className="text-sm text-gray-600">{participant.type}</p>
-                        <div className="flex items-center text-xs mt-1">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          <span>{participant.location}</span>
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                          <span className="text-sm">{participant.rating}</span>
+            <Tabs defaultValue="participants" className="w-full">
+              <TabsList className="mb-6 w-full bg-gray-100/50 p-1 rounded-lg">
+                <TabsTrigger value="participants" className="flex-1 data-[state=active]:bg-white rounded-md">
+                  <Users className="h-4 w-4 mr-2" />
+                  Participants
+                </TabsTrigger>
+                <TabsTrigger value="mentors" className="flex-1 data-[state=active]:bg-white rounded-md">
+                  <Award className="h-4 w-4 mr-2" />
+                  Mentors
+                </TabsTrigger>
+                <TabsTrigger value="featured" className="flex-1 data-[state=active]:bg-white rounded-md">
+                  <Star className="h-4 w-4 mr-2" />
+                  Featured
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="participants" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {participants.map(participant => (
+                    <div 
+                      key={participant.id} 
+                      className="bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
+                    >
+                      <div className="flex items-start gap-4">
+                        <Avatar className="h-16 w-16 border-2 border-white shadow-sm">
+                          <AvatarImage src={participant.avatar} alt={participant.name} />
+                          <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold text-lg">{participant.name}</h3>
+                          <p className="text-sm text-primary/80 font-medium">{participant.type}</p>
+                          <div className="flex items-center text-xs mt-1 text-gray-600">
+                            <MapPin className="h-3 w-3 mr-1" />
+                            <span>{participant.location}</span>
+                          </div>
+                          <div className="flex items-center mt-2">
+                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
+                            <span className="text-sm">{participant.rating}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </GlassMorphism>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="mentors" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {mentors.map(mentor => (
-                  <GlassMorphism key={mentor.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                    <div className="flex flex-col items-center text-center p-2">
-                      <Avatar className="h-20 w-20 mb-3">
+                  ))}
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="mentors" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {mentors.map(mentor => (
+                    <div 
+                      key={mentor.id} 
+                      className="bg-white rounded-lg p-6 hover:shadow-md transition-shadow text-center border border-gray-100 shadow-sm"
+                    >
+                      <Avatar className="h-20 w-20 mx-auto mb-4 border-4 border-white shadow">
                         <AvatarImage src={mentor.avatar} alt={mentor.name} />
                         <AvatarFallback>{mentor.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <h3 className="font-semibold text-lg">{mentor.name}</h3>
-                      <p className="text-primary font-medium">{mentor.specialization}</p>
-                      <div className="flex items-center mt-2 mb-1">
+                      <p className="text-primary font-medium text-sm">{mentor.specialization}</p>
+                      <div className="flex items-center justify-center mt-2 mb-1">
                         <Star className="h-4 w-4 text-yellow-500 mr-1" />
                         <span>{mentor.rating}</span>
                       </div>
-                      <p className="text-sm text-gray-600">{mentor.experience}</p>
-                      <Button className="mt-3" size="sm">View Profile</Button>
+                      <p className="text-sm text-gray-600 mb-4">{mentor.experience}</p>
+                      <Button className="w-full" size="sm">View Profile</Button>
                     </div>
-                  </GlassMorphism>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="featured" className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Award className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-medium">Featured Talents</h2>
-              </div>
+                  ))}
+                </div>
+              </TabsContent>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {participants
-                  .filter(p => p.featured)
-                  .map(participant => (
-                    <GlassMorphism key={participant.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer border border-primary/20">
-                      <div className="flex flex-col items-center text-center p-2">
-                        <div className="absolute -top-2 -right-2">
-                          <div className="bg-primary text-white text-xs px-2 py-1 rounded-full">Featured</div>
+              <TabsContent value="featured" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {participants
+                    .filter(p => p.featured)
+                    .map(participant => (
+                      <div 
+                        key={participant.id} 
+                        className="bg-gradient-to-br from-white to-blue-50 rounded-lg p-6 hover:shadow-lg transition-shadow text-center relative overflow-hidden border border-blue-100 shadow-sm"
+                      >
+                        <div className="absolute top-3 right-3">
+                          <span className="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full font-medium">Featured</span>
                         </div>
-                        <Avatar className="h-20 w-20 mb-3">
+                        <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-white shadow">
                           <AvatarImage src={participant.avatar} alt={participant.name} />
                           <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <h3 className="font-semibold text-lg">{participant.name}</h3>
                         <p className="text-primary font-medium">{participant.type}</p>
-                        <div className="flex items-center mt-2 mb-1">
+                        <div className="flex items-center justify-center mt-2 mb-1">
                           <Star className="h-4 w-4 text-yellow-500 mr-1" />
                           <span>{participant.rating}</span>
                         </div>
-                        <p className="text-sm text-gray-600">{participant.location}</p>
-                        <Button className="mt-3" size="sm">View Profile</Button>
+                        <p className="text-sm text-gray-600 mb-4">{participant.location}</p>
+                        <Button className="w-full bg-primary/90 hover:bg-primary" size="sm">View Profile</Button>
                       </div>
-                    </GlassMorphism>
-                  ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </GlassMorphism>
+                    ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
       </main>
       <Footer />
     </div>
