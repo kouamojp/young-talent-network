@@ -1,6 +1,5 @@
 
 import React from 'react';
-import GlassMorphism from './GlassMorphism';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 
@@ -20,8 +19,8 @@ const suggestions = [
 
 const RightSidebar: React.FC = () => {
   return (
-    <div className="w-full max-w-xs mx-auto space-y-6 animate-fade-in animate-scale-in">
-      <GlassMorphism className="p-4 mb-6">
+    <div className="w-full max-w-xs mx-auto space-y-6">
+      <div className="bg-white rounded-xl p-4 shadow-sm">
         <h3 className="font-medium mb-3">Contacts</h3>
         <ul className="space-y-3">
           {contacts.map(contact => (
@@ -41,9 +40,9 @@ const RightSidebar: React.FC = () => {
             </li>
           ))}
         </ul>
-      </GlassMorphism>
+      </div>
       
-      <GlassMorphism className="p-4">
+      <div className="bg-white rounded-xl p-4 shadow-sm">
         <h3 className="font-medium mb-3">Talented People You May Know</h3>
         <ul className="space-y-4">
           {suggestions.map(person => (
@@ -62,7 +61,7 @@ const RightSidebar: React.FC = () => {
             </li>
           ))}
         </ul>
-      </GlassMorphism>
+      </div>
     </div>
   );
 };

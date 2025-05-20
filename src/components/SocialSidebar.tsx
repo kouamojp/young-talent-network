@@ -1,30 +1,70 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { SidebarProvider } from './ui/sidebar';
-import SidebarMain from './sidebar/SidebarMain';
+import { User, Star, MessageSquare, Phone, Users } from 'lucide-react';
+
+const mainMenuItems = [
+  { 
+    icon: User, 
+    label: 'Profile', 
+    description: 'Your digital talent hub', 
+    to: '/profile' 
+  },
+  { 
+    icon: Star, 
+    label: 'Feed', 
+    description: 'Talent & opportunity stream', 
+    to: '/' 
+  },
+  { 
+    icon: MessageSquare, 
+    label: 'Messenger', 
+    description: 'Secure chats & connections', 
+    to: '/messages' 
+  },
+  { 
+    icon: Phone, 
+    label: 'Calls', 
+    description: 'Voice/video meetings', 
+    to: '/calls' 
+  },
+  { 
+    icon: Users, 
+    label: 'Friends', 
+    description: 'Your talent network', 
+    to: '/friends' 
+  }
+];
 
 const SocialSidebar: React.FC = () => {
   return (
-    <SidebarProvider>
-      <aside className="w-[290px] h-[calc(100vh-56px)] overflow-y-auto fixed top-14 left-0 bg-white shadow-md z-30 md:relative md:top-0 md:h-auto
-        animate-fade-in animate-scale-in
-        hidden md:block md:animate-none"
-      >
-        <div className="space-y-1 p-4">
-          <Link to="/profile" className="flex items-center p-2 rounded-lg hover:bg-[#F0F2F5] transition-colors">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src="/placeholder.svg" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <span className="ml-3 font-medium">Your Profile</span>
-          </Link>
-          
-          <SidebarMain />
-        </div>
-      </aside>
-    </SidebarProvider>
+    <aside className="bg-white rounded-xl shadow-sm p-4">
+      <div>
+        <h3 className="text-sm font-medium text-gray-500 mb-2">Main</h3>
+        <nav className="space-y-1">
+          {mainMenuItems.map((item, index) => (
+            <Link 
+              key={index}
+              to={item.to} 
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <div className="bg-gray-100 p-2 rounded-full">
+                <item.icon className="h-5 w-5 text-gray-600" />
+              </div>
+              <div>
+                <div className="font-medium">{item.label}</div>
+                <div className="text-xs text-gray-500">{item.description}</div>
+              </div>
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-gray-100">
+        <h3 className="text-sm font-medium text-gray-500 mb-2">Communities & Content</h3>
+        {/* Additional menu items would go here */}
+      </div>
+    </aside>
   );
 };
 

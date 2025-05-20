@@ -3,6 +3,7 @@ import React from 'react';
 import GlassMorphism from './GlassMorphism';
 import PostCard from './PostCard';
 import { Button } from './ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Plus } from 'lucide-react';
 
 // Sample data for demonstration
@@ -47,20 +48,23 @@ const samplePosts = [
 
 const Feed: React.FC = () => {
   return (
-    <div className="max-w-2xl mx-auto py-8 space-y-6">
-      <GlassMorphism className="p-4 mb-6">
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div className="bg-white p-4 rounded-xl shadow-sm mb-6">
         <div className="flex items-center space-x-4">
-          <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-            <img src="/placeholder.svg" alt="User avatar" className="w-full h-full object-cover" />
-          </div>
-          <Button variant="outline" className="w-full justify-start text-gray-500 font-normal">
-            What's on your mind?
-          </Button>
-          <Button size="icon" variant="ghost">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src="/placeholder.svg" alt="User avatar" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+          <input
+            type="text"
+            placeholder="What's on your mind?"
+            className="w-full p-2 px-4 bg-gray-50 rounded-full text-sm focus:outline-none border border-gray-100"
+          />
+          <Button size="icon" variant="ghost" className="text-gray-500">
             <Plus className="h-5 w-5" />
           </Button>
         </div>
-      </GlassMorphism>
+      </div>
 
       <div className="space-y-4">
         {samplePosts.map(post => (
