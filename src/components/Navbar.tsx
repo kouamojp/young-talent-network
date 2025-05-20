@@ -55,6 +55,13 @@ const Navbar: React.FC = () => {
           />
         </div>
       </div>
+      
+      {/* Mobile Menu (Hidden for now, will only appear when isMenuOpen is true) */}
+      <div className={`md:hidden fixed inset-0 bg-white z-40 transform transition-transform duration-300 ${
+        isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        {/* Mobile menu content would go here */}
+      </div>
     </header>
   );
 };
