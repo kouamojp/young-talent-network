@@ -30,6 +30,14 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-4">
+          <Link to="/" className="text-sm font-medium hover:text-blue-500">Home</Link>
+          <Link to="/categories" className="text-sm font-medium hover:text-blue-500">Categories</Link>
+          <Link to="/sports-categories" className="text-sm font-medium hover:text-blue-500">Sports</Link>
+          <Link to="/work" className="text-sm font-medium hover:text-blue-500">Work</Link>
+        </nav>
+
         {/* Right side icons */}
         <div className="flex items-center gap-4">
           <Link to="/messages" className="hidden sm:flex items-center justify-center h-9 w-9 hover:bg-gray-100 rounded-full">
