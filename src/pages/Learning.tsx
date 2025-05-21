@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import LearningHubEntry from '@/components/learning/LearningHubEntry';
@@ -19,7 +18,6 @@ const Learning: React.FC = () => {
   if (!path) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-        <Navbar />
         <main className="container mx-auto px-4 py-12">
           <LearningHubEntry />
         </main>
@@ -30,7 +28,6 @@ const Learning: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6">
           {path === 'explore' ? (

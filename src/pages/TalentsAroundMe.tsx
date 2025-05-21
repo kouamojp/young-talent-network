@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import TalentsHero from '@/components/talents/TalentsHero';
@@ -27,8 +26,6 @@ const TalentsAroundMe: React.FC = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-        <Navbar />
-        
         <div className="container mx-auto py-6 px-4">
           <TalentsHero 
             talentCount={filteredTalents.length} 

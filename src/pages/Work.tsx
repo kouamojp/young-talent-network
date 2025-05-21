@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import WorkHubEntry from '@/components/work/WorkHubEntry';
@@ -40,7 +39,6 @@ const Work: React.FC = () => {
   if (!path) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-        <Navbar />
         <main className="container mx-auto px-4 py-12">
           <WorkHubEntry />
         </main>
@@ -51,7 +49,6 @@ const Work: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6 mb-6">
           <SearchHeader

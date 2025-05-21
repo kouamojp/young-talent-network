@@ -1,6 +1,5 @@
 
 import React from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Newspaper, Calendar, TrendingUp } from 'lucide-react';
@@ -33,7 +32,6 @@ const News: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">

@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import LiveDiscovery from '@/components/live/LiveDiscovery';
@@ -16,7 +15,6 @@ const Live: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6">
           <div className="flex items-center gap-2 mb-6">

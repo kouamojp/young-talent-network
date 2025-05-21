@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import ProfileHeader from '@/components/profile/ProfileHeader';
@@ -24,8 +23,7 @@ const Profile: React.FC = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-[#F0F2F5]">
-        <Navbar />
-        <main className="pt-16">
+        <main>
           <div className="max-w-[940px] mx-auto">
             <ProfileHeader 
               user={user}

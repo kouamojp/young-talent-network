@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
@@ -40,7 +39,6 @@ const AptitudeTest: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <div className="container mx-auto flex flex-col md:flex-row">
         <SocialSidebar />
         <main className="flex-1 p-4">

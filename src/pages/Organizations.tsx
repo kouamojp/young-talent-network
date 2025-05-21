@@ -1,5 +1,5 @@
+
 import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Building, MapPin, Star, Globe, Users, Award } from 'lucide-react';
@@ -70,7 +70,6 @@ const Organizations: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6">
           <div className="flex items-center justify-between mb-6">
