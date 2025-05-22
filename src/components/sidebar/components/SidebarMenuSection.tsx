@@ -37,15 +37,7 @@ const SidebarMenuSection: React.FC<SidebarMenuSectionProps> = ({ items, currentP
             asChild
             tooltip={item.description}
           >
-            <SidebarMenuLink
-              icon={item.icon}
-              label={item.label}
-              path={item.path}
-              description={item.description}
-              url={item.url}
-              badge={item.badge}
-              badgeColor={item.badgeColor}
-            />
+            <SidebarMenuLink item={item} />
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
