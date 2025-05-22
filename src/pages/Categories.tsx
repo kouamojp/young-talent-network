@@ -1,29 +1,53 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
-import { Grid, Music, Film, Palette, Users, Code, Briefcase, Trophy, Theater, Mic, Dumbbell, Volleyball } from 'lucide-react';
-import { categories } from '@/components/learning/data/categories';
+import { Grid, Volleyball, ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { categories, Subcategory, SubcategoryItem } from '@/components/learning/data/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const Categories: React.FC = () => {
-  // Find the sports category from our categories data
-  const sportsCategory = categories.find(category => category.name === 'Sports');
   const isMobile = useIsMobile();
+  const [expandedCategories, setExpandedCategories] = useState<number[]>([1]); // Start with Sports expanded
+  const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState('');
   
-  const generalCategories = [
-    { id: 1, name: 'Music', icon: Music, count: 1245 },
-    { id: 2, name: 'Film & Photography', icon: Film, count: 872 },
-    { id: 3, name: 'Art & Design', icon: Palette, count: 643 },
-    { id: 4, name: 'Acting', icon: Theater, count: 643 },
-    { id: 5, name: 'Dance', icon: Users, count: 789 },
-    { id: 6, name: 'Technology', icon: Code, count: 512 },
-    { id: 7, name: 'Writing', icon: Mic, count: 432 },
-    { id: 8, name: 'Sports', icon: Dumbbell, count: 865 },
-    { id: 9, name: 'Business', icon: Briefcase, count: 378 },
-    { id: 10, name: 'Competitions', icon: Trophy, count: 246 },
-  ];
+  const toggleCategory = (categoryId: number) => {
+    setExpandedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const toggleSubcategory = (categoryId: number, subcategoryName: string) => {
+    const key = `${categoryId}-${subcategoryName}`;
+    setExpandedSubcategories(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const isSubcategoryExpanded = (categoryId: number, subcategoryName: string) => {
+    const key = `${categoryId}-${subcategoryName}`;
+    return expandedSubcategories[key];
+  };
+
+  const filteredCategories = categories.map(category => ({
+    ...category,
+    subcategories: category.subcategories.map(subcategory => ({
+      ...subcategory,
+      items: subcategory.items.filter(item => 
+        searchTerm === '' || 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        subcategory.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })).filter(subcategory => subcategory.items.length > 0)
+  })).filter(category => category.subcategories.length > 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
@@ -39,70 +63,93 @@ const Categories: React.FC = () => {
             Browse and explore different talent categories and thematic sections. Find your area of interest and connect with like-minded talents.
           </p>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            {generalCategories.map(category => (
-              <GlassMorphism key={category.id} className={`${isMobile ? 'p-3' : 'p-4'} hover:shadow-md transition-shadow cursor-pointer`}>
-                <div className="flex items-center gap-3">
-                  <div className={`${isMobile ? 'p-2' : 'p-3'} rounded-full bg-primary/10`}>
-                    <category.icon className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} text-primary`} />
+          <div className="relative flex mb-6">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input
+                type="text"
+                placeholder="Search categories, subcategories, or skills..."
+                className="pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {filteredCategories.length > 0 ? (
+            filteredCategories.map(category => (
+              <GlassMorphism key={category.id} className={`${isMobile ? 'p-4' : 'p-6'} mb-6`}>
+                <div 
+                  className="flex items-center justify-between mb-4 cursor-pointer"
+                  onClick={() => toggleCategory(category.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 md:w-10 md:h-10 ${category.color} rounded-lg flex items-center justify-center`}>
+                      <span className="text-lg md:text-xl">{category.icon}</span>
+                    </div>
+                    <h2 className="text-lg md:text-xl font-semibold">{category.name}</h2>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-sm md:text-base">{category.name}</h3>
-                    <p className="text-xs md:text-sm text-gray-500">{category.count} members</p>
-                  </div>
+                  {expandedCategories.includes(category.id) ? 
+                    <ChevronUp className="text-gray-500" /> : 
+                    <ChevronDown className="text-gray-500" />
+                  }
                 </div>
+                
+                {expandedCategories.includes(category.id) && (
+                  <div className="space-y-6">
+                    {category.subcategories.map(subcategory => (
+                      <div key={subcategory.name} className="bg-white/50 rounded-lg p-4">
+                        <div 
+                          className="flex justify-between items-center mb-3 cursor-pointer" 
+                          onClick={() => toggleSubcategory(category.id, subcategory.name)}
+                        >
+                          <h3 className="font-medium text-base md:text-lg">{subcategory.name}</h3>
+                          {isSubcategoryExpanded(category.id, subcategory.name) ? 
+                            <ChevronUp className="text-gray-500 h-4 w-4" /> : 
+                            <ChevronDown className="text-gray-500 h-4 w-4" />
+                          }
+                        </div>
+                        <div 
+                          className={cn(
+                            "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3",
+                            !isSubcategoryExpanded(category.id, subcategory.name) && "max-h-28 overflow-hidden"
+                          )}
+                        >
+                          {subcategory.items.map((item, idx) => (
+                            <div 
+                              key={idx}
+                              className="bg-white p-3 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center gap-2"
+                            >
+                              <span className="text-xl">{item.icon}</span>
+                              <p className="font-medium text-xs md:text-sm">{item.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                        {subcategory.items.length > 10 && !isSubcategoryExpanded(category.id, subcategory.name) && (
+                          <button
+                            onClick={() => toggleSubcategory(category.id, subcategory.name)}
+                            className="mt-2 text-xs md:text-sm text-primary hover:underline"
+                          >
+                            Show all {subcategory.items.length} items
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </GlassMorphism>
-            ))}
-          </div>
-        </GlassMorphism>
-        
-        {/* Sports Category Section */}
-        {sportsCategory && (
-          <GlassMorphism className={`${isMobile ? 'p-4' : 'p-6'} mb-6`}>
-            <div className="flex items-center gap-3 mb-4 md:mb-6">
-              <Volleyball className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'} text-primary`} />
-              <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>Sports Categories</h2>
+            ))
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-lg text-gray-500">No categories found matching your search.</p>
+              <button 
+                className="mt-4 text-primary hover:underline"
+                onClick={() => setSearchTerm('')}
+              >
+                Clear search
+              </button>
             </div>
-            
-            <div className="bg-white/50 p-4 md:p-6 rounded-lg shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-8 h-8 md:w-10 md:h-10 ${sportsCategory.color} rounded-lg flex items-center justify-center`}>
-                  <span className="text-lg md:text-xl">{sportsCategory.icon}</span>
-                </div>
-                <h3 className="text-base md:text-lg font-medium">{sportsCategory.name}</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-3 mt-4">
-                {sportsCategory.subcategories.map((sport, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-white p-2 md:p-3 rounded-md shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                  >
-                    <p className="font-medium text-xs md:text-sm text-center">{sport}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </GlassMorphism>
-        )}
-        
-        <GlassMorphism className={`${isMobile ? 'p-4' : 'p-6'}`}>
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold mb-3 md:mb-4`}>Featured Thematic Section</h2>
-          
-          <div className="bg-primary/5 p-3 md:p-4 rounded-lg">
-            <h3 className="font-medium text-base md:text-lg mb-2">Music Production Workshop Series</h3>
-            <p className="text-gray-600 mb-3 text-sm md:text-base">
-              Join our music production workshop series featuring industry professionals who will guide you through the process of creating and producing music.
-            </p>
-            
-            <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-4">
-              <span className="text-xs px-2 py-0.5 md:py-1 bg-primary/10 rounded-full">Music</span>
-              <span className="text-xs px-2 py-0.5 md:py-1 bg-primary/10 rounded-full">Production</span>
-              <span className="text-xs px-2 py-0.5 md:py-1 bg-primary/10 rounded-full">Workshop</span>
-            </div>
-            
-            <button className="text-primary hover:underline text-xs md:text-sm">Learn more</button>
-          </div>
+          )}
         </GlassMorphism>
       </main>
       <Footer />

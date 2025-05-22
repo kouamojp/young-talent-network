@@ -39,6 +39,7 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
   const linkBadge = item?.badge || badge;
   const linkBadgeColor = item?.badgeColor || badgeColor || "bg-blue-100 text-blue-800";
 
+  // If we don't have an icon, return null to prevent the error
   if (!Icon) {
     console.error('Icon is required for SidebarMenuLink');
     return null;
