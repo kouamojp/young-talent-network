@@ -1,11 +1,14 @@
 
 import React, { useState } from 'react';
-import { Search, MessageSquare, Bell, User, ChevronDown, Home, Users, Grid2X2 } from 'lucide-react';
+import { Search, MessageSquare, Bell, User, ChevronDown, Home, Users, Grid2X2, Menu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from './ui/button';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 shadow-sm z-50">
@@ -67,15 +70,31 @@ const Navbar: React.FC = () => {
           
           {/* Facebook-style circular buttons */}
           <div className="flex items-center space-x-2">
-            <button className="flex items-center justify-center h-10 w-10 bg-gray-200 rounded-full hover:bg-gray-300">
-              <MessageSquare className="h-5 w-5 text-black" />
-            </button>
-            <button className="flex items-center justify-center h-10 w-10 bg-gray-200 rounded-full hover:bg-gray-300">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              asChild
+            >
+              <Link to="/messages">
+                <MessageSquare className="h-5 w-5 text-black" />
+              </Link>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-gray-200 hover:bg-gray-300"
+            >
               <Bell className="h-5 w-5 text-black" />
-            </button>
-            <button className="flex items-center justify-center h-10 w-10 bg-gray-200 rounded-full hover:bg-gray-300">
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
               <ChevronDown className="h-5 w-5 text-black" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
