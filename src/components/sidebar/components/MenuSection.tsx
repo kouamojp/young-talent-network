@@ -1,30 +1,29 @@
 
 import React from 'react';
-import MenuItem from './MenuItem';
-import { MenuSectionItem } from '../types';
+import { MenuSectionItem } from '@/components/sidebar/types';
+import { cn } from '@/lib/utils';
+import SidebarMenuLink from './SidebarMenuLink';
 
 interface MenuSectionProps {
   items: MenuSectionItem[];
-  title?: string;
+  isCollapsed?: boolean;
+  className?: string;
 }
 
-const MenuSection: React.FC<MenuSectionProps> = ({ items, title }) => {
+const MenuSection: React.FC<MenuSectionProps> = ({
+  items,
+  isCollapsed = false,
+  className
+}) => {
   return (
-    <div className="mb-2">
-      {title && (
-        <h3 className="px-4 text-[#65676B] font-medium text-sm mb-1">{title}</h3>
-      )}
-      <ul className="space-y-1">
-        {items.map((item) => (
-          <MenuItem
-            key={item.label}
-            icon={item.icon}
-            label={item.label}
-            description={item.description}
-            path={item.path}
-          />
-        ))}
-      </ul>
+    <div className={cn("space-y-1", className)}>
+      {items.map((item, index) => (
+        <SidebarMenuLink
+          key={`${item.label}-${index}`}
+          item={item}
+          isCollapsed={isCollapsed}
+        />
+      ))}
     </div>
   );
 };
