@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -8,6 +9,22 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    // Add timeout configuration
+    hmr: {
+      timeout: 120000 // Increase timeout to 2 minutes
+    }
+  },
+  // Optimize the build process
+  build: {
+    // Make sure the build process is optimized
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    }
   },
   plugins: [
     react(),
@@ -19,4 +36,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Add optimizeDeps for faster dependency pre-bundling
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+    esbuildOptions: {
+      target: 'esnext'
+    }
+  }
 }));
