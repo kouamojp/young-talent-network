@@ -9,6 +9,8 @@ interface SidebarMenuLinkProps {
   description: string;
   path: string;
   url?: string; // For external links
+  badge?: string; // Optional badge text
+  badgeColor?: string; // Optional badge color
 }
 
 const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({ 
@@ -16,7 +18,9 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
   label, 
   description, 
   path, 
-  url 
+  url,
+  badge,
+  badgeColor = "bg-primary text-white" 
 }) => {
   // Check if this is an external link (like social media)
   const isExternal = !!url;
@@ -28,7 +32,14 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
           <Icon className="h-4 w-4 text-gray-600" />
         </div>
         <div className="flex flex-col">
-          <span className="font-medium">{label}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{label}</span>
+            {badge && (
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${badgeColor}`}>
+                {badge}
+              </span>
+            )}
+          </div>
           <span className="text-xs text-gray-500">{description}</span>
         </div>
       </div>

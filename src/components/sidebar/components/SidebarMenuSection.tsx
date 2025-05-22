@@ -42,6 +42,9 @@ const SidebarMenuSection: React.FC<SidebarMenuSectionProps> = ({ items, currentP
               label={item.label}
               path={item.path}
               description={item.description}
+              url={item.url}
+              badge={item.badge}
+              badgeColor={item.badgeColor}
             />
           </SidebarMenuButton>
         </SidebarMenuItem>

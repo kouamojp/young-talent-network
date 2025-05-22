@@ -7,4 +7,6 @@ export interface MenuSectionItem {
   path: string;
   description: string;
   url?: string; // For external links
+  badge?: string; // Optional badge text
+  badgeColor?: string; // Optional badge color
 }

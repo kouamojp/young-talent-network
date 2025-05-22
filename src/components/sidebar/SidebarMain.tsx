@@ -8,17 +8,17 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
 } from '@/components/ui/sidebar';
-import { menuItems, socialLinks } from './sidebarData';
+import { 
+  mainNavigationItems, 
+  contentItems, 
+  profileItems,
+  connectItems 
+} from './sidebarData';
 import SidebarMenuSection from './components/SidebarMenuSection';
 
 const SidebarMain: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
-
-  // Group menu items by section for better organization
-  const mainMenuItems = menuItems.slice(0, 5);
-  const communityItems = menuItems.slice(5, 10); 
-  const profileItems = menuItems.slice(10, 15);
 
   return (
     <Sidebar className="px-2 py-4">
@@ -27,7 +27,7 @@ const SidebarMain: React.FC = () => {
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mb-1">Main</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenuSection items={mainMenuItems} currentPath={currentPath} />
+            <SidebarMenuSection items={mainNavigationItems} currentPath={currentPath} />
           </SidebarGroupContent>
         </SidebarGroup>
         
@@ -35,7 +35,7 @@ const SidebarMain: React.FC = () => {
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Communities & Content</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenuSection items={communityItems} currentPath={currentPath} />
+            <SidebarMenuSection items={contentItems} currentPath={currentPath} />
           </SidebarGroupContent>
         </SidebarGroup>
         
@@ -51,7 +51,7 @@ const SidebarMain: React.FC = () => {
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Connect</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenuSection items={socialLinks} currentPath={currentPath} />
+            <SidebarMenuSection items={connectItems} currentPath={currentPath} />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarHeader>
