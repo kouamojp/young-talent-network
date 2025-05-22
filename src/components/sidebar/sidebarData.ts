@@ -1,145 +1,140 @@
-
 import { 
-  User, 
-  Star, 
-  MessageCircle, 
-  PhoneCall,
-  Users, 
-  Citrus,
-  Video,
-  Image,
-  Gamepad,
-  ShoppingBag,
-  Settings,
+  Home, 
+  Compass, 
+  MessagesSquare, 
+  Bell, 
+  Users,
+  User,
+  Briefcase,
+  LucideIcon,
+  PanelRight,
+  GraduationCap,
+  Radio,
+  Newspaper,
+  Calendar,
+  Building,
   FileText,
-  Image as ImageIcon,
-  Link as LinkIcon,
-  Facebook,
-  Instagram,
-  X,
-  CircleUser
+  MapPin
 } from 'lucide-react';
 
-export const menuItems = [
-  { 
-    icon: User, 
-    label: 'Profile', 
-    path: '/profile',
-    description: 'Your digital talent hub' 
+import { MenuSectionItem } from './types';
+
+// Main navigation items
+export const mainNavigationItems: MenuSectionItem[] = [
+  {
+    label: 'Home',
+    description: 'Your personalized feed',
+    icon: Home,
+    path: '/'
   },
-  { 
-    icon: Star, 
-    label: 'Feed', 
-    path: '/',
-    description: 'Talent & opportunity stream' 
+  {
+    label: 'Discover',
+    description: 'Explore new content',
+    icon: Compass,
+    path: '/categories'
   },
-  { 
-    icon: MessageCircle, 
-    label: 'Messenger', 
-    path: '/messages',
-    description: 'Secure chats & connections' 
+  {
+    label: 'Messages',
+    description: 'Your conversations',
+    icon: MessagesSquare,
+    path: '/messages'
   },
-  { 
-    icon: PhoneCall, 
-    label: 'Calls', 
-    path: '/calls',
-    description: 'Voice/video meetings' 
-  },
-  { 
-    icon: Users, 
-    label: 'Friends', 
-    path: '/friends',
-    description: 'Your talent network' 
-  },
-  { 
-    icon: Citrus, 
-    label: 'Communities', 
-    path: '/communities',
-    description: 'Groups by interest' 
-  },
-  { 
-    icon: Video, 
-    label: 'Live', 
-    path: '/live',
-    description: 'Real-time talent streams' 
-  },
-  { 
-    icon: Image, 
-    label: 'Media Hub', 
-    path: '/media',
-    description: 'Photos, music & videos' 
-  },
-  { 
-    icon: Gamepad, 
-    label: 'Games', 
-    path: '/games',
-    description: 'Skill-based challenges' 
-  },
-  { 
-    icon: ShoppingBag, 
-    label: 'Market', 
-    path: '/market',
-    description: 'Talent economy' 
-  },
-  { 
-    icon: Settings, 
-    label: 'Settings', 
-    path: '/settings',
-    description: 'Customize your experience' 
-  },
-  { 
-    icon: FileText, 
-    label: 'Posts', 
-    path: '/profile?tab=posts',
-    description: 'Your talent stories' 
-  },
-  { 
-    icon: ImageIcon, 
-    label: 'Media', 
-    path: '/profile?tab=media',
-    description: 'Photos & videos' 
-  },
-  { 
-    icon: User, 
-    label: 'About', 
-    path: '/profile?tab=about',
-    description: 'Your talent journey' 
-  },
-  { 
-    icon: LinkIcon, 
-    label: 'Social Universe', 
-    path: '/profile?tab=social',
-    description: 'Your online talent network' 
-  },
+  {
+    label: 'Notifications',
+    description: 'Stay updated',
+    icon: Bell,
+    path: '/notifications',
+  }
 ];
 
-export const socialLinks = [
-  { 
-    icon: Facebook,
-    label: 'Facebook', 
-    path: '#',
-    description: 'Connect on Facebook',
-    url: 'https://facebook.com' 
+// Content and communities section
+export const contentItems: MenuSectionItem[] = [
+  {
+    label: 'Talents Around Me',
+    description: 'Discover nearby talent',
+    icon: MapPin,
+    path: '/talents-around-me'
   },
-  { 
-    icon: Instagram,
-    label: 'Instagram', 
-    path: '#',
-    description: 'Follow on Instagram',
-    url: 'https://instagram.com' 
+  {
+    label: 'Sports Categories',
+    description: 'Explore sports',
+    icon: Users,
+    path: '/sports-categories'
   },
-  { 
-    icon: X,
-    label: 'X (Twitter)', 
-    path: '#',
-    description: 'Follow on X',
-    url: 'https://x.com' 
+  {
+    label: 'Learning Hub',
+    description: 'Educational content',
+    icon: GraduationCap,
+    path: '/learning'
   },
-  { 
-    icon: CircleUser,
-    label: 'TikTok', 
-    path: '#',
-    description: 'Follow on TikTok',
-    url: 'https://tiktok.com' 
+  {
+    label: 'Live Events',
+    description: 'Streams & broadcasts',
+    icon: Radio,
+    path: '/live'
+  },
+  {
+    label: 'News & Updates',
+    description: 'Latest in sports & arts',
+    icon: Newspaper,
+    path: '/news'
+  },
+  {
+    label: 'Upcoming Events',
+    description: 'Calendar of activities',
+    icon: Calendar,
+    path: '/events'
+  }
+];
+
+// Talent profile section
+export const profileItems: MenuSectionItem[] = [
+  {
+    label: 'My Profile',
+    description: 'Manage your presence',
+    icon: User,
+    path: '/profile'
+  },
+  {
+    label: 'My Resumes',
+    description: 'Your talent portfolios',
+    icon: FileText,
+    path: '/profile?tab=resumes',
+    badge: "New"
+  },
+  {
+    label: 'Organizations',
+    description: 'Browse agencies & companies',
+    icon: Building,
+    path: '/organizations'
+  },
+  {
+    label: 'Communities',
+    description: 'Your groups & activities',
+    icon: Users,
+    path: '/communities'
+  }
+];
+
+// Connect section
+export const connectItems: MenuSectionItem[] = [
+  {
+    label: 'Talent Community',
+    description: 'Connect with other talents',
+    icon: Users,
+    path: '/participants'
+  },
+  {
+    label: 'Work Opportunities',
+    description: 'Jobs & collaborations',
+    icon: Briefcase,
+    path: '/work',
+    badge: "New"
+  },
+  {
+    label: 'YAT TV',
+    description: 'Watch talent showcases',
+    icon: PanelRight,
+    path: '/online-tv'
   }
 ];

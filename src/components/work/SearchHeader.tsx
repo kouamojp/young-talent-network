@@ -2,30 +2,60 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, ArrowLeft, Briefcase } from 'lucide-react';
+import { Search, Filter, ArrowLeft, Briefcase, FileText } from 'lucide-react';
 
 interface SearchHeaderProps {
   path: string;
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onBack: () => void;
+  viewMode?: 'jobs' | 'resumes';
 }
 
 const SearchHeader: React.FC<SearchHeaderProps> = ({
   path,
   searchTerm,
   onSearchChange,
-  onBack
+  onBack,
+  viewMode = 'jobs'
 }) => {
+  const getPlaceholder = () => {
+    if (viewMode === 'jobs') {
+      return path === 'talent' 
+        ? "Search for jobs, scholarships..." 
+        : "Search for talents applying to your jobs...";
+    } else {
+      return path === 'talent' 
+        ? "Search for collaborator resumes..." 
+        : "Search for talent resumes...";
+    }
+  };
+
+  const getTitle = () => {
+    if (viewMode === 'jobs') {
+      return path === 'talent' 
+        ? "Find Your Dream Opportunity" 
+        : "Manage Your Job Postings";
+    } else {
+      return path === 'talent' 
+        ? "Find Collaborators" 
+        : "Discover Top Talent";
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
         <Button variant="ghost" size="icon" onClick={onBack}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Briefcase className="h-6 w-6" />
+        {viewMode === 'jobs' ? (
+          <Briefcase className="h-6 w-6" />
+        ) : (
+          <FileText className="h-6 w-6" />
+        )}
         <h1 className="text-2xl font-bold">
-          {path === 'talent' ? "Find Your Dream Stage" : "Find Your Dream Team"}
+          {getTitle()}
         </h1>
       </div>
       
@@ -34,7 +64,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
           <Input 
             className="pl-10" 
-            placeholder={path === 'talent' ? "Search for jobs, scholarships..." : "Search for talents, skills..."} 
+            placeholder={getPlaceholder()}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
