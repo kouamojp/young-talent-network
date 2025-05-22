@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,10 +22,9 @@ import Live from "./pages/Live";
 import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
-import Navbar from "./components/Navbar";
 import React from "react";
 import { Sheet, SheetTrigger, SheetContent } from "./components/ui/sheet";
 import { Menu } from "lucide-react";
@@ -43,7 +43,6 @@ const App = () => {
           <div className="flex min-h-screen w-full">
             <div>
               <div className="md:hidden fixed top-3 left-3 z-50">
-                <SidebarTrigger />
               </div>
               <div className="hidden md:block animate-fade-in animate-scale-in">
                 <SocialSidebar />
@@ -51,8 +50,6 @@ const App = () => {
             </div>
 
             <div className="flex-1 flex flex-col min-h-screen">
-              <Navbar />
-
               <div className="flex md:hidden fixed top-3 right-3 z-50">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                   <SheetTrigger asChild>
@@ -69,7 +66,7 @@ const App = () => {
                 </Sheet>
               </div>
 
-              <div className="flex-1 pt-14 flex">
+              <div className="flex-1 flex">
                 <main className="flex-1 mx-auto w-full max-w-screen-xl px-4 py-6 animate-fade-in">
                   <Routes>
                     <Route path="/" element={<Index />} />

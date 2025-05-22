@@ -24,12 +24,12 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
   const content = (
     <>
       <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-[#E4E6EB]">
-          <Icon className="h-4 w-4 text-[#65676B]" />
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-200">
+          <Icon className="h-4 w-4 text-gray-600" />
         </div>
         <div className="flex flex-col">
-          <span className="font-medium text-[#050505]">{label}</span>
-          <span className="text-xs text-[#65676B]">{description}</span>
+          <span className="font-medium">{label}</span>
+          <span className="text-xs text-gray-500">{description}</span>
         </div>
       </div>
     </>
@@ -41,7 +41,7 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-full"
+        className="flex items-center p-2 rounded-lg hover:bg-gray-200 transition-colors w-full"
       >
         {content}
       </a>
@@ -49,7 +49,7 @@ const SidebarMenuLink: React.FC<SidebarMenuLinkProps> = ({
   }
   
   return (
-    <Link to={path} className="w-full">
+    <Link to={path} className="flex items-center p-2 rounded-lg hover:bg-gray-200 transition-colors w-full">
       {content}
     </Link>
   );
