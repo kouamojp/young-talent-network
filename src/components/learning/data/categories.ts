@@ -5,11 +5,13 @@ export interface Category {
   icon: string;
   color: string;
   subcategories: Subcategory[];
+  performanceTracking?: PerformanceTracking;
 }
 
 export interface Subcategory {
   name: string;
   items: SubcategoryItem[];
+  performanceMetrics?: PerformanceMetric[];
 }
 
 export interface SubcategoryItem {
@@ -17,15 +19,57 @@ export interface SubcategoryItem {
   icon: string;
 }
 
+export interface PerformanceTracking {
+  title: string;
+  description: string;
+  features: string[];
+}
+
+export interface PerformanceMetric {
+  name: string;
+  icon: string;
+  description: string;
+}
+
+export interface AthleteParameter {
+  name: string;
+  score: number;
+  goal: number;
+}
+
+export const athleteParameters: AthleteParameter[] = [
+  { name: "Endurance", score: 75, goal: 90 },
+  { name: "Flexibility", score: 60, goal: 80 },
+  { name: "Game IQ", score: 88, goal: 95 },
+  { name: "Reaction Time", score: 82, goal: 95 },
+  { name: "Balance", score: 70, goal: 85 }
+];
+
 export const categories: Category[] = [
   {
     id: 1,
     name: 'Sports & Fitness',
     icon: '🏆',
     color: 'bg-green-100',
+    performanceTracking: {
+      title: "Athlete Profile Hub",
+      description: "Accessible from any sport category!",
+      features: [
+        "🎮 Unlock achievements (e.g., 'Fast Footwork Frenzy')",
+        "🤝 Compare stats with friends (friendly mode!)",
+        "📱 Sync with wearables (Apple Watch/Strava)",
+        "🍎 Get nutrition tips based on workouts"
+      ]
+    },
     subcategories: [
       {
         name: 'Team Sports',
+        performanceMetrics: [
+          { name: "Speed drills", icon: "👟", description: "Track your sprint times and agility" },
+          { name: "Passing accuracy", icon: "🎯", description: "Measure passing completion percentage" },
+          { name: "Tactical IQ test", icon: "🧠", description: "Test your game awareness and decision making" },
+          { name: "Team synergy score", icon: "💛", description: "Rate how well you collaborate with teammates" }
+        ],
         items: [
           { name: 'Football (Soccer)', icon: '⚽' },
           { name: 'Basketball', icon: '🏀' },
@@ -41,6 +85,12 @@ export const categories: Category[] = [
       },
       {
         name: 'Individual Sports',
+        performanceMetrics: [
+          { name: "Serve/swing force", icon: "💪", description: "Measure the power of your shots" },
+          { name: "Precision radar", icon: "🎯", description: "Track your accuracy and consistency" },
+          { name: "Focus endurance", icon: "🧘", description: "Evaluate your mental concentration over time" },
+          { name: "Progress dashboard", icon: "📈", description: "Visualize your improvement over time" }
+        ],
         items: [
           { name: 'Tennis', icon: '🎾' },
           { name: 'Badminton', icon: '🏸' },
@@ -56,6 +106,12 @@ export const categories: Category[] = [
       },
       {
         name: 'Martial Arts',
+        performanceMetrics: [
+          { name: "Reaction time", icon: "⚡", description: "Test how quickly you respond to stimuli" },
+          { name: "Strike impact", icon: "🥊", description: "Measure the force of your strikes" },
+          { name: "Defense agility", icon: "🛡️", description: "Evaluate your defensive movements and evasions" },
+          { name: "Mental resilience", icon: "❤️", description: "Track your mental toughness under pressure" }
+        ],
         items: [
           { name: 'Karate', icon: '🥋' },
           { name: 'Judo', icon: '🤼' },
@@ -71,6 +127,12 @@ export const categories: Category[] = [
       },
       {
         name: 'Quidditch for Beginners',
+        performanceMetrics: [
+          { name: "Broom balance", icon: "🧹", description: "Test your stability while riding a broom" },
+          { name: "Snitch spotting", icon: "✨", description: "Measure your ability to spot the golden snitch" },
+          { name: "Quaffle accuracy", icon: "🎯", description: "Track your scoring percentage with the quaffle" },
+          { name: "Air time tracker", icon: "☁️", description: "Measure time spent airborne during practice" }
+        ],
         items: [
           { name: 'Basics of Broom Handling', icon: '🧹' },
           { name: 'Chaser Drills (Score with Quaffle)', icon: '🎯' },
@@ -81,6 +143,12 @@ export const categories: Category[] = [
       },
       {
         name: 'Yoga & Wellness',
+        performanceMetrics: [
+          { name: "Pose hold time", icon: "🕊️", description: "Track how long you can maintain challenging poses" },
+          { name: "Mind/body sync", icon: "☯️", description: "Measure your breath-movement coordination" },
+          { name: "Recovery score", icon: "🌿", description: "Evaluate how quickly your body recovers after sessions" },
+          { name: "Stress-o-meter", icon: "😌", description: "Monitor your stress levels before and after practice" }
+        ],
         items: [
           { name: 'Hatha Yoga', icon: '🧘' },
           { name: 'Vinyasa Flow', icon: '🌊' },
