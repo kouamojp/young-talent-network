@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
-import { Grid, Volleyball, ChevronDown, ChevronUp, Search, BarChart } from 'lucide-react';
+import { Grid, ChevronDown, ChevronUp, Search, BarChart } from 'lucide-react';
 import { categories, Subcategory, SubcategoryItem, athleteParameters } from '@/components/learning/data/categories';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Input } from '@/components/ui/input';
@@ -81,9 +82,9 @@ const Categories: React.FC = () => {
             </Tabs>
           </div>
 
-          {/* Important: Wrap all TabsContent components inside a parent Tabs */}
+          {/* Use a single Tabs component with single set of TabsContent */}
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "categories" | "profile")}>
-            <TabsContent value="categories" className="focus-visible:outline-none focus-visible:ring-0 mt-0">
+            <TabsContent value="categories" className="mt-0">
               <p className="text-gray-600 mb-6 md:mb-8 text-sm md:text-base">
                 Browse categories with personalized performance tracking! Each sport comes with specific metrics to track your progress and improvement.
               </p>
@@ -204,7 +205,7 @@ const Categories: React.FC = () => {
               )}
             </TabsContent>
             
-            <TabsContent value="profile" className="focus-visible:outline-none focus-visible:ring-0 mt-0">
+            <TabsContent value="profile" className="mt-0">
               <div className="mb-6">
                 <h2 className="text-xl md:text-2xl font-bold mb-2">🌟 Athlete Profile Hub</h2>
                 <p className="text-gray-600 text-sm md:text-base">
