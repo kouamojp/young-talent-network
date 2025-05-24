@@ -2,18 +2,22 @@
 import React, { useState } from 'react';
 import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
-import { Building, MapPin, Star, Globe, Users, Award } from 'lucide-react';
+import { Building, MapPin, Star, Globe, Users, Award, Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import OrganizationMapView from '@/components/organizations/OrganizationMapView';
 import OrganizationListView from '@/components/organizations/OrganizationListView';
+import OrganizationProfileForm from '@/components/organizations/OrganizationProfileForm';
 
 const Organizations: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
   const [selectedOrg, setSelectedOrg] = useState<number | null>(null);
+  const [editingOrg, setEditingOrg] = useState<any>(null);
+  const [isProfileFormOpen, setIsProfileFormOpen] = useState(false);
 
-  const organizations = [
+  const [organizations, setOrganizations] = useState([
     { 
       id: 1, 
       name: 'Elite Talent Agency', 
@@ -23,9 +27,12 @@ const Organizations: React.FC = () => {
       city: 'New York',
       logo: '/placeholder.svg',
       description: 'Premier talent agency representing actors, musicians, and artists across various industries.',
+      customDescription: 'Specializing in breakthrough talent discovery and career management for entertainment professionals.',
       rating: 4.8,
       website: 'www.elitetalent.com',
-      verified: true
+      verified: true,
+      phone: '+1 (555) 123-4567',
+      email: 'contact@elitetalent.com'
     },
     { 
       id: 2, 
@@ -36,9 +43,12 @@ const Organizations: React.FC = () => {
       city: 'Los Angeles',
       logo: '/placeholder.svg',
       description: 'Full-service production company specializing in film, TV, and digital content creation.',
+      customDescription: 'Award-winning production services from concept to completion.',
       rating: 4.7,
       website: 'www.creativeartstudio.com',
-      verified: true
+      verified: true,
+      phone: '+1 (555) 987-6543',
+      email: 'info@creativeartstudio.com'
     },
     { 
       id: 3, 
@@ -51,7 +61,9 @@ const Organizations: React.FC = () => {
       description: 'Independent record label focused on discovering and promoting emerging musical talent.',
       rating: 4.6,
       website: 'www.globalmusicrecords.com',
-      verified: false
+      verified: false,
+      phone: '+1 (555) 456-7890',
+      email: 'artists@globalmusicrecords.com'
     },
     { 
       id: 4, 
@@ -62,11 +74,66 @@ const Organizations: React.FC = () => {
       city: 'London',
       logo: '/placeholder.svg',
       description: 'Leading performing arts school offering training in acting, dancing, and music.',
+      customDescription: 'Transforming passion into professional excellence through world-class training.',
       rating: 4.9,
       website: 'www.performanceartsacademy.edu',
-      verified: true
+      verified: true,
+      phone: '+44 20 7123 4567',
+      email: 'admissions@performanceartsacademy.edu'
     },
-  ];
+    {
+      id: 5,
+      name: 'WebConsult Moscow',
+      type: 'Web Services',
+      location: 'Moscow, Russia',
+      country: 'Russia',
+      city: 'Moscow',
+      logo: '/placeholder.svg',
+      description: 'Professional web development and digital marketing services.',
+      customDescription: 'Я занимаюсь консалтингом в вебе. Создание и продвижение сайтов в Москве.',
+      rating: 4.5,
+      website: 'www.webconsult.ru',
+      verified: true,
+      phone: '+7 (495) 123-45-67',
+      email: 'info@webconsult.ru'
+    }
+  ]);
+
+  const handleEditOrganization = (org: any) => {
+    setEditingOrg(org);
+    setIsProfileFormOpen(true);
+  };
+
+  const handleCreateNew = () => {
+    setEditingOrg(null);
+    setIsProfileFormOpen(true);
+  };
+
+  const handleSaveOrganization = (formData: any) => {
+    if (editingOrg) {
+      // Update existing organization
+      setOrganizations(prev => prev.map(org => 
+        org.id === editingOrg.id ? { ...org, ...formData } : org
+      ));
+    } else {
+      // Create new organization
+      const newOrg = {
+        id: Math.max(...organizations.map(o => o.id)) + 1,
+        ...formData,
+        rating: 4.0,
+        verified: false,
+        logo: '/placeholder.svg'
+      };
+      setOrganizations(prev => [...prev, newOrg]);
+    }
+    setIsProfileFormOpen(false);
+    setEditingOrg(null);
+  };
+
+  const handleCancelEdit = () => {
+    setIsProfileFormOpen(false);
+    setEditingOrg(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
@@ -78,6 +145,14 @@ const Organizations: React.FC = () => {
               <h1 className="text-2xl font-bold">Organizations & Agencies</h1>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleCreateNew}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Organization
+              </Button>
               <Button
                 variant={viewMode === 'list' ? 'default' : 'outline'}
                 onClick={() => setViewMode('list')}
@@ -109,9 +184,23 @@ const Organizations: React.FC = () => {
               setSelectedOrg={setSelectedOrg}
             />
           ) : (
-            <OrganizationListView organizations={organizations} />
+            <OrganizationListView 
+              organizations={organizations} 
+              onEditOrganization={handleEditOrganization}
+            />
           )}
         </GlassMorphism>
+
+        {/* Profile Form Dialog */}
+        <Dialog open={isProfileFormOpen} onOpenChange={setIsProfileFormOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <OrganizationProfileForm
+              organization={editingOrg}
+              onSave={handleSaveOrganization}
+              onCancel={handleCancelEdit}
+            />
+          </DialogContent>
+        </Dialog>
       </main>
       <Footer />
     </div>
