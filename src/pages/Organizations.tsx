@@ -10,12 +10,18 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import OrganizationMapView from '@/components/organizations/OrganizationMapView';
 import OrganizationListView from '@/components/organizations/OrganizationListView';
 import OrganizationProfileForm from '@/components/organizations/OrganizationProfileForm';
+import OrganizationAuth from '@/components/organization-profiles/OrganizationAuth';
+import OrganizationProfileEditor from '@/components/organization-profiles/OrganizationProfileEditor';
+import OrganizationDiscovery from '@/components/organization-profiles/OrganizationDiscovery';
 
 const Organizations: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
   const [selectedOrg, setSelectedOrg] = useState<number | null>(null);
   const [editingOrg, setEditingOrg] = useState<any>(null);
   const [isProfileFormOpen, setIsProfileFormOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('discovery');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userType, setUserType] = useState<'talent' | 'organization' | null>(null);
 
   const [organizations, setOrganizations] = useState([
     { 
@@ -99,6 +105,18 @@ const Organizations: React.FC = () => {
     }
   ]);
 
+  const handleLogin = (type: 'talent' | 'organization') => {
+    setIsLoggedIn(true);
+    setUserType(type);
+    setActiveTab('profile');
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserType(null);
+    setActiveTab('discovery');
+  };
+
   const handleEditOrganization = (org: any) => {
     setEditingOrg(org);
     setIsProfileFormOpen(true);
@@ -111,12 +129,10 @@ const Organizations: React.FC = () => {
 
   const handleSaveOrganization = (formData: any) => {
     if (editingOrg) {
-      // Update existing organization
       setOrganizations(prev => prev.map(org => 
         org.id === editingOrg.id ? { ...org, ...formData } : org
       ));
     } else {
-      // Create new organization
       const newOrg = {
         id: Math.max(...organizations.map(o => o.id)) + 1,
         ...formData,
@@ -142,53 +158,108 @@ const Organizations: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Building className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">Organizations & Agencies</h1>
+              <h1 className="text-2xl font-bold">YAT Organizations</h1>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={handleCreateNew}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Add Organization
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                onClick={() => setViewMode('list')}
-              >
-                List View
-              </Button>
-              <Button
-                variant={viewMode === 'map' ? 'default' : 'outline'}
-                onClick={() => setViewMode('map')}
-              >
-                Map View
-              </Button>
+              {isLoggedIn && (
+                <Button variant="outline" onClick={handleLogout}>
+                  Logout
+                </Button>
+              )}
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <Input placeholder="Search organizations, agencies, institutions..." />
-            </div>
-            <Button>
-              Search
-            </Button>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="discovery">
+                Discovery
+              </TabsTrigger>
+              <TabsTrigger value="browse">
+                Browse All
+              </TabsTrigger>
+              <TabsTrigger value="auth" disabled={isLoggedIn}>
+                Join/Login
+              </TabsTrigger>
+              <TabsTrigger value="profile" disabled={!isLoggedIn}>
+                My Profile
+              </TabsTrigger>
+            </TabsList>
 
-          {viewMode === 'map' ? (
-            <OrganizationMapView
-              organizations={organizations}
-              selectedOrg={selectedOrg}
-              setSelectedOrg={setSelectedOrg}
-            />
-          ) : (
-            <OrganizationListView 
-              organizations={organizations} 
-              onEditOrganization={handleEditOrganization}
-            />
-          )}
+            <TabsContent value="discovery">
+              <OrganizationDiscovery />
+            </TabsContent>
+
+            <TabsContent value="browse">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={handleCreateNew}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Organization
+                    </Button>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      onClick={() => setViewMode('list')}
+                    >
+                      List View
+                    </Button>
+                    <Button
+                      variant={viewMode === 'map' ? 'default' : 'outline'}
+                      onClick={() => setViewMode('map')}
+                    >
+                      Map View
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <Input placeholder="Search organizations, agencies, institutions..." />
+                  </div>
+                  <Button>
+                    Search
+                  </Button>
+                </div>
+
+                {viewMode === 'map' ? (
+                  <OrganizationMapView
+                    organizations={organizations}
+                    selectedOrg={selectedOrg}
+                    setSelectedOrg={setSelectedOrg}
+                  />
+                ) : (
+                  <OrganizationListView 
+                    organizations={organizations} 
+                    onEditOrganization={handleEditOrganization}
+                  />
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="auth">
+              <OrganizationAuth onLogin={handleLogin} />
+            </TabsContent>
+
+            <TabsContent value="profile">
+              {isLoggedIn && userType === 'organization' && (
+                <OrganizationProfileEditor />
+              )}
+              {isLoggedIn && userType === 'talent' && (
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-semibold mb-2">Talent Profile</h3>
+                  <p className="text-muted-foreground">
+                    This section is for talents to manage their profiles and connect with organizations.
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </GlassMorphism>
 
         {/* Profile Form Dialog */}
