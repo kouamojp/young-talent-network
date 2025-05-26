@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -357,9 +356,7 @@ const ProjectFunding: React.FC = () => {
               <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No Funding History Yet</h3>
               <p className="text-gray-600 mb-4">Start funding projects to see your investment history here.</p>
-              <Button onClick={() => setActiveTab?.('browse')}>
-                Browse Projects
-              </Button>
+              <p className="text-sm text-gray-500">Switch to the "Browse Projects" tab to explore funding opportunities.</p>
             </div>
           )}
         </TabsContent>
