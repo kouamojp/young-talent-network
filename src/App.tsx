@@ -22,6 +22,7 @@ import Live from "./pages/Live";
 import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
+import YatCoin from "./pages/YatCoin";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
@@ -86,6 +87,7 @@ const App = () => {
                     <Route path="/work" element={<Work />} />
                     <Route path="/learning" element={<Learning />} />
                     <Route path="/talents-around-me" element={<TalentsAroundMe />} />
+                    <Route path="/yat-coin" element={<YatCoin />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>
