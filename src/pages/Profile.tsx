@@ -5,10 +5,11 @@ import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileInfo from '@/components/profile/ProfileInfo';
 import { ProfileTabs } from '@/components/profile/ProfileTabs';
 import { user, userPosts } from '@/components/profile/ProfileData';
-import { History } from 'lucide-react';
+import { History, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Navbar from '@/components/Navbar';
+import { Link } from 'react-router-dom';
 
 const Profile: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -50,15 +51,25 @@ const Profile: React.FC = () => {
             setIsEditMode={setIsEditMode}
           />
           
-          {/* Create History Button */}
-          <div className="mb-4">
+          {/* Action Buttons */}
+          <div className="mb-4 flex gap-3">
             <Button 
               onClick={handleCreateHistory}
-              className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600"
+              className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600"
             >
               <History className="h-4 w-4" />
               <span>Create History</span>
             </Button>
+            
+            <Link to="/talent-dashboard">
+              <Button 
+                variant="outline"
+                className="flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Talent Dashboard</span>
+              </Button>
+            </Link>
           </div>
           
           <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
