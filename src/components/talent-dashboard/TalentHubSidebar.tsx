@@ -7,10 +7,11 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { 
-  Rocket, Gem, Film, Heart, Zap, Search, Plus, Megaphone, Sos,
+  Rocket, Gem, Film, Heart, Zap, Search, Plus, Megaphone, AlertTriangle,
   Play, Users, TrendingUp, TrendingDown, Coins, Clock, Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useShakeDetection } from '@/hooks/useShakeDetection';
 
 interface TalentHubSidebarProps {
   isOpen: boolean;
@@ -78,6 +79,13 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
     });
   };
 
+  // Shake detection
+  const { isShaking } = useShakeDetection({
+    threshold: 15,
+    timeWindow: 1000,
+    onShake: handleShake
+  });
+
   // Mock data for investors
   const investors = [
     { id: 1, name: "Alex", avatar: "/placeholder.svg", amount: "$500" },
@@ -97,7 +105,7 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       
       {/* Sidebar */}
-      <div className={`absolute left-0 top-0 h-full w-80 bg-gradient-to-b from-purple-600 via-blue-600 to-pink-600 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`absolute left-0 top-0 h-full w-80 bg-gradient-to-b from-purple-600 via-blue-600 to-pink-600 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${isShaking ? 'animate-pulse' : ''}`}>
         <div className="h-full overflow-y-auto p-4 text-white">
           
           {/* Header - Your Talent HQ */}
@@ -138,6 +146,13 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
               </div>
             </div>
           </div>
+
+          {/* Shake Detection Indicator */}
+          {isShaking && (
+            <div className="mb-4 p-3 bg-yellow-400/20 border border-yellow-400/30 rounded-lg text-center">
+              <p className="text-sm font-medium">📱 Shake detected! Fortune cookie incoming... 🥠</p>
+            </div>
+          )}
 
           {/* Main Sections */}
           <div className="space-y-4">
@@ -306,7 +321,7 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
                   variant="ghost" 
                   className="text-white hover:bg-white/10 justify-start"
                 >
-                  <Sos className="h-4 w-4 mr-2" />
+                  <AlertTriangle className="h-4 w-4 mr-2" />
                   🆘 SOS Boost
                 </Button>
               </div>
@@ -318,10 +333,13 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
             <Button 
               onClick={handleShake}
               variant="ghost" 
-              className="w-full text-white hover:bg-white/10 text-xs"
+              className={`w-full text-white hover:bg-white/10 text-xs ${isShaking ? 'animate-bounce bg-white/20' : ''}`}
             >
               🥠 Shake for Fortune Cookie
             </Button>
+            <p className="text-xs text-white/60 mt-2 text-center">
+              📱 Or physically shake your phone!
+            </p>
           </div>
 
           {/* Tagline */}
