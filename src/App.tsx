@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,7 +28,6 @@ import TalentDashboard from "./pages/TalentDashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
-import React from "react";
 import { Sheet, SheetTrigger, SheetContent } from "./components/ui/sheet";
 import { Menu } from "lucide-react";
 

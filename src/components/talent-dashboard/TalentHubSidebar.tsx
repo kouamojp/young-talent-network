@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { 
-  Rocket, Gem, Film, Heart, Zap, Search, Plus, Megaphone, Sos,
+  Rocket, Gem, Film, Heart, Zap, Search, Plus, Megaphone, sos,
   Play, Users, TrendingUp, TrendingDown, Coins, Clock, Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -306,7 +305,7 @@ const TalentHubSidebar: React.FC<TalentHubSidebarProps> = ({ isOpen, onClose }) 
                   variant="ghost" 
                   className="text-white hover:bg-white/10 justify-start"
                 >
-                  <Sos className="h-4 w-4 mr-2" />
+                  <sos className="h-4 w-4 mr-2" />
                   🆘 SOS Boost
                 </Button>
               </div>
