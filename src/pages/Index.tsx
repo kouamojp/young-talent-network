@@ -40,7 +40,13 @@ const Index: React.FC = () => {
       {/* Hero Section - Talent Search */}
       <div className="relative bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900 min-h-[400px] flex items-center justify-center overflow-hidden">
         {/* Background particles/stars effect */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="20" cy="20" r="1"/%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+        <div className="absolute inset-0 opacity-50">
+          <div className="w-full h-full bg-[length:40px_40px] bg-repeat" 
+               style={{
+                 backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E")`
+               }}>
+          </div>
+        </div>
         
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">
