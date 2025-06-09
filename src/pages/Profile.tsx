@@ -33,17 +33,14 @@ const Profile: React.FC = () => {
         <div className="h-14"></div>
       </div>
       
-      {/* Header */}
+      {/* Header with integrated navigation */}
       <div className="bg-[#5181B8] text-white py-3">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="text-2xl font-bold">Y&T</div>
               <div className="hidden md:flex items-center gap-6 text-sm">
-                <Link to="/" className="hover:text-blue-200">Новости</Link>
-                <Link to="/messages" className="hover:text-blue-200">Сообщения</Link>
-                <Link to="/communities" className="hover:text-blue-200">Сообщества</Link>
-                <Link to="/work" className="hover:text-blue-200">Работа</Link>
+                <ProfileMenu />
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -55,9 +52,8 @@ const Profile: React.FC = () => {
 
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Sidebar - Now with Menu */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Profile Card */}
+          {/* Left Sidebar - Profile Card only */}
+          <div className="lg:col-span-1">
             <Card className="bg-white">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
@@ -127,9 +123,6 @@ const Profile: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Navigation Menu */}
-            <ProfileMenu />
           </div>
 
           {/* Main Content */}

@@ -33,26 +33,21 @@ const ProfileMenu: React.FC = () => {
   const isActive = (path: string) => currentPath === path;
 
   return (
-    <nav className="bg-white rounded-lg shadow-sm">
-      <div className="p-2">
-        <ul className="space-y-1">
-          {menuItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive(item.path)
-                    ? 'bg-[#5181B8] text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <nav className="flex items-center gap-6">
+      {menuItems.map((item) => (
+        <Link
+          key={item.path}
+          to={item.path}
+          className={`flex items-center gap-2 px-2 py-1 rounded text-sm transition-colors ${
+            isActive(item.path)
+              ? 'text-blue-200 font-medium'
+              : 'text-white hover:text-blue-200'
+          }`}
+        >
+          <item.icon className="h-4 w-4" />
+          <span className="hidden lg:inline">{item.label}</span>
+        </Link>
+      ))}
     </nav>
   );
 };
