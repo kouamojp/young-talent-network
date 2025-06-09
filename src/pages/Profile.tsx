@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { MessageSquare, UserPlus, Settings, Calendar, MapPin, Briefcase, Heart } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Navbar from '@/components/Navbar';
+import ProfileMenu from '@/components/ProfileMenu';
 import { Link } from 'react-router-dom';
 
 const Profile: React.FC = () => {
@@ -54,8 +55,9 @@ const Profile: React.FC = () => {
 
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Left Sidebar - Now with Menu */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Card */}
             <Card className="bg-white">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
@@ -125,6 +127,9 @@ const Profile: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Navigation Menu */}
+            <ProfileMenu />
           </div>
 
           {/* Main Content */}
