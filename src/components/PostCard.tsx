@@ -26,7 +26,7 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className="bg-card rounded-lg shadow-sm border border-border">
       {/* Post Header */}
       <div className="p-4">
         <div className="flex items-start justify-between">
@@ -37,12 +37,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             </Avatar>
             <div className="ml-3">
               <h3 className="font-semibold text-[15px]">{post.author.name}</h3>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
               </span>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-gray-600">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <MoreHorizontal className="h-5 w-5" />
           </button>
         </div>
@@ -54,9 +54,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       </div>
       
       {/* Like/Comment/Share Count */}
-      <div className="px-4 py-2 flex justify-between border-t border-b border-gray-100 text-xs text-gray-500">
+      <div className="px-4 py-2 flex justify-between border-t border-b text-xs text-muted-foreground">
         <div className="flex items-center">
-          <div className="bg-blue-500 rounded-full p-1">
+          <div className="bg-primary rounded-full p-1">
             <ThumbsUp className="h-3 w-3 text-white" />
           </div>
           <span className="ml-2">{post.likes}</span>
@@ -70,15 +70,15 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       
       {/* Actions */}
       <div className="px-4 py-1 flex justify-between">
-        <Button variant="ghost" size="sm" className="flex-1 text-sm text-gray-600">
+        <Button variant="ghost" size="sm" className="flex-1 text-sm">
           <ThumbsUp className="h-5 w-5 mr-2" />
           Like
         </Button>
-        <Button variant="ghost" size="sm" className="flex-1 text-sm text-gray-600">
+        <Button variant="ghost" size="sm" className="flex-1 text-sm">
           <MessageSquare className="h-5 w-5 mr-2" />
           Comment
         </Button>
-        <Button variant="ghost" size="sm" className="flex-1 text-sm text-gray-600">
+        <Button variant="ghost" size="sm" className="flex-1 text-sm">
           <Share className="h-5 w-5 mr-2" />
           Share
         </Button>

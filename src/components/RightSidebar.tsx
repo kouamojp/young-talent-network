@@ -20,55 +20,55 @@ const birthdays = [
 
 const RightSidebar: React.FC = () => {
   return (
-    <div className="w-full max-w-xs mx-auto space-y-6 p-4">
+    <div className="w-full space-y-4 py-4">
       {/* Sponsored */}
-      <div className="mb-4">
-        <h3 className="font-medium text-gray-500 mb-3">Sponsored</h3>
-        <div className="rounded-md overflow-hidden mb-3">
+      <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
+        <h3 className="font-semibold text-sm text-muted-foreground mb-3">Sponsored</h3>
+        <div className="rounded-md overflow-hidden">
           <img 
             src="/placeholder.svg" 
             alt="Advertisement" 
             className="w-full h-32 object-cover"
           />
-          <div className="p-2">
-            <h4 className="text-sm">Music lessons for beginners</h4>
-            <p className="text-xs text-gray-500">musiclessons.com</p>
+          <div className="p-2 bg-muted/50">
+            <h4 className="text-sm font-medium">Music lessons for beginners</h4>
+            <p className="text-xs text-muted-foreground">musiclessons.com</p>
           </div>
         </div>
       </div>
       
       {/* Birthdays */}
-      <div className="mb-4">
-        <h3 className="font-medium text-gray-500 mb-3">Birthdays</h3>
+      <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
+        <h3 className="font-semibold text-sm text-muted-foreground mb-3">Birthdays</h3>
         {birthdays.map(person => (
           <div key={person.id} className="flex items-center gap-3 py-2">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center text-blue-500">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center">
               🎂
             </div>
             <p className="text-sm">
               <span className="font-medium">{person.name}</span>
-              <span className="text-gray-500">'s birthday is {person.date}</span>
+              <span className="text-muted-foreground">'s birthday is {person.date}</span>
             </p>
           </div>
         ))}
       </div>
       
-      {/* Contacts - Facebook Style */}
-      <div>
+      {/* Contacts */}
+      <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-gray-500">Contacts</h3>
+          <h3 className="font-semibold text-sm text-muted-foreground">Contacts</h3>
           <div className="flex space-x-2">
-            <button className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
+            <button className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors">
               <Search className="h-4 w-4" />
             </button>
-            <button className="text-gray-500 hover:bg-gray-100 rounded-full p-1">
+            <button className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors">
               <Plus className="h-4 w-4" />
             </button>
           </div>
         </div>
         <ul className="space-y-1">
           {contacts.map(contact => (
-            <li key={contact.id} className="flex items-center gap-3 py-1 px-2 rounded-md hover:bg-gray-100 cursor-pointer">
+            <li key={contact.id} className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-muted cursor-pointer transition-colors">
               <div className="relative">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={contact.avatar} alt={contact.name} />
@@ -76,8 +76,8 @@ const RightSidebar: React.FC = () => {
                 </Avatar>
                 <span 
                   className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full ${
-                    contact.status === 'online' ? 'bg-green-500' : 'bg-gray-300'
-                  } border-2 border-white`}
+                    contact.status === 'online' ? 'bg-green-500' : 'bg-muted-foreground'
+                  } border-2 border-card`}
                 />
               </div>
               <span className="text-sm font-medium">{contact.name}</span>
