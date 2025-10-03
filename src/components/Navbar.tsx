@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
-import LeftSidebarMenu from './LeftSidebarMenu';
+import BurgerMenu from './BurgerMenu';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,7 +16,7 @@ const Navbar: React.FC = () => {
       <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Burger Menu and Logo */}
         <div className="flex items-center gap-3">
-          <LeftSidebarMenu />
+          <BurgerMenu />
           <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" 
