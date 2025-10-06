@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -132,7 +133,7 @@ const OnlineTV: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12">
           <GlassMorphism className="p-6 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Tv className="h-6 w-6" />

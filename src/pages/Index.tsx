@@ -3,6 +3,7 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Feed from '@/components/Feed';
+import RightSidebar from '@/components/RightSidebar';
 
 const Index: React.FC = () => {
   return (
@@ -35,9 +36,21 @@ const Index: React.FC = () => {
         </div>
       </header>
 
-      {/* Centered content */}
-      <div className="max-w-3xl mx-auto px-4">
-        <Feed />
+      {/* Two-column layout */}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex gap-4">
+          {/* Main Feed */}
+          <main className="flex-1 min-w-0">
+            <Feed />
+          </main>
+
+          {/* Right Sidebar */}
+          <aside className="hidden xl:block w-72 flex-shrink-0">
+            <div className="sticky top-20">
+              <RightSidebar />
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );
