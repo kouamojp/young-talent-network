@@ -2,7 +2,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import SocialSidebar from '@/components/SocialSidebar';
 import Feed from '@/components/Feed';
 import RightSidebar from '@/components/RightSidebar';
 
@@ -37,16 +36,9 @@ const Index: React.FC = () => {
         </div>
       </header>
 
-      {/* Three-column VK-style layout */}
+      {/* Two-column layout */}
       <div className="max-w-7xl mx-auto">
         <div className="flex gap-4">
-          {/* Left Sidebar */}
-          <aside className="hidden lg:block w-60 flex-shrink-0">
-            <div className="sticky top-20">
-              <SocialSidebar />
-            </div>
-          </aside>
-
           {/* Main Feed */}
           <main className="flex-1 min-w-0">
             <Feed />
