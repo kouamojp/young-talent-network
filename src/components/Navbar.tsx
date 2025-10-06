@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
-import BurgerMenu from './BurgerMenu';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,9 +13,8 @@ const Navbar: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 shadow-sm z-50">
       <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-full">
-        {/* Burger Menu and Logo */}
+        {/* Logo */}
         <div className="flex items-center gap-3">
-          <BurgerMenu />
           <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" 

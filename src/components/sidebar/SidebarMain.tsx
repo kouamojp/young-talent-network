@@ -13,9 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import { 
   mainNavigationItems, 
-  contentItems, 
-  profileItems,
-  connectItems 
+  profileItems
 } from './sidebarData';
 import { MenuSectionItem } from './types';
 
@@ -65,27 +63,11 @@ const SidebarMain: React.FC = () => {
           </SidebarGroupContent>
         </SidebarGroup>
         
-        {/* Communities & Content */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Communities & Content</SidebarGroupLabel>
-          <SidebarGroupContent>
-            {renderMenuItems(contentItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
-        
-        {/* Profile */}
+        {/* Your Talent Profile */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Your Talent Profile</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(profileItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
-        
-        {/* Social Links */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Connect</SidebarGroupLabel>
-          <SidebarGroupContent>
-            {renderMenuItems(connectItems)}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarHeader>

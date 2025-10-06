@@ -28,8 +28,7 @@ import TalentDashboard from "./pages/TalentDashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
-import { Sheet, SheetTrigger, SheetContent } from "./components/ui/sheet";
-import { Menu } from "lucide-react";
+import Navbar from "./components/Navbar";
 
 const queryClient = new QueryClient();
 
@@ -43,32 +42,16 @@ const App = () => {
         <Sonner />
         <SidebarProvider>
           <div className="flex min-h-screen w-full">
-            <div>
-              <div className="md:hidden fixed top-3 left-3 z-50">
-              </div>
-              <div className="hidden md:block animate-fade-in animate-scale-in">
-                <SocialSidebar />
-              </div>
+            {/* Left Sidebar */}
+            <div className="hidden md:block animate-fade-in animate-scale-in">
+              <SocialSidebar />
             </div>
 
             <div className="flex-1 flex flex-col min-h-screen">
-              <div className="flex md:hidden fixed top-3 right-3 z-50">
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <button
-                      className="p-2 bg-white/80 rounded-full border border-gray-200 shadow-lg hover:scale-105 transition"
-                      aria-label="Open menu"
-                    >
-                      <Menu className="h-6 w-6 text-gray-700" />
-                    </button>
-                  </SheetTrigger>
-                  <SheetContent className="bg-white animate-fade-in animate-scale-in px-0 py-6 shadow-xl w-72">
-                    <RightSidebar />
-                  </SheetContent>
-                </Sheet>
-              </div>
+              {/* Navbar */}
+              <Navbar />
 
-              <div className="flex-1 flex">
+              <div className="flex-1 flex mt-14">
                 <main className="flex-1 mx-auto w-full max-w-screen-xl px-4 py-6 animate-fade-in">
                   <Routes>
                     <Route path="/" element={<Index />} />
