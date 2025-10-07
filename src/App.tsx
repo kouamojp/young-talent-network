@@ -37,7 +37,7 @@ const App = () => {
         <Sonner />
         
         {/* Fixed Navbar */}
-        <Navbar className="mx-[7px]" />
+        <Navbar />
         
         {/* Main Layout Container */}
         <div className="flex w-full pt-14">

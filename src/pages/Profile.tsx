@@ -5,17 +5,19 @@ import { user, userPosts } from '@/components/profile/ProfileData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { MessageSquare, UserPlus, Settings, Calendar, MapPin, Briefcase, Heart, Home, Compass, MessagesSquare, Bell, Users, GraduationCap, Radio, Newspaper, User, FileText, Building, PanelRight } from 'lucide-react';
+import { MessageSquare, UserPlus, Settings, Calendar, MapPin, Briefcase, Heart, Home, Compass, MessagesSquare, Bell, Users, GraduationCap, Radio, Newspaper, User, FileText, Building, PanelRight, Menu, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Navbar from '@/components/Navbar';
 import ProfileMenu from '@/components/ProfileMenu';
 import ProfileSidebarMenu from '@/components/ProfileSidebarMenu';
 import { Link } from 'react-router-dom';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Profile: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [statusText, setStatusText] = useState(user.status);
   const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,27 +56,33 @@ const Profile: React.FC = () => {
 
       <main className="max-w-6xl mx-auto px-4 py-6">
         <div className="space-y-6">
-            {/* Navigation Menu Grid */}
-            <Card className="bg-white">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Burger Menu */}
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="lg" className="w-full flex items-center justify-center gap-2">
+                  <Menu className="h-5 w-5" />
+                  <span>Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
+                <div className="py-6 space-y-6">
                   {/* Main Section */}
                   <div className="space-y-4">
                     <h3 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">Main</h3>
                     <div className="space-y-3">
-                      <Link to="/" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Home className="h-5 w-5" />
                         <span>Home</span>
                       </Link>
-                      <Link to="/categories" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/categories" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Compass className="h-5 w-5" />
                         <span>Discover</span>
                       </Link>
-                      <Link to="/messages" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/messages" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <MessagesSquare className="h-5 w-5" />
                         <span>Messages</span>
                       </Link>
-                      <Link to="/notifications" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Bell className="h-5 w-5" />
                         <span>Notifications</span>
                       </Link>
@@ -85,27 +93,27 @@ const Profile: React.FC = () => {
                   <div className="space-y-4">
                     <h3 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">Communities & Content</h3>
                     <div className="space-y-3">
-                      <Link to="/talents-around-me" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/talents-around-me" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <MapPin className="h-5 w-5" />
                         <span>Talents Around Me</span>
                       </Link>
-                      <Link to="/sports-categories" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/sports-categories" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Users className="h-5 w-5" />
                         <span>Sports Categories</span>
                       </Link>
-                      <Link to="/learning" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/learning" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <GraduationCap className="h-5 w-5" />
                         <span>Learning Hub</span>
                       </Link>
-                      <Link to="/live" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/live" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Radio className="h-5 w-5" />
                         <span>Live Events</span>
                       </Link>
-                      <Link to="/news" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/news" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Newspaper className="h-5 w-5" />
                         <span>News & Updates</span>
                       </Link>
-                      <Link to="/events" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/events" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Calendar className="h-5 w-5" />
                         <span>Upcoming Events</span>
                       </Link>
@@ -116,22 +124,22 @@ const Profile: React.FC = () => {
                   <div className="space-y-4">
                     <h3 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">Your Talent Profile</h3>
                     <div className="space-y-3">
-                      <Link to="/profile" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <User className="h-5 w-5" />
                         <span>My Profile</span>
                       </Link>
-                      <Link to="/profile?tab=resumes" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/profile?tab=resumes" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <FileText className="h-5 w-5" />
                         <span className="flex items-center gap-2">
                           My Resumes
                           <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">New</span>
                         </span>
                       </Link>
-                      <Link to="/organizations" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/organizations" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Building className="h-5 w-5" />
                         <span>Organizations</span>
                       </Link>
-                      <Link to="/communities" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/communities" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Users className="h-5 w-5" />
                         <span>Communities</span>
                       </Link>
@@ -142,26 +150,26 @@ const Profile: React.FC = () => {
                   <div className="space-y-4">
                     <h3 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">Connect</h3>
                     <div className="space-y-3">
-                      <Link to="/participants" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/participants" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Users className="h-5 w-5" />
                         <span>Talent Community</span>
                       </Link>
-                      <Link to="/work" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/work" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <Briefcase className="h-5 w-5" />
                         <span className="flex items-center gap-2">
                           Work Opportunities
                           <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">New</span>
                         </span>
                       </Link>
-                      <Link to="/online-tv" className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <Link to="/online-tv" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                         <PanelRight className="h-5 w-5" />
                         <span>YAT TV</span>
                       </Link>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </SheetContent>
+            </Sheet>
 
             {/* Status/Post Creation */}
             <Card className="bg-white">
