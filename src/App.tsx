@@ -40,49 +40,56 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <SidebarProvider>
-          <div className="flex min-h-screen w-full">
-            {/* Left Sidebar */}
-            <div className="hidden md:block animate-fade-in animate-scale-in">
-              <SocialSidebar />
-            </div>
-
-            <div className="flex-1 flex flex-col min-h-screen">
-              {/* Navbar */}
-              <Navbar />
-
-              <div className="flex-1 flex mt-14">
-                <main className="flex-1 mx-auto w-full max-w-screen-xl px-4 py-6 animate-fade-in">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/auth" element={<Authentication />} />
-                    <Route path="/search" element={<Search />} />
-                    <Route path="/messages" element={<Messages />} />
-                    <Route path="/news" element={<News />} />
-                    <Route path="/categories" element={<Categories />} />
-                    <Route path="/participants" element={<Participants />} />
-                    <Route path="/communities" element={<Communities />} />
-                    <Route path="/organizations" element={<Organizations />} />
-                    <Route path="/test" element={<AptitudeTest />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/tv" element={<OnlineTV />} />
-                    <Route path="/live" element={<Live />} />
-                    <Route path="/work" element={<Work />} />
-                    <Route path="/learning" element={<Learning />} />
-                    <Route path="/talents-around-me" element={<TalentsAroundMe />} />
-                    <Route path="/yat-coin" element={<YatCoin />} />
-                    <Route path="/talent-dashboard" element={<TalentDashboard />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </main>
-                <div className="hidden lg:block animate-fade-in animate-scale-in">
-                  <RightSidebar />
-                </div>
-              </div>
+        
+        {/* Fixed Navbar */}
+        <Navbar />
+        
+        {/* Main Layout Container */}
+        <div className="flex w-full pt-14">
+          {/* Left Sidebar - Fixed */}
+          <div className="hidden lg:block w-[280px] flex-shrink-0">
+            <div className="fixed top-14 left-0 w-[280px] h-[calc(100vh-3.5rem)] overflow-y-auto">
+              <SidebarProvider>
+                <SocialSidebar />
+              </SidebarProvider>
             </div>
           </div>
-        </SidebarProvider>
+
+          {/* Main Content - Scrollable */}
+          <main className="flex-1 min-w-0 bg-background">
+            <div className="max-w-[680px] mx-auto px-4 py-4">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/auth" element={<Authentication />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/participants" element={<Participants />} />
+                <Route path="/communities" element={<Communities />} />
+                <Route path="/organizations" element={<Organizations />} />
+                <Route path="/test" element={<AptitudeTest />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/tv" element={<OnlineTV />} />
+                <Route path="/live" element={<Live />} />
+                <Route path="/work" element={<Work />} />
+                <Route path="/learning" element={<Learning />} />
+                <Route path="/talents-around-me" element={<TalentsAroundMe />} />
+                <Route path="/yat-coin" element={<YatCoin />} />
+                <Route path="/talent-dashboard" element={<TalentDashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </main>
+
+          {/* Right Sidebar - Fixed */}
+          <div className="hidden xl:block w-[320px] flex-shrink-0">
+            <div className="fixed top-14 right-0 w-[320px] h-[calc(100vh-3.5rem)] overflow-y-auto">
+              <RightSidebar />
+            </div>
+          </div>
+        </div>
       </TooltipProvider>
     </QueryClientProvider>
   );

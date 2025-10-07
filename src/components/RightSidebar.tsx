@@ -20,7 +20,7 @@ const birthdays = [
 
 const RightSidebar: React.FC = () => {
   return (
-    <div className="w-full space-y-4 py-4">
+    <div className="w-full space-y-4 p-4">
       {/* Sponsored */}
       <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
         <h3 className="font-semibold text-sm text-muted-foreground mb-3">Sponsored</h3>
