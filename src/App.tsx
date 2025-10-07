@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -28,64 +29,48 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
 import Navbar from "./components/Navbar";
+
 const queryClient = new QueryClient();
+
 const App = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
-  return <QueryClientProvider client={queryClient}>
+
+  return (
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
         
-        {/* Fixed Navbar */}
-        <Navbar className="mx-[7px]" />
-        
-        {/* Main Layout Container */}
-        <div className="flex w-full pt-14">
-          {/* Left Sidebar - Fixed */}
-          <div className="hidden lg:block w-[280px] flex-shrink-0">
-            <div className="fixed top-14 left-0 w-[280px] h-[calc(100vh-3.5rem)] overflow-y-auto">
-              <SidebarProvider>
-                <SocialSidebar />
-              </SidebarProvider>
-            </div>
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 bg-background">
+          <div className="max-w-[680px] mx-auto px-4 py-4">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/auth" element={<Authentication />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/participants" element={<Participants />} />
+              <Route path="/communities" element={<Communities />} />
+              <Route path="/organizations" element={<Organizations />} />
+              <Route path="/test" element={<AptitudeTest />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/tv" element={<OnlineTV />} />
+              <Route path="/live" element={<Live />} />
+              <Route path="/work" element={<Work />} />
+              <Route path="/learning" element={<Learning />} />
+              <Route path="/talents-around-me" element={<TalentsAroundMe />} />
+              <Route path="/yat-coin" element={<YatCoin />} />
+              <Route path="/talent-dashboard" element={<TalentDashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </div>
-
-          {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0 bg-background">
-            <div className="max-w-[680px] mx-auto px-4 py-4">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/auth" element={<Authentication />} />
-                <Route path="/search" element={<Search />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/participants" element={<Participants />} />
-                <Route path="/communities" element={<Communities />} />
-                <Route path="/organizations" element={<Organizations />} />
-                <Route path="/test" element={<AptitudeTest />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/tv" element={<OnlineTV />} />
-                <Route path="/live" element={<Live />} />
-                <Route path="/work" element={<Work />} />
-                <Route path="/learning" element={<Learning />} />
-                <Route path="/talents-around-me" element={<TalentsAroundMe />} />
-                <Route path="/yat-coin" element={<YatCoin />} />
-                <Route path="/talent-dashboard" element={<TalentDashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </main>
-
-          {/* Right Sidebar - Fixed */}
-          <div className="hidden xl:block w-[320px] flex-shrink-0">
-            <div className="fixed top-14 right-0 w-[320px] h-[calc(100vh-3.5rem)] overflow-y-auto">
-              <RightSidebar />
-            </div>
-          </div>
-        </div>
+        </main>
       </TooltipProvider>
-    </QueryClientProvider>;
+    </QueryClientProvider>
+  );
 };
+
 export default App;
