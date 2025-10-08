@@ -51,8 +51,8 @@ const App = () => {
           </div>
 
           {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0 bg-background">
-            <div className="max-w-[680px] mx-auto px-4 py-4">
+          <main className="flex-1 min-w-0 bg-background mx-0">
+            <div className="max-w-[680px] mx-auto py-0 px-0">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/profile" element={<Profile />} />
