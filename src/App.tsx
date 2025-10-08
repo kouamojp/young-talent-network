@@ -13,6 +13,7 @@ import Categories from "./pages/Categories";
 import Participants from "./pages/Participants";
 import Communities from "./pages/Communities";
 import Organizations from "./pages/Organizations";
+import OrganizationProfiles from "./pages/OrganizationProfiles";
 import AptitudeTest from "./pages/AptitudeTest";
 import Events from "./pages/Events";
 import OnlineTV from "./pages/OnlineTV";
@@ -64,6 +65,7 @@ const App = () => {
                 <Route path="/participants" element={<Participants />} />
                 <Route path="/communities" element={<Communities />} />
                 <Route path="/organizations" element={<Organizations />} />
+                <Route path="/organization-profiles" element={<OrganizationProfiles />} />
                 <Route path="/test" element={<AptitudeTest />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/tv" element={<OnlineTV />} />

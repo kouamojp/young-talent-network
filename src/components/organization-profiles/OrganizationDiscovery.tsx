@@ -123,7 +123,7 @@ const OrganizationDiscovery: React.FC = () => {
           </div>
           
           <div className="mt-4 text-sm text-muted-foreground">
-            Found <strong>{organizationCount}</strong> organizations
+            Found <strong>{organizationCount}</strong> {organizationCount === 1 ? 'organization' : 'organizations'}
           </div>
         </CardContent>
       </Card>

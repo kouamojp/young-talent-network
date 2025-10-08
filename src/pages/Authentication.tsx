@@ -1,29 +1,45 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import GlassMorphism from '@/components/GlassMorphism';
 import AnimatedText from '@/components/AnimatedText';
-import { Facebook } from 'lucide-react';
+import { Facebook, Users, Building } from 'lucide-react';
 
 const Authentication: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [userType, setUserType] = useState<'talent' | 'organization'>('talent');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login process
-    setTimeout(() => setIsLoading(false), 1500);
+    setTimeout(() => {
+      setIsLoading(false);
+      if (userType === 'organization') {
+        navigate('/organization-profiles');
+      } else {
+        navigate('/profile');
+      }
+    }, 1500);
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate registration process
-    setTimeout(() => setIsLoading(false), 1500);
+    setTimeout(() => {
+      setIsLoading(false);
+      if (userType === 'organization') {
+        navigate('/organization-profiles');
+      } else {
+        navigate('/profile');
+      }
+    }, 1500);
   };
 
   const handleFacebookLogin = () => {
@@ -53,12 +69,36 @@ const Authentication: React.FC = () => {
               <CardContent className="space-y-4">
                 <form onSubmit={handleLogin}>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="your@email.com" required />
+                    <Label htmlFor="user-type">I am a...</Label>
+                    <Select value={userType} onValueChange={(value: 'talent' | 'organization') => setUserType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="talent">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            <span>Talent (Individual)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="organization">
+                          <div className="flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            <span>Organization/Agency</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="space-y-2 mt-4">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" required />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" type="email" placeholder="your@email.com" required autoComplete="username" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input id="password" type="password" required autoComplete="current-password" />
+                    </div>
                   </div>
                   <Button className="w-full mt-6" type="submit" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Login"}
@@ -97,30 +137,43 @@ const Authentication: React.FC = () => {
               <CardContent className="space-y-4">
                 <form onSubmit={handleRegister}>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-name">Full Name</Label>
-                    <Input id="reg-name" placeholder="John Doe" required />
+                    <Label htmlFor="user-type-reg">I am a...</Label>
+                    <Select value={userType} onValueChange={(value: 'talent' | 'organization') => setUserType(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="talent">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            <span>Talent (Individual)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="organization">
+                          <div className="flex items-center gap-2">
+                            <Building className="h-4 w-4" />
+                            <span>Organization/Agency</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2 mt-4">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input id="reg-email" type="email" placeholder="your@email.com" required />
+                    <Label htmlFor="reg-name">{userType === 'organization' ? 'Organization Name' : 'Full Name'}</Label>
+                    <Input id="reg-name" placeholder={userType === 'organization' ? 'Your Company Name' : 'John Doe'} required />
                   </div>
-                  <div className="space-y-2 mt-4">
-                    <Label htmlFor="reg-password">Password</Label>
-                    <Input id="reg-password" type="password" required />
-                  </div>
-                  <div className="space-y-2 mt-4">
-                    <Label htmlFor="account-type">Account Type</Label>
-                    <select 
-                      id="account-type" 
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    >
-                      <option value="participant">Participant (Talent)</option>
-                      <option value="agent">Agent/Mentor</option>
-                      <option value="organization">Organization</option>
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reg-email">Email</Label>
+                      <Input id="reg-email" type="email" placeholder="your@email.com" required autoComplete="username" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reg-password">Password</Label>
+                      <Input id="reg-password" type="password" required autoComplete="new-password" />
+                    </div>
                   </div>
                   <Button className="w-full mt-6" type="submit" disabled={isLoading}>
-                    {isLoading ? "Creating Account..." : "Create Account"}
+                    {isLoading ? "Creating Account..." : `Create ${userType === 'organization' ? 'Organization' : 'Talent'} Account`}
                   </Button>
                 </form>
                 

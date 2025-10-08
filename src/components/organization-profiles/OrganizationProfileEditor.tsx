@@ -24,6 +24,7 @@ import {
 import ImageEditor from './ImageEditor';
 import StaffManager from './StaffManager';
 import JobPostingsManager from './JobPostingsManager';
+import { countries } from '@/data/countries';
 
 const OrganizationProfileEditor: React.FC = () => {
   const [organizationData, setOrganizationData] = useState({

@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Combobox } from '@/components/ui/combobox';
+import { countries } from '@/data/countries';
 import { Edit, Upload, Settings, Save, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
@@ -347,21 +349,15 @@ const OrganizationProfileForm: React.FC<OrganizationProfileFormProps> = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select country" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="USA">United States</SelectItem>
-                        <SelectItem value="UK">United Kingdom</SelectItem>
-                        <SelectItem value="Canada">Canada</SelectItem>
-                        <SelectItem value="Australia">Australia</SelectItem>
-                        <SelectItem value="Russia">Russia</SelectItem>
-                        <SelectItem value="Germany">Germany</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Combobox
+                        options={countries}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        placeholder="Select or search country"
+                        searchPlaceholder="Search countries..."
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
