@@ -66,11 +66,11 @@ const Navbar: React.FC = () => {
                     </Link>
                     <Link to="/learning" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                       <GraduationCap className="h-5 w-5" />
-                      <span>Learning Hub</span>
+                      <span>YAT LEARNING</span>
                     </Link>
                     <Link to="/live" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                       <Radio className="h-5 w-5" />
-                      <span>Live Events</span>
+                      <span>YAT LIVE</span>
                     </Link>
                     <Link to="/news" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                       <Newspaper className="h-5 w-5" />
@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
                     </Link>
                     <Link to="/events" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
                       <Calendar className="h-5 w-5" />
-                      <span>Upcoming Events</span>
+                      <span>YAT EVENTS</span>
                     </Link>
                   </div>
                 </div>

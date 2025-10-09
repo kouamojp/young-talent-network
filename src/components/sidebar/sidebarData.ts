@@ -17,7 +17,7 @@ import { MenuSectionItem } from './types';
 // Main navigation items
 export const mainNavigationItems: MenuSectionItem[] = [
   {
-    label: 'Learning Hub',
+    label: 'YAT LEARNING',
     description: 'Educational content',
     icon: GraduationCap,
     path: '/learning'
@@ -41,7 +41,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
     path: '/tv'
   },
   {
-    label: 'Live Events',
+    label: 'YAT LIVE',
     description: 'Streams & broadcasts',
     icon: Radio,
     path: '/live'
