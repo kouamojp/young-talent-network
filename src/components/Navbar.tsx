@@ -80,6 +80,10 @@ const Navbar: React.FC = () => {
                       <Calendar className="h-5 w-5" />
                       <span>YAT EVENTS</span>
                     </Link>
+                    <Link to="/karta" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 text-gray-700 hover:text-[#5181B8] transition-colors">
+                      <MapPin className="h-5 w-5" />
+                      <span>YAT KARTA</span>
+                    </Link>
                   </div>
                 </div>
 

@@ -9,7 +9,9 @@ import {
   MapPin,
   MessagesSquare,
   Bell,
-  LucideIcon
+  LucideIcon,
+  Map,
+  Calendar
 } from 'lucide-react';
 
 import { MenuSectionItem } from './types';
@@ -45,6 +47,18 @@ export const mainNavigationItems: MenuSectionItem[] = [
     description: 'Streams & broadcasts',
     icon: Radio,
     path: '/live'
+  },
+  {
+    label: 'YAT EVENTS',
+    description: 'Sports events',
+    icon: Calendar,
+    path: '/events'
+  },
+  {
+    label: 'YAT KARTA',
+    description: 'Map & locations',
+    icon: Map,
+    path: '/karta'
   },
   {
     label: 'News & Updates',
