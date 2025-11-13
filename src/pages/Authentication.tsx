@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,43 +10,116 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import GlassMorphism from '@/components/GlassMorphism';
 import AnimatedText from '@/components/AnimatedText';
 import { Facebook, Users, Building } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const Authentication: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userType, setUserType] = useState<'talent' | 'organization'>('talent');
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      if (userType === 'organization') {
-        navigate('/organization-profiles');
-      } else {
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         navigate('/profile');
       }
-    }, 1500);
-  };
+    });
+  }, [navigate]);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      if (userType === 'organization') {
-        navigate('/organization-profiles');
-      } else {
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.session) {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully logged in.",
+        });
         navigate('/profile');
       }
-    }, 1500);
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleFacebookLogin = () => {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Simulate Facebook login process
-    console.log("Facebook login initiated");
-    setTimeout(() => setIsLoading(false), 1500);
+    
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const name = formData.get('name') as string;
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            user_type: userType,
+            name: name,
+          },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "Account created!",
+          description: "Welcome to YAT! Your account has been created successfully.",
+        });
+        navigate('/profile');
+      }
+    } catch (error: any) {
+      toast({
+        title: "Registration failed",
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Facebook login failed",
+        description: error.message || "Unable to connect with Facebook.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -93,11 +166,11 @@ const Authentication: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="your@email.com" required autoComplete="username" />
+                      <Input id="email" name="email" type="email" placeholder="your@email.com" required autoComplete="username" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="password">Password</Label>
-                      <Input id="password" type="password" required autoComplete="current-password" />
+                      <Input id="password" name="password" type="password" required autoComplete="current-password" />
                     </div>
                   </div>
                   <Button className="w-full mt-6" type="submit" disabled={isLoading}>
@@ -160,16 +233,16 @@ const Authentication: React.FC = () => {
                   </div>
                   <div className="space-y-2 mt-4">
                     <Label htmlFor="reg-name">{userType === 'organization' ? 'Organization Name' : 'Full Name'}</Label>
-                    <Input id="reg-name" placeholder={userType === 'organization' ? 'Your Company Name' : 'John Doe'} required />
+                    <Input id="reg-name" name="name" placeholder={userType === 'organization' ? 'Your Company Name' : 'John Doe'} required />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div className="space-y-2">
                       <Label htmlFor="reg-email">Email</Label>
-                      <Input id="reg-email" type="email" placeholder="your@email.com" required autoComplete="username" />
+                      <Input id="reg-email" name="email" type="email" placeholder="your@email.com" required autoComplete="username" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="reg-password">Password</Label>
-                      <Input id="reg-password" type="password" required autoComplete="new-password" />
+                      <Input id="reg-password" name="password" type="password" required autoComplete="new-password" />
                     </div>
                   </div>
                   <Button className="w-full mt-6" type="submit" disabled={isLoading}>
