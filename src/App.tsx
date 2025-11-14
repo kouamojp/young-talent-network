@@ -42,7 +42,7 @@ const App = () => {
         <Navbar />
         
         {/* Main Layout Container */}
-        <div className="flex w-full pt-14 mx-0">
+        <div className="flex w-full pt-14">
           {/* Left Sidebar - Fixed */}
           <div className="hidden lg:block w-[280px] flex-shrink-0">
             <div className="fixed top-14 left-0 w-[280px] h-[calc(100vh-3.5rem)] overflow-y-auto">
@@ -53,7 +53,7 @@ const App = () => {
           </div>
 
           {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0 bg-background mx-[290px] px-0">
+          <main className="flex-1 min-w-0 bg-background mx-0">
             <div className="max-w-[680px] mx-auto py-0 px-0">
               <Routes>
                 <Route path="/" element={<Index />} />
