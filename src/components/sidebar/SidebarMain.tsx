@@ -2,20 +2,11 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
-  Sidebar, 
-  SidebarHeader,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
-import { 
   mainNavigationItems, 
-  profileItems
+  servicesItems
 } from './sidebarData';
 import { MenuSectionItem } from './types';
+import { Separator } from '@/components/ui/separator';
 
 const SidebarMain: React.FC = () => {
   const location = useLocation();
@@ -30,48 +21,61 @@ const SidebarMain: React.FC = () => {
     return currentPath === path;
   };
 
-  const renderMenuItems = (items: MenuSectionItem[]) => (
-    <SidebarMenu>
-      {items.map((item) => (
-        <SidebarMenuItem key={item.label}>
-          <SidebarMenuButton isActive={isActive(item.path)} asChild tooltip={item.description}>
-            {item.url ? (
-              <a href={item.url} target="_blank" rel="noopener noreferrer">
-                <item.icon className="h-5 w-5 shrink-0" />
-                <span className="ml-2 truncate">{item.label}</span>
-              </a>
-            ) : (
-              <Link to={item.path}>
-                <item.icon className="h-5 w-5 shrink-0" />
-                <span className="ml-2 truncate">{item.label}</span>
-              </Link>
-            )}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  );
+  const renderMenuItem = (item: MenuSectionItem) => {
+    const active = isActive(item.path);
+    const content = (
+      <>
+        <item.icon className="h-5 w-5 shrink-0 text-muted-foreground" />
+        <span className="ml-3 truncate text-sm">{item.label}</span>
+      </>
+    );
+
+    const className = `flex items-center px-3 py-2 rounded-md transition-colors ${
+      active 
+        ? 'bg-primary/10 text-primary font-medium' 
+        : 'text-foreground hover:bg-muted'
+    }`;
+
+    if (item.url) {
+      return (
+        <a 
+          href={item.url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className={className}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <Link to={item.path} className={className}>
+        {content}
+      </Link>
+    );
+  };
 
   return (
-    <Sidebar className="px-2 py-4">
-      <SidebarHeader>
+    <aside className="w-full h-full bg-card">
+      <nav className="p-2 space-y-1">
         {/* Main Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mb-1">Main</SidebarGroupLabel>
-          <SidebarGroupContent>
-            {renderMenuItems(mainNavigationItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {mainNavigationItems.map((item) => (
+          <div key={item.label}>
+            {renderMenuItem(item)}
+          </div>
+        ))}
         
-        {/* Your Talent Profile */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-gray-500 font-medium text-sm px-2 mt-4 mb-1">Your Talent Profile</SidebarGroupLabel>
-          <SidebarGroupContent>
-            {renderMenuItems(profileItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarHeader>
-    </Sidebar>
+        <Separator className="my-3" />
+        
+        {/* Services */}
+        {servicesItems.map((item) => (
+          <div key={item.label}>
+            {renderMenuItem(item)}
+          </div>
+        ))}
+      </nav>
+    </aside>
   );
 };
 
