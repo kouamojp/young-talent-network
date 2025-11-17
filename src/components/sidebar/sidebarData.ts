@@ -1,86 +1,34 @@
 import { 
-  GraduationCap,
-  Building,
+  Home,
+  User,
   Users,
-  PanelRight,
-  Radio,
-  Newspaper,
-  LayoutDashboard,
-  MapPin,
   MessagesSquare,
   Bell,
-  LucideIcon,
+  Briefcase,
+  GraduationCap,
+  Radio,
+  Calendar,
   Map,
-  Calendar
+  Building,
+  Newspaper,
+  LucideIcon
 } from 'lucide-react';
 
 import { MenuSectionItem } from './types';
 
-// Main navigation items
+// Main navigation items - VK style organization
 export const mainNavigationItems: MenuSectionItem[] = [
   {
-    label: 'YAT LEARNING',
-    description: 'Educational content',
-    icon: GraduationCap,
-    path: '/learning'
+    label: 'My Page',
+    description: 'Your profile',
+    icon: Home,
+    path: '/'
   },
   {
-    label: 'Organizations',
-    description: 'Browse agencies & companies',
-    icon: Building,
-    path: '/organizations'
-  },
-  {
-    label: 'Talent Community',
-    description: 'Connect with other talents',
-    icon: Users,
-    path: '/participants'
-  },
-  {
-    label: 'YAT TV',
-    description: 'Watch talent showcases',
-    icon: PanelRight,
-    path: '/tv'
-  },
-  {
-    label: 'YAT LIVE',
-    description: 'Streams & broadcasts',
-    icon: Radio,
-    path: '/live'
-  },
-  {
-    label: 'YAT EVENTS',
-    description: 'Sports events',
-    icon: Calendar,
-    path: '/events'
-  },
-  {
-    label: 'YAT KARTA',
-    description: 'Map & locations',
-    icon: Map,
-    path: '/karta'
-  },
-  {
-    label: 'News & Updates',
-    description: 'Latest in sports & arts',
-    icon: Newspaper,
-    path: '/news'
-  }
-];
-
-// Your Talent Profile section
-export const profileItems: MenuSectionItem[] = [
-  {
-    label: 'Talent Dashboard',
-    description: 'Your talent dashboard',
-    icon: LayoutDashboard,
-    path: '/talent-dashboard'
-  },
-  {
-    label: 'Talents Around Me',
-    description: 'Discover nearby talent',
-    icon: MapPin,
-    path: '/talents-around-me'
+    label: 'Profile',
+    description: 'Your talent profile',
+    icon: User,
+    path: '/profile'
   },
   {
     label: 'Messages',
@@ -93,5 +41,57 @@ export const profileItems: MenuSectionItem[] = [
     description: 'Stay updated',
     icon: Bell,
     path: '/notifications'
+  },
+  {
+    label: 'Friends',
+    description: 'Your connections',
+    icon: Users,
+    path: '/participants'
+  }
+];
+
+// Secondary navigation - Services
+export const servicesItems: MenuSectionItem[] = [
+  {
+    label: 'Work',
+    description: 'Job opportunities',
+    icon: Briefcase,
+    path: '/work'
+  },
+  {
+    label: 'Organizations',
+    description: 'Browse companies',
+    icon: Building,
+    path: '/organizations'
+  },
+  {
+    label: 'Learning',
+    description: 'Educational content',
+    icon: GraduationCap,
+    path: '/learning'
+  },
+  {
+    label: 'Live',
+    description: 'Streams & broadcasts',
+    icon: Radio,
+    path: '/live'
+  },
+  {
+    label: 'Events',
+    description: 'Sports events',
+    icon: Calendar,
+    path: '/events'
+  },
+  {
+    label: 'Map',
+    description: 'Explore locations',
+    icon: Map,
+    path: '/karta'
+  },
+  {
+    label: 'News',
+    description: 'Latest updates',
+    icon: Newspaper,
+    path: '/news'
   }
 ];
