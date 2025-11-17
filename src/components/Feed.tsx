@@ -65,12 +65,12 @@ const Feed: React.FC = () => {
     }
   };
   return (
-    <div className="w-full py-4 space-y-3">
+    <div className="w-full py-2 space-y-2">
       {/* Recently Added Organizations */}
       <RecentOrganizations />
       
       {/* Create Post */}
-      <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
+      <div className="bg-card rounded-lg shadow-sm p-3 border border-border">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={currentUser?.avatar_url} alt="User avatar" />
@@ -95,7 +95,7 @@ const Feed: React.FC = () => {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {posts.map(post => (
             <PostCard
               key={post.id}
