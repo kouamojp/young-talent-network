@@ -74,8 +74,12 @@ const SidebarMain: React.FC = () => {
             {renderMenuItem(item)}
           </div>
         ))}
-      </nav>
-    </aside>
+        </nav>
+      </aside>
+      
+      <AISearchDialog open={aiSearchOpen} onOpenChange={setAiSearchOpen} />
+      <QuickCreateDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} type={createType} />
+    </>
   );
 };
 
