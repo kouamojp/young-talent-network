@@ -61,6 +61,30 @@ export type Database = {
           },
         ]
       }
+      ai_search_history: {
+        Row: {
+          created_at: string
+          id: string
+          query: string
+          results: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          query: string
+          results?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          query?: string
+          results?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -939,6 +963,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_categories: {
+        Row: {
+          category_name: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          category_name: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          category_name?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_interests: {
+        Row: {
+          created_at: string
+          id: string
+          interest_type: string
+          interest_value: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interest_type: string
+          interest_value: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interest_type?: string
+          interest_value?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pages: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string
+          id: string
+          is_public: boolean | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
