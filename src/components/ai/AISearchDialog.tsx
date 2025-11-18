@@ -22,6 +22,9 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
     
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       const { data, error } = await supabase.functions.invoke('ai-search', {
         body: { query, context: {} }
       });
@@ -34,7 +37,8 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
       // Save to history
       await supabase.from('ai_search_history').insert({
         query,
-        results: parsedResults
+        results: parsedResults,
+        user_id: user.id
       });
     } catch (error: any) {
       toast({

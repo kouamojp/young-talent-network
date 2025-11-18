@@ -24,12 +24,15 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
   const handleCreate = async () => {
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
       switch (type) {
         case 'post':
-          await supabase.from('posts').insert({ content });
+          await supabase.from('posts').insert({ content, user_id: user.id });
           break;
         case 'page':
-          await supabase.from('user_pages').insert({ title, content, category });
+          await supabase.from('user_pages').insert({ title, content, category, user_id: user.id });
           break;
         case 'event':
           await supabase.from('events').insert({
@@ -37,21 +40,21 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
             description: content,
             start_date: new Date().toISOString(),
             end_date: new Date(Date.now() + 3600000).toISOString(),
-            organizer_id: (await supabase.auth.getUser()).data.user?.id
+            organizer_id: user.id
           });
           break;
         case 'job':
           await supabase.from('job_postings').insert({
             title,
             description: content,
-            organization_id: (await supabase.auth.getUser()).data.user?.id
+            organization_id: user.id
           });
           break;
         case 'course':
           await supabase.from('courses').insert({
             title,
             description: content,
-            instructor_id: (await supabase.auth.getUser()).data.user?.id
+            instructor_id: user.id
           });
           break;
       }
