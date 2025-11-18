@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { 
   mainNavigationItems, 
@@ -7,10 +7,15 @@ import {
 } from './sidebarData';
 import { MenuSectionItem } from './types';
 import { Separator } from '@/components/ui/separator';
+import { AISearchDialog } from '@/components/ai/AISearchDialog';
+import { QuickCreateDialog } from '@/components/create/QuickCreateDialog';
 
 const SidebarMain: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const [aiSearchOpen, setAiSearchOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [createType, setCreateType] = useState<'post' | 'event' | 'job' | 'course' | 'page'>('post');
 
   const isActive = (path: string) => {
     if (path.includes('?')) {
@@ -57,23 +62,24 @@ const SidebarMain: React.FC = () => {
   };
 
   return (
-    <aside className="w-full h-full bg-card">
-      <nav className="p-2 space-y-1">
-        {/* Main Navigation */}
-        {mainNavigationItems.map((item) => (
-          <div key={item.label}>
-            {renderMenuItem(item)}
-          </div>
-        ))}
-        
-        <Separator className="my-3" />
-        
-        {/* Services */}
-        {servicesItems.map((item) => (
-          <div key={item.label}>
-            {renderMenuItem(item)}
-          </div>
-        ))}
+    <>
+      <aside className="w-full h-full bg-card">
+        <nav className="p-2 space-y-1">
+          {/* Main Navigation */}
+          {mainNavigationItems.map((item) => (
+            <div key={item.label}>
+              {renderMenuItem(item)}
+            </div>
+          ))}
+          
+          <Separator className="my-3" />
+          
+          {/* Services */}
+          {servicesItems.map((item) => (
+            <div key={item.label}>
+              {renderMenuItem(item)}
+            </div>
+          ))}
         </nav>
       </aside>
       
