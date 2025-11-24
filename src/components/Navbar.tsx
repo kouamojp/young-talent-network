@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import SidebarMain from './sidebar/SidebarMain';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,8 +16,25 @@ const Navbar: React.FC = () => {
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 shadow-sm z-50">
       <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-full">
-        {/* Logo */}
+        {/* Logo with Burger Menu */}
         <div className="flex items-center gap-3">
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="rounded-full hover:bg-gray-100"
+              >
+                <Menu className="h-5 w-5 text-black" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] sm:w-[320px] overflow-y-auto p-0">
+              <div className="py-4">
+                <SidebarMain />
+              </div>
+            </SheetContent>
+          </Sheet>
+          
           <Link to="/" className="flex items-center gap-2">
             <img 
               src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" 

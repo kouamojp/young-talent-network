@@ -27,7 +27,6 @@ import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import SocialSidebar from "./components/SocialSidebar";
 import RightSidebar from "./components/RightSidebar";
 import Navbar from "./components/Navbar";
 const queryClient = new QueryClient();
@@ -42,19 +41,10 @@ const App = () => {
         <Navbar />
         
         {/* Main Layout Container */}
-        <div className="flex w-full pt-14">
-          {/* Left Sidebar - Fixed */}
-          <div className="hidden lg:block w-[200px] flex-shrink-0">
-            <div className="fixed top-14 left-0 w-[200px] h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border">
-              <SidebarProvider>
-                <SocialSidebar />
-              </SidebarProvider>
-            </div>
-          </div>
-
-          {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0 bg-background">
-            <div className="max-w-[680px] mx-auto py-0 px-4">
+        <div className="flex w-full pt-14 justify-center">
+          {/* Main Content - Scrollable & Centered */}
+          <main className="flex-1 max-w-[680px] bg-background px-4">
+            <div className="w-full py-0">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/profile" element={<Profile />} />
@@ -82,9 +72,9 @@ const App = () => {
             </div>
           </main>
 
-          {/* Right Sidebar - Fixed */}
-          <div className="hidden xl:block w-[280px] flex-shrink-0">
-            <div className="fixed top-14 right-0 w-[280px] h-[calc(100vh-3.5rem)] overflow-y-auto border-l border-border">
+          {/* Right Sidebar - Fixed on large screens */}
+          <div className="hidden xl:block w-[320px] flex-shrink-0">
+            <div className="fixed top-14 right-[calc((100vw-680px-320px)/2)] w-[320px] h-[calc(100vh-3.5rem)] overflow-y-auto border-l border-border">
               <RightSidebar />
             </div>
           </div>
