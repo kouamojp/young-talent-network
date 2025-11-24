@@ -63,8 +63,8 @@ const SidebarMain: React.FC = () => {
 
   return (
     <>
-      <aside className="w-full h-full bg-card">
-        <nav className="p-2 space-y-1">
+      <aside className="w-full h-full">
+        <nav className="p-3 space-y-1">
           {/* Main Navigation */}
           {mainNavigationItems.map((item) => (
             <div key={item.label}>

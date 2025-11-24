@@ -44,8 +44,8 @@ const App = () => {
         {/* Main Layout Container */}
         <div className="flex w-full pt-14">
           {/* Left Sidebar - Fixed */}
-          <div className="hidden lg:block w-[220px] flex-shrink-0">
-            <div className="fixed top-14 left-0 w-[220px] h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <div className="hidden lg:block w-[200px] flex-shrink-0">
+            <div className="fixed top-14 left-0 w-[200px] h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border">
               <SidebarProvider>
                 <SocialSidebar />
               </SidebarProvider>
@@ -53,8 +53,8 @@ const App = () => {
           </div>
 
           {/* Main Content - Scrollable */}
-          <main className="flex-1 min-w-0 bg-background mx-0">
-            <div className="max-w-[900px] mx-auto py-0 px-0">
+          <main className="flex-1 min-w-0 bg-background">
+            <div className="max-w-[680px] mx-auto py-0 px-4">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/profile" element={<Profile />} />
@@ -83,8 +83,8 @@ const App = () => {
           </main>
 
           {/* Right Sidebar - Fixed */}
-          <div className="hidden xl:block w-[260px] flex-shrink-0">
-            <div className="fixed top-14 right-0 w-[260px] h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <div className="hidden xl:block w-[280px] flex-shrink-0">
+            <div className="fixed top-14 right-0 w-[280px] h-[calc(100vh-3.5rem)] overflow-y-auto border-l border-border">
               <RightSidebar />
             </div>
           </div>
