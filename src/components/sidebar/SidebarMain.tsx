@@ -10,7 +10,11 @@ import { Separator } from '@/components/ui/separator';
 import { AISearchDialog } from '@/components/ai/AISearchDialog';
 import { QuickCreateDialog } from '@/components/create/QuickCreateDialog';
 
-const SidebarMain: React.FC = () => {
+interface SidebarMainProps {
+  onNavigate?: () => void;
+}
+
+const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [aiSearchOpen, setAiSearchOpen] = useState(false);
@@ -55,7 +59,7 @@ const SidebarMain: React.FC = () => {
     }
 
     return (
-      <Link to={item.path} className={className}>
+      <Link to={item.path} className={className} onClick={onNavigate}>
         {content}
       </Link>
     );
@@ -64,7 +68,7 @@ const SidebarMain: React.FC = () => {
   return (
     <>
       <aside className="w-full h-full bg-card">
-        <nav className="p-2 space-y-1">
+        <nav className="p-4 space-y-1">
           {/* Main Navigation */}
           {mainNavigationItems.map((item) => (
             <div key={item.label}>
