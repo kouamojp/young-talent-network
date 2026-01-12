@@ -911,6 +911,27 @@ export type Database = {
         }
         Relationships: []
       }
+      skills: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       talent_profiles: {
         Row: {
           availability: string | null
@@ -1062,6 +1083,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_skills: {
+        Row: {
+          created_at: string
+          id: string
+          level: string | null
+          skill_id: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level?: string | null
+          skill_id: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: string | null
+          skill_id?: string
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
