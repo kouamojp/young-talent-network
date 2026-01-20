@@ -1,20 +1,57 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { user } from '@/components/profile/ProfileData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Camera, MapPin, Briefcase, Globe } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Settings, Camera, MapPin, Briefcase, Globe, LayoutDashboard, ArrowRight, Radio, GraduationCap, Calendar, Tv, Coins } from 'lucide-react';
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
 import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+
+interface TalentPresence {
+  id: string;
+  section: string;
+  is_active: boolean;
+  visibility: string;
+}
+
+const sectionIcons: Record<string, React.ElementType> = {
+  work: Briefcase,
+  learning: GraduationCap,
+  live: Radio,
+  tv: Tv,
+  events: Calendar,
+  'yat-coin': Coins
+};
+
+const sectionPaths: Record<string, string> = {
+  work: '/work',
+  learning: '/learning',
+  live: '/live',
+  tv: '/tv',
+  events: '/events',
+  'yat-coin': '/yat-coin'
+};
+
+const sectionLabels: Record<string, string> = {
+  work: 'Travail',
+  learning: 'Formation',
+  live: 'Live',
+  tv: 'TV',
+  events: 'Événements',
+  'yat-coin': 'YAT Coin'
+};
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [talentPresence, setTalentPresence] = useState<TalentPresence[]>([]);
 
   useEffect(() => {
     fetchProfile();
@@ -25,12 +62,24 @@ const Profile: React.FC = () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
         setUserId(authUser.id);
-        const { data } = await supabase
+        
+        // Fetch profile
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', authUser.id)
           .single();
-        setProfile(data);
+        setProfile(profileData);
+
+        // Fetch talent presence
+        const { data: presenceData } = await supabase
+          .from('talent_presence')
+          .select('*')
+          .eq('user_id', authUser.id);
+        
+        if (presenceData) {
+          setTalentPresence(presenceData);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -82,12 +131,10 @@ const Profile: React.FC = () => {
                   <p className="text-sm text-muted-foreground">{displayProfile.email}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Link to="/talent-dashboard">
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
+                  <Button onClick={() => navigate('/talent-dashboard')}>
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    Talent Dashboard
+                  </Button>
                 </div>
               </div>
               
@@ -120,6 +167,55 @@ const Profile: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Talent Presence Card */}
+      {talentPresence.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Globe className="h-5 w-5 text-primary" />
+              Votre Présence sur la Plateforme
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {talentPresence.map((presence) => {
+                const Icon = sectionIcons[presence.section] || Globe;
+                return (
+                  <Link 
+                    key={presence.id} 
+                    to={sectionPaths[presence.section] || '/'}
+                    className="group"
+                  >
+                    <div className="flex flex-col items-center p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all">
+                      <Icon className="h-6 w-6 text-primary mb-2" />
+                      <span className="text-sm font-medium text-center">
+                        {sectionLabels[presence.section] || presence.section}
+                      </span>
+                      <Badge 
+                        variant={presence.is_active ? "default" : "secondary"} 
+                        className="mt-2 text-xs"
+                      >
+                        {presence.is_active ? 'Actif' : 'Inactif'}
+                      </Badge>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="mt-4 pt-4 border-t border-border">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => navigate('/talent-dashboard')}
+              >
+                Gérer ma présence sur le Dashboard
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Profile Tabs */}
       <Tabs defaultValue="skills" className="w-full">
