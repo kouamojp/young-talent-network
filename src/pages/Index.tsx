@@ -1,9 +1,8 @@
-
 import React from 'react';
-import Feed from '@/components/Feed';
+import LandingPage from '@/components/landing/LandingPage';
 
 const Index: React.FC = () => {
-  return <Feed />;
+  return <LandingPage />;
 };
 
 export default Index;

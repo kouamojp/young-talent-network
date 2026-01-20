@@ -932,6 +932,45 @@ export type Database = {
         }
         Relationships: []
       }
+      talent_presence: {
+        Row: {
+          bio: string | null
+          created_at: string
+          featured: boolean | null
+          id: string
+          is_active: boolean | null
+          section: string
+          skills: string[] | null
+          updated_at: string
+          user_id: string
+          visibility: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          section: string
+          skills?: string[] | null
+          updated_at?: string
+          user_id: string
+          visibility?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          section?: string
+          skills?: string[] | null
+          updated_at?: string
+          user_id?: string
+          visibility?: string | null
+        }
+        Relationships: []
+      }
       talent_profiles: {
         Row: {
           availability: string | null
