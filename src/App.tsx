@@ -41,7 +41,7 @@ const App = () => {
         <div className="flex justify-center w-full pt-14">
           {/* Main Content - Centered and Scrollable */}
           <main className="w-full max-w-[1400px] bg-background px-4">
-            <div className="flex gap-4">
+            <div className="gap-4 flex-row flex items-start justify-start">
               {/* Main Feed - Centered */}
               <div className="flex-1 max-w-[900px] mx-auto py-0">
                 <Routes>
@@ -73,7 +73,7 @@ const App = () => {
               {/* Right Sidebar - Fixed on large screens */}
               <div className="hidden xl:block w-[280px] flex-shrink-0">
                 <div className="sticky top-16">
-                  <RightSidebar />
+                  <RightSidebar className="" />
                 </div>
               </div>
             </div>
