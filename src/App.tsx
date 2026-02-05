@@ -25,7 +25,7 @@ import TalentsAroundMe from "./pages/TalentsAroundMe";
 import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
-import RightSidebar from "./components/RightSidebar";
+
 import Navbar from "./components/Navbar";
 const queryClient = new QueryClient();
 const App = () => {
@@ -37,46 +37,33 @@ const App = () => {
         {/* Fixed Navbar */}
         <Navbar />
         
-        {/* Main Layout Container - Centered */}
-        <div className="flex justify-center w-full pt-14">
-          {/* Main Content - Centered and Scrollable */}
-          <main className="w-full max-w-[1400px] bg-background px-4">
-            <div className="gap-4 flex-row flex items-start justify-start">
-              {/* Main Feed - Centered */}
-              <div className="flex-1 max-w-[900px] mx-auto py-0">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/auth" element={<Authentication />} />
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/news" element={<News />} />
-                  <Route path="/categories" element={<Categories />} />
-                  <Route path="/participants" element={<Participants />} />
-                  <Route path="/communities" element={<Communities />} />
-                  <Route path="/organizations" element={<Organizations />} />
-                  <Route path="/organization-profiles" element={<OrganizationProfiles />} />
-                  <Route path="/test" element={<AptitudeTest />} />
-                  <Route path="/events" element={<Events />} />
-                  <Route path="/tv" element={<OnlineTV />} />
-                  <Route path="/live" element={<Live />} />
-                  <Route path="/work" element={<Work />} />
-                  <Route path="/learning" element={<Learning />} />
-                  <Route path="/talents-around-me" element={<TalentsAroundMe />} />
-                  <Route path="/yat-coin" element={<YatCoin />} />
-                  <Route path="/karta" element={<YatKarta />} />
-                  <Route path="/talent-dashboard" element={<TalentDashboard />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-
-              {/* Right Sidebar - Fixed on large screens */}
-              <div className="hidden xl:block w-[280px] flex-shrink-0">
-                <div className="sticky top-16">
-                  <RightSidebar className="" />
-                </div>
-              </div>
-            </div>
+        {/* Main Layout Container */}
+        <div className="w-full pt-14">
+          <main className="w-full bg-background">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/auth" element={<Authentication />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/participants" element={<Participants />} />
+              <Route path="/communities" element={<Communities />} />
+              <Route path="/organizations" element={<Organizations />} />
+              <Route path="/organization-profiles" element={<OrganizationProfiles />} />
+              <Route path="/test" element={<AptitudeTest />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/tv" element={<OnlineTV />} />
+              <Route path="/live" element={<Live />} />
+              <Route path="/work" element={<Work />} />
+              <Route path="/learning" element={<Learning />} />
+              <Route path="/talents-around-me" element={<TalentsAroundMe />} />
+              <Route path="/yat-coin" element={<YatCoin />} />
+              <Route path="/karta" element={<YatKarta />} />
+              <Route path="/talent-dashboard" element={<TalentDashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </main>
         </div>
       </TooltipProvider>
