@@ -85,6 +85,33 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          name_fr: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          name_fr?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          name_fr?: string | null
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -876,11 +903,18 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          birthday: string | null
+          category_id: string | null
+          city: string | null
+          country: string | null
+          cover_photo_url: string | null
           created_at: string
           email: string
           id: string
           location: string | null
           name: string
+          phone: string | null
+          sport_type: string | null
           updated_at: string
           user_type: string
           website: string | null
@@ -888,11 +922,18 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          birthday?: string | null
+          category_id?: string | null
+          city?: string | null
+          country?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           email: string
           id: string
           location?: string | null
           name: string
+          phone?: string | null
+          sport_type?: string | null
           updated_at?: string
           user_type: string
           website?: string | null
@@ -900,16 +941,31 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          birthday?: string | null
+          category_id?: string | null
+          city?: string | null
+          country?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           email?: string
           id?: string
           location?: string | null
           name?: string
+          phone?: string | null
+          sport_type?: string | null
           updated_at?: string
           user_type?: string
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       skills: {
         Row: {
@@ -929,6 +985,69 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      talent_achievements: {
+        Row: {
+          category: string | null
+          created_at: string
+          date: string | null
+          description: string | null
+          id: string
+          level: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          level?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date?: string | null
+          description?: string | null
+          id?: string
+          level?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      talent_media: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          media_type: string
+          title: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_type: string
+          title?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          media_type?: string
+          title?: string | null
+          url?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1023,6 +1142,77 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      talent_resumes: {
+        Row: {
+          achievements: string[] | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          experience: string | null
+          id: string
+          is_primary: boolean | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achievements?: string[] | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          id?: string
+          is_primary?: boolean | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achievements?: string[] | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          experience?: string | null
+          id?: string
+          is_primary?: boolean | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_resumes_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_social_links: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_categories: {
         Row: {
