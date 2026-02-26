@@ -914,6 +914,8 @@ export type Database = {
           location: string | null
           name: string
           phone: string | null
+          platform_rating: number | null
+          rating_count: number | null
           sport_type: string | null
           updated_at: string
           user_type: string
@@ -933,6 +935,8 @@ export type Database = {
           location?: string | null
           name: string
           phone?: string | null
+          platform_rating?: number | null
+          rating_count?: number | null
           sport_type?: string | null
           updated_at?: string
           user_type: string
@@ -952,6 +956,8 @@ export type Database = {
           location?: string | null
           name?: string
           phone?: string | null
+          platform_rating?: number | null
+          rating_count?: number | null
           sport_type?: string | null
           updated_at?: string
           user_type?: string
@@ -1017,6 +1023,48 @@ export type Database = {
           id?: string
           level?: string | null
           title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      talent_education: {
+        Row: {
+          created_at: string
+          degree: string | null
+          description: string | null
+          education_type: string
+          end_year: number | null
+          field_of_study: string | null
+          id: string
+          institution: string
+          is_current: boolean | null
+          start_year: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          education_type?: string
+          end_year?: number | null
+          field_of_study?: string | null
+          id?: string
+          institution: string
+          is_current?: boolean | null
+          start_year?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string | null
+          description?: string | null
+          education_type?: string
+          end_year?: number | null
+          field_of_study?: string | null
+          id?: string
+          institution?: string
+          is_current?: boolean | null
+          start_year?: number | null
           user_id?: string
         }
         Relationships: []

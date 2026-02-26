@@ -12,7 +12,9 @@ import { ProfileSettings } from '@/components/profile/ProfileSettings';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
 import AddMediaDialog from '@/components/profile/AddMediaDialog';
+import AddEducationDialog from '@/components/profile/AddEducationDialog';
 import AutoResumeCard from '@/components/profile/AutoResumeCard';
+import FileUploadButton from '@/components/profile/FileUploadButton';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 
@@ -34,6 +36,7 @@ const Profile: React.FC = () => {
   const [achievements, setAchievements] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
+  const [education, setEducation] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProfile();
@@ -50,13 +53,14 @@ const Profile: React.FC = () => {
       setUserId(authUser.id);
 
       // Fetch all data in parallel
-      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes] = await Promise.all([
+      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', authUser.id).single(),
         supabase.from('talent_presence').select('*').eq('user_id', authUser.id),
         supabase.from('talent_resumes').select('*, categories(name, name_fr)').eq('user_id', authUser.id),
         supabase.from('talent_achievements').select('*').eq('user_id', authUser.id).order('date', { ascending: false }),
         supabase.from('talent_media').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }),
         supabase.from('talent_social_links').select('*').eq('user_id', authUser.id),
+        (supabase.from('talent_education') as any).select('*').eq('user_id', authUser.id).order('start_year', { ascending: false }),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -65,6 +69,7 @@ const Profile: React.FC = () => {
       if (achievementsRes.data) setAchievements(achievementsRes.data);
       if (mediaRes.data) setMedia(mediaRes.data);
       if (linksRes.data) setSocialLinks(linksRes.data);
+      if (eduRes.data) setEducation(eduRes.data);
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -130,7 +135,13 @@ const Profile: React.FC = () => {
           {displayProfile.cover_photo_url && (
             <img src={displayProfile.cover_photo_url} alt="Cover" className="w-full h-full object-cover" />
           )}
-          <Button size="icon" variant="secondary" className="absolute bottom-3 right-3 h-8 w-8"><Camera className="h-4 w-4" /></Button>
+          {userId && (
+            <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon"
+              variant="secondary" onUploaded={async (url) => {
+                await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId);
+                setProfile((p: any) => ({ ...p, cover_photo_url: url }));
+              }} />
+          )}
         </div>
         <CardContent className="pt-0 pb-6">
           <div className="flex flex-col md:flex-row gap-6 -mt-16">
@@ -139,7 +150,15 @@ const Profile: React.FC = () => {
                 <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
                 <AvatarFallback className="text-3xl">{displayProfile.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
-              <Button size="icon" variant="secondary" className="absolute bottom-0 right-0 h-8 w-8 rounded-full shadow"><Camera className="h-4 w-4" /></Button>
+              {userId && (
+                <div className="absolute bottom-0 right-0">
+                  <FileUploadButton userId={userId} folder="avatar" accept="image/*" label="" size="icon"
+                    variant="secondary" onUploaded={async (url) => {
+                      await supabase.from('profiles').update({ avatar_url: url }).eq('id', userId);
+                      setProfile((p: any) => ({ ...p, avatar_url: url }));
+                    }} />
+                </div>
+              )}
             </div>
             <div className="flex-1 pt-16 md:pt-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -272,6 +291,41 @@ const Profile: React.FC = () => {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Ajoutez des photos, vidéos ou documents.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Education */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium flex items-center gap-2"><GraduationCap className="h-4 w-4" />Formation & Diplômes</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{education.length}</Badge>
+                  {userId && <AddEducationDialog userId={userId} onAdded={fetchProfile} />}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {education.length > 0 ? (
+                <div className="space-y-3">
+                  {education.map((e: any) => (
+                    <div key={e.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px]">
+                          {e.education_type === 'school' ? 'École' : e.education_type === 'university' ? 'Université' : e.education_type === 'training' ? 'Formation' : e.education_type === 'certification' ? 'Certification' : e.education_type === 'diploma' ? 'Diplôme' : 'Autre'}
+                        </Badge>
+                        <p className="font-medium text-sm">{[e.degree, e.field_of_study].filter(Boolean).join(' - ') || e.institution}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? ' - présent' : e.end_year ? ` - ${e.end_year}` : ''}` : ''}
+                      </p>
+                      {e.description && <p className="text-[10px] text-muted-foreground mt-1">{e.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Ajoutez votre cursus scolaire, universitaire, formations et diplômes.</p>
               )}
             </CardContent>
           </Card>
