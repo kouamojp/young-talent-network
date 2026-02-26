@@ -5,11 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus } from 'lucide-react';
+import { Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image } from 'lucide-react';
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
+import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
+import AddMediaDialog from '@/components/profile/AddMediaDialog';
+import AutoResumeCard from '@/components/profile/AutoResumeCard';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 
@@ -207,40 +210,20 @@ const Profile: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Resumes */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium flex items-center gap-2"><FileText className="h-4 w-4" />Mes CV / Résumés</CardTitle>
-                <Badge variant="secondary">{resumes.length}</Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {resumes.length > 0 ? (
-                <div className="space-y-3">
-                  {resumes.map(r => (
-                    <div key={r.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-sm">{r.title}</p>
-                        {r.is_primary && <Badge variant="default" className="text-[10px]">Principal</Badge>}
-                      </div>
-                      {r.categories && <Badge variant="outline" className="mt-1 text-[10px]">{r.categories.name_fr || r.categories.name}</Badge>}
-                      {r.description && <p className="text-xs text-muted-foreground mt-1">{r.description}</p>}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">Vous pouvez créer plusieurs CV pour différentes activités.</p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Auto Resume */}
+          {userId && (
+            <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />
+          )}
 
           {/* Achievements */}
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium flex items-center gap-2"><Trophy className="h-4 w-4" />Réalisations & Prix</CardTitle>
-                <Badge variant="secondary">{achievements.length}</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{achievements.length}</Badge>
+                  {userId && <AddAchievementDialog userId={userId} onAdded={fetchProfile} />}
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -259,6 +242,36 @@ const Profile: React.FC = () => {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Ajoutez vos réalisations, prix et distinctions.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Media */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium flex items-center gap-2"><Image className="h-4 w-4" />Médias</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">{media.length}</Badge>
+                  {userId && <AddMediaDialog userId={userId} onAdded={fetchProfile} />}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {media.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {media.map(m => (
+                    <div key={m.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                      {m.media_type === 'image' && m.url && (
+                        <img src={m.url} alt={m.title || ''} className="w-full h-24 object-cover rounded mb-2" />
+                      )}
+                      <p className="font-medium text-xs truncate">{m.title || m.media_type}</p>
+                      {m.description && <p className="text-[10px] text-muted-foreground truncate">{m.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Ajoutez des photos, vidéos ou documents.</p>
               )}
             </CardContent>
           </Card>
