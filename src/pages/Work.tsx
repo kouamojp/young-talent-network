@@ -7,7 +7,7 @@ import WorkHubEntry from '@/components/work/WorkHubEntry';
 import TalentView from '@/components/work/TalentView';
 import OrganizationView from '@/components/work/OrganizationView';
 import SearchHeader from '@/components/work/SearchHeader';
-import TalentSearchDirectory from '@/components/profile/TalentSearchDirectory';
+import TalentSearchCards from '@/components/TalentSearchCards';
 import SuccessStories from '@/components/work/SuccessStories';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Briefcase } from 'lucide-react';
@@ -95,7 +95,7 @@ const Work: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="resumes">
-              <TalentSearchDirectory />
+              <TalentSearchCards />
             </TabsContent>
           </Tabs>
         </GlassMorphism>
