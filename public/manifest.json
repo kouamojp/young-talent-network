@@ -1,0 +1,24 @@
+{
+  "name": "Young & Talented",
+  "short_name": "Y&T",
+  "description": "Plateforme de talents sportifs et professionnels",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4A7DBD",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

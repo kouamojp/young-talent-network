@@ -28,6 +28,7 @@ import TalentDashboard from "./pages/TalentDashboard";
 import TalentPublicProfile from "./pages/TalentPublicProfile";
 
 import Navbar from "./components/Navbar";
+import MobileBottomNav from "./components/MobileBottomNav";
 const queryClient = new QueryClient();
 const App = () => {
   return <QueryClientProvider client={queryClient}>
@@ -39,7 +40,7 @@ const App = () => {
         <Navbar />
         
         {/* Main Layout Container */}
-        <div className="w-full pt-14">
+        <div className="w-full pt-14 pb-16 md:pb-0">
           <main className="w-full bg-background">
             <Routes>
               <Route path="/" element={<Index />} />
@@ -68,6 +69,9 @@ const App = () => {
             </Routes>
           </main>
         </div>
+        
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
       </TooltipProvider>
     </QueryClientProvider>;
 };

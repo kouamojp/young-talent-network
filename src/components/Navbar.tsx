@@ -96,18 +96,6 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      {/* Mobile Search - Only visible on mobile */}
-      <div className="md:hidden px-4 pb-2">
-        <div className="relative flex items-center bg-gray-100 rounded-full">
-          <Search className="absolute left-3 h-4 w-4 text-gray-500" />
-          <input 
-            type="text"
-            placeholder="Search Y&T"
-            className="h-9 w-full bg-gray-100 pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
-          />
-        </div>
-      </div>
     </header>
   );
 };
