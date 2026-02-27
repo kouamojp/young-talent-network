@@ -25,6 +25,7 @@ import TalentsAroundMe from "./pages/TalentsAroundMe";
 import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
+import TalentPublicProfile from "./pages/TalentPublicProfile";
 
 import Navbar from "./components/Navbar";
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => {
               <Route path="/yat-coin" element={<YatCoin />} />
               <Route path="/karta" element={<YatKarta />} />
               <Route path="/talent-dashboard" element={<TalentDashboard />} />
+              <Route path="/talent/:id" element={<TalentPublicProfile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

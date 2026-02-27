@@ -147,8 +147,8 @@ const TalentSearchDirectory: React.FC = () => {
                   {t.achievements_count > 0 && <Badge variant="secondary" className="text-[10px]">{t.achievements_count} réalisation(s)</Badge>}
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="gap-1 shrink-0">
-                <FileText className="h-3 w-3" /> CV
+              <Button variant="outline" size="sm" className="gap-1 shrink-0" onClick={() => window.location.href = `/talent/${t.id}`}>
+                <FileText className="h-3 w-3" /> Voir CV
               </Button>
             </div>
           ))}
