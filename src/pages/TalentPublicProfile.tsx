@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase } from 'lucide-react';
+import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
 
@@ -19,6 +18,23 @@ const StarRating = ({ value, onChange, readonly = false }: { value: number; onCh
         onClick={() => !readonly && onChange?.(i)}
       />
     ))}
+  </div>
+);
+
+const InfoRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
+  if (!value) return null;
+  return (
+    <div className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold text-foreground text-right max-w-[60%]">{value}</span>
+    </div>
+  );
+};
+
+const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
+  <div className="flex items-center gap-2 py-2 px-3 bg-primary/10 rounded-t-lg border border-primary/20">
+    <Icon className="h-4 w-4 text-primary" />
+    <h3 className="text-sm font-bold text-primary">{title}</h3>
   </div>
 );
 
@@ -98,121 +114,201 @@ const TalentPublicProfile: React.FC = () => {
     }
   };
 
+  const formatDate = (date: string | null) => {
+    if (!date) return null;
+    return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
+  const calculateAge = (birthday: string | null) => {
+    if (!birthday) return null;
+    const birth = new Date(birthday);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
+    return `${age} ans`;
+  };
+
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
   if (!profile) return <div className="text-center py-20"><p className="text-muted-foreground">Profil introuvable</p></div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4 gap-2"><ArrowLeft className="h-4 w-4" /> Retour</Button>
+    <div className="min-h-screen bg-background">
+      <main className="container mx-auto px-4 py-6 max-w-5xl">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
+          <ArrowLeft className="h-4 w-4" /> Retour
+        </Button>
 
-        {/* Header */}
-        <Card className="overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-primary/80 to-primary relative">
+        {/* CV Header - inspired by sports profile template */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden mb-6 print:shadow-none">
+          {/* Cover & Name */}
+          <div className="relative h-28 md:h-36 bg-gradient-to-r from-primary to-primary/70">
             {profile.cover_photo_url && <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />}
           </div>
-          <CardContent className="pt-0 pb-6">
-            <div className="flex flex-col md:flex-row gap-6 -mt-12">
-              <Avatar className="h-24 w-24 border-4 border-card shadow-lg">
+
+          <div className="px-4 md:px-6 pb-6">
+            <div className="flex flex-col md:flex-row gap-4 -mt-12">
+              {/* Photo */}
+              <Avatar className="h-24 w-24 border-4 border-card shadow-lg shrink-0">
                 <AvatarImage src={profile.avatar_url || ''} />
-                <AvatarFallback className="text-2xl">{profile.name?.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-2xl bg-muted">{profile.name?.charAt(0)}</AvatarFallback>
               </Avatar>
-              <div className="flex-1 pt-12 md:pt-2">
-                <h1 className="text-2xl font-bold">{profile.name}</h1>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <Badge variant="outline">{profile.user_type === 'organization' ? 'Organisation' : profile.user_type === 'agent' ? 'Agent' : 'Talent'}</Badge>
-                  {profile.sport_type && <Badge variant="secondary">{profile.sport_type}</Badge>}
+
+              {/* Title Info */}
+              <div className="flex-1 pt-12 md:pt-1">
+                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+                  <h1 className="text-2xl font-bold text-foreground">{profile.name}</h1>
                   {Number(profile.platform_rating) > 0 && (
-                    <span className="flex items-center gap-1 text-sm text-yellow-600">
-                      <Star className="h-4 w-4 fill-current" /> {Number(profile.platform_rating).toFixed(1)}
-                      <span className="text-muted-foreground">({profile.rating_count || 0} avis)</span>
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <StarRating value={Math.round(Number(profile.platform_rating))} readonly />
+                      <span className="text-sm font-medium text-yellow-600">{Number(profile.platform_rating).toFixed(1)}</span>
+                      <span className="text-xs text-muted-foreground">({profile.rating_count || 0})</span>
+                    </div>
                   )}
                 </div>
-                <div className="flex flex-wrap gap-3 mt-3 text-sm text-muted-foreground">
-                  {(profile.city || profile.country) && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{[profile.city, profile.country].filter(Boolean).join(', ')}</span>}
-                  {profile.website && <a href={profile.website} className="flex items-center gap-1 text-primary hover:underline"><Globe className="h-3.5 w-3.5" />{profile.website}</a>}
+                {profile.bio && <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{profile.bio}</p>}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <Badge variant="outline">{profile.user_type === 'organization' ? 'Organisation' : profile.user_type === 'agent' ? 'Agent' : 'Talent'}</Badge>
+                  {profile.sport_type && <Badge variant="secondary">{profile.sport_type}</Badge>}
                 </div>
-                {profile.bio && <p className="mt-3 text-sm">{profile.bio}</p>}
-                {socialLinks.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {socialLinks.map(l => <a key={l.id} href={l.url} target="_blank" rel="noopener noreferrer"><Badge variant="secondary" className="cursor-pointer">{l.platform}</Badge></a>)}
-                  </div>
-                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Skills */}
-        {skills.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Briefcase className="h-4 w-4" /> Compétences</CardTitle></CardHeader>
-            <CardContent><div className="flex flex-wrap gap-1.5">{skills.map((s, i) => <Badge key={i} variant="outline">{s}</Badge>)}</div></CardContent>
-          </Card>
-        )}
+        {/* Two-column CV layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Left Column - Personal Info */}
+          <div className="space-y-4">
+            {/* About */}
+            <div className="bg-card border border-border rounded-xl overflow-hidden">
+              <SectionHeader icon={User} title="Informations Personnelles" />
+              <div className="p-3 space-y-0">
+                <InfoRow label="Nom" value={profile.name} />
+                <InfoRow label="Date de naissance" value={formatDate(profile.birthday)} />
+                <InfoRow label="Âge" value={calculateAge(profile.birthday)} />
+                <InfoRow label="Spécialité" value={profile.sport_type} />
+                <InfoRow label="Ville" value={profile.city} />
+                <InfoRow label="Pays" value={profile.country} />
+                {profile.phone && <InfoRow label="Téléphone" value={profile.phone} />}
+                {profile.email && <InfoRow label="Email" value={profile.email} />}
+                {profile.website && <InfoRow label="Site web" value={profile.website} />}
+              </div>
+            </div>
 
-        {/* Education */}
-        {education.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><GraduationCap className="h-4 w-4" /> Formation & Diplômes</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {education.map((e: any) => (
-                <div key={e.id} className="p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-[10px]">{e.education_type === 'school' ? 'École' : e.education_type === 'university' ? 'Université' : e.education_type === 'training' ? 'Formation' : e.education_type === 'certification' ? 'Certification' : e.education_type}</Badge>
-                    <p className="font-medium text-sm">{[e.degree, e.field_of_study].filter(Boolean).join(' - ') || e.institution}</p>
+            {/* Skills */}
+            {skills.length > 0 && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <SectionHeader icon={Briefcase} title="Compétences" />
+                <div className="p-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {skills.map((s, i) => <Badge key={i} variant="outline" className="text-xs">{s}</Badge>)}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? ' - présent' : e.end_year ? ` - ${e.end_year}` : ''}` : ''}</p>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+              </div>
+            )}
 
-        {/* Achievements */}
-        {achievements.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Trophy className="h-4 w-4" /> Réalisations & Prix</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {achievements.map(a => (
-                <div key={a.id} className="p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium text-sm">{a.title}</p>
-                    {a.level && <Badge variant="outline" className="text-[10px]">{a.level}</Badge>}
-                  </div>
-                  {a.description && <p className="text-xs text-muted-foreground mt-1">{a.description}</p>}
-                  {a.date && <p className="text-[10px] text-muted-foreground mt-1">{new Date(a.date).toLocaleDateString('fr-FR')}</p>}
+            {/* Social Links */}
+            {socialLinks.length > 0 && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <SectionHeader icon={Globe} title="Réseaux Sociaux" />
+                <div className="p-3 space-y-0">
+                  {socialLinks.map(l => (
+                    <div key={l.id} className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
+                      <span className="text-xs font-medium text-muted-foreground">{l.platform}</span>
+                      <a href={l.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline truncate max-w-[60%]">{l.url}</a>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+              </div>
+            )}
+          </div>
 
-        {/* Media */}
+          {/* Right Column - Career */}
+          <div className="space-y-4">
+            {/* Education */}
+            {education.length > 0 && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <SectionHeader icon={GraduationCap} title="Formation & Diplômes" />
+                <div className="p-3 space-y-2">
+                  {education.map((e: any) => (
+                    <div key={e.id} className="p-2.5 rounded-lg bg-muted/40 border border-border/30">
+                      <div className="flex items-start gap-2">
+                        <Badge variant="outline" className="text-[10px] shrink-0 mt-0.5">
+                          {e.education_type === 'school' ? 'École' : e.education_type === 'university' ? 'Université' : e.education_type === 'training' ? 'Formation' : e.education_type === 'certification' ? 'Certif.' : e.education_type}
+                        </Badge>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-xs text-foreground">{e.institution}</p>
+                          {(e.degree || e.field_of_study) && (
+                            <p className="text-[11px] text-muted-foreground">{[e.degree, e.field_of_study].filter(Boolean).join(' — ')}</p>
+                          )}
+                          {e.start_year && (
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {e.start_year}{e.is_current ? ' — présent' : e.end_year ? ` — ${e.end_year}` : ''}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Achievements */}
+            {achievements.length > 0 && (
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <SectionHeader icon={Trophy} title="Réalisations & Prix" />
+                <div className="p-3">
+                  <table className="w-full text-xs">
+                    <tbody>
+                      {achievements.map(a => (
+                        <tr key={a.id} className="border-b border-border/30 last:border-0">
+                          <td className="py-1.5 pr-2 text-muted-foreground whitespace-nowrap align-top">
+                            {a.date ? new Date(a.date).getFullYear() : '—'}
+                          </td>
+                          <td className="py-1.5">
+                            <span className="font-medium text-foreground">{a.title}</span>
+                            {a.level && <Badge variant="secondary" className="ml-1.5 text-[9px]">{a.level}</Badge>}
+                            {a.description && <p className="text-[10px] text-muted-foreground mt-0.5">{a.description}</p>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Media Gallery */}
         {media.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Image className="h-4 w-4" /> Médias</CardTitle></CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+            <SectionHeader icon={Image} title="Médias & Portfolio" />
+            <div className="p-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {media.map(m => (
-                  <div key={m.id} className="p-3 rounded-lg bg-muted/50">
-                    {m.media_type === 'image' && m.url && <img src={m.url} alt={m.title || ''} className="w-full h-24 object-cover rounded mb-2" />}
-                    <p className="font-medium text-xs truncate">{m.title || m.media_type}</p>
+                  <div key={m.id} className="rounded-lg overflow-hidden bg-muted/40 border border-border/30">
+                    {m.media_type === 'image' && m.url && <img src={m.url} alt={m.title || ''} className="w-full h-28 object-cover" />}
+                    {m.media_type === 'video' && m.url && (
+                      <div className="w-full h-28 bg-muted flex items-center justify-center">
+                        <FileText className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    <p className="text-[11px] font-medium px-2 py-1.5 truncate">{m.title || m.media_type}</p>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
-        {/* Rating Section */}
-        <Card className="mb-6">
-          <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Star className="h-4 w-4" /> Évaluations ({ratings.length})</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            {/* Submit rating */}
+        {/* Ratings */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+          <SectionHeader icon={Star} title={`Évaluations (${ratings.length})`} />
+          <div className="p-4 space-y-4">
             {currentUserId && currentUserId !== id && (
-              <div className="p-4 rounded-lg border bg-card space-y-3">
+              <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
                 <p className="text-sm font-medium">Évaluer ce talent</p>
                 <StarRating value={myRating} onChange={setMyRating} />
                 <Textarea placeholder="Commentaire (optionnel)..." value={myComment} onChange={e => setMyComment(e.target.value)} className="text-sm" rows={2} />
@@ -223,11 +319,10 @@ const TalentPublicProfile: React.FC = () => {
             )}
             {!currentUserId && <p className="text-sm text-muted-foreground">Connectez-vous pour évaluer ce talent.</p>}
 
-            {/* Existing ratings */}
             {ratings.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {ratings.map(r => (
-                  <div key={r.id} className="p-3 rounded-lg bg-muted/50">
+                  <div key={r.id} className="p-3 rounded-lg bg-muted/40 border border-border/30">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={r.profiles?.avatar_url || ''} />
@@ -244,8 +339,15 @@ const TalentPublicProfile: React.FC = () => {
             ) : (
               <p className="text-sm text-muted-foreground">Aucune évaluation pour le moment.</p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+
+        {/* Print button */}
+        <div className="flex justify-center mb-8 print:hidden">
+          <Button variant="outline" onClick={() => window.print()} className="gap-2">
+            <FileText className="h-4 w-4" /> Imprimer le CV
+          </Button>
+        </div>
       </main>
       <Footer />
     </div>
