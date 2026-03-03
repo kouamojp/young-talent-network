@@ -1,314 +1,358 @@
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
+import React, { useState, useEffect } from 'react';
 import Footer from '@/components/Footer';
-import GlassMorphism from '@/components/GlassMorphism';
-import { Calendar, MapPin, Clock, Users, Filter, Search, Ticket, PartyPopper, MessageCircle } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Filter, Search, Plus, ChevronDown, Map, Eye } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
+import { countries } from '@/data/countries';
+import { sportCategories } from '@/data/sportCategories';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+const thematicCategories = [
+  { name: 'Спорт / Sport', subcategories: sportCategories.map(s => s.name) },
+  { name: 'IT', subcategories: ['Web', 'Mobile', 'AI', 'DevOps', 'Cybersecurity'] },
+  { name: 'Киберспорт / Esports', subcategories: ['Valorant', 'Fortnite', 'LoL', 'CS2', 'Dota 2'] },
+  { name: 'Наука / Science', subcategories: ['Физика', 'Химия', 'Биология', 'Математика'] },
+  { name: 'Мода / Fashion', subcategories: [] },
+  { name: 'Медицина / Medicine', subcategories: [] },
+  { name: 'Музыка / Music', subcategories: ['Поп', 'Рок', 'Джаз', 'Классика', 'Электронная'] },
+  { name: 'Танцы / Dance', subcategories: ['Бальные', 'Хип-хоп', 'Контемпорари', 'Брейк'] },
+  { name: 'Хобби / Hobbies', subcategories: [] },
+  { name: 'Кулинария / Cooking', subcategories: [] },
+  { name: 'Искусство / Art', subcategories: ['Живопись', 'Скульптура', 'Фотография', 'Графика'] },
+  { name: 'Финансы / Finance', subcategories: [] },
+];
+
+interface EventItem {
+  id: string;
+  title: string;
+  description: string | null;
+  location: string | null;
+  start_date: string;
+  end_date: string;
+  image_url: string | null;
+  attendees_count: number | null;
+  capacity: number | null;
+  is_virtual: boolean | null;
+  organizer_id: string;
+}
 
 const Events: React.FC = () => {
-  const [filterOpen, setFilterOpen] = useState(false);
-  
-  const events = [
-    {
-      id: 1,
-      title: 'Young Innovators Fair',
-      date: 'June 15, 2023',
-      time: '10:00 AM - 6:00 PM',
-      location: 'Online & Central Park, New York',
-      category: 'Innovation',
-      attendees: 250,
-      image: '/placeholder.svg',
-      perks: 'Free cotton candy for all participants!',
-      description: "Join us for a day of creativity and innovation! Whether you're a beginner or experienced creator, this is your chance to shine. PS. Come even if your project isn't perfect - we love works in progress! 🌟",
-      tags: ['beginner-friendly', 'free-snacks', 'hybrid-event']
-    },
-    {
-      id: 2,
-      title: 'Digital Art Exhibition',
-      date: 'June 23-25, 2023',
-      time: '10:00 AM - 6:00 PM',
-      location: 'Modern Gallery, Chicago',
-      category: 'Art & Design',
-      attendees: 85,
-      image: '/placeholder.svg',
-      description: 'Exhibition featuring works from emerging digital artists, with interactive installations and artist talks throughout the weekend.'
-    },
-    {
-      id: 3,
-      title: 'Film Festival: New Voices',
-      date: 'July 5-10, 2023',
-      time: 'Various Times',
-      location: 'Cinema Center, Los Angeles',
-      category: 'Film',
-      attendees: 450,
-      image: '/placeholder.svg',
-      description: 'Annual film festival showcasing short films, documentaries, and feature films from emerging filmmakers and student directors.'
-    },
-    {
-      id: 4,
-      title: 'Theatre Workshop with Broadway Actors',
-      date: 'July 15, 2023',
-      time: '1:00 PM - 5:00 PM',
-      location: 'Community Theatre, Boston',
-      category: 'Acting',
-      attendees: 40,
-      image: '/placeholder.svg',
-      description: 'Intensive workshop led by Broadway actors covering performance techniques, auditioning skills, and industry insights.'
-    },
-  ];
-  
-  const upcomingEvents = events.slice(0, 3);
-  const pastEvents = [
-    {
-      id: 5,
-      title: 'Dance Competition Finals',
-      date: 'May 28, 2023',
-      location: 'Grand Hall, Miami',
-      category: 'Dance',
-      attendees: 320,
-      image: '/placeholder.svg'
-    },
-    {
-      id: 6,
-      title: 'Songwriting Masterclass',
-      date: 'May 15, 2023',
-      location: 'Music Studio, Nashville',
-      category: 'Music',
-      attendees: 60,
-      image: '/placeholder.svg'
-    },
-  ];
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('upcoming');
+  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [regionFilter, setRegionFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Create event form state
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [newStartDate, setNewStartDate] = useState('');
+  const [newEndDate, setNewEndDate] = useState('');
+  const [newCapacity, setNewCapacity] = useState('');
+  const [newIsVirtual, setNewIsVirtual] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || null));
+    fetchEvents();
+  }, []);
+
+  const fetchEvents = async () => {
+    setLoading(true);
+    const now = new Date().toISOString();
+    let q = supabase.from('events').select('*').order('start_date', { ascending: true });
+
+    if (activeTab === 'upcoming') {
+      q = q.gte('start_date', now);
+    } else if (activeTab === 'past') {
+      q = q.lt('end_date', now);
+    } else if (activeTab === 'popular') {
+      q = q.gte('start_date', now).order('attendees_count', { ascending: false });
+    }
+
+    if (searchQuery.trim()) {
+      q = q.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
+    }
+    if (regionFilter && regionFilter !== 'all') {
+      q = q.ilike('location', `%${regionFilter}%`);
+    }
+
+    const { data } = await q.limit(50);
+    setEvents(data || []);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, [activeTab, searchQuery, regionFilter]);
+
+  const handleCreateEvent = async () => {
+    if (!userId) {
+      toast.error('Войдите в аккаунт / Connectez-vous');
+      return;
+    }
+    if (!newTitle || !newStartDate || !newEndDate) {
+      toast.error('Заполните обязательные поля / Remplissez les champs requis');
+      return;
+    }
+
+    const { error } = await supabase.from('events').insert({
+      title: newTitle,
+      description: newDescription,
+      location: newLocation,
+      start_date: newStartDate,
+      end_date: newEndDate,
+      capacity: newCapacity ? parseInt(newCapacity) : null,
+      is_virtual: newIsVirtual,
+      organizer_id: userId,
+    });
+
+    if (error) {
+      toast.error('Ошибка / Erreur: ' + error.message);
+    } else {
+      toast.success('Мероприятие создано / Événement créé!');
+      setCreateOpen(false);
+      setNewTitle('');
+      setNewDescription('');
+      setNewLocation('');
+      setNewStartDate('');
+      setNewEndDate('');
+      setNewCapacity('');
+      fetchEvents();
+    }
+  };
+
+  const handleJoinEvent = async (eventId: string) => {
+    if (!userId) {
+      toast.error('Войдите в аккаунт / Connectez-vous');
+      return;
+    }
+    const { error } = await supabase.from('event_attendees').insert({
+      event_id: eventId,
+      user_id: userId,
+    });
+    if (error) {
+      if (error.code === '23505') toast.info('Вы уже участвуете / Déjà inscrit');
+      else toast.error(error.message);
+    } else {
+      toast.success('Вы участвуете! / Inscrit!');
+    }
+  };
+
+  const formatDate = (d: string) => {
+    return new Date(d).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
-      <Navbar />
-      <main className="container mx-auto px-4 py-12">
-        <GlassMorphism className="p-6 mb-6">
-          <div className="flex items-center gap-3 mb-6">
-            <PartyPopper className="h-6 w-6 text-purple-500" />
-            <div>
-              <h1 className="text-2xl font-bold">Events & Activities</h1>
-              <p className="text-gray-600 mt-1">Where stars are born and friendships spark! ✨</p>
-            </div>
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      {/* Header */}
+      <div className="bg-muted/50 border-b border-border">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl font-bold text-foreground">YAT Event</h1>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  Создать / Créer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Создание мероприятия / Créer un événement</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <Input placeholder="Название / Titre *" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
+                  <Textarea placeholder="Описание / Description" value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
+                  <Input placeholder="Место / Lieu (город, страна)" value={newLocation} onChange={e => setNewLocation(e.target.value)} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs text-muted-foreground">Начало / Début *</label>
+                      <Input type="datetime-local" value={newStartDate} onChange={e => setNewStartDate(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Конец / Fin *</label>
+                      <Input type="datetime-local" value={newEndDate} onChange={e => setNewEndDate(e.target.value)} />
+                    </div>
+                  </div>
+                  <Input placeholder="Вместимость / Capacité" type="number" value={newCapacity} onChange={e => setNewCapacity(e.target.value)} />
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="virtual" checked={newIsVirtual} onChange={e => setNewIsVirtual(e.target.checked)} />
+                    <label htmlFor="virtual" className="text-sm">Онлайн / Virtuel</label>
+                  </div>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Тематика / Catégorie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {thematicCategories.map(c => (
+                        <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleCreateEvent} className="w-full">Создать / Créer</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input className="pl-10" placeholder="Search events..." />
-            </div>
-            <Button variant="outline" onClick={() => setFilterOpen(!filterOpen)}>
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
+
+          <div className="flex gap-2">
+            <Input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Поиск мероприятий / Rechercher..."
+              className="flex-1 h-10 text-sm bg-card"
+            />
+            <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="gap-1">
+              <Filter className="h-3.5 w-3.5" />
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
             </Button>
-            <Button>Create Event</Button>
           </div>
-          
-          {filterOpen && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-white/30 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <select className="w-full p-2 rounded-md border border-gray-300">
-                  <option value="">All Categories</option>
-                  <option value="music">Music</option>
-                  <option value="art">Art & Design</option>
-                  <option value="film">Film</option>
-                  <option value="acting">Acting</option>
-                  <option value="dance">Dance</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Location</label>
-                <select className="w-full p-2 rounded-md border border-gray-300">
-                  <option value="">All Locations</option>
-                  <option value="new-york">New York</option>
-                  <option value="los-angeles">Los Angeles</option>
-                  <option value="chicago">Chicago</option>
-                  <option value="boston">Boston</option>
-                  <option value="miami">Miami</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Date Range</label>
-                <select className="w-full p-2 rounded-md border border-gray-300">
-                  <option value="">Any Date</option>
-                  <option value="today">Today</option>
-                  <option value="this-week">This Week</option>
-                  <option value="this-month">This Month</option>
-                  <option value="next-month">Next Month</option>
-                </select>
-              </div>
+
+          {showFilters && (
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <Select value={regionFilter} onValueChange={setRegionFilter}>
+                <SelectTrigger className="text-xs h-8">
+                  <SelectValue placeholder="Регион / Région" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все / Tous</SelectItem>
+                  {countries.map(c => (
+                    <SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="text-xs h-8">
+                  <SelectValue placeholder="Тематика / Catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все / Toutes</SelectItem>
+                  {thematicCategories.map(c => (
+                    <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
-          
-          <Tabs defaultValue="upcoming">
-            <TabsList className="mb-4">
-              <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
-              <TabsTrigger value="featured">Featured Events</TabsTrigger>
-              <TabsTrigger value="my-events">My Events</TabsTrigger>
-              <TabsTrigger value="past">Past Events</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="upcoming" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {upcomingEvents.map(event => (
-                  <Dialog key={event.id}>
-                    <DialogTrigger asChild>
-                      <div className="cursor-pointer transform hover:scale-105 transition-transform duration-200">
-                        <GlassMorphism className="overflow-hidden hover:shadow-lg border border-purple-100">
-                          <div className="h-48 overflow-hidden relative">
-                            <img 
-                              src={event.image} 
-                              alt={event.title} 
-                              className="w-full h-full object-cover"
-                            />
-                            {event.perks && (
-                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-500/90 to-purple-500/0 p-3">
-                                <div className="flex items-center text-white">
-                                  <Ticket className="h-4 w-4 mr-2" />
-                                  <p className="text-sm">{event.perks}</p>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-600 rounded-full mb-2">
-                              {event.category}
-                            </span>
-                            <h3 className="font-semibold text-lg mb-2 text-purple-900">{event.title}</h3>
-                            <div className="space-y-2 text-gray-600">
-                              <div className="flex items-center text-sm">
-                                <Calendar className="h-4 w-4 mr-1 text-purple-400" />
-                                <span>{event.date}</span>
-                              </div>
-                              <div className="flex items-center text-sm">
-                                <Clock className="h-4 w-4 mr-1 text-purple-400" />
-                                <span>{event.time}</span>
-                              </div>
-                              <div className="flex items-center text-sm">
-                                <MapPin className="h-4 w-4 mr-1 text-purple-400" />
-                                <span>{event.location}</span>
-                              </div>
-                              <div className="flex items-center text-sm">
-                                <Users className="h-4 w-4 mr-1 text-purple-400" />
-                                <span>{event.attendees} attending</span>
-                              </div>
-                            </div>
-                            {event.tags && (
-                              <div className="mt-3 flex flex-wrap gap-2">
-                                {event.tags.map(tag => (
-                                  <span key={tag} className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded-full">
-                                    #{tag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </GlassMorphism>
-                      </div>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle className="text-2xl text-purple-900">{event.title}</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-1">
-                          <img 
-                            src={event.image} 
-                            alt={event.title} 
-                            className="w-full rounded-lg"
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <div className="space-y-4">
-                            <p className="text-gray-700">{event.description}</p>
-                            
-                            <div className="space-y-3">
-                              <div className="flex items-center text-gray-600">
-                                <Calendar className="h-4 w-4 mr-2 text-purple-400" />
-                                <span>{event.date}</span>
-                              </div>
-                              <div className="flex items-center text-gray-600">
-                                <Clock className="h-4 w-4 mr-2 text-purple-400" />
-                                <span>{event.time}</span>
-                              </div>
-                              <div className="flex items-center text-gray-600">
-                                <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                                <span>{event.location}</span>
-                              </div>
-                              <div className="flex items-center text-gray-600">
-                                <Users className="h-4 w-4 mr-2 text-purple-400" />
-                                <span>{event.attendees} amazing talents attending</span>
-                              </div>
-                              {event.perks && (
-                                <div className="flex items-center text-purple-600">
-                                  <Ticket className="h-4 w-4 mr-2" />
-                                  <span>{event.perks}</span>
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div className="flex gap-3 pt-4">
-                              <Button className="bg-purple-600 hover:bg-purple-700">
-                                Join the Fun!
-                              </Button>
-                              <Button variant="outline" className="border-purple-200 text-purple-600">
-                                <MessageCircle className="h-4 w-4 mr-2" />
-                                Ask Questions
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="featured">
-              <p>Featured events selected by Y&T staff based on significance and relevance to the community.</p>
-            </TabsContent>
-            
-            <TabsContent value="my-events">
-              <p>Events you've registered for or shown interest in attending.</p>
-            </TabsContent>
-            
-            <TabsContent value="past" className="space-y-4">
-              <h2 className="text-lg font-medium mb-4">Past Events</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {pastEvents.map(event => (
-                  <GlassMorphism key={event.id} className="overflow-hidden hover:shadow-md transition-shadow opacity-75">
-                    <div className="h-32 overflow-hidden">
-                      <img 
-                        src={event.image} 
-                        alt={event.title} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold mb-1">{event.title}</h3>
-                      <div className="flex items-center text-xs text-gray-600 mb-1">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-gray-600">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        <span>{event.location}</span>
-                      </div>
-                    </div>
-                  </GlassMorphism>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </GlassMorphism>
-      </main>
+        </div>
+      </div>
+
+      {/* Map placeholder */}
+      <div className="bg-muted border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="h-32 md:h-48 bg-muted/80 rounded-lg my-3 flex items-center justify-center border border-border/50 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10" />
+            <div className="text-center z-10">
+              <Map className="h-8 w-8 text-muted-foreground/40 mx-auto mb-1" />
+              <p className="text-xs text-muted-foreground">Карта мероприятий / Carte des événements</p>
+              <Button variant="link" size="sm" className="text-[10px]" onClick={() => navigate('/karta')}>
+                Открыть карту →
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs + content */}
+      <div className="container mx-auto px-4 py-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4 w-full grid grid-cols-4 text-xs">
+            <TabsTrigger value="upcoming" className="text-xs">Ближайшие</TabsTrigger>
+            <TabsTrigger value="popular" className="text-xs">Популярные</TabsTrigger>
+            <TabsTrigger value="my" className="text-xs">Мои</TabsTrigger>
+            <TabsTrigger value="past" className="text-xs">Прошедшие</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="upcoming">
+            <EventGrid events={events} loading={loading} onJoin={handleJoinEvent} formatDate={formatDate} />
+          </TabsContent>
+          <TabsContent value="popular">
+            <EventGrid events={events} loading={loading} onJoin={handleJoinEvent} formatDate={formatDate} />
+          </TabsContent>
+          <TabsContent value="my">
+            <div className="text-center py-12 text-muted-foreground">
+              <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">Войдите, чтобы видеть свои мероприятия</p>
+              <p className="text-xs">Connectez-vous pour voir vos événements</p>
+            </div>
+          </TabsContent>
+          <TabsContent value="past">
+            <EventGrid events={events} loading={loading} onJoin={handleJoinEvent} formatDate={formatDate} />
+          </TabsContent>
+        </Tabs>
+      </div>
       <Footer />
+    </div>
+  );
+};
+
+interface EventGridProps {
+  events: EventItem[];
+  loading: boolean;
+  onJoin: (id: string) => void;
+  formatDate: (d: string) => string;
+}
+
+const EventGrid: React.FC<EventGridProps> = ({ events, loading, onJoin, formatDate }) => {
+  if (loading) return <div className="text-center py-12 text-muted-foreground text-sm">Загрузка...</div>;
+  if (events.length === 0) return (
+    <div className="text-center py-12 text-muted-foreground">
+      <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30" />
+      <p className="text-sm">Нет мероприятий / Aucun événement</p>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {events.map(event => (
+        <div key={event.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+          <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            {event.image_url ? (
+              <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
+            ) : (
+              <Calendar className="h-10 w-10 text-primary/30" />
+            )}
+          </div>
+          <div className="p-3">
+            <h3 className="font-semibold text-sm text-foreground line-clamp-1">{event.title}</h3>
+            <div className="space-y-1 mt-2">
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Clock className="h-3 w-3 mr-1 shrink-0" />
+                <span className="truncate">{formatDate(event.start_date)}</span>
+              </div>
+              {event.location && (
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                  <span className="truncate">{event.location}</span>
+                </div>
+              )}
+              <div className="flex items-center text-xs text-muted-foreground">
+                <Users className="h-3 w-3 mr-1 shrink-0" />
+                <span>{event.attendees_count || 0} участник(ов)</span>
+                {event.capacity && <span className="ml-1">/ {event.capacity}</span>}
+              </div>
+            </div>
+            {event.is_virtual && <Badge variant="secondary" className="text-[10px] mt-2">🌐 Онлайн</Badge>}
+            {event.description && <p className="text-[11px] text-muted-foreground mt-2 line-clamp-2">{event.description}</p>}
+            <Button size="sm" className="w-full mt-3 text-xs" onClick={() => onJoin(event.id)}>
+              Участвовать / Participer
+            </Button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
