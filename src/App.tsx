@@ -26,6 +26,7 @@ import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
 import TalentPublicProfile from "./pages/TalentPublicProfile";
+import Media from "./pages/Media";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
@@ -58,6 +59,7 @@ const App = () => {
               <Route path="/events" element={<Events />} />
               <Route path="/tv" element={<OnlineTV />} />
               <Route path="/live" element={<Live />} />
+              <Route path="/media" element={<Media />} />
               <Route path="/work" element={<Work />} />
               <Route path="/learning" element={<Learning />} />
               <Route path="/talents-around-me" element={<TalentsAroundMe />} />
