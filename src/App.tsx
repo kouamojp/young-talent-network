@@ -30,9 +30,13 @@ import Media from "./pages/Media";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
+import SidebarMain from "./components/sidebar/SidebarMain";
+
 const queryClient = new QueryClient();
+
 const App = () => {
-  return <QueryClientProvider client={queryClient}>
+  return (
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -42,39 +46,49 @@ const App = () => {
         
         {/* Main Layout Container */}
         <div className="w-full pt-14 pb-16 md:pb-0">
-          <main className="w-full bg-background">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/auth" element={<Authentication />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/participants" element={<Participants />} />
-              <Route path="/communities" element={<Communities />} />
-              <Route path="/organizations" element={<Organizations />} />
-              <Route path="/organization-profiles" element={<OrganizationProfiles />} />
-              <Route path="/test" element={<AptitudeTest />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/tv" element={<OnlineTV />} />
-              <Route path="/live" element={<Live />} />
-              <Route path="/media" element={<Media />} />
-              <Route path="/work" element={<Work />} />
-              <Route path="/learning" element={<Learning />} />
-              <Route path="/talents-around-me" element={<TalentsAroundMe />} />
-              <Route path="/yat-coin" element={<YatCoin />} />
-              <Route path="/karta" element={<YatKarta />} />
-              <Route path="/talent-dashboard" element={<TalentDashboard />} />
-              <Route path="/talent/:id" element={<TalentPublicProfile />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
+          <div className="max-w-[1400px] mx-auto flex">
+            {/* Left Sidebar - desktop only */}
+            <aside className="hidden md:block w-[260px] shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border bg-card">
+              <SidebarMain />
+            </aside>
+            
+            {/* Main Content */}
+            <main className="flex-1 min-w-0 bg-background">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/auth" element={<Authentication />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/messages" element={<Messages />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/participants" element={<Participants />} />
+                <Route path="/communities" element={<Communities />} />
+                <Route path="/organizations" element={<Organizations />} />
+                <Route path="/organization-profiles" element={<OrganizationProfiles />} />
+                <Route path="/test" element={<AptitudeTest />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/tv" element={<OnlineTV />} />
+                <Route path="/live" element={<Live />} />
+                <Route path="/media" element={<Media />} />
+                <Route path="/work" element={<Work />} />
+                <Route path="/learning" element={<Learning />} />
+                <Route path="/talents-around-me" element={<TalentsAroundMe />} />
+                <Route path="/yat-coin" element={<YatCoin />} />
+                <Route path="/karta" element={<YatKarta />} />
+                <Route path="/talent-dashboard" element={<TalentDashboard />} />
+                <Route path="/talent/:id" element={<TalentPublicProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+          </div>
         </div>
         
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />
       </TooltipProvider>
-    </QueryClientProvider>;
+    </QueryClientProvider>
+  );
 };
+
 export default App;

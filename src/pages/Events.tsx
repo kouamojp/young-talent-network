@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Footer from '@/components/Footer';
 import { Calendar, MapPin, Clock, Users, Filter, Search, Plus, ChevronDown, Map, Eye } from 'lucide-react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +43,8 @@ interface EventItem {
   capacity: number | null;
   is_virtual: boolean | null;
   organizer_id: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const Events: React.FC = () => {
@@ -250,18 +254,11 @@ const Events: React.FC = () => {
         </div>
       </div>
 
-      {/* Map placeholder */}
-      <div className="bg-muted border-b border-border">
+      {/* Mapbox Map */}
+      <div className="border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="h-32 md:h-48 bg-muted/80 rounded-lg my-3 flex items-center justify-center border border-border/50 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10" />
-            <div className="text-center z-10">
-              <Map className="h-8 w-8 text-muted-foreground/40 mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Карта мероприятий / Carte des événements</p>
-              <Button variant="link" size="sm" className="text-[10px]" onClick={() => navigate('/karta')}>
-                Открыть карту →
-              </Button>
-            </div>
+          <div className="h-48 md:h-64 rounded-lg my-3 overflow-hidden border border-border/50">
+            <EventsMapbox events={events} />
           </div>
         </div>
       </div>
@@ -355,6 +352,54 @@ const EventGrid: React.FC<EventGridProps> = ({ events, loading, onJoin, formatDa
       ))}
     </div>
   );
+};
+
+const EventsMapbox: React.FC<{ events: EventItem[] }> = ({ events }) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpY3B2MG0wMXVjMmtwNjlzOHV5dGxzIn0.a_bGOwlDWjFEeSbQ1SInjQ';
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [2.35, 46.85],
+      zoom: 3,
+    });
+
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    return () => {
+      map.current?.remove();
+      map.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!map.current) return;
+    
+    // Remove existing markers
+    const markers = document.querySelectorAll('.mapboxgl-marker');
+    markers.forEach(m => m.remove());
+
+    events.forEach(event => {
+      if (event.latitude != null && event.longitude != null) {
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+          `<div style="max-width:200px"><strong>${event.title}</strong><br/><small>${event.location || ''}</small></div>`
+        );
+
+        new mapboxgl.Marker({ color: '#3b82f6' })
+          .setLngLat([event.longitude, event.latitude])
+          .setPopup(popup)
+          .addTo(map.current!);
+      }
+    });
+  }, [events]);
+
+  return <div ref={mapContainer} className="w-full h-full" />;
 };
 
 export default Events;
