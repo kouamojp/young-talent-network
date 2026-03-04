@@ -1,4 +1,3 @@
-
 import { LucideIcon } from 'lucide-react';
 
 export interface MenuSectionItem {
@@ -6,7 +5,8 @@ export interface MenuSectionItem {
   label: string;
   path: string;
   description: string;
-  url?: string; // For external links
-  badge?: string; // Optional badge text
-  badgeColor?: string; // Optional badge color
+  url?: string;
+  badge?: string;
+  badgeColor?: string;
+  iconColor?: string;
 }

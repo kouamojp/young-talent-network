@@ -14,6 +14,12 @@ import {
   Images,
   UserCircle,
   Globe,
+  Briefcase,
+  CalendarDays,
+  GraduationCap,
+  Building2,
+  Map,
+  Tv,
   LucideIcon
 } from 'lucide-react';
 
@@ -30,32 +36,84 @@ export const mainNavigationItems: MenuSectionItem[] = [
     label: 'Profile',
     description: 'Your digital talent hub',
     icon: UserCircle,
-    path: '/profile'
+    path: '/profile',
+    iconColor: 'text-blue-500',
   },
   {
     label: 'Feed',
     description: 'Talent & opportunity stream',
     icon: Star,
-    path: '/'
+    path: '/',
+    iconColor: 'text-amber-500',
   },
   {
     label: 'Messenger',
     description: 'Secure chats & connections',
     icon: MessageSquare,
-    path: '/messages'
+    path: '/messages',
+    iconColor: 'text-sky-500',
+    badge: '3',
+    badgeColor: 'bg-red-500 text-white',
   },
   {
     label: 'Calls',
     description: 'Voice/video meetings',
     icon: Phone,
-    path: '/messages'
+    path: '/messages',
+    iconColor: 'text-green-500',
   },
   {
     label: 'Friends',
     description: 'Your talent network',
     icon: Users,
-    path: '/participants'
+    path: '/participants',
+    iconColor: 'text-indigo-500',
+    badge: '12',
+    badgeColor: 'bg-blue-500 text-white',
   }
+];
+
+// Services YAT
+export const yatServicesItems: MenuSectionItem[] = [
+  {
+    label: 'YAT Work',
+    description: 'Jobs & opportunities',
+    icon: Briefcase,
+    path: '/work',
+    iconColor: 'text-orange-500',
+    badge: 'New',
+    badgeColor: 'bg-emerald-500 text-white',
+  },
+  {
+    label: 'YAT Events',
+    description: 'Sports & talent events',
+    icon: CalendarDays,
+    path: '/events',
+    iconColor: 'text-rose-500',
+    badge: '5',
+    badgeColor: 'bg-rose-500 text-white',
+  },
+  {
+    label: 'YAT Learning',
+    description: 'Courses & training',
+    icon: GraduationCap,
+    path: '/learning',
+    iconColor: 'text-violet-500',
+  },
+  {
+    label: 'Organizations',
+    description: 'Clubs & companies',
+    icon: Building2,
+    path: '/organizations',
+    iconColor: 'text-teal-500',
+  },
+  {
+    label: 'YAT Karta',
+    description: 'Global talent map',
+    icon: Map,
+    path: '/karta',
+    iconColor: 'text-cyan-500',
+  },
 ];
 
 // Communities & Content
@@ -64,31 +122,45 @@ export const servicesItems: MenuSectionItem[] = [
     label: 'Communities',
     description: 'Groups by interest',
     icon: Users2,
-    path: '/communities'
+    path: '/communities',
+    iconColor: 'text-purple-500',
   },
   {
     label: 'Live',
     description: 'Real-time talent streams',
     icon: Radio,
-    path: '/live'
+    path: '/live',
+    iconColor: 'text-red-500',
+    badge: 'LIVE',
+    badgeColor: 'bg-red-500 text-white',
   },
   {
     label: 'Media Hub',
     description: 'Photos, music & videos',
     icon: Image,
-    path: '/media'
+    path: '/media',
+    iconColor: 'text-pink-500',
+  },
+  {
+    label: 'Online TV',
+    description: 'Talent TV channels',
+    icon: Tv,
+    path: '/tv',
+    iconColor: 'text-fuchsia-500',
   },
   {
     label: 'Games',
     description: 'Skill-based challenges',
     icon: Gamepad2,
-    path: '/test'
+    path: '/test',
+    iconColor: 'text-lime-500',
   },
   {
     label: 'Market',
     description: 'Talent economy',
     icon: ShoppingBag,
-    path: '/yat-coin'
+    path: '/yat-coin',
+    iconColor: 'text-yellow-500',
   }
 ];
 
@@ -98,31 +170,29 @@ export const profileItems: MenuSectionItem[] = [
     label: 'Settings',
     description: 'Customize your experience',
     icon: Settings,
-    path: '/profile'
+    path: '/profile',
+    iconColor: 'text-gray-500',
   },
   {
     label: 'Posts',
     description: 'Your talent stories',
     icon: FileText,
-    path: '/news'
+    path: '/news',
+    iconColor: 'text-blue-400',
   },
   {
     label: 'Media',
     description: 'Photos & videos',
     icon: Images,
-    path: '/media'
-  },
-  {
-    label: 'About',
-    description: 'Your talent journey',
-    icon: UserCircle,
-    path: '/profile'
+    path: '/media',
+    iconColor: 'text-pink-400',
   },
   {
     label: 'Social Universe',
     description: 'Your online talent network',
     icon: Globe,
-    path: '/talents-around-me'
+    path: '/talents-around-me',
+    iconColor: 'text-emerald-500',
   }
 ];
 
@@ -133,33 +203,38 @@ export const connectItems: MenuSectionItem[] = [
     description: 'Connect on Facebook',
     icon: Globe,
     path: '#',
-    url: 'https://facebook.com'
+    url: 'https://facebook.com',
+    iconColor: 'text-blue-600',
   },
   {
     label: 'Instagram',
     description: 'Follow on Instagram',
     icon: Globe,
     path: '#',
-    url: 'https://instagram.com'
+    url: 'https://instagram.com',
+    iconColor: 'text-pink-600',
   },
   {
     label: 'X (Twitter)',
     description: 'Follow on X',
     icon: Globe,
     path: '#',
-    url: 'https://x.com'
+    url: 'https://x.com',
+    iconColor: 'text-gray-700',
   },
   {
     label: 'TikTok',
     description: 'Follow on TikTok',
     icon: Globe,
     path: '#',
-    url: 'https://tiktok.com'
+    url: 'https://tiktok.com',
+    iconColor: 'text-black',
   }
 ];
 
 export const allSections: MenuSection[] = [
   { title: 'Main', items: mainNavigationItems },
+  { title: 'Services YAT', items: yatServicesItems },
   { title: 'Communities & Content', items: servicesItems },
   { title: 'Your Talent Profile', items: profileItems },
   { title: 'Connect', items: connectItems },
