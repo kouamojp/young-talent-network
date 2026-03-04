@@ -1,97 +1,166 @@
 import { 
   Home,
-  User,
+  Star,
+  MessageSquare,
+  Phone,
   Users,
-  MessagesSquare,
-  Bell,
-  Briefcase,
-  GraduationCap,
+  Users2,
   Radio,
-  Calendar,
-  Map,
-  Building,
-  Newspaper,
+  Image,
+  Gamepad2,
+  ShoppingBag,
+  Settings,
+  FileText,
+  Images,
+  UserCircle,
+  Globe,
   LucideIcon
 } from 'lucide-react';
 
 import { MenuSectionItem } from './types';
 
-// Main navigation items - VK style organization
+export interface MenuSection {
+  title: string;
+  items: MenuSectionItem[];
+}
+
+// Main section
 export const mainNavigationItems: MenuSectionItem[] = [
   {
-    label: 'My Page',
-    description: 'Your profile',
-    icon: Home,
-    path: '/'
-  },
-  {
     label: 'Profile',
-    description: 'Your talent profile',
-    icon: User,
+    description: 'Your digital talent hub',
+    icon: UserCircle,
     path: '/profile'
   },
   {
-    label: 'Messages',
-    description: 'Your conversations',
-    icon: MessagesSquare,
+    label: 'Feed',
+    description: 'Talent & opportunity stream',
+    icon: Star,
+    path: '/'
+  },
+  {
+    label: 'Messenger',
+    description: 'Secure chats & connections',
+    icon: MessageSquare,
     path: '/messages'
   },
   {
-    label: 'Notifications',
-    description: 'Stay updated',
-    icon: Bell,
-    path: '/notifications'
+    label: 'Calls',
+    description: 'Voice/video meetings',
+    icon: Phone,
+    path: '/messages'
   },
   {
     label: 'Friends',
-    description: 'Your connections',
+    description: 'Your talent network',
     icon: Users,
     path: '/participants'
   }
 ];
 
-// Secondary navigation - Services
+// Communities & Content
 export const servicesItems: MenuSectionItem[] = [
   {
-    label: 'Work',
-    description: 'Job opportunities',
-    icon: Briefcase,
-    path: '/work'
-  },
-  {
-    label: 'Organizations',
-    description: 'Browse companies',
-    icon: Building,
-    path: '/organizations'
-  },
-  {
-    label: 'Learning',
-    description: 'Educational content',
-    icon: GraduationCap,
-    path: '/learning'
+    label: 'Communities',
+    description: 'Groups by interest',
+    icon: Users2,
+    path: '/communities'
   },
   {
     label: 'Live',
-    description: 'Streams & broadcasts',
+    description: 'Real-time talent streams',
     icon: Radio,
     path: '/live'
   },
   {
-    label: 'Events',
-    description: 'Sports events',
-    icon: Calendar,
-    path: '/events'
+    label: 'Media Hub',
+    description: 'Photos, music & videos',
+    icon: Image,
+    path: '/media'
   },
   {
-    label: 'Map',
-    description: 'Explore locations',
-    icon: Map,
-    path: '/karta'
+    label: 'Games',
+    description: 'Skill-based challenges',
+    icon: Gamepad2,
+    path: '/test'
   },
   {
-    label: 'News',
-    description: 'Latest updates',
-    icon: Newspaper,
-    path: '/news'
+    label: 'Market',
+    description: 'Talent economy',
+    icon: ShoppingBag,
+    path: '/yat-coin'
   }
+];
+
+// Your Talent Profile
+export const profileItems: MenuSectionItem[] = [
+  {
+    label: 'Settings',
+    description: 'Customize your experience',
+    icon: Settings,
+    path: '/profile'
+  },
+  {
+    label: 'Posts',
+    description: 'Your talent stories',
+    icon: FileText,
+    path: '/news'
+  },
+  {
+    label: 'Media',
+    description: 'Photos & videos',
+    icon: Images,
+    path: '/media'
+  },
+  {
+    label: 'About',
+    description: 'Your talent journey',
+    icon: UserCircle,
+    path: '/profile'
+  },
+  {
+    label: 'Social Universe',
+    description: 'Your online talent network',
+    icon: Globe,
+    path: '/talents-around-me'
+  }
+];
+
+// Connect (social links)
+export const connectItems: MenuSectionItem[] = [
+  {
+    label: 'Facebook',
+    description: 'Connect on Facebook',
+    icon: Globe,
+    path: '#',
+    url: 'https://facebook.com'
+  },
+  {
+    label: 'Instagram',
+    description: 'Follow on Instagram',
+    icon: Globe,
+    path: '#',
+    url: 'https://instagram.com'
+  },
+  {
+    label: 'X (Twitter)',
+    description: 'Follow on X',
+    icon: Globe,
+    path: '#',
+    url: 'https://x.com'
+  },
+  {
+    label: 'TikTok',
+    description: 'Follow on TikTok',
+    icon: Globe,
+    path: '#',
+    url: 'https://tiktok.com'
+  }
+];
+
+export const allSections: MenuSection[] = [
+  { title: 'Main', items: mainNavigationItems },
+  { title: 'Communities & Content', items: servicesItems },
+  { title: 'Your Talent Profile', items: profileItems },
+  { title: 'Connect', items: connectItems },
 ];

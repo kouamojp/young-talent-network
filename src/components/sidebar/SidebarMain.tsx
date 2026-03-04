@@ -1,14 +1,9 @@
 
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { 
-  mainNavigationItems, 
-  servicesItems
-} from './sidebarData';
+import { allSections } from './sidebarData';
 import { MenuSectionItem } from './types';
 import { Separator } from '@/components/ui/separator';
-import { AISearchDialog } from '@/components/ai/AISearchDialog';
-import { QuickCreateDialog } from '@/components/create/QuickCreateDialog';
 
 interface SidebarMainProps {
   onNavigate?: () => void;
@@ -17,32 +12,35 @@ interface SidebarMainProps {
 const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
   const location = useLocation();
   const currentPath = location.pathname;
-  const [aiSearchOpen, setAiSearchOpen] = useState(false);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [createType, setCreateType] = useState<'post' | 'event' | 'job' | 'course' | 'page'>('post');
 
   const isActive = (path: string) => {
-    if (path.includes('?')) {
-      const basePath = path.split('?')[0];
-      const queryParam = path.split('?')[1];
-      return currentPath === path || (currentPath.startsWith(basePath) && currentPath.includes(queryParam));
-    }
+    if (path === '#') return false;
+    if (path === '/') return currentPath === '/';
     return currentPath === path;
   };
 
   const renderMenuItem = (item: MenuSectionItem) => {
     const active = isActive(item.path);
     const content = (
-      <>
-        <item.icon className="h-5 w-5 shrink-0 text-muted-foreground" />
-        <span className="ml-3 truncate text-sm">{item.label}</span>
-      </>
+      <div className="flex items-center gap-3">
+        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-muted">
+          <item.icon className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="flex flex-col min-w-0">
+          <span className={`text-sm font-medium truncate ${active ? 'text-primary' : 'text-foreground'}`}>
+            {item.label}
+          </span>
+          <span className="text-[11px] text-muted-foreground truncate">
+            {item.description}
+          </span>
+        </div>
+      </div>
     );
 
-    const className = `flex items-center px-3 py-2 rounded-md transition-colors ${
+    const className = `flex items-center px-3 py-2 rounded-lg transition-colors ${
       active 
-        ? 'bg-primary/10 text-primary font-medium' 
-        : 'text-foreground hover:bg-muted'
+        ? 'bg-primary/10' 
+        : 'hover:bg-muted'
     }`;
 
     if (item.url) {
@@ -66,30 +64,25 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
   };
 
   return (
-    <>
-      <aside className="w-full h-full bg-card">
-        <nav className="p-4 space-y-1">
-          {/* Main Navigation */}
-          {mainNavigationItems.map((item) => (
-            <div key={item.label}>
-              {renderMenuItem(item)}
+    <aside className="w-full h-full bg-card">
+      <nav className="p-3 space-y-4">
+        {allSections.map((section, idx) => (
+          <div key={section.title}>
+            {idx > 0 && <Separator className="mb-3" />}
+            <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+              {section.title}
+            </p>
+            <div className="space-y-0.5">
+              {section.items.map((item) => (
+                <div key={item.label}>
+                  {renderMenuItem(item)}
+                </div>
+              ))}
             </div>
-          ))}
-          
-          <Separator className="my-3" />
-          
-          {/* Services */}
-          {servicesItems.map((item) => (
-            <div key={item.label}>
-              {renderMenuItem(item)}
-            </div>
-          ))}
-        </nav>
-      </aside>
-      
-      <AISearchDialog open={aiSearchOpen} onOpenChange={setAiSearchOpen} />
-      <QuickCreateDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen} type={createType} />
-    </>
+          </div>
+        ))}
+      </nav>
+    </aside>
   );
 };
 
