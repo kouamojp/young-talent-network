@@ -27,6 +27,8 @@ import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
 import TalentPublicProfile from "./pages/TalentPublicProfile";
 import Media from "./pages/Media";
+import Marketplace from "./pages/Marketplace";
+import Social from "./pages/Social";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
@@ -78,6 +80,8 @@ const App = () => {
                 <Route path="/karta" element={<YatKarta />} />
                 <Route path="/talent-dashboard" element={<TalentDashboard />} />
                 <Route path="/talent/:id" element={<TalentPublicProfile />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/social" element={<Social />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

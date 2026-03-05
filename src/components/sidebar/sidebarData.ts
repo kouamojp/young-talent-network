@@ -161,6 +161,22 @@ export const servicesItems: MenuSectionItem[] = [
     icon: ShoppingBag,
     path: '/yat-coin',
     iconColor: 'text-yellow-500',
+  },
+  {
+    label: 'YAT Marketplace',
+    description: 'Buy & sell products/services',
+    icon: ShoppingBag,
+    path: '/marketplace',
+    iconColor: 'text-orange-600',
+    badge: 'New',
+    badgeColor: 'bg-orange-500 text-white',
+  },
+  {
+    label: 'YAT Social',
+    description: 'Your social networks hub',
+    icon: Globe,
+    path: '/social',
+    iconColor: 'text-blue-500',
   }
 ];
 
