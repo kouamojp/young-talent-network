@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   Briefcase, 
   GraduationCap, 
@@ -26,6 +26,8 @@ interface ProfileSidebarProps {
   talentPresence: TalentPresence[];
   userName?: string;
   userAvatar?: string;
+  activeSection?: string;
+  onSectionChange?: (section: string) => void;
 }
 
 const sidebarItems = [
@@ -90,9 +92,10 @@ const sidebarItems = [
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ 
   talentPresence, 
   userName,
-  userAvatar 
+  userAvatar,
+  activeSection,
+  onSectionChange,
 }) => {
-  const location = useLocation();
 
   const getPresenceStatus = (section: string) => {
     const presence = talentPresence.find(p => p.section === section);
@@ -111,16 +114,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
         <nav className="space-y-1">
           {sidebarItems.map((item) => {
             const presence = getPresenceStatus(item.key);
-            const isActive = location.pathname === item.path;
-            
             return (
-              <Link
+              <button
                 key={item.key}
-                to={item.path}
+                onClick={() => onSectionChange?.(item.key)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all w-full text-left",
                   "hover:bg-muted group",
-                  isActive && "bg-primary/10 border-l-2 border-primary"
+                  activeSection === item.key && "bg-primary/10 border-l-2 border-primary"
                 )}
               >
                 <div className={cn(
@@ -143,7 +144,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                     {presence.isActive ? 'Actif' : 'Inactif'}
                   </Badge>
                 )}
-              </Link>
+              </button>
             );
           })}
           
