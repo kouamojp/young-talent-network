@@ -1,20 +1,22 @@
 
 import React, { useState } from 'react';
-import { Search, MessageSquare, Bell, ChevronDown, Menu } from 'lucide-react';
+import { Search, MessageSquare, Bell, ChevronDown, Menu, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import SidebarMain from './sidebar/SidebarMain';
+import { useTheme } from '@/hooks/useTheme';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 shadow-sm z-50">
+    <header className="fixed top-0 left-0 right-0 h-14 bg-card border-b border-border shadow-sm z-50">
       <div className="max-w-screen-2xl mx-auto px-4 flex items-center justify-between h-full">
         {/* Logo with Burger Menu */}
         <div className="flex items-center gap-3">
@@ -25,7 +27,7 @@ const Navbar: React.FC = () => {
                 size="icon"
                 className="rounded-full hover:bg-gray-100"
               >
-                <Menu className="h-5 w-5 text-black" />
+                <Menu className="h-5 w-5 text-foreground" />
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto p-0">
@@ -46,52 +48,59 @@ const Navbar: React.FC = () => {
 
         {/* Center Search */}
         <div className="flex-1 max-w-2xl mx-4 hidden md:block">
-          <div className="relative flex items-center bg-gray-100 rounded-full">
-            <Search className="absolute left-3 h-4 w-4 text-gray-500" />
+          <div className="relative flex items-center bg-muted rounded-full">
+            <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
             <input 
               type="text"
               placeholder="Search Y&T"
-              className="h-10 w-full bg-gray-100 pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="h-10 w-full bg-muted pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
             />
           </div>
         </div>
 
         {/* Right side icons */}
         <div className="flex items-center gap-2">
-          <Link to="/profile" className="hidden sm:flex items-center gap-2 rounded-full hover:bg-gray-100 p-2">
+          <Link to="/profile" className="hidden sm:flex items-center gap-2 rounded-full hover:bg-muted p-2">
             <Avatar className="h-8 w-8">
               <AvatarImage src="/placeholder.svg" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium hidden md:inline">Your Profile</span>
+            <span className="text-sm font-medium hidden md:inline text-foreground">Your Profile</span>
           </Link>
           
-          {/* Facebook-style circular buttons */}
           <div className="flex items-center space-x-2">
             <Button 
               variant="ghost" 
               size="icon"
-              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              className="rounded-full bg-muted hover:bg-muted/80"
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-muted hover:bg-muted/80"
               asChild
             >
               <Link to="/messages">
-                <MessageSquare className="h-5 w-5 text-black" />
+                <MessageSquare className="h-5 w-5 text-foreground" />
               </Link>
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              className="rounded-full bg-muted hover:bg-muted/80"
             >
-              <Bell className="h-5 w-5 text-black" />
+              <Bell className="h-5 w-5 text-foreground" />
             </Button>
             <Button 
               variant="ghost" 
               size="icon"
-              className="rounded-full bg-gray-200 hover:bg-gray-300"
+              className="rounded-full bg-muted hover:bg-muted/80"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <ChevronDown className="h-5 w-5 text-black" />
+              <ChevronDown className="h-5 w-5 text-foreground" />
             </Button>
           </div>
         </div>
