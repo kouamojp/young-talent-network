@@ -204,28 +204,17 @@ const Profile: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
-          <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} />
+          <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={setActiveSection} />
         </div>
 
         <div className="lg:col-span-3 space-y-6">
-          {/* YAT Sections Tabs */}
+          {/* YAT Section Content */}
           <Card>
             <CardContent className="p-4">
-              <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-                <TabsList className="w-full flex-wrap h-auto gap-1 bg-muted/50 p-2 rounded-lg">
-                  {sectionTabs.map((tab) => (
-                    <TabsTrigger key={tab.key} value={tab.key} className="flex items-center gap-1.5 px-3 py-2 text-xs data-[state=active]:bg-background">
-                      <tab.icon className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-                {sectionTabs.map((tab) => (
-                  <TabsContent key={tab.key} value={tab.key} className="mt-4">
-                    <SectionContent section={tab.key} icon={tab.icon} color={tab.color} />
-                  </TabsContent>
-                ))}
-              </Tabs>
+              {(() => {
+                const tab = sectionTabs.find(t => t.key === activeSection) || sectionTabs[0];
+                return <SectionContent section={tab.key} icon={tab.icon} color={tab.color} />;
+              })()}
             </CardContent>
           </Card>
 
