@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { user } from '@/components/profile/ProfileData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image } from 'lucide-react';
+import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image, ShoppingBag } from 'lucide-react';
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
@@ -17,6 +16,7 @@ import AutoResumeCard from '@/components/profile/AutoResumeCard';
 import FileUploadButton from '@/components/profile/FileUploadButton';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface TalentPresence {
   id: string;
@@ -79,6 +79,19 @@ const Profile: React.FC = () => {
 
   const displayProfile = profile || user;
 
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const prevSectionRef = useRef(activeSection);
+
+  const handleSectionChange = (section: string) => {
+    if (section === activeSection) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveSection(section);
+      prevSectionRef.current = section;
+      setTimeout(() => setIsTransitioning(false), 50);
+    }, 150);
+  };
+
   const sectionTabs = [
     { key: 'work', label: 'YAT Work', icon: Briefcase, color: 'bg-blue-500/20 text-blue-500' },
     { key: 'learning', label: 'YAT Learning', icon: GraduationCap, color: 'bg-green-500/20 text-green-500' },
@@ -87,6 +100,8 @@ const Profile: React.FC = () => {
     { key: 'events', label: 'YAT Events', icon: Calendar, color: 'bg-orange-500/20 text-orange-500' },
     { key: 'karta', label: 'YAT Karta', icon: Map, color: 'bg-teal-500/20 text-teal-500' },
     { key: 'yat-coin', label: 'YAT Coin', icon: Coins, color: 'bg-yellow-500/20 text-yellow-500' },
+    { key: 'marketplace', label: 'YAT Marketplace', icon: ShoppingBag, color: 'bg-orange-600/20 text-orange-600' },
+    { key: 'social', label: 'YAT Social', icon: Globe, color: 'bg-indigo-500/20 text-indigo-500' },
   ];
 
   const SectionContent = ({ section, icon: Icon, color }: { section: string; icon: any; color: string }) => {
@@ -129,6 +144,11 @@ const Profile: React.FC = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto py-6 px-4">
+      {/* Back Button */}
+      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
+        <ArrowLeft className="h-4 w-4" /> Retour
+      </Button>
+
       {/* Profile Header */}
       <Card className="overflow-hidden mb-6">
         <div className="h-40 bg-gradient-to-r from-primary/80 to-primary relative">
@@ -204,17 +224,26 @@ const Profile: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1">
-          <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={setActiveSection} />
+          <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={handleSectionChange} />
         </div>
 
         <div className="lg:col-span-3 space-y-6">
           {/* YAT Section Content */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardContent className="p-4">
-              {(() => {
-                const tab = sectionTabs.find(t => t.key === activeSection) || sectionTabs[0];
-                return <SectionContent section={tab.key} icon={tab.icon} color={tab.color} />;
-              })()}
+              <div
+                className={cn(
+                  "transition-all duration-200 ease-out",
+                  isTransitioning
+                    ? "opacity-0 translate-y-2 scale-[0.98]"
+                    : "opacity-100 translate-y-0 scale-100"
+                )}
+              >
+                {(() => {
+                  const tab = sectionTabs.find(t => t.key === activeSection) || sectionTabs[0];
+                  return <SectionContent section={tab.key} icon={tab.icon} color={tab.color} />;
+                })()}
+              </div>
             </CardContent>
           </Card>
 

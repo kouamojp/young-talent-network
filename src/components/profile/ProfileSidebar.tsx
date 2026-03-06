@@ -9,7 +9,11 @@ import {
   Map, 
   Coins,
   User,
-  LayoutDashboard
+  LayoutDashboard,
+  ShoppingBag,
+  Globe,
+  CheckCircle2,
+  Circle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -86,6 +90,22 @@ const sidebarItems = [
     path: '/yat-coin',
     color: 'text-yellow-500',
     bgColor: 'bg-yellow-500/10'
+  },
+  {
+    key: 'marketplace',
+    label: 'YAT Marketplace',
+    icon: ShoppingBag,
+    path: '/marketplace',
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-600/10'
+  },
+  {
+    key: 'social',
+    label: 'YAT Social',
+    icon: Globe,
+    path: '/social',
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-500/10'
   }
 ];
 
@@ -114,20 +134,21 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
         <nav className="space-y-1">
           {sidebarItems.map((item) => {
             const presence = getPresenceStatus(item.key);
+            const isRegistered = !!presence;
             return (
               <button
                 key={item.key}
                 onClick={() => onSectionChange?.(item.key)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all w-full text-left",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 w-full text-left",
                   "hover:bg-muted group",
-                  activeSection === item.key && "bg-primary/10 border-l-2 border-primary"
+                  activeSection === item.key && "bg-primary/10 border-l-2 border-primary shadow-sm"
                 )}
               >
                 <div className={cn(
-                  "p-1.5 rounded-md transition-colors",
+                  "p-1.5 rounded-md transition-all duration-200",
                   item.bgColor,
-                  "group-hover:scale-105"
+                  "group-hover:scale-110"
                 )}>
                   <item.icon className={cn("h-4 w-4", item.color)} />
                 </div>
@@ -136,12 +157,15 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                     {item.label}
                   </span>
                 </div>
-                {presence && (
-                  <Badge 
-                    variant={presence.isActive ? "default" : "secondary"}
-                    className="text-[10px] px-1.5 py-0"
-                  >
-                    {presence.isActive ? 'Actif' : 'Inactif'}
+                {isRegistered ? (
+                  presence.isActive ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-muted-foreground/50 shrink-0" />
+                  )
+                ) : (
+                  <Badge variant="outline" className="text-[9px] px-1 py-0 text-muted-foreground">
+                    —
                   </Badge>
                 )}
               </button>
