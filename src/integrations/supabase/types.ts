@@ -14,48 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_organization_memberships: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          joined_at: string | null
+          organization_id: string
+          role: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          organization_id: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          joined_at?: string | null
+          organization_id?: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_organization_memberships_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_organization_memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organization_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_profiles: {
         Row: {
           agency_name: string
+          avatar_url: string | null
+          bio: string | null
+          category: string | null
           clients_represented: number | null
           commission_rate: number | null
           created_at: string
+          deals_completed: number | null
+          email: string | null
           id: string
           license_number: string | null
+          location: string | null
+          phone: string | null
+          services: string[] | null
           specialization: string[] | null
           updated_at: string
           user_id: string
           verified: boolean | null
+          website: string | null
         }
         Insert: {
           agency_name: string
+          avatar_url?: string | null
+          bio?: string | null
+          category?: string | null
           clients_represented?: number | null
           commission_rate?: number | null
           created_at?: string
+          deals_completed?: number | null
+          email?: string | null
           id?: string
           license_number?: string | null
+          location?: string | null
+          phone?: string | null
+          services?: string[] | null
           specialization?: string[] | null
           updated_at?: string
           user_id: string
           verified?: boolean | null
+          website?: string | null
         }
         Update: {
           agency_name?: string
+          avatar_url?: string | null
+          bio?: string | null
+          category?: string | null
           clients_represented?: number | null
           commission_rate?: number | null
           created_at?: string
+          deals_completed?: number | null
+          email?: string | null
           id?: string
           license_number?: string | null
+          location?: string | null
+          phone?: string | null
+          services?: string[] | null
           specialization?: string[] | null
           updated_at?: string
           user_id?: string
           verified?: boolean | null
+          website?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "agent_profiles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_talent_contracts: {
+        Row: {
+          agent_id: string
+          commission_rate: number | null
+          contract_duration_months: number | null
+          created_at: string
+          end_date: string | null
+          id: string
+          start_date: string | null
+          status: string
+          talent_id: string
+          terms: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          commission_rate?: number | null
+          contract_duration_months?: number | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          talent_id: string
+          terms?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          commission_rate?: number | null
+          contract_duration_months?: number | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          talent_id?: string
+          terms?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_talent_contracts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_talent_contracts_talent_id_fkey"
+            columns: ["talent_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },

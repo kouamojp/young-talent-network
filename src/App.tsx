@@ -26,6 +26,8 @@ import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
 import TalentDashboard from "./pages/TalentDashboard";
 import TalentPublicProfile from "./pages/TalentPublicProfile";
+import AgentProfile from "./pages/AgentProfile";
+import OrganizationHub from "./pages/OrganizationHub";
 import Media from "./pages/Media";
 import Marketplace from "./pages/Marketplace";
 import Social from "./pages/Social";
@@ -80,6 +82,8 @@ const App = () => {
                 <Route path="/karta" element={<YatKarta />} />
                 <Route path="/talent-dashboard" element={<TalentDashboard />} />
                 <Route path="/talent/:id" element={<TalentPublicProfile />} />
+                <Route path="/agent/:id" element={<AgentProfile />} />
+                <Route path="/organization/:id" element={<OrganizationHub />} />
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/social" element={<Social />} />
                 <Route path="*" element={<NotFound />} />
