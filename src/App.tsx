@@ -87,6 +87,7 @@ const App = () => {
                 <Route path="/organization/:id" element={<OrganizationHub />} />
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/social" element={<Social />} />
+                <Route path="/yat-database" element={<YatDatabase />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
