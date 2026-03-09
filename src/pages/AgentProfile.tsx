@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye } from 'lucide-react';
 import Footer from '@/components/Footer';
+import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
+import PendingContractsManager from '@/components/agent/PendingContractsManager';
 
 interface AgentData {
   id: string;
@@ -56,6 +58,7 @@ interface OrgMembership {
   role: string | null;
   status: string;
   organization?: {
+    id: string;
     company_name: string;
     logo_url: string | null;
     industry: string | null;
@@ -70,15 +73,28 @@ const AgentProfile: React.FC = () => {
   const [memberships, setMemberships] = useState<OrgMembership[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id || null);
+    });
+  }, []);
 
   useEffect(() => {
     if (id) fetchAgentData();
   }, [id]);
 
+  useEffect(() => {
+    if (currentUserId && id) {
+      setIsOwner(currentUserId === id);
+    }
+  }, [currentUserId, id]);
+
   const fetchAgentData = async () => {
     setLoading(true);
     try {
-      // Fetch agent profile
       const { data: agentData } = await supabase
         .from('agent_profiles')
         .select('*')
@@ -86,7 +102,6 @@ const AgentProfile: React.FC = () => {
         .single();
 
       if (agentData) {
-        // Fetch linked profile
         const { data: profileData } = await supabase
           .from('profiles')
           .select('name, avatar_url, country, city')
@@ -179,7 +194,6 @@ const AgentProfile: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto p-4 space-y-6">
-        {/* Back button */}
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
@@ -198,14 +212,10 @@ const AgentProfile: React.FC = () => {
               <div className="flex-1 mt-2">
                 <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-2xl font-bold text-foreground">{agent.agency_name}</h1>
-                  {agent.verified && (
-                    <Badge className="bg-green-500 text-white">Vérifié</Badge>
-                  )}
+                  {agent.verified && <Badge className="bg-green-500 text-white">Vérifié</Badge>}
                 </div>
                 <p className="text-muted-foreground">{agent.profile?.name}</p>
-                {agent.category && (
-                  <Badge variant="secondary" className="mt-1">{agent.category}</Badge>
-                )}
+                {agent.category && <Badge variant="secondary" className="mt-1">{agent.category}</Badge>}
                 <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
                   {(agent.location || agent.profile?.city) && (
                     <span className="flex items-center gap-1">
@@ -214,28 +224,24 @@ const AgentProfile: React.FC = () => {
                     </span>
                   )}
                   {agent.email && (
-                    <span className="flex items-center gap-1">
-                      <Mail className="h-4 w-4" />
-                      {agent.email}
-                    </span>
+                    <span className="flex items-center gap-1"><Mail className="h-4 w-4" />{agent.email}</span>
                   )}
                   {agent.phone && (
-                    <span className="flex items-center gap-1">
-                      <Phone className="h-4 w-4" />
-                      {agent.phone}
-                    </span>
+                    <span className="flex items-center gap-1"><Phone className="h-4 w-4" />{agent.phone}</span>
                   )}
                   {agent.website && (
-                    <span className="flex items-center gap-1">
-                      <Globe className="h-4 w-4" />
-                      {agent.website}
-                    </span>
+                    <span className="flex items-center gap-1"><Globe className="h-4 w-4" />{agent.website}</span>
                   )}
                 </div>
               </div>
-              <Button className="gap-2">
-                <Handshake className="h-4 w-4" /> Contacter
-              </Button>
+              <div className="flex gap-2">
+                {isOwner && (
+                  <ContractCreationDialog agentId={id!} onContractCreated={fetchAgentData} />
+                )}
+                <Button variant="outline" className="gap-2">
+                  <Handshake className="h-4 w-4" /> Contacter
+                </Button>
+              </div>
             </div>
 
             {/* Stats */}
@@ -251,6 +257,11 @@ const AgentProfile: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Pending Contracts (visible to owner) */}
+        {isOwner && (
+          <PendingContractsManager userId={id!} userType="agent" onUpdate={fetchAgentData} />
+        )}
+
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
@@ -264,12 +275,9 @@ const AgentProfile: React.FC = () => {
             {agent.bio && (
               <Card>
                 <CardHeader><CardTitle className="text-lg">À propos</CardTitle></CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{agent.bio}</p>
-                </CardContent>
+                <CardContent><p className="text-muted-foreground">{agent.bio}</p></CardContent>
               </Card>
             )}
-
             {agent.specialization && agent.specialization.length > 0 && (
               <Card>
                 <CardHeader><CardTitle className="text-lg">Spécialisations</CardTitle></CardHeader>
@@ -280,7 +288,6 @@ const AgentProfile: React.FC = () => {
                 </CardContent>
               </Card>
             )}
-
             {agent.license_number && (
               <Card>
                 <CardContent className="p-4 flex items-center gap-3">
@@ -302,15 +309,19 @@ const AgentProfile: React.FC = () => {
               </Card>
             ) : (
               contracts.map((contract) => (
-                <Card key={contract.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/talent/${contract.talent_id}`)}>
+                <Card key={contract.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4 flex items-center gap-4">
-                    <Avatar>
+                    <Avatar className="cursor-pointer" onClick={() => navigate(`/talent/${contract.talent_id}`)}>
                       <AvatarImage src={contract.talent_profile?.avatar_url || ''} />
                       <AvatarFallback>{contract.talent_profile?.name?.charAt(0) || 'T'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold">{contract.talent_profile?.name || 'Talent'}</h4>
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => navigate(`/talent/${contract.talent_id}`)}
+                      >
+                        {contract.talent_profile?.name || 'Talent'}
+                      </h4>
                       <p className="text-sm text-muted-foreground">{contract.talent_profile?.sport_type}</p>
                       {contract.talent_profile?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
@@ -318,9 +329,14 @@ const AgentProfile: React.FC = () => {
                         </p>
                       )}
                     </div>
-                    <Badge variant="secondary">
-                      {contract.status === 'active' ? 'Actif' : contract.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        {contract.status === 'active' ? 'Actif' : contract.status}
+                      </Badge>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/talent/${contract.talent_id}`)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -338,18 +354,27 @@ const AgentProfile: React.FC = () => {
               </Card>
             ) : (
               memberships.map((membership) => (
-                <Card key={membership.id} className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => navigate(`/organization/${membership.organization_id}`)}>
+                <Card key={membership.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4 flex items-center gap-4">
-                    <Avatar>
+                    <Avatar className="cursor-pointer" onClick={() => navigate(`/organization/${membership.organization?.id || membership.organization_id}`)}>
                       <AvatarImage src={membership.organization?.logo_url || ''} />
                       <AvatarFallback>{membership.organization?.company_name?.charAt(0) || 'O'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold">{membership.organization?.company_name}</h4>
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => navigate(`/organization/${membership.organization?.id || membership.organization_id}`)}
+                      >
+                        {membership.organization?.company_name}
+                      </h4>
                       <p className="text-sm text-muted-foreground">{membership.organization?.industry}</p>
                     </div>
-                    <Badge variant="outline">{membership.role || 'Membre'}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{membership.role || 'Membre'}</Badge>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/organization/${membership.organization?.id || membership.organization_id}`)}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -371,7 +396,7 @@ const AgentProfile: React.FC = () => {
                   <Card key={i}>
                     <CardContent className="p-4 flex items-center gap-3">
                       <Star className="h-5 w-5 text-primary" />
-                      <span className="font-medium">{service}</span>
+                      <span className="font-medium text-foreground">{service}</span>
                     </CardContent>
                   </Card>
                 ))}
