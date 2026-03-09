@@ -20,6 +20,7 @@ import {
   Building2,
   Map,
   Tv,
+  Database,
   LucideIcon
 } from 'lucide-react';
 
@@ -113,6 +114,15 @@ export const yatServicesItems: MenuSectionItem[] = [
     icon: Map,
     path: '/karta',
     iconColor: 'text-cyan-500',
+  },
+  {
+    label: 'YAT Database',
+    description: 'Search all participants',
+    icon: Database,
+    path: '/yat-database',
+    iconColor: 'text-amber-600',
+    badge: 'New',
+    badgeColor: 'bg-amber-500 text-white',
   },
 ];
 

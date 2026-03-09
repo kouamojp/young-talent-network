@@ -31,6 +31,7 @@ import OrganizationHub from "./pages/OrganizationHub";
 import Media from "./pages/Media";
 import Marketplace from "./pages/Marketplace";
 import Social from "./pages/Social";
+import YatDatabase from "./pages/YatDatabase";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
@@ -86,6 +87,7 @@ const App = () => {
                 <Route path="/organization/:id" element={<OrganizationHub />} />
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/social" element={<Social />} />
+                <Route path="/yat-database" element={<YatDatabase />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
