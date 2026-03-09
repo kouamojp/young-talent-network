@@ -20,6 +20,7 @@ import {
   Building2,
   Map,
   Tv,
+  Database,
   LucideIcon
 } from 'lucide-react';
 
