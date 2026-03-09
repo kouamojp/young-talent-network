@@ -267,7 +267,10 @@ const OrganizationHub: React.FC = () => {
                       <AvatarFallback>{agent.agent_profile?.name?.charAt(0) || 'A'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}
+                      >
                         {agent.agent_detail?.agency_name || agent.agent_profile?.name}
                       </h4>
                       <p className="text-sm text-muted-foreground">{agent.agent_detail?.category}</p>
@@ -275,7 +278,12 @@ const OrganizationHub: React.FC = () => {
                         {agent.agent_detail?.clients_represented || 0} talents représentés
                       </p>
                     </div>
-                    <Badge variant="outline">{agent.role || 'Membre'}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{agent.role || 'Membre'}</Badge>
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
