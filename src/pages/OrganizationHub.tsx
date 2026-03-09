@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 interface OrgData {
@@ -267,7 +267,10 @@ const OrganizationHub: React.FC = () => {
                       <AvatarFallback>{agent.agent_profile?.name?.charAt(0) || 'A'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}
+                      >
                         {agent.agent_detail?.agency_name || agent.agent_profile?.name}
                       </h4>
                       <p className="text-sm text-muted-foreground">{agent.agent_detail?.category}</p>
@@ -275,7 +278,12 @@ const OrganizationHub: React.FC = () => {
                         {agent.agent_detail?.clients_represented || 0} talents représentés
                       </p>
                     </div>
-                    <Badge variant="outline">{agent.role || 'Membre'}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{agent.role || 'Membre'}</Badge>
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
@@ -303,7 +311,12 @@ const OrganizationHub: React.FC = () => {
                       <AvatarFallback>{talent.talent_profile?.name?.charAt(0) || 'T'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{talent.talent_profile?.name}</h4>
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}
+                      >
+                        {talent.talent_profile?.name}
+                      </h4>
                       <p className="text-sm text-muted-foreground">{talent.talent_profile?.sport_type}</p>
                       {talent.talent_profile?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -311,7 +324,12 @@ const OrganizationHub: React.FC = () => {
                         </p>
                       )}
                     </div>
-                    <Badge variant="secondary">Agent: {talent.agent_name}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">Agent: {talent.agent_name}</Badge>
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
