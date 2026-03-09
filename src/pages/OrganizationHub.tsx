@@ -311,7 +311,12 @@ const OrganizationHub: React.FC = () => {
                       <AvatarFallback>{talent.talent_profile?.name?.charAt(0) || 'T'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground">{talent.talent_profile?.name}</h4>
+                      <h4
+                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}
+                      >
+                        {talent.talent_profile?.name}
+                      </h4>
                       <p className="text-sm text-muted-foreground">{talent.talent_profile?.sport_type}</p>
                       {talent.talent_profile?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -319,7 +324,12 @@ const OrganizationHub: React.FC = () => {
                         </p>
                       )}
                     </div>
-                    <Badge variant="secondary">Agent: {talent.agent_name}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">Agent: {talent.agent_name}</Badge>
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))
