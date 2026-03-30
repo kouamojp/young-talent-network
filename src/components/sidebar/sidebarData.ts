@@ -150,13 +150,6 @@ export const yatServicesItems: MenuSectionItem[] = [
 // Communities & Content
 export const servicesItems: MenuSectionItem[] = [
   {
-    label: 'Communities',
-    description: 'Groups by interest',
-    icon: Users2,
-    path: '/communities',
-    iconColor: 'text-purple-500',
-  },
-  {
     label: 'Live',
     description: 'Real-time talent streams',
     icon: Radio,
@@ -164,13 +157,6 @@ export const servicesItems: MenuSectionItem[] = [
     iconColor: 'text-red-500',
     badge: 'LIVE',
     badgeColor: 'bg-red-500 text-white',
-  },
-  {
-    label: 'Media Hub',
-    description: 'Photos, music & videos',
-    icon: Image,
-    path: '/media',
-    iconColor: 'text-pink-500',
   },
   {
     label: 'Online TV',
@@ -208,17 +194,6 @@ export const servicesItems: MenuSectionItem[] = [
     icon: Globe,
     path: '/social',
     iconColor: 'text-blue-500',
-  }
-];
-
-// Your Talent Profile
-export const profileItems: MenuSectionItem[] = [
-  {
-    label: 'Settings',
-    description: 'Customize your experience',
-    icon: Settings,
-    path: '/profile',
-    iconColor: 'text-gray-500',
   },
   {
     label: 'Posts',
@@ -226,13 +201,6 @@ export const profileItems: MenuSectionItem[] = [
     icon: FileText,
     path: '/news',
     iconColor: 'text-blue-400',
-  },
-  {
-    label: 'Media',
-    description: 'Photos & videos',
-    icon: Images,
-    path: '/media',
-    iconColor: 'text-pink-400',
   },
   {
     label: 'Social Universe',
@@ -280,9 +248,8 @@ export const connectItems: MenuSectionItem[] = [
 ];
 
 export const allSections: MenuSection[] = [
-  { title: 'Main', items: mainNavigationItems },
+  { title: 'Your Profile', items: mainNavigationItems },
   { title: 'Services YAT', items: yatServicesItems },
   { title: 'Communities & Content', items: servicesItems },
-  { title: 'Your Talent Profile', items: profileItems },
   { title: 'Connect', items: connectItems },
 ];
