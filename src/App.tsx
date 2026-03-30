@@ -62,6 +62,7 @@ const App = () => {
             <main className="flex-1 min-w-0 bg-background">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/feed" element={<Feed />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/auth" element={<Authentication />} />
                 <Route path="/search" element={<Search />} />
