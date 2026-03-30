@@ -22,7 +22,7 @@ const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [saving, setSaving] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   // Notification preferences (local state)
   const [notifications, setNotifications] = useState({
