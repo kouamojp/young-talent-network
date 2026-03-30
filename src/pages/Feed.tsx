@@ -110,10 +110,54 @@ const FeedPage: React.FC = () => {
     }
   };
 
+  const userType = currentUser?.user_type || 'talent';
+
+  const getHeaderGradient = () => {
+    switch (userType) {
+      case 'agent': return 'from-violet-600 via-purple-600 to-indigo-600';
+      case 'organization': return 'from-teal-600 via-emerald-600 to-green-600';
+      default: return 'from-blue-600 via-sky-600 to-cyan-600';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (userType) {
+      case 'agent': return 'Gérez vos talents, contrats et opportunités';
+      case 'organization': return 'Recrutez des talents et gérez votre équipe';
+      default: return 'Découvrez des opportunités et connectez-vous avec la communauté';
+    }
+  };
+
+  const getStats = () => {
+    switch (userType) {
+      case 'agent':
+        return [
+          { icon: Users, label: 'Talents', value: suggestedTalents.length },
+          { icon: Briefcase, label: 'Contrats', value: 0 },
+          { icon: Building2, label: 'Organisations', value: suggestedOrgs.length },
+          { icon: Star, label: 'Réputation', value: currentUser?.platform_rating || 0 },
+        ];
+      case 'organization':
+        return [
+          { icon: Users, label: 'Membres', value: suggestedTalents.length },
+          { icon: Briefcase, label: 'Offres', value: 0 },
+          { icon: TrendingUp, label: 'Candidatures', value: 0 },
+          { icon: Star, label: 'Score', value: currentUser?.platform_rating || 0 },
+        ];
+      default:
+        return [
+          { icon: TrendingUp, label: 'Posts', value: posts.length },
+          { icon: Users, label: 'Connexions', value: suggestedTalents.length },
+          { icon: Building2, label: 'Organisations', value: suggestedOrgs.length },
+          { icon: Star, label: 'YAT Score', value: currentUser?.platform_rating || 0 },
+        ];
+    }
+  };
+
   return (
     <div className="w-full min-h-screen">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white">
+      <div className={`bg-gradient-to-r ${getHeaderGradient()} text-white`}>
         <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-white/30">
@@ -123,19 +167,17 @@ const FeedPage: React.FC = () => {
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold">Bienvenue, {currentUser?.name || 'Utilisateur'} !</h1>
-              <p className="text-white/80 text-sm">Votre flux personnalisé • Talents, organisations et opportunités</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold">Bienvenue, {currentUser?.name || 'Utilisateur'} !</h1>
+                <Badge className="bg-white/20 text-white border-0 text-xs">{getUserTypeLabel(userType)}</Badge>
+              </div>
+              <p className="text-white/80 text-sm">{getSubtitle()}</p>
             </div>
           </div>
           
           {/* Quick Stats */}
           <div className="grid grid-cols-4 gap-3 mt-6">
-            {[
-              { icon: TrendingUp, label: 'Posts', value: posts.length },
-              { icon: Users, label: 'Connexions', value: suggestedTalents.length },
-              { icon: Building2, label: 'Organisations', value: suggestedOrgs.length },
-              { icon: Star, label: 'YAT Score', value: currentUser?.platform_rating || 0 },
-            ].map((stat) => (
+            {getStats().map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
                 <stat.icon className="h-5 w-5 mx-auto mb-1 text-white/80" />
                 <div className="text-lg font-bold">{stat.value}</div>
