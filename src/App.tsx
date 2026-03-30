@@ -32,6 +32,7 @@ import Media from "./pages/Media";
 import Marketplace from "./pages/Marketplace";
 import Social from "./pages/Social";
 import YatDatabase from "./pages/YatDatabase";
+import Feed from "./pages/Feed";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
@@ -61,6 +62,7 @@ const App = () => {
             <main className="flex-1 min-w-0 bg-background">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/feed" element={<Feed />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/auth" element={<Authentication />} />
                 <Route path="/search" element={<Search />} />
