@@ -67,7 +67,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
     label: 'Calls',
     description: 'Voice/video meetings',
     icon: Phone,
-    path: '/messages',
+    path: '/calls',
     iconColor: 'text-green-500',
   },
   {
@@ -83,7 +83,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
     label: 'Settings',
     description: 'Customize your experience',
     icon: Settings,
-    path: '/profile',
+    path: '/settings',
     iconColor: 'text-gray-500',
   },
   {

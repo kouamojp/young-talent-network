@@ -33,6 +33,8 @@ import Marketplace from "./pages/Marketplace";
 import Social from "./pages/Social";
 import YatDatabase from "./pages/YatDatabase";
 import Feed from "./pages/Feed";
+import Calls from "./pages/Calls";
+import SettingsPage from "./pages/Settings";
 
 import Navbar from "./components/Navbar";
 import MobileBottomNav from "./components/MobileBottomNav";
@@ -67,6 +69,8 @@ const App = () => {
                 <Route path="/auth" element={<Authentication />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/messages" element={<Messages />} />
+                <Route path="/calls" element={<Calls />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/participants" element={<Participants />} />
