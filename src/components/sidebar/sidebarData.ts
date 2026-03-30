@@ -41,11 +41,18 @@ export const mainNavigationItems: MenuSectionItem[] = [
     iconColor: 'text-blue-500',
   },
   {
-    label: 'Feed',
-    description: 'Talent & opportunity stream',
+    label: 'What is YAT?',
+    description: 'Discover the platform',
     icon: Star,
     path: '/',
     iconColor: 'text-amber-500',
+  },
+  {
+    label: 'My Feed',
+    description: 'Your personalized stream',
+    icon: Home,
+    path: '/feed',
+    iconColor: 'text-emerald-500',
   },
   {
     label: 'Messenger',
