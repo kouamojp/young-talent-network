@@ -31,6 +31,7 @@ import OrganizationHub from "./pages/OrganizationHub";
 import Media from "./pages/Media";
 import Marketplace from "./pages/Marketplace";
 import Social from "./pages/Social";
+import YatDatabase from "./pages/YatDatabase";
 import Feed from "./pages/Feed";
 import Calls from "./pages/Calls";
 import SettingsPage from "./pages/Settings";
