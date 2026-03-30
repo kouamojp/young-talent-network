@@ -168,10 +168,10 @@ const TalentMarketplace: React.FC = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button className="flex-1" size="sm">
+                <Button className="flex-1" size="sm" onClick={() => window.location.href = `/yat-coin`}>
                   Invest Now
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" onClick={() => window.location.href = `/talent/${talent.id}`}>
                   View Profile
                 </Button>
               </div>

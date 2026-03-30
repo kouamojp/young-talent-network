@@ -166,7 +166,7 @@ export const servicesItems: MenuSectionItem[] = [
     iconColor: 'text-lime-500',
   },
   {
-    label: 'Market',
+    label: 'YAT COIN',
     description: 'Talent economy',
     icon: ShoppingBag,
     path: '/yat-coin',
