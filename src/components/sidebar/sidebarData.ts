@@ -71,7 +71,28 @@ export const mainNavigationItems: MenuSectionItem[] = [
     iconColor: 'text-indigo-500',
     badge: '12',
     badgeColor: 'bg-blue-500 text-white',
-  }
+  },
+  {
+    label: 'Settings',
+    description: 'Customize your experience',
+    icon: Settings,
+    path: '/profile',
+    iconColor: 'text-gray-500',
+  },
+  {
+    label: 'Media Hub',
+    description: 'Photos, music & videos',
+    icon: Image,
+    path: '/media',
+    iconColor: 'text-pink-500',
+  },
+  {
+    label: 'Communities',
+    description: 'Groups by interest',
+    icon: Users2,
+    path: '/communities',
+    iconColor: 'text-purple-500',
+  },
 ];
 
 // Services YAT
