@@ -339,7 +339,7 @@ const Settings: React.FC = () => {
                         key={t.value}
                         variant={theme === t.value ? 'default' : 'outline'}
                         className="flex flex-col gap-2 h-auto py-4"
-                        onClick={() => setTheme(t.value as any)}
+                        onClick={() => toggleTheme()}
                       >
                         <t.icon className="h-5 w-5" />
                         <span className="text-xs">{t.label}</span>
