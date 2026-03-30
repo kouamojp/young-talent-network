@@ -83,7 +83,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
     label: 'Settings',
     description: 'Customize your experience',
     icon: Settings,
-    path: '/profile',
+    path: '/settings',
     iconColor: 'text-gray-500',
   },
   {
