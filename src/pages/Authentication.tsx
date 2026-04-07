@@ -11,10 +11,12 @@ import AnimatedText from '@/components/AnimatedText';
 import { Facebook, Users, Building, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const Authentication: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState<'talent' | 'organization' | 'agent'>('talent');
 
@@ -35,11 +37,11 @@ const Authentication: React.FC = () => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       if (data.session) {
-        toast({ title: "Bienvenue !", description: "Connexion réussie." });
+        toast({ title: t('auth.welcomeBack'), description: t('auth.loginSuccess') });
         navigate('/profile');
       }
     } catch (error: any) {
-      toast({ title: "Échec de connexion", description: error.message, variant: "destructive" });
+      toast({ title: t('auth.loginFailed'), description: error.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -64,11 +66,11 @@ const Authentication: React.FC = () => {
       });
       if (error) throw error;
       if (data.user) {
-        toast({ title: "Compte créé !", description: "Bienvenue sur YAT ! Votre profil a été créé automatiquement dans toutes les sections." });
+        toast({ title: t('auth.accountCreated'), description: t('auth.accountCreatedDesc') });
         navigate('/profile');
       }
     } catch (error: any) {
-      toast({ title: "Échec d'inscription", description: error.message, variant: "destructive" });
+      toast({ title: t('auth.registerFailed'), description: error.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +82,7 @@ const Authentication: React.FC = () => {
       const { error } = await supabase.auth.signInWithOAuth({ provider: 'facebook' });
       if (error) throw error;
     } catch (error: any) {
-      toast({ title: "Échec Facebook", description: error.message, variant: "destructive" });
+      toast({ title: t('auth.facebookFailed'), description: error.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -88,18 +90,18 @@ const Authentication: React.FC = () => {
 
   const UserTypeSelector = () => (
     <div className="space-y-2">
-      <Label>Je suis...</Label>
+      <Label>{t('auth.iAm')}</Label>
       <Select value={userType} onValueChange={(v: 'talent' | 'organization' | 'agent') => setUserType(v)}>
         <SelectTrigger><SelectValue /></SelectTrigger>
         <SelectContent>
           <SelectItem value="talent">
-            <div className="flex items-center gap-2"><Users className="h-4 w-4" /><span>Talent</span></div>
+            <div className="flex items-center gap-2"><Users className="h-4 w-4" /><span>{t('auth.talent')}</span></div>
           </SelectItem>
           <SelectItem value="agent">
-            <div className="flex items-center gap-2"><UserCheck className="h-4 w-4" /><span>Agent / Représentant</span></div>
+            <div className="flex items-center gap-2"><UserCheck className="h-4 w-4" /><span>{t('auth.agent')}</span></div>
           </SelectItem>
           <SelectItem value="organization">
-            <div className="flex items-center gap-2"><Building className="h-4 w-4" /><span>Organisation / Club / École</span></div>
+            <div className="flex items-center gap-2"><Building className="h-4 w-4" /><span>{t('auth.organization')}</span></div>
           </SelectItem>
         </SelectContent>
       </Select>
@@ -108,47 +110,56 @@ const Authentication: React.FC = () => {
 
   const getNameLabel = () => {
     switch (userType) {
-      case 'organization': return 'Nom de l\'organisation';
-      case 'agent': return 'Nom complet de l\'agent';
-      default: return 'Nom complet';
+      case 'organization': return t('auth.orgName');
+      case 'agent': return t('auth.agentName');
+      default: return t('auth.fullName');
+    }
+  };
+
+  const getCreateButtonText = () => {
+    if (isLoading) return t('auth.creating');
+    switch (userType) {
+      case 'organization': return t('auth.createOrg');
+      case 'agent': return t('auth.createAgent');
+      default: return t('auth.createTalent');
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/5 to-secondary/5 p-4">
       <GlassMorphism className="w-full max-w-md p-6">
-        <AnimatedText text="Young & Talented" tag="h1" className="text-2xl font-bold text-center mb-2" />
-        <p className="text-center text-muted-foreground text-sm mb-6">Я Талант — Plateforme mondiale pour jeunes talents</p>
+        <AnimatedText text={t('auth.title')} tag="h1" className="text-2xl font-bold text-center mb-2" />
+        <p className="text-center text-muted-foreground text-sm mb-6">{t('auth.subtitle')}</p>
         
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="login">Connexion</TabsTrigger>
-            <TabsTrigger value="register">Inscription</TabsTrigger>
+            <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
+            <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
             <Card>
               <CardHeader>
-                <CardTitle>Connexion</CardTitle>
-                <CardDescription>Accédez à votre compte YAT</CardDescription>
+                <CardTitle>{t('auth.loginTitle')}</CardTitle>
+                <CardDescription>{t('auth.loginDesc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="votre@email.com" required autoComplete="username" />
+                    <Label htmlFor="email">{t('auth.email')}</Label>
+                    <Input id="email" name="email" type="email" placeholder={t('auth.emailPlaceholder')} required autoComplete="username" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe</Label>
+                    <Label htmlFor="password">{t('auth.password')}</Label>
                     <Input id="password" name="password" type="password" required autoComplete="current-password" />
                   </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
-                    {isLoading ? "Connexion..." : "Se Connecter"}
+                    {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
                   </Button>
                 </form>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Ou</span></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">{t('common.or')}</span></div>
                 </div>
                 <Button variant="outline" className="w-full" onClick={handleFacebookLogin} disabled={isLoading}>
                   <Facebook className="mr-2 h-4 w-4" /> Facebook
@@ -160,31 +171,31 @@ const Authentication: React.FC = () => {
           <TabsContent value="register">
             <Card>
               <CardHeader>
-                <CardTitle>Inscription Gratuite</CardTitle>
-                <CardDescription>Créez votre profil YAT — vos profils seront créés automatiquement dans toutes les sections</CardDescription>
+                <CardTitle>{t('auth.registerTitle')}</CardTitle>
+                <CardDescription>{t('auth.registerDesc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleRegister} className="space-y-4">
                   <UserTypeSelector />
                   <div className="space-y-2">
                     <Label htmlFor="reg-name">{getNameLabel()}</Label>
-                    <Input id="reg-name" name="name" placeholder={userType === 'organization' ? 'Nom du club/école' : 'Prénom Nom'} required />
+                    <Input id="reg-name" name="name" placeholder={userType === 'organization' ? t('auth.orgPlaceholder') : t('auth.namePlaceholder')} required />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-email">Email</Label>
-                    <Input id="reg-email" name="email" type="email" placeholder="votre@email.com" required autoComplete="username" />
+                    <Label htmlFor="reg-email">{t('auth.email')}</Label>
+                    <Input id="reg-email" name="email" type="email" placeholder={t('auth.emailPlaceholder')} required autoComplete="username" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reg-password">Mot de passe</Label>
+                    <Label htmlFor="reg-password">{t('auth.password')}</Label>
                     <Input id="reg-password" name="password" type="password" required autoComplete="new-password" />
                   </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
-                    {isLoading ? "Création..." : `Créer mon compte ${userType === 'organization' ? 'Organisation' : userType === 'agent' ? 'Agent' : 'Talent'}`}
+                    {getCreateButtonText()}
                   </Button>
                 </form>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Ou</span></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">{t('common.or')}</span></div>
                 </div>
                 <Button variant="outline" className="w-full" onClick={handleFacebookLogin} disabled={isLoading}>
                   <Facebook className="mr-2 h-4 w-4" /> Facebook

@@ -5,8 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Send, Loader2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useConversations } from '@/hooks/useConversations';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const Messages: React.FC = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [messageInput, setMessageInput] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -36,22 +38,16 @@ const Messages: React.FC = () => {
     conv.participants[0]?.profiles.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="h-screen bg-background flex">
       <div className="w-80 border-r border-border bg-card flex flex-col">
         <div className="p-4 border-b border-border">
-          <h1 className="text-2xl font-bold mb-3">Chats</h1>
+          <h1 className="text-2xl font-bold mb-3">{t('messages.chats')}</h1>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search conversations" className="pl-10 bg-muted border-0" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <Input placeholder={t('messages.searchConversations')} className="pl-10 bg-muted border-0" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
         </div>
         <ScrollArea className="flex-1">
@@ -60,16 +56,13 @@ const Messages: React.FC = () => {
             const lastMessage = conversation.messages[0];
             return (
               <div key={conversation.id} onClick={() => setActiveConversationId(conversation.id)} className={`p-3 cursor-pointer transition-colors flex items-center gap-3 ${activeConversationId === conversation.id ? 'bg-muted' : 'hover:bg-muted/50'}`}>
-                <Avatar className="h-14 w-14">
-                  <AvatarImage src={participant?.profiles.avatar_url || '/placeholder.svg'} />
-                  <AvatarFallback>{participant?.profiles.name?.[0] || 'U'}</AvatarFallback>
-                </Avatar>
+                <Avatar className="h-14 w-14"><AvatarImage src={participant?.profiles.avatar_url || '/placeholder.svg'} /><AvatarFallback>{participant?.profiles.name?.[0] || 'U'}</AvatarFallback></Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-1">
                     <h3 className="font-semibold text-sm truncate">{participant?.profiles.name || 'Unknown'}</h3>
                     <span className="text-xs text-muted-foreground">{lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
                   </div>
-                  <p className="text-sm truncate text-muted-foreground">{lastMessage?.content || 'No messages yet'}</p>
+                  <p className="text-sm truncate text-muted-foreground">{lastMessage?.content || t('messages.noMessages')}</p>
                 </div>
               </div>
             );
@@ -81,14 +74,8 @@ const Messages: React.FC = () => {
           <>
             <div className="p-4 border-b border-border bg-card">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={activeConversation.participants[0]?.profiles.avatar_url || '/placeholder.svg'} />
-                  <AvatarFallback>{activeConversation.participants[0]?.profiles.name?.[0] || 'U'}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-semibold">{activeConversation.participants[0]?.profiles.name || 'Unknown'}</h3>
-                  <p className="text-xs text-muted-foreground">Active now</p>
-                </div>
+                <Avatar className="h-10 w-10"><AvatarImage src={activeConversation.participants[0]?.profiles.avatar_url || '/placeholder.svg'} /><AvatarFallback>{activeConversation.participants[0]?.profiles.name?.[0] || 'U'}</AvatarFallback></Avatar>
+                <div><h3 className="font-semibold">{activeConversation.participants[0]?.profiles.name || 'Unknown'}</h3><p className="text-xs text-muted-foreground">{t('messages.activeNow')}</p></div>
               </div>
             </div>
             <ScrollArea className="flex-1 p-4">
@@ -109,13 +96,13 @@ const Messages: React.FC = () => {
             </ScrollArea>
             <div className="p-4 border-t border-border bg-card">
               <div className="flex items-center gap-2">
-                <Input placeholder="Type a message..." value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} className="flex-1" />
+                <Input placeholder={t('messages.typeMessage')} value={messageInput} onChange={(e) => setMessageInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()} className="flex-1" />
                 <Button onClick={handleSendMessage} disabled={!messageInput.trim()}><Send className="h-5 w-5" /></Button>
               </div>
             </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-full text-muted-foreground">Select a conversation to start messaging</div>
+          <div className="flex items-center justify-center h-full text-muted-foreground">{t('messages.selectConversation')}</div>
         )}
       </div>
     </div>
