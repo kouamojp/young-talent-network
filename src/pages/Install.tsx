@@ -54,12 +54,12 @@ const Install: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
         <Card className="max-w-md w-full text-center border-none shadow-xl">
           <CardContent className="pt-8 pb-8 space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-green-100 flex items-center justify-center">
-              <Check className="h-8 w-8 text-green-600" />
+            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+              <Check className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-2xl font-bold text-foreground">Application installée !</h2>
             <p className="text-muted-foreground">
-              YAT est maintenant disponible sur votre écran d'accueil. Vous pouvez fermer ce navigateur et utiliser l'application directement.
+              YAT est maintenant disponible sur votre écran d&apos;accueil. Vous pouvez fermer ce navigateur et utiliser l&apos;application directement.
             </p>
           </CardContent>
         </Card>
