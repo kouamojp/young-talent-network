@@ -8,12 +8,15 @@ import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import SidebarMain from './sidebar/SidebarMain';
 import { useTheme } from '@/hooks/useTheme';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-card border-b border-border shadow-sm z-50">
@@ -52,7 +55,7 @@ const Navbar: React.FC = () => {
             <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
             <input 
               type="text"
-              placeholder="Search Y&T"
+              placeholder={t('nav.search')}
               className="h-10 w-full bg-muted pl-10 pr-4 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
             />
           </div>
@@ -69,6 +72,9 @@ const Navbar: React.FC = () => {
           </Link>
           
           <div className="flex items-center space-x-2">
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <Button 
               variant="ghost" 
               size="icon"
