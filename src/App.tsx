@@ -95,6 +95,7 @@ const App = () => {
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/social" element={<Social />} />
                 <Route path="/yat-database" element={<YatDatabase />} />
+                <Route path="/install" element={<Install />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
