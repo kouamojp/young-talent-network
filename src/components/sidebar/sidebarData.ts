@@ -255,9 +255,22 @@ export const connectItems: MenuSectionItem[] = [
   }
 ];
 
+const installItem: MenuSectionItem[] = [
+  {
+    label: 'Installer YAT',
+    description: 'Ajouter à l\'écran d\'accueil',
+    icon: Download,
+    path: '/install',
+    iconColor: 'text-primary',
+    badge: 'App',
+    badgeColor: 'bg-primary text-white',
+  }
+];
+
 export const allSections: MenuSection[] = [
   { title: 'Your Profile', items: mainNavigationItems },
   { title: 'Services YAT', items: yatServicesItems },
   { title: 'Communities & Content', items: servicesItems },
   { title: 'Connect', items: connectItems },
+  { title: 'Application', items: installItem },
 ];
