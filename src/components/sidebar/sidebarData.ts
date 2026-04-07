@@ -21,6 +21,7 @@ import {
   Map,
   Tv,
   Database,
+  Download,
   LucideIcon
 } from 'lucide-react';
 
