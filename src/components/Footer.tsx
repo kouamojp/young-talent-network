@@ -7,32 +7,27 @@ const Footer: React.FC = () => {
   const year = new Date().getFullYear().toString();
 
   const links = [
-    { key: 'footer.about', href: '#' },
-    { key: 'footer.privacy', href: '#' },
-    { key: 'footer.terms', href: '#' },
-    { key: 'footer.cookies', href: '#' },
-    { key: 'footer.help', href: '#' },
-    { key: 'footer.careers', href: '#' },
-    { key: 'footer.advertising', href: '#' },
+    'footer.about',
+    'footer.privacy',
+    'footer.terms',
+    'footer.cookies',
+    'footer.help',
+    'footer.careers',
+    'footer.advertising',
   ];
 
   return (
-    <footer className="hidden md:block border-t border-border bg-card py-3 px-4">
-      <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-        {links.map((link) => (
-          <a
-            key={link.key}
-            href={link.href}
-            className="text-xs text-muted-foreground hover:underline"
-          >
-            {t(link.key)}
-          </a>
-        ))}
-        <div className="flex items-center gap-2">
+    <footer className="hidden md:block border-t border-border bg-card py-2 px-4">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="flex flex-wrap items-center gap-x-1 text-[11px] text-muted-foreground leading-relaxed">
           <LanguageSwitcher />
-          <span className="text-xs text-muted-foreground">
-            {t('footer.copyright', { year })}
-          </span>
+          {links.map((key, i) => (
+            <React.Fragment key={key}>
+              <a href="#" className="hover:underline">{t(key)}</a>
+              {i < links.length - 1 && <span className="mx-0.5">·</span>}
+            </React.Fragment>
+          ))}
+          <span className="ml-auto">{t('footer.copyright', { year })}</span>
         </div>
       </div>
     </footer>
