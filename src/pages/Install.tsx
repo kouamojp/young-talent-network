@@ -109,8 +109,8 @@ const Install: React.FC = () => {
             {platform === 'ios' ? (
               <div className="space-y-4">
                 <Step number={1} icon={<Share className="h-5 w-5" />} text="Appuyez sur le bouton Partager en bas du navigateur Safari" />
-                <Step number={2} icon={<Plus className="h-5 w-5" />} text='Faites défiler et appuyez sur "Sur l\'écran d\'accueil"' />
-                <Step number={3} icon={<Check className="h-5 w-5" />} text='Appuyez sur "Ajouter" en haut à droite' />
+                <Step number={2} icon={<Plus className="h-5 w-5" />} text={"Faites défiler et appuyez sur \"Sur l'écran d'accueil\""} />
+                <Step number={3} icon={<Check className="h-5 w-5" />} text={"Appuyez sur \"Ajouter\" en haut à droite"} />
               </div>
             ) : platform === 'android' ? (
               <div className="space-y-4">
