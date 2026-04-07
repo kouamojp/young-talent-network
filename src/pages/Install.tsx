@@ -115,8 +115,8 @@ const Install: React.FC = () => {
             ) : platform === 'android' ? (
               <div className="space-y-4">
                 <Step number={1} icon={<MoreVertical className="h-5 w-5" />} text="Appuyez sur le menu ⋮ en haut à droite du navigateur" />
-                <Step number={2} icon={<Download className="h-5 w-5" />} text='Appuyez sur "Installer l\'application" ou "Ajouter à l\'écran d\'accueil"' />
-                <Step number={3} icon={<Check className="h-5 w-5" />} text="Confirmez l'installation" />
+                <Step number={2} icon={<Download className="h-5 w-5" />} text={"Appuyez sur \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\""} />
+                <Step number={3} icon={<Check className="h-5 w-5" />} text={"Confirmez l'installation"} />
               </div>
             ) : (
               <div className="space-y-4">
