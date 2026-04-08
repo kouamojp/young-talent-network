@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import WorkHubEntry from '@/components/work/WorkHubEntry';
 import TalentView from '@/components/work/TalentView';
@@ -48,7 +47,6 @@ const Work: React.FC = () => {
         <main className="container mx-auto px-4 py-12">
           <WorkHubEntry />
         </main>
-        <Footer />
       </div>
     );
   }
@@ -105,7 +103,6 @@ const Work: React.FC = () => {
           <SuccessStories />
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

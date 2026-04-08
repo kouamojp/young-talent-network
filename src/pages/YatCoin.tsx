@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Coins, TrendingUp, Users, Star, ArrowUpRight, DollarSign } from 'lucide-react';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import TalentMarketplace from '@/components/yat-coin/TalentMarketplace';
 import InvestorDashboard from '@/components/yat-coin/InvestorDashboard';
@@ -116,7 +115,6 @@ const YatCoin: React.FC = () => {
           </Tabs>
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

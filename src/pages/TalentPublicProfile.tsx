@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText } from 'lucide-react';
-import Footer from '@/components/Footer';
 import { toast } from '@/hooks/use-toast';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
@@ -349,7 +348,6 @@ const TalentPublicProfile: React.FC = () => {
           </Button>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

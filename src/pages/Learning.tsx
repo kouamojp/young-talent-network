@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { GraduationCap, Brain, Palette, BookOpen, Globe, MapPin, Users, TrendingUp, ArrowUpRight } from 'lucide-react';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import LearningExplore from '@/components/learning/LearningExplore';
 import LearningCreate from '@/components/learning/LearningCreate';
@@ -41,7 +40,6 @@ const Learning: React.FC = () => {
             {path === 'explore' ? <LearningExplore onBack={handleBack} /> : <LearningCreate onBack={handleBack} />}
           </GlassMorphism>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -176,7 +174,6 @@ const Learning: React.FC = () => {
           </Tabs>
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

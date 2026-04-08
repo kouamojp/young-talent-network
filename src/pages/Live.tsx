@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Footer from '@/components/Footer';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -156,7 +155,6 @@ const Live: React.FC = () => {
           ))}
         </Tabs>
       </div>
-      <Footer />
     </div>
   );
 };

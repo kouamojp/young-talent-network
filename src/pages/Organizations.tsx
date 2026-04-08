@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Building, MapPin, Star, Globe, Users, Award, Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -273,7 +272,6 @@ const Organizations: React.FC = () => {
           </DialogContent>
         </Dialog>
       </main>
-      <Footer />
     </div>
   );
 };

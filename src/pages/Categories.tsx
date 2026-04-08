@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Grid, ChevronDown, ChevronUp, Search, BarChart } from 'lucide-react';
 import { categories, Subcategory, SubcategoryItem, athleteParameters } from '@/components/learning/data/categories';
@@ -271,7 +270,6 @@ const Categories: React.FC = () => {
           </Tabs>
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Award, Star, Filter, MapPin } from 'lucide-react';
@@ -158,7 +157,6 @@ const Participants: React.FC = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };

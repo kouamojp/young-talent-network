@@ -1,7 +1,6 @@
 
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Users, Globe, Settings, Plus, MessageSquare, UserPlus, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -208,7 +207,6 @@ const Communities: React.FC = () => {
           </div>
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

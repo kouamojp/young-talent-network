@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
@@ -361,7 +360,6 @@ const OnlineTV: React.FC = () => {
             </div>
           </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };
