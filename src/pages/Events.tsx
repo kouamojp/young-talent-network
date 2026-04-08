@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Footer from '@/components/Footer';
 import { Calendar, MapPin, Clock, Users, Filter, Search, Plus, ChevronDown, Map, Eye } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -228,7 +227,6 @@ const Events: React.FC = () => {
           <TabsContent value="past"><EventGrid events={events} loading={loading} onJoin={handleJoinEvent} formatDate={formatDate} t={t} /></TabsContent>
         </Tabs>
       </div>
-      <Footer />
     </div>
   );
 };

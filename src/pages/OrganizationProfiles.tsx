@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building, Users, MapPin, Plus } from 'lucide-react';
-import Footer from '@/components/Footer';
 import GlassMorphism from '@/components/GlassMorphism';
 import OrganizationAuth from '@/components/organization-profiles/OrganizationAuth';
 import OrganizationProfileEditor from '@/components/organization-profiles/OrganizationProfileEditor';
@@ -82,7 +81,6 @@ const OrganizationProfiles: React.FC = () => {
           </Tabs>
         </GlassMorphism>
       </main>
-      <Footer />
     </div>
   );
 };

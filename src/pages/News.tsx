@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import Footer from '@/components/Footer';
 import { Newspaper, TrendingUp, Search, Calendar, Eye, Heart, MessageSquare, Share2, BookOpen, Star, Filter, ChevronRight, Play, Image as ImageIcon, Clock, User, Flame } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -316,7 +315,6 @@ const News: React.FC = () => {
         </Tabs>
       </div>
 
-      <Footer />
     </div>
   );
 };

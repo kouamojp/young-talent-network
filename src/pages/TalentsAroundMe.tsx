@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import Footer from '@/components/Footer';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import TalentsHero from '@/components/talents/TalentsHero';
 import TalentsList from '@/components/talents/TalentsList';
@@ -62,7 +61,6 @@ const TalentsAroundMe: React.FC = () => {
           )}
         </div>
         
-        <Footer />
       </div>
     </TooltipProvider>
   );
