@@ -100,6 +100,7 @@ const App = () => {
                 <Route path="/social" element={<Social />} />
                 <Route path="/yat-database" element={<YatDatabase />} />
                 <Route path="/install" element={<Install />} />
+                <Route path="/admin" element={<AdminPanel />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
