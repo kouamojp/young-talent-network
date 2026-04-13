@@ -1,24 +1,25 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Coins, TrendingUp, Users, Star, ArrowUpRight, DollarSign } from 'lucide-react';
 import GlassMorphism from '@/components/GlassMorphism';
 import TalentMarketplace from '@/components/yat-coin/TalentMarketplace';
 import InvestorDashboard from '@/components/yat-coin/InvestorDashboard';
 import TokenizeProfile from '@/components/yat-coin/TokenizeProfile';
 import ProjectFunding from '@/components/yat-coin/ProjectFunding';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const YatCoin: React.FC = () => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('marketplace');
   const [userType, setUserType] = useState<'talent' | 'investor' | null>(null);
 
   const stats = [
-    { label: 'Total Market Cap', value: '$2.4M', icon: DollarSign, change: '+12.5%' },
-    { label: 'Active Talents', value: '1,247', icon: Users, change: '+8.2%' },
-    { label: 'Funded Projects', value: '156', icon: TrendingUp, change: '+15.3%' },
-    { label: 'Average ROI', value: '23.7%', icon: Star, change: '+4.1%' }
+    { label: t('yatcoin.totalMarketCap'), value: '$2.4M', icon: DollarSign, change: '+12.5%' },
+    { label: t('yatcoin.activeTalents'), value: '1,247', icon: Users, change: '+8.2%' },
+    { label: t('yatcoin.fundedProjects'), value: '156', icon: TrendingUp, change: '+15.3%' },
+    { label: t('yatcoin.averageROI'), value: '23.7%', icon: Star, change: '+4.1%' }
   ];
 
   return (
@@ -29,40 +30,21 @@ const YatCoin: React.FC = () => {
             <div className="flex items-center gap-3">
               <Coins className="h-8 w-8 text-purple-600" />
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  YAT COIN
-                </h1>
-                <p className="text-gray-600">Talent Exchange Platform</p>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{t('yatcoin.title')}</h1>
+                <p className="text-gray-600">{t('yatcoin.subtitle')}</p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button 
-                variant={userType === 'talent' ? 'default' : 'outline'}
-                onClick={() => setUserType('talent')}
-              >
-                I'm a Talent
-              </Button>
-              <Button 
-                variant={userType === 'investor' ? 'default' : 'outline'}
-                onClick={() => setUserType('investor')}
-              >
-                I'm an Investor
-              </Button>
+              <Button variant={userType === 'talent' ? 'default' : 'outline'} onClick={() => setUserType('talent')}>{t('yatcoin.imTalent')}</Button>
+              <Button variant={userType === 'investor' ? 'default' : 'outline'} onClick={() => setUserType('investor')}>{t('yatcoin.imInvestor')}</Button>
             </div>
           </div>
 
-          {/* Hero Section */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-4">
-              Where Talent Meets Capital - Tokenize Your Potential
-            </h2>
-            <p className="text-gray-600 max-w-3xl mx-auto mb-6">
-              Revolutionary platform where individuals are valued like startups. Talents tokenize their skills, 
-              investors fund human potential, and everyone benefits from transparent growth tracking and returns.
-            </p>
+            <h2 className="text-2xl font-bold mb-4">{t('yatcoin.heroTitle')}</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto mb-6">{t('yatcoin.heroDesc')}</p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {stats.map((stat, index) => (
               <Card key={index} className="p-4">
@@ -83,35 +65,15 @@ const YatCoin: React.FC = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="marketplace">
-                Talent Marketplace
-              </TabsTrigger>
-              <TabsTrigger value="tokenize">
-                Tokenize Profile
-              </TabsTrigger>
-              <TabsTrigger value="invest">
-                Investment Hub
-              </TabsTrigger>
-              <TabsTrigger value="funding">
-                Project Funding
-              </TabsTrigger>
+              <TabsTrigger value="marketplace">{t('yatcoin.talentMarketplace')}</TabsTrigger>
+              <TabsTrigger value="tokenize">{t('yatcoin.tokenizeProfile')}</TabsTrigger>
+              <TabsTrigger value="invest">{t('yatcoin.investmentHub')}</TabsTrigger>
+              <TabsTrigger value="funding">{t('yatcoin.projectFunding')}</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="marketplace">
-              <TalentMarketplace />
-            </TabsContent>
-
-            <TabsContent value="tokenize">
-              <TokenizeProfile />
-            </TabsContent>
-
-            <TabsContent value="invest">
-              <InvestorDashboard />
-            </TabsContent>
-
-            <TabsContent value="funding">
-              <ProjectFunding />
-            </TabsContent>
+            <TabsContent value="marketplace"><TalentMarketplace /></TabsContent>
+            <TabsContent value="tokenize"><TokenizeProfile /></TabsContent>
+            <TabsContent value="invest"><InvestorDashboard /></TabsContent>
+            <TabsContent value="funding"><ProjectFunding /></TabsContent>
           </Tabs>
         </GlassMorphism>
       </main>
