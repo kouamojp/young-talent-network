@@ -76,7 +76,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
     label: 'Friends',
     description: 'Your talent network',
     icon: Users,
-    path: '/participants',
+    path: '/friends',
     iconColor: 'text-indigo-500',
     badge: '12',
     badgeColor: 'bg-blue-500 text-white',

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, MessageSquare, Bell, ChevronDown, Menu, Sun, Moon } from 'lucide-react';
+import { Search, MessageSquare, Bell, ChevronDown, Menu, Sun, Moon, Users, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
