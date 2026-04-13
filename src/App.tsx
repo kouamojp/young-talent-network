@@ -103,11 +103,15 @@ const App = () => {
                 <Route path="/yat-database" element={<YatDatabase />} />
                 <Route path="/install" element={<Install />} />
                 <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/friends" element={<Friends />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </div>
         </div>
+        
+        {/* Floating Create Button */}
+        <FloatingCreateButton />
         
         {/* Facebook-style Footer - desktop only */}
         <Footer />
