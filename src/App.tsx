@@ -37,6 +37,7 @@ import Feed from "./pages/Feed";
 import Calls from "./pages/Calls";
 import Install from "./pages/Install";
 import SettingsPage from "./pages/Settings";
+import AdminPanel from "./pages/AdminPanel";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
