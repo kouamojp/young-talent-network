@@ -38,11 +38,13 @@ import Calls from "./pages/Calls";
 import Install from "./pages/Install";
 import SettingsPage from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
+import Friends from "./pages/Friends";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import MobileBottomNav from "./components/MobileBottomNav";
 import SidebarMain from "./components/sidebar/SidebarMain";
+import FloatingCreateButton from "./components/FloatingCreateButton";
 
 const queryClient = new QueryClient();
 
@@ -101,11 +103,15 @@ const App = () => {
                 <Route path="/yat-database" element={<YatDatabase />} />
                 <Route path="/install" element={<Install />} />
                 <Route path="/admin" element={<AdminPanel />} />
+                <Route path="/friends" element={<Friends />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </div>
         </div>
+        
+        {/* Floating Create Button */}
+        <FloatingCreateButton />
         
         {/* Facebook-style Footer - desktop only */}
         <Footer />

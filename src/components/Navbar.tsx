@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, MessageSquare, Bell, ChevronDown, Menu, Sun, Moon } from 'lucide-react';
+import { Search, MessageSquare, Bell, ChevronDown, Menu, Sun, Moon, Users, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -82,6 +82,16 @@ const Navbar: React.FC = () => {
               onClick={toggleTheme}
             >
               {theme === 'dark' ? <Sun className="h-5 w-5 text-foreground" /> : <Moon className="h-5 w-5 text-foreground" />}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-muted hover:bg-muted/80"
+              asChild
+            >
+              <Link to="/friends">
+                <Users className="h-5 w-5 text-foreground" />
+              </Link>
             </Button>
             <Button 
               variant="ghost" 
