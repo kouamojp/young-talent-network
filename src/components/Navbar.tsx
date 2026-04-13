@@ -89,6 +89,16 @@ const Navbar: React.FC = () => {
               className="rounded-full bg-muted hover:bg-muted/80"
               asChild
             >
+              <Link to="/friends">
+                <Users className="h-5 w-5 text-foreground" />
+              </Link>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="rounded-full bg-muted hover:bg-muted/80"
+              asChild
+            >
               <Link to="/messages">
                 <MessageSquare className="h-5 w-5 text-foreground" />
               </Link>
