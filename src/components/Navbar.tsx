@@ -72,9 +72,7 @@ const Navbar: React.FC = () => {
           </Link>
           
           <div className="flex items-center space-x-2">
-            <div className="hidden md:block">
-              <LanguageSwitcher />
-            </div>
+            <LanguageSwitcher />
             <Button 
               variant="ghost" 
               size="icon"
