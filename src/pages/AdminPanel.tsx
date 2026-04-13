@@ -8,9 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Shield, Users, Activity, AlertTriangle, Search, Settings, BarChart3, Eye, Trash2, Ban, CheckCircle, UserPlus, Edit, Globe, FileText, Calendar, Briefcase, Image, Radio, GraduationCap, Building2, MessageSquare, Lock, Unlock } from 'lucide-react';
+import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -26,10 +24,13 @@ const AdminPanel: React.FC = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [communities, setCommunities] = useState<any[]>([]);
-  const [selectedTab, setSelectedTab] = useState('users');
+  const [selectedTab, setSelectedTab] = useState('overview');
   const [roleDialogOpen, setRoleDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>('user');
+  const [weeklyGrowth, setWeeklyGrowth] = useState(0);
+  const [activeToday, setActiveToday] = useState(0);
+  const [retentionRate, setRetentionRate] = useState(0);
 
   useEffect(() => {
     const checkRole = async () => {
@@ -61,7 +62,29 @@ const AdminPanel: React.FC = () => {
       supabase.from('events').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('communities').select('*').order('created_at', { ascending: false }).limit(50),
     ]);
-    if (usersRes.data) setUsers(usersRes.data);
+    if (usersRes.data) {
+      setUsers(usersRes.data);
+      // Calculate stats from real data
+      const now = new Date();
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const thisWeekUsers = usersRes.data.filter(u => new Date(u.created_at) >= weekAgo).length;
+      const lastWeekUsers = usersRes.data.filter(u => new Date(u.created_at) >= twoWeeksAgo && new Date(u.created_at) < weekAgo).length;
+      setWeeklyGrowth(lastWeekUsers > 0 ? Math.round(((thisWeekUsers - lastWeekUsers) / lastWeekUsers) * 100) : thisWeekUsers > 0 ? 100 : 0);
+
+      const todayActive = usersRes.data.filter(u => new Date(u.updated_at) >= todayStart).length;
+      setActiveToday(todayActive);
+
+      const totalUsers = usersRes.data.length;
+      const returning = usersRes.data.filter(u => {
+        const created = new Date(u.created_at);
+        const updated = new Date(u.updated_at);
+        return (updated.getTime() - created.getTime()) > 24 * 60 * 60 * 1000;
+      }).length;
+      setRetentionRate(totalUsers > 0 ? Math.round((returning / totalUsers) * 100) : 0);
+    }
     if (postsRes.data) setPosts(postsRes.data);
     if (eventsRes.data) setEvents(eventsRes.data);
     if (communitiesRes.data) setCommunities(communitiesRes.data);
@@ -75,10 +98,10 @@ const AdminPanel: React.FC = () => {
         { onConflict: 'user_id,role' }
       );
       if (error) throw error;
-      toast({ title: t('admin.roleAssigned') });
+      toast({ title: t('admin.roleAssigned') || 'Role assigned successfully' });
       setRoleDialogOpen(false);
-    } catch (err) {
-      toast({ title: t('admin.roleError'), variant: 'destructive' });
+    } catch (err: any) {
+      toast({ title: err?.message || t('admin.roleError') || 'Error assigning role', variant: 'destructive' });
     }
   };
 
@@ -86,7 +109,7 @@ const AdminPanel: React.FC = () => {
     const { error } = await supabase.from('posts').delete().eq('id', postId);
     if (!error) {
       setPosts(prev => prev.filter(p => p.id !== postId));
-      toast({ title: t('admin.postDeleted') });
+      toast({ title: t('admin.postDeleted') || 'Post deleted' });
     }
   };
 
@@ -94,7 +117,7 @@ const AdminPanel: React.FC = () => {
     const { error } = await supabase.from('events').delete().eq('id', eventId);
     if (!error) {
       setEvents(prev => prev.filter(e => e.id !== eventId));
-      toast({ title: t('admin.eventDeleted') });
+      toast({ title: t('admin.eventDeleted') || 'Event deleted' });
     }
   };
 
@@ -103,66 +126,80 @@ const AdminPanel: React.FC = () => {
     u.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const stats = [
-    { label: t('admin.totalUsers'), value: users.length.toString(), icon: Users, color: 'text-blue-600' },
-    { label: t('admin.totalPosts'), value: posts.length.toString(), icon: FileText, color: 'text-green-600' },
-    { label: t('admin.totalEvents'), value: events.length.toString(), icon: Calendar, color: 'text-purple-600' },
-    { label: t('admin.totalCommunities'), value: communities.length.toString(), icon: Building2, color: 'text-amber-600' },
-  ];
-
   const getRoleBadge = (userType: string) => {
     switch (userType) {
-      case 'agent': return <Badge className="bg-blue-100 text-blue-800">{t('admin.agent')}</Badge>;
-      case 'organization': return <Badge className="bg-teal-100 text-teal-800">{t('admin.organization')}</Badge>;
-      default: return <Badge variant="secondary">{t('admin.talent')}</Badge>;
+      case 'agent': return <Badge className="bg-blue-100 text-blue-800">{t('admin.agent') || 'Agent'}</Badge>;
+      case 'organization': return <Badge className="bg-teal-100 text-teal-800">{t('admin.organization') || 'Organization'}</Badge>;
+      default: return <Badge variant="secondary">{t('admin.talent') || 'Talent'}</Badge>;
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-muted-foreground">{t('common.loading')}</div>;
+  if (loading) return <div className="p-8 text-center text-muted-foreground">{t('common.loading') || 'Loading...'}</div>;
+
+  if (currentUserRole !== 'admin' && currentUserRole !== 'moderator') {
+    return (
+      <div className="p-8 text-center">
+        <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+        <h2 className="text-xl font-bold mb-2">{t('admin.accessDenied') || 'Access Denied'}</h2>
+        <p className="text-muted-foreground">{t('admin.noPermission') || 'You do not have permission to access this page.'}</p>
+        <Button className="mt-4" onClick={() => navigate('/')}>{t('common.goHome') || 'Go Home'}</Button>
+      </div>
+    );
+  }
+
+  const stats = [
+    { label: t('admin.totalUsers') || 'Total Users', value: users.length.toString(), icon: Users, color: 'text-blue-600' },
+    { label: t('admin.totalPosts') || 'Total Posts', value: posts.length.toString(), icon: FileText, color: 'text-green-600' },
+    { label: t('admin.totalEvents') || 'Total Events', value: events.length.toString(), icon: Calendar, color: 'text-purple-600' },
+    { label: t('admin.totalCommunities') || 'Communities', value: communities.length.toString(), icon: Building2, color: 'text-amber-600' },
+  ];
+
+  const liveStats = [
+    { label: t('admin.weeklyGrowth') || 'Weekly Growth', value: `${weeklyGrowth >= 0 ? '+' : ''}${weeklyGrowth}%`, icon: TrendingUp, color: 'text-emerald-600' },
+    { label: t('admin.activeToday') || 'Active Today', value: activeToday.toString(), icon: Activity, color: 'text-cyan-600' },
+    { label: t('admin.retentionRate') || 'Retention Rate', value: `${retentionRate}%`, icon: BarChart3, color: 'text-orange-600' },
+  ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <Shield className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold">{t('admin.panel')}</h1>
+            <h1 className="text-2xl font-bold">{t('admin.panel') || 'Admin Panel'}</h1>
             <p className="text-sm text-muted-foreground">
-              {currentUserRole === 'admin' ? t('admin.superAdmin') : t('admin.moderator')}
+              {currentUserRole === 'admin' ? (t('admin.superAdmin') || 'Super Admin') : (t('admin.moderator') || 'Moderator')}
             </p>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline"><UserPlus className="h-4 w-4 mr-2" />{t('admin.assignRole')}</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>{t('admin.assignRole')}</DialogTitle></DialogHeader>
-              <div className="space-y-4 pt-4">
-                <Select value={selectedUserId || ''} onValueChange={setSelectedUserId}>
-                  <SelectTrigger><SelectValue placeholder={t('admin.selectUser')} /></SelectTrigger>
-                  <SelectContent>
-                    {users.slice(0, 20).map(u => (
-                      <SelectItem key={u.id} value={u.id}>{u.name} ({u.email})</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={selectedRole} onValueChange={setSelectedRole}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">{t('admin.admin')}</SelectItem>
-                    <SelectItem value="moderator">{t('admin.moderator')}</SelectItem>
-                    <SelectItem value="user">{t('admin.user')}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleAssignRole} className="w-full">{t('admin.confirm')}</Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Button variant="outline"><Settings className="h-4 w-4 mr-2" />{t('admin.systemSettings')}</Button>
-        </div>
+        <Dialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline"><UserPlus className="h-4 w-4 mr-2" />{t('admin.assignRole') || 'Assign Role'}</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>{t('admin.assignRole') || 'Assign Role'}</DialogTitle></DialogHeader>
+            <div className="space-y-4 pt-4">
+              <Select value={selectedUserId || ''} onValueChange={setSelectedUserId}>
+                <SelectTrigger><SelectValue placeholder={t('admin.selectUser') || 'Select user'} /></SelectTrigger>
+                <SelectContent>
+                  {users.slice(0, 20).map(u => (
+                    <SelectItem key={u.id} value={u.id}>{u.name} ({u.email})</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedRole} onValueChange={setSelectedRole}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="moderator">{t('admin.moderator') || 'Moderator'}</SelectItem>
+                  <SelectItem value="user">{t('admin.user') || 'User'}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={handleAssignRole} className="w-full">{t('admin.confirm') || 'Confirm'}</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Stats */}
@@ -172,7 +209,7 @@ const AdminPanel: React.FC = () => {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
                   <p className="text-2xl font-bold">{stat.value}</p>
                 </div>
                 <stat.icon className={`h-8 w-8 ${stat.color}`} />
@@ -182,35 +219,97 @@ const AdminPanel: React.FC = () => {
         ))}
       </div>
 
+      {/* Live Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        {liveStats.map((stat, i) => (
+          <Card key={i} className="border-dashed">
+            <CardContent className="p-4 flex items-center gap-3">
+              <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              <div>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className="text-lg font-bold">{stat.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* Tabs */}
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-4">
         <TabsList className="flex-wrap">
-          <TabsTrigger value="users">{t('admin.userManagement')}</TabsTrigger>
-          <TabsTrigger value="content">{t('admin.contentManagement')}</TabsTrigger>
-          <TabsTrigger value="events">{t('admin.eventsManagement')}</TabsTrigger>
-          <TabsTrigger value="roles">{t('admin.manageRoles')}</TabsTrigger>
-          <TabsTrigger value="moderation">{t('admin.contentModeration')}</TabsTrigger>
+          <TabsTrigger value="overview">{t('admin.overview') || 'Overview'}</TabsTrigger>
+          <TabsTrigger value="users">{t('admin.userManagement') || 'Users'}</TabsTrigger>
+          <TabsTrigger value="content">{t('admin.contentManagement') || 'Content'}</TabsTrigger>
+          <TabsTrigger value="events">{t('admin.eventsManagement') || 'Events'}</TabsTrigger>
+          <TabsTrigger value="moderation">{t('admin.contentModeration') || 'Moderation'}</TabsTrigger>
         </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Shield className="h-5 w-5 text-red-500" />{t('admin.superAdmin') || 'Super Admin'}</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.superAdminDesc') || 'Full platform access and management'}</p>
+                <Badge className="bg-red-100 text-red-800">{t('admin.fullAccess') || 'Full Access'}</Badge>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Lock className="h-5 w-5 text-blue-500" />{t('admin.moderator') || 'Moderator'}</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.moderatorDesc') || 'Content moderation and user support'}</p>
+                <Badge className="bg-blue-100 text-blue-800">{t('admin.limitedAccess') || 'Limited Access'}</Badge>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Users className="h-5 w-5 text-gray-500" />{t('admin.user') || 'User'}</CardTitle></CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.userDesc') || 'Standard platform access'}</p>
+                <Badge variant="secondary">{t('admin.standardAccess') || 'Standard Access'}</Badge>
+              </CardContent>
+            </Card>
+          </div>
+          <Card>
+            <CardHeader><CardTitle>{t('admin.recentUsers') || 'Recent Users'}</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {users.slice(0, 5).map(user => (
+                  <div key={user.id} className="flex items-center justify-between p-2 border rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatar_url} />
+                        <AvatarFallback className="text-xs">{user.name?.charAt(0) || 'U'}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-sm">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                      </div>
+                    </div>
+                    {getRoleBadge(user.user_type)}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder={t('admin.searchUsers')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
-            </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder={t('admin.searchUsers') || 'Search users...'} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
           </div>
           <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('admin.name')}</TableHead>
-                    <TableHead>{t('admin.email')}</TableHead>
-                    <TableHead>{t('admin.type')}</TableHead>
-                    <TableHead>{t('admin.country')}</TableHead>
-                    <TableHead>{t('admin.joined')}</TableHead>
-                    <TableHead>{t('admin.actions')}</TableHead>
+                    <TableHead>{t('admin.name') || 'Name'}</TableHead>
+                    <TableHead>{t('admin.email') || 'Email'}</TableHead>
+                    <TableHead>{t('admin.type') || 'Type'}</TableHead>
+                    <TableHead>{t('admin.country') || 'Country'}</TableHead>
+                    <TableHead>{t('admin.joined') || 'Joined'}</TableHead>
+                    <TableHead>{t('admin.actions') || 'Actions'}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -246,7 +345,7 @@ const AdminPanel: React.FC = () => {
         {/* Content Tab */}
         <TabsContent value="content" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>{t('admin.allPosts')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('admin.allPosts') || 'All Posts'}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {posts.map(post => (
@@ -258,13 +357,10 @@ const AdminPanel: React.FC = () => {
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
-                    <div className="flex gap-2 ml-4">
-                      <Button size="sm" variant="outline">{t('admin.review')}</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
-                {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent')}</p>}
+                {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
               </div>
             </CardContent>
           </Card>
@@ -273,7 +369,7 @@ const AdminPanel: React.FC = () => {
         {/* Events Tab */}
         <TabsContent value="events" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>{t('admin.allEvents')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('admin.allEvents') || 'All Events'}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {events.map(event => (
@@ -282,60 +378,30 @@ const AdminPanel: React.FC = () => {
                       <p className="font-medium">{event.title}</p>
                       <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString()}</p>
                     </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">{t('common.edit')}</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
+                    <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
-                {events.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent')}</p>}
+                {events.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Roles Tab */}
-        <TabsContent value="roles" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Shield className="h-5 w-5 text-red-500" />{t('admin.superAdmin')}</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.superAdminDesc')}</p>
-                <Badge className="bg-red-100 text-red-800">{t('admin.fullAccess')}</Badge>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Lock className="h-5 w-5 text-blue-500" />{t('admin.moderator')}</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.moderatorDesc')}</p>
-                <Badge className="bg-blue-100 text-blue-800">{t('admin.limitedAccess')}</Badge>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Users className="h-5 w-5 text-gray-500" />{t('admin.user')}</CardTitle></CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.userDesc')}</p>
-                <Badge variant="secondary">{t('admin.standardAccess')}</Badge>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>{t('admin.contentModeration')}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('admin.contentModeration') || 'Content Moderation'}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {posts.slice(0, 5).map((post, i) => (
                   <div key={post.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <p className="font-medium">{t('admin.reportedPost')} #{i + 1}</p>
+                      <p className="font-medium">{t('admin.reportedPost') || 'Post'} #{i + 1}</p>
                       <p className="text-sm text-muted-foreground truncate max-w-md">{post.content}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline"><CheckCircle className="h-4 w-4 mr-1" />{t('admin.approve')}</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4 mr-1" />{t('admin.remove')}</Button>
+                      <Button size="sm" variant="outline"><CheckCircle className="h-4 w-4 mr-1" />{t('admin.approve') || 'Approve'}</Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4 mr-1" />{t('admin.remove') || 'Remove'}</Button>
                     </div>
                   </div>
                 ))}
