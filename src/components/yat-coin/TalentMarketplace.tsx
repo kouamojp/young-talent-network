@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Star, TrendingUp, Search } from 'lucide-react';
 import InvestDialog from './InvestDialog';
 import TalentProfileDialog from './TalentProfileDialog';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const talents = [
   {
@@ -38,6 +39,7 @@ const talents = [
 const categories = ['all', 'Technology', 'Creative', 'Marketing', 'Media', 'Business'];
 
 const TalentMarketplace: React.FC = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [investDialogOpen, setInvestDialogOpen] = useState(false);
@@ -57,12 +59,12 @@ const TalentMarketplace: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input placeholder="Search talents, skills, or categories..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+          <Input placeholder={t('marketplace.searchTalents')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
         </div>
         <div className="flex gap-2 flex-wrap">
           {categories.map(category => (
             <Button key={category} variant={selectedCategory === category ? 'default' : 'outline'} size="sm" onClick={() => setSelectedCategory(category)} className="capitalize">
-              {category}
+              {category === 'all' ? t('talentMkt.all') : category}
             </Button>
           ))}
         </div>
@@ -91,10 +93,10 @@ const TalentMarketplace: React.FC = () => {
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div><p className="text-muted-foreground">Token Price</p><p className="font-semibold">{talent.tokenPrice}</p></div>
-                <div><p className="text-muted-foreground">Market Cap</p><p className="font-semibold">{talent.marketCap}</p></div>
-                <div><p className="text-muted-foreground">24h Change</p><p className="font-semibold text-green-600">{talent.change}</p></div>
-                <div><p className="text-muted-foreground">Investors</p><p className="font-semibold">{talent.investors}</p></div>
+                <div><p className="text-muted-foreground">{t('marketplace.tokenPrice')}</p><p className="font-semibold">{talent.tokenPrice}</p></div>
+                <div><p className="text-muted-foreground">{t('marketplace.marketCap')}</p><p className="font-semibold">{talent.marketCap}</p></div>
+                <div><p className="text-muted-foreground">{t('marketplace.24hChange')}</p><p className="font-semibold text-green-600">{talent.change}</p></div>
+                <div><p className="text-muted-foreground">{t('marketplace.investors')}</p><p className="font-semibold">{talent.investors}</p></div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
@@ -103,15 +105,15 @@ const TalentMarketplace: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <TrendingUp className="h-4 w-4" />
-                  <span>{talent.projects} projects</span>
+                  <span>{talent.projects} {t('marketplace.projects')}</span>
                 </div>
               </div>
               <div className="flex gap-2">
                 <Button className="flex-1" size="sm" onClick={() => { setSelectedTalent(talent); setInvestDialogOpen(true); }}>
-                  Invest Now
+                  {t('marketplace.investNow')}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => { setSelectedTalent(talent); setProfileDialogOpen(true); }}>
-                  View Profile
+                  {t('marketplace.viewProfile')}
                 </Button>
               </div>
             </CardContent>
@@ -121,8 +123,8 @@ const TalentMarketplace: React.FC = () => {
 
       {filteredTalents.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No talents found matching your criteria.</p>
-          <Button variant="outline" onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} className="mt-4">Clear Filters</Button>
+          <p className="text-muted-foreground">{t('marketplace.noTalents')}</p>
+          <Button variant="outline" onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} className="mt-4">{t('marketplace.clearFilters')}</Button>
         </div>
       )}
 
