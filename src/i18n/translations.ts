@@ -598,7 +598,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'marketplace.projects': 'projects',
     'marketplace.noTalents': 'No talents found matching your criteria.',
     'marketplace.clearFilters': 'Clear Filters',
-    'marketplace.all': 'all',
+    'talentMkt.all': 'all',
 
     // InvestorDashboard
     'investor.totalInvested': 'Total Invested',
@@ -1387,7 +1387,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'marketplace.projects': 'projets',
     'marketplace.noTalents': 'Aucun talent trouvé correspondant à vos critères.',
     'marketplace.clearFilters': 'Effacer les filtres',
-    'marketplace.all': 'tous',
+    'talentMkt.all': 'tous',
 
     // InvestorDashboard
     'investor.totalInvested': 'Total investi',
@@ -2176,7 +2176,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'marketplace.projects': 'проектов',
     'marketplace.noTalents': 'Таланты по вашим критериям не найдены.',
     'marketplace.clearFilters': 'Сбросить фильтры',
-    'marketplace.all': 'все',
+    'talentMkt.all': 'все',
 
     // InvestorDashboard
     'investor.totalInvested': 'Всего инвестировано',
