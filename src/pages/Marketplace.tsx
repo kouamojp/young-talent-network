@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface MarketplaceItem {
   id: string;
@@ -36,6 +37,7 @@ const mockItems: MarketplaceItem[] = [
 const categories = ['All', 'Coaching', 'Equipment', 'Creative', 'Nutrition', 'Events', 'Digital'];
 
 const Marketplace: React.FC = () => {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeTab, setActiveTab] = useState('all');
@@ -49,63 +51,48 @@ const Marketplace: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
       <div className="bg-gradient-to-br from-primary/10 via-accent to-primary/5 px-4 py-8 md:py-12">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-semibold">
-            <ShoppingBag className="h-4 w-4" /> YAT Marketplace
+            <ShoppingBag className="h-4 w-4" /> {t('marketplace.title')}
           </div>
-          <h1 className="text-2xl md:text-4xl font-bold text-foreground">
-            Buy, Sell & Offer Your Talent Services
-          </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto text-sm md:text-base">
-            The marketplace for athletes, coaches and creatives to monetize their skills and find the gear they need.
-          </p>
-
+          <h1 className="text-2xl md:text-4xl font-bold text-foreground">{t('marketplace.heroTitle')}</h1>
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm md:text-base">{t('marketplace.heroDesc')}</p>
           <div className="flex items-center gap-2 max-w-lg mx-auto mt-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products & services..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="pl-10 bg-card border-border"
-              />
+              <Input placeholder={t('marketplace.searchPlaceholder')} value={search} onChange={e => setSearch(e.target.value)} className="pl-10 bg-card border-border" />
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="gap-1.5">
-                  <Plus className="h-4 w-4" /> Sell
-                </Button>
+                <Button className="gap-1.5"><Plus className="h-4 w-4" /> {t('marketplace.sell')}</Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Create a Listing</DialogTitle>
-                </DialogHeader>
+                <DialogHeader><DialogTitle>{t('marketplace.createListing')}</DialogTitle></DialogHeader>
                 <div className="space-y-3 pt-2">
-                  <div><Label>Title</Label><Input placeholder="What are you selling?" /></div>
-                  <div><Label>Description</Label><Textarea placeholder="Describe your product or service" rows={3} /></div>
+                  <div><Label>{t('marketplace.title_field')}</Label><Input placeholder={t('marketplace.titlePlaceholder')} /></div>
+                  <div><Label>{t('marketplace.description')}</Label><Textarea placeholder={t('marketplace.descPlaceholder')} rows={3} /></div>
                   <div className="grid grid-cols-2 gap-3">
-                    <div><Label>Price (€)</Label><Input type="number" placeholder="0" /></div>
+                    <div><Label>{t('marketplace.price')}</Label><Input type="number" placeholder="0" /></div>
                     <div>
-                      <Label>Type</Label>
-                      <Select><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                      <Label>{t('marketplace.type')}</Label>
+                      <Select><SelectTrigger><SelectValue placeholder={t('marketplace.select')} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="product">Product</SelectItem>
-                          <SelectItem value="service">Service</SelectItem>
+                          <SelectItem value="product">{t('marketplace.product')}</SelectItem>
+                          <SelectItem value="service">{t('marketplace.service')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   <div>
-                    <Label>Category</Label>
-                    <Select><SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <Label>{t('marketplace.category')}</Label>
+                    <Select><SelectTrigger><SelectValue placeholder={t('marketplace.select')} /></SelectTrigger>
                       <SelectContent>
                         {categories.filter(c => c !== 'All').map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full">Publish Listing</Button>
+                  <Button className="w-full">{t('marketplace.publish')}</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -113,27 +100,18 @@ const Marketplace: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="px-4 py-4 border-b border-border">
         <div className="max-w-5xl mx-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <TabsList className="bg-muted">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="product">Products</TabsTrigger>
-                <TabsTrigger value="service">Services</TabsTrigger>
+                <TabsTrigger value="all">{t('marketplace.all')}</TabsTrigger>
+                <TabsTrigger value="product">{t('marketplace.products')}</TabsTrigger>
+                <TabsTrigger value="service">{t('marketplace.services')}</TabsTrigger>
               </TabsList>
               <div className="flex gap-1.5 overflow-x-auto">
                 {categories.map(cat => (
-                  <Button
-                    key={cat}
-                    variant={selectedCategory === cat ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedCategory(cat)}
-                    className="text-xs whitespace-nowrap"
-                  >
-                    {cat}
-                  </Button>
+                  <Button key={cat} variant={selectedCategory === cat ? 'default' : 'outline'} size="sm" onClick={() => setSelectedCategory(cat)} className="text-xs whitespace-nowrap">{cat}</Button>
                 ))}
               </div>
             </div>
@@ -141,7 +119,6 @@ const Marketplace: React.FC = () => {
         </div>
       </div>
 
-      {/* Grid */}
       <div className="px-4 py-6 max-w-5xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(item => (
@@ -156,14 +133,10 @@ const Marketplace: React.FC = () => {
                     <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{item.description}</p>
                   </div>
                   <Badge variant={item.type === 'service' ? 'default' : 'secondary'} className="text-[10px] shrink-0 ml-2">
-                    {item.type === 'service' ? 'Service' : 'Product'}
+                    {item.type === 'service' ? t('marketplace.service') : t('marketplace.product')}
                   </Badge>
                 </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> {item.location}
-                </div>
-
+                <div className="flex items-center gap-2 text-xs text-muted-foreground"><MapPin className="h-3 w-3" /> {item.location}</div>
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="text-lg font-bold text-primary">{item.currency}{item.price}</span>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -171,18 +144,13 @@ const Marketplace: React.FC = () => {
                     <span className="flex items-center gap-0.5"><Eye className="h-3 w-3" />{item.views}</span>
                   </div>
                 </div>
-
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex items-center gap-1.5">
-                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                      {item.seller.name.charAt(0)}
-                    </div>
+                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">{item.seller.name.charAt(0)}</div>
                     <span className="text-xs text-muted-foreground">{item.seller.name}</span>
                     <span className="text-xs text-amber-500 flex items-center gap-0.5"><Star className="h-3 w-3 fill-amber-500" />{item.seller.rating}</span>
                   </div>
-                  <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
-                    <MessageSquare className="h-3 w-3" /> Contact
-                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 text-xs gap-1"><MessageSquare className="h-3 w-3" /> {t('marketplace.contact')}</Button>
                 </div>
               </div>
             </div>
@@ -191,7 +159,7 @@ const Marketplace: React.FC = () => {
         {filtered.length === 0 && (
           <div className="text-center py-16 text-muted-foreground">
             <ShoppingBag className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p>No listings found</p>
+            <p>{t('marketplace.noListings')}</p>
           </div>
         )}
       </div>
