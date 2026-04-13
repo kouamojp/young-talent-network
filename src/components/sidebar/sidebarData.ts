@@ -22,6 +22,7 @@ import {
   Tv,
   Database,
   Download,
+  Shield,
   LucideIcon
 } from 'lucide-react';
 
@@ -267,10 +268,23 @@ const installItem: MenuSectionItem[] = [
   }
 ];
 
+const adminItems: MenuSectionItem[] = [
+  {
+    label: 'Admin Panel',
+    description: 'Platform administration',
+    icon: Shield,
+    path: '/admin',
+    iconColor: 'text-red-600',
+    badge: 'Admin',
+    badgeColor: 'bg-red-100 text-red-800',
+  }
+];
+
 export const allSections: MenuSection[] = [
   { title: 'Your Profile', items: mainNavigationItems },
   { title: 'Services YAT', items: yatServicesItems },
   { title: 'Communities & Content', items: servicesItems },
   { title: 'Connect', items: connectItems },
   { title: 'Application', items: installItem },
+  { title: 'Administration', items: adminItems },
 ];
