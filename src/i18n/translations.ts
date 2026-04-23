@@ -453,9 +453,27 @@ export const translations: Record<Language, Record<string, string>> = {
     'learning.subcategories': 'subcategories',
 
     // Work page
+    'work.title': 'YAT Work',
+    'work.subtitle': 'Where talents and opportunities connect',
     'work.jobOpenings': 'Job Openings',
     'work.resumes': 'Resumes',
     'work.successStories': 'Success Stories',
+    'work.openOpportunities': 'Open Opportunities',
+    'work.activeTalents': 'Active Talents',
+    'work.organizations': 'Organizations',
+    'work.successRate': 'Hire Success',
+    'work.findTalents': 'Find Talents',
+    'work.findOpportunities': 'Find Opportunities',
+    'work.forOrganizations': 'For Organizations',
+    'work.forTalents': 'For Talents',
+    'work.dreamTeam': 'Find Your Dream Team',
+    'work.dreamTeamDesc': 'Discover talents who match your vision and culture.',
+    'work.dreamStage': 'Find Your Dream Stage',
+    'work.dreamStageDesc': 'Your next opportunity starts right here.',
+    'work.overview': 'Overview',
+    'work.opportunitiesTab': 'Opportunities',
+    'work.talentsTab': 'Talents',
+    'work.storiesTab': 'Stories',
 
     // Marketplace
     'marketplace.title': 'YAT Marketplace',
