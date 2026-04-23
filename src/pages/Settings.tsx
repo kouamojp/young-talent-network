@@ -154,6 +154,10 @@ const Settings: React.FC = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="services">
+            <YatServicesManager />
+          </TabsContent>
+
           <TabsContent value="notifications">
             <Card>
               <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Bell className="h-5 w-5 text-primary" /> {t('settings.notifPrefs')}</CardTitle></CardHeader>
