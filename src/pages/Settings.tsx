@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { YatServicesManager } from '@/components/profile/YatServicesManager';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -100,8 +101,9 @@ const Settings: React.FC = () => {
 
       <div className="max-w-5xl mx-auto px-4 py-6">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="w-full justify-start mb-6 bg-muted/50">
+          <TabsList className="w-full justify-start mb-6 bg-muted/50 flex-wrap h-auto">
             <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
+            <TabsTrigger value="services">{t('services.title') || 'YAT Services'}</TabsTrigger>
             <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
             <TabsTrigger value="privacy">{t('settings.privacy')}</TabsTrigger>
             <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
@@ -150,6 +152,10 @@ const Settings: React.FC = () => {
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="services">
+            <YatServicesManager />
           </TabsContent>
 
           <TabsContent value="notifications">
