@@ -10,6 +10,7 @@ import SidebarMain from './sidebar/SidebarMain';
 import { useTheme } from '@/hooks/useTheme';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { PostCreationDialog } from './PostCreationDialog';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
