@@ -165,7 +165,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                   )
                 ) : (
                   <Badge variant="outline" className="text-[9px] px-1 py-0 text-muted-foreground">
-                    —
+                    active
                   </Badge>
                 )}
               </button>
