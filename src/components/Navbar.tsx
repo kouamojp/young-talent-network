@@ -73,6 +73,18 @@ const Navbar: React.FC = () => {
           </Link>
           
           <div className="flex items-center space-x-2">
+            <PostCreationDialog
+              trigger={
+                <Button
+                  size="sm"
+                  className="rounded-full gap-1.5 hidden sm:inline-flex"
+                  title={t('create.post')}
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden md:inline">{t('create.post')}</span>
+                </Button>
+              }
+            />
             <LanguageSwitcher />
             <Button 
               variant="ghost" 
