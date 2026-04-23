@@ -156,6 +156,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.accountCreatedDesc': 'Welcome to YAT! Your profile has been created automatically in all sections.',
     'auth.registerFailed': 'Registration failed',
     'auth.facebookFailed': 'Facebook login failed',
+    'auth.forgotPassword': 'Forgot password?',
+    'auth.resetTitle': 'Reset password',
+    'auth.resetDesc': 'Enter your email to receive a reset link.',
+    'auth.sendResetLink': 'Send reset link',
+    'auth.resetEmailSent': 'Email sent',
+    'auth.resetEmailSentDesc': 'Check your inbox for the password reset link.',
+    'common.cancel': 'Cancel',
 
     // Landing page
     'landing.badge': 'I Am Talent — Global Platform for Young Talents',
