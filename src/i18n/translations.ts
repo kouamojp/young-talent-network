@@ -282,6 +282,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.typeMessage': 'Type a message...',
 
     // Settings page
+    'services.title': 'YAT Services',
+    'services.description': 'Activate or deactivate the YAT services you want to use.',
+    'services.active': 'active',
+    'services.inactive': 'inactive',
+    'services.activated': 'Service activated',
+    'services.deactivated': 'Service deactivated',
+    'profile.myYatProfiles': 'My YAT Profiles',
     'settings.title': 'Settings',
     'settings.subtitle': 'Manage your account and preferences',
     'settings.profile': 'Profile',
@@ -1138,6 +1145,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.typeMessage': 'Tapez un message...',
 
     // Settings
+    'services.title': 'Services YAT',
+    'services.description': 'Activez ou désactivez les services YAT que vous souhaitez utiliser.',
+    'services.active': 'actif',
+    'services.inactive': 'inactif',
+    'services.activated': 'Service activé',
+    'services.deactivated': 'Service désactivé',
+    'profile.myYatProfiles': 'Mes Profils YAT',
     'settings.title': 'Paramètres',
     'settings.subtitle': 'Gérez votre compte et vos préférences',
     'settings.profile': 'Profil',
@@ -1994,6 +2008,13 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.typeMessage': 'Введите сообщение...',
 
     // Settings
+    'services.title': 'Сервисы YAT',
+    'services.description': 'Активируйте или деактивируйте сервисы YAT, которые вы хотите использовать.',
+    'services.active': 'активен',
+    'services.inactive': 'неактивен',
+    'services.activated': 'Сервис активирован',
+    'services.deactivated': 'Сервис деактивирован',
+    'profile.myYatProfiles': 'Мои профили YAT',
     'settings.title': 'Настройки',
     'settings.subtitle': 'Управление аккаунтом и предпочтениями',
     'settings.profile': 'Профиль',
