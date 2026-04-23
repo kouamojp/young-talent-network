@@ -1,86 +1,59 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Briefcase, MicIcon, Building, SparklesIcon } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Briefcase, Building, Sparkles, Target, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import GlassMorphism from '@/components/GlassMorphism';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const WorkHubEntry: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
-    <GlassMorphism className="p-8 max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">Y&T Work Hub</h1>
-        <p className="text-lg text-gray-600">Where dreams meet opportunities</p>
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold mb-2">{t('work.title') || 'YAT Work'}</h2>
+        <p className="text-muted-foreground max-w-2xl mx-auto">{t('work.subtitle')}</p>
       </div>
-      
-      <div className="grid md:grid-cols-2 gap-6">
-        <div 
-          className="group bg-gradient-to-br from-blue-50 to-purple-100 p-6 rounded-xl shadow-md hover:shadow-lg transition-all"
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card
+          className="group p-6 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-blue-400"
+          onClick={() => navigate('/work?path=organization')}
         >
-          <div className="text-center mb-4">
-            <div className="inline-block p-4 bg-white/60 rounded-full mb-4 transition-all">
+          <div className="text-center">
+            <div className="inline-block p-4 bg-blue-100 rounded-full mb-4 transition-transform group-hover:scale-110">
               <Building className="h-12 w-12 text-blue-600 group-hover:hidden" />
-              <SparklesIcon className="h-12 w-12 text-purple-600 hidden group-hover:block" />
+              <Sparkles className="h-12 w-12 text-blue-600 hidden group-hover:block" />
             </div>
-            <h2 className="text-2xl font-bold">Find Your Dream Team</h2>
-            <p className="text-gray-600 mt-2">Discover talents who'll make your heart skip a beat!</p>
+            <h3 className="text-xl font-bold mb-2">{t('work.dreamTeam')}</h3>
+            <p className="text-muted-foreground mb-4">{t('work.dreamTeamDesc')}</p>
+            <Button className="w-full gap-2">
+              {t('work.forOrganizations')}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/work?path=organization')} 
-            className="w-full py-6 text-lg h-auto group-hover:bg-purple-600 transition-colors"
-          >
-            For Organizations
-          </Button>
-        </div>
-        
-        <div 
-          className="group bg-gradient-to-br from-purple-50 to-pink-100 p-6 rounded-xl shadow-md hover:shadow-lg transition-all"
+        </Card>
+
+        <Card
+          className="group p-6 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-pink-400"
+          onClick={() => navigate('/work?path=talent')}
         >
-          <div className="text-center mb-4">
-            <div className="inline-block p-4 bg-white/60 rounded-full mb-4">
-              <MicIcon className="h-12 w-12 text-purple-600 group-hover:hidden" />
+          <div className="text-center">
+            <div className="inline-block p-4 bg-pink-100 rounded-full mb-4 transition-transform group-hover:scale-110">
+              <Target className="h-12 w-12 text-pink-600 group-hover:hidden" />
               <Briefcase className="h-12 w-12 text-pink-600 hidden group-hover:block" />
             </div>
-            <h2 className="text-2xl font-bold">Find Your Dream Stage</h2>
-            <p className="text-gray-600 mt-2">Your next adventure starts here!</p>
+            <h3 className="text-xl font-bold mb-2">{t('work.dreamStage')}</h3>
+            <p className="text-muted-foreground mb-4">{t('work.dreamStageDesc')}</p>
+            <Button variant="outline" className="w-full gap-2">
+              {t('work.forTalents')}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/work?path=talent')} 
-            className="w-full py-6 text-lg h-auto group-hover:bg-pink-600 transition-colors"
-          >
-            For Talents
-          </Button>
-        </div>
+        </Card>
       </div>
-      
-      <div className="mt-10 bg-white/30 p-6 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">Success Stories</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((item) => (
-            <div key={item} className="bg-white/60 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="aspect-video bg-gray-200 relative">
-                <img 
-                  src="/placeholder.svg" 
-                  alt="Success story" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h4 className="font-bold">From Passion to Profession</h4>
-                <p className="text-sm text-gray-600 mt-1">
-                  How I found my dream opportunity through Y&T Work Hub
-                </p>
-                <Button variant="link" className="px-0 mt-2">
-                  Read Full Story
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </GlassMorphism>
+    </div>
   );
 };
 
