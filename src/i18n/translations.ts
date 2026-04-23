@@ -156,6 +156,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.accountCreatedDesc': 'Welcome to YAT! Your profile has been created automatically in all sections.',
     'auth.registerFailed': 'Registration failed',
     'auth.facebookFailed': 'Facebook login failed',
+    'auth.forgotPassword': 'Forgot password?',
+    'auth.resetTitle': 'Reset password',
+    'auth.resetDesc': 'Enter your email to receive a reset link.',
+    'auth.sendResetLink': 'Send reset link',
+    'auth.resetEmailSent': 'Email sent',
+    'auth.resetEmailSentDesc': 'Check your inbox for the password reset link.',
 
     // Landing page
     'landing.badge': 'I Am Talent — Global Platform for Young Talents',
@@ -1008,6 +1014,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.accountCreatedDesc': 'Bienvenue sur YAT ! Votre profil a été créé automatiquement dans toutes les sections.',
     'auth.registerFailed': 'Échec d\'inscription',
     'auth.facebookFailed': 'Échec Facebook',
+    'auth.forgotPassword': 'Mot de passe oublié ?',
+    'auth.resetTitle': 'Réinitialiser le mot de passe',
+    'auth.resetDesc': 'Saisissez votre email pour recevoir un lien de réinitialisation.',
+    'auth.sendResetLink': 'Envoyer le lien',
+    'auth.resetEmailSent': 'Email envoyé',
+    'auth.resetEmailSentDesc': 'Vérifiez votre boîte mail pour le lien de réinitialisation.',
 
     // Landing
     'landing.badge': 'Я Талант — Plateforme Mondiale pour Jeunes Talents',
@@ -1858,6 +1870,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.accountCreatedDesc': 'Добро пожаловать на YAT! Ваш профиль создан автоматически во всех разделах.',
     'auth.registerFailed': 'Ошибка регистрации',
     'auth.facebookFailed': 'Ошибка Facebook',
+    'auth.forgotPassword': 'Забыли пароль?',
+    'auth.resetTitle': 'Сброс пароля',
+    'auth.resetDesc': 'Введите email, чтобы получить ссылку для сброса.',
+    'auth.sendResetLink': 'Отправить ссылку',
+    'auth.resetEmailSent': 'Email отправлен',
+    'auth.resetEmailSentDesc': 'Проверьте почту для ссылки на сброс пароля.',
 
     // Landing
     'landing.badge': 'Я Талант — Мировая Платформа для Молодых Талантов',

@@ -140,28 +140,21 @@ export const useConversations = () => {
     if (!currentUserId) return null;
 
     try {
-      const { data: conversation, error: convError } = await supabase
-        .from('conversations')
-        .insert({})
-        .select()
-        .single();
+      const { data, error } = await supabase.rpc('create_conversation_with_participant', {
+        _other_user_id: participantId,
+      });
 
-      if (convError) throw convError;
-
-      const { error: participantsError } = await supabase
-        .from('conversation_participants')
-        .insert([
-          { conversation_id: conversation.id, user_id: currentUserId },
-          { conversation_id: conversation.id, user_id: participantId }
-        ]);
-
-      if (participantsError) throw participantsError;
+      if (error) throw error;
 
       await fetchConversations();
-      return conversation.id;
-    } catch (error) {
+      return data as string;
+    } catch (error: any) {
       console.error('Error creating conversation:', error);
-      toast({ title: "Failed to create conversation", variant: "destructive" });
+      toast({
+        title: "Failed to create conversation",
+        description: error?.message,
+        variant: "destructive",
+      });
       return null;
     }
   };

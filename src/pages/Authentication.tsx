@@ -19,12 +19,36 @@ const Authentication: React.FC = () => {
   const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState<'talent' | 'organization' | 'agent'>('talent');
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/profile');
     });
   }, [navigate]);
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) return;
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      if (error) throw error;
+      toast({
+        title: t('auth.resetEmailSent') || 'Email envoyé',
+        description: t('auth.resetEmailSentDesc') || 'Vérifiez votre boîte mail pour réinitialiser votre mot de passe.',
+      });
+      setShowReset(false);
+      setResetEmail('');
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,10 +177,45 @@ const Authentication: React.FC = () => {
                     <Label htmlFor="password">{t('auth.password')}</Label>
                     <Input id="password" name="password" type="password" required autoComplete="current-password" />
                   </div>
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setShowReset(v => !v)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      {t('auth.forgotPassword') || 'Mot de passe oublié ?'}
+                    </button>
+                  </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
                     {isLoading ? t('auth.loggingIn') : t('auth.loginButton')}
                   </Button>
                 </form>
+                {showReset && (
+                  <form onSubmit={handlePasswordReset} className="mt-4 space-y-3 p-3 border rounded-lg bg-muted/40">
+                    <Label htmlFor="reset-email" className="text-sm font-medium">
+                      {t('auth.resetTitle') || 'Réinitialiser le mot de passe'}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {t('auth.resetDesc') || 'Saisissez votre email pour recevoir un lien de réinitialisation.'}
+                    </p>
+                    <Input
+                      id="reset-email"
+                      type="email"
+                      placeholder={t('auth.emailPlaceholder')}
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      required
+                    />
+                    <div className="flex gap-2">
+                      <Button type="submit" size="sm" disabled={isLoading} className="flex-1">
+                        {isLoading ? '…' : (t('auth.sendResetLink') || 'Envoyer le lien')}
+                      </Button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setShowReset(false)}>
+                        {t('common.cancel') || 'Annuler'}
+                      </Button>
+                    </div>
+                  </form>
+                )}
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
                   <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">{t('common.or')}</span></div>
