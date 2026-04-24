@@ -86,7 +86,14 @@ const OrganizationDiscovery: React.FC = () => {
                     <div className="mt-3 flex justify-between items-center">
                       <div className="space-x-2">
                         <Button size="sm" className="rounded-full">{t('orgDisc.contact')}</Button>
-                        <Button size="sm" variant="outline" className="rounded-full"><Users className="h-4 w-4 mr-1" />{t('orgDisc.viewProfileBtn')}</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="rounded-full"
+                          onClick={() => navigate(`/organization/${org.id}`)}
+                        >
+                          <Users className="h-4 w-4 mr-1" />{t('orgDisc.viewProfileBtn')}
+                        </Button>
                       </div>
                       <div className="flex items-center gap-2">
                         {org.verified && (<Badge variant="outline" className="bg-blue-50"><Award className="h-3 w-3 mr-1" />{t('orgDisc.verified')}</Badge>)}
