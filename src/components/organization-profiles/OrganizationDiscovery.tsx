@@ -16,6 +16,7 @@ const sampleOrganizations = [
 
 const OrganizationDiscovery: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
 
