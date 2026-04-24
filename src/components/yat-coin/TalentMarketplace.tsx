@@ -8,6 +8,7 @@ import { Star, TrendingUp, Search } from 'lucide-react';
 import InvestDialog from './InvestDialog';
 import TalentProfileDialog from './TalentProfileDialog';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 const talents = [
   {
@@ -40,6 +41,7 @@ const categories = ['all', 'Technology', 'Creative', 'Marketing', 'Media', 'Busi
 
 const TalentMarketplace: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [investDialogOpen, setInvestDialogOpen] = useState(false);
@@ -112,7 +114,11 @@ const TalentMarketplace: React.FC = () => {
                 <Button className="flex-1" size="sm" onClick={() => { setSelectedTalent(talent); setInvestDialogOpen(true); }}>
                   {t('marketplace.investNow')}
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => { setSelectedTalent(talent); setProfileDialogOpen(true); }}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate(`/talent/${talent.id}`)}
+                >
                   {t('marketplace.viewProfile')}
                 </Button>
               </div>

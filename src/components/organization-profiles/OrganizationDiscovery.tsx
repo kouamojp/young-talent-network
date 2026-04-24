@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, MapPin, Globe, Phone, Mail, Users, Award, Building, Star } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 const sampleOrganizations = [
   { id: 1, name: 'Elite Talent Agency', type: 'Talent Agency', location: 'New York, USA', logo: '/placeholder.svg', description: 'Premier talent agency representing actors, musicians, and artists.', customDescription: 'Specializing in breakthrough talent discovery and career management.', rating: 4.8, verified: true, phone: '+1 (555) 123-4567', email: 'contact@elitetalent.com', website: 'www.elitetalent.com', recentlyAdded: true },
@@ -15,6 +16,7 @@ const sampleOrganizations = [
 
 const OrganizationDiscovery: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
 
@@ -84,7 +86,14 @@ const OrganizationDiscovery: React.FC = () => {
                     <div className="mt-3 flex justify-between items-center">
                       <div className="space-x-2">
                         <Button size="sm" className="rounded-full">{t('orgDisc.contact')}</Button>
-                        <Button size="sm" variant="outline" className="rounded-full"><Users className="h-4 w-4 mr-1" />{t('orgDisc.viewProfileBtn')}</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="rounded-full"
+                          onClick={() => navigate(`/organization/${org.id}`)}
+                        >
+                          <Users className="h-4 w-4 mr-1" />{t('orgDisc.viewProfileBtn')}
+                        </Button>
                       </div>
                       <div className="flex items-center gap-2">
                         {org.verified && (<Badge variant="outline" className="bg-blue-50"><Award className="h-3 w-3 mr-1" />{t('orgDisc.verified')}</Badge>)}
