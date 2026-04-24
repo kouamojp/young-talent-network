@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, MapPin, Globe, Phone, Mail, Users, Award, Building, Star } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 
 const sampleOrganizations = [
   { id: 1, name: 'Elite Talent Agency', type: 'Talent Agency', location: 'New York, USA', logo: '/placeholder.svg', description: 'Premier talent agency representing actors, musicians, and artists.', customDescription: 'Specializing in breakthrough talent discovery and career management.', rating: 4.8, verified: true, phone: '+1 (555) 123-4567', email: 'contact@elitetalent.com', website: 'www.elitetalent.com', recentlyAdded: true },
