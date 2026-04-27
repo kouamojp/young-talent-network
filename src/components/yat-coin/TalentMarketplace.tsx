@@ -115,7 +115,7 @@ const TalentMarketplace: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => navigate(`/talent/${talent.id}`)}
+                  onClick={() => { setSelectedTalent(talent); setProfileDialogOpen(true); }}
                 >
                   {t('marketplace.viewProfile')}
                 </Button>
