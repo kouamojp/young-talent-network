@@ -156,8 +156,17 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       
       {/* Post Content */}
       <div className="px-4 pb-3">
-        <p className="text-[15px]">{post.content}</p>
+        <p className="text-[15px] whitespace-pre-wrap">{post.content}</p>
       </div>
+
+      {/* Post Media */}
+      {post.media_urls && post.media_urls.length > 0 && (
+        <div className={`grid gap-1 px-1 pb-2 ${post.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+          {post.media_urls.map((url, i) => (
+            <img key={i} src={url} alt="" className="w-full max-h-[500px] object-cover rounded-md" />
+          ))}
+        </div>
+      )}
       
       {/* Like/Comment/Share Count */}
       <div className="px-4 py-2 flex justify-between border-t border-b text-xs text-muted-foreground">
