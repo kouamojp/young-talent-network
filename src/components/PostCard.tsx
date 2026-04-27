@@ -21,6 +21,7 @@ interface Post {
   likes: number;
   comments: number;
   shares: number;
+  media_urls?: string[] | null;
 }
 
 interface PostCardProps {
