@@ -22,10 +22,10 @@ const Footer: React.FC = () => {
         <div className="flex flex-wrap items-center gap-x-1 text-[11px] text-muted-foreground leading-relaxed">
           <LanguageSwitcher />
           {links.map((key, i) => (
-            <React.Fragment key={key}>
+            <span key={key} className="inline-flex items-center">
               <a href="#" className="hover:underline">{t(key)}</a>
               {i < links.length - 1 && <span className="mx-0.5">·</span>}
-            </React.Fragment>
+            </span>
           ))}
           <span className="ml-auto">{t('footer.copyright', { year })}</span>
         </div>
