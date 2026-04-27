@@ -110,7 +110,8 @@ const Feed: React.FC = () => {
                 timestamp: post.created_at,
                 likes: post.likes_count,
                 comments: post.comments_count,
-                shares: 0
+                shares: 0,
+                media_urls: post.media_urls,
               }}
               onUpdate={fetchPosts}
             />
