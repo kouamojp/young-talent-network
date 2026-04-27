@@ -40,7 +40,6 @@ const categories = ['all', 'Technology', 'Creative', 'Marketing', 'Media', 'Busi
 
 const TalentMarketplace: React.FC = () => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [investDialogOpen, setInvestDialogOpen] = useState(false);
