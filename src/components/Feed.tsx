@@ -14,6 +14,7 @@ interface Post {
   likes_count: number;
   comments_count: number;
   user_id: string;
+  media_urls: string[] | null;
   profiles: {
     name: string;
     avatar_url: string | null;
