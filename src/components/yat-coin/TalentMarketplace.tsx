@@ -8,7 +8,6 @@ import { Star, TrendingUp, Search } from 'lucide-react';
 import InvestDialog from './InvestDialog';
 import TalentProfileDialog from './TalentProfileDialog';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useNavigate } from 'react-router-dom';
 
 const talents = [
   {
