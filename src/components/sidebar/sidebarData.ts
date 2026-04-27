@@ -117,8 +117,6 @@ export const yatServicesItems: MenuSectionItem[] = [
     icon: CalendarDays,
     path: '/events',
     iconColor: 'text-rose-500',
-    badge: '5',
-    badgeColor: 'bg-rose-500 text-white',
   },
   {
     label: 'YAT Learning',
