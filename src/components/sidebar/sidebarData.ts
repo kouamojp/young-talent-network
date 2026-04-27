@@ -62,8 +62,6 @@ export const mainNavigationItems: MenuSectionItem[] = [
     icon: MessageSquare,
     path: '/messages',
     iconColor: 'text-sky-500',
-    badge: '3',
-    badgeColor: 'bg-red-500 text-white',
   },
   {
     label: 'Calls',
@@ -78,8 +76,6 @@ export const mainNavigationItems: MenuSectionItem[] = [
     icon: Users,
     path: '/friends',
     iconColor: 'text-indigo-500',
-    badge: '12',
-    badgeColor: 'bg-blue-500 text-white',
   },
   {
     label: 'Settings',
