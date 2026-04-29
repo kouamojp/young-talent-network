@@ -931,6 +931,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.noUsers': 'No users found',
     'messages.noConversations': 'No conversations',
     'messages.startChat': 'Start a chat',
+    'location.label': 'Location',
+    'location.placeholder': 'Search a city or address…',
+    'location.useCurrent': 'Use my current location',
   },
 
   fr: {
