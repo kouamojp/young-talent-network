@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
 import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
 interface PostCreationDialogProps {
   trigger: React.ReactNode;
@@ -26,7 +27,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<TabType>('post');
   const [content, setContent] = useState('');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState<LocationValue | null>(null);
   const [showLocation, setShowLocation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
@@ -56,7 +57,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   };
 
   const reset = () => {
-    setContent(''); setLocation(''); setShowLocation(false);
+    setContent(''); setLocation(null); setShowLocation(false);
     setFiles([]); setPreviews([]);
     setArticleTitle(''); setArticleCategory('');
     setPollQuestion(''); setPollOptions(['', '']);
@@ -158,7 +159,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           return;
         }
         const mediaUrls = files.length ? await uploadFiles(user.id) : [];
-        const finalContent = showLocation && location ? `${content}\n📍 ${location}` : content;
+        const finalContent = showLocation && location?.address ? `${content}\n📍 ${location.address}` : content;
         const { error } = await supabase.from('posts').insert({
           content: finalContent.trim() || ' ',
           user_id: user.id,
@@ -305,17 +306,16 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             )}
 
             {showLocation && (
-              <div className="flex items-center gap-2 bg-muted p-2 rounded-lg">
-                <MapPin className="h-4 w-4 text-primary" />
-                <Input
-                  placeholder={t('post.locationPlaceholder') || 'Add location'}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="border-0 bg-transparent focus-visible:ring-0 h-7 p-0"
-                />
-                <button onClick={() => { setShowLocation(false); setLocation(''); }}>
-                  <X className="h-4 w-4 text-muted-foreground" />
-                </button>
+              <div className="bg-muted/50 p-2 rounded-lg space-y-1">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> {t('location.label') || 'Location'}
+                  </span>
+                  <button onClick={() => { setShowLocation(false); setLocation(null); }} className="p-0.5 rounded hover:bg-muted">
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                </div>
+                <LocationPicker value={location} onChange={setLocation} showLabel={false} />
               </div>
             )}
 

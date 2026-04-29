@@ -931,6 +931,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.noUsers': 'No users found',
     'messages.noConversations': 'No conversations',
     'messages.startChat': 'Start a chat',
+    'location.label': 'Location',
+    'location.placeholder': 'Search a city or address…',
+    'location.useCurrent': 'Use my current location',
   },
 
   fr: {
@@ -1850,6 +1853,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.noUsers': 'Aucun utilisateur trouvé',
     'messages.noConversations': 'Aucune conversation',
     'messages.startChat': 'Commencer une discussion',
+    'location.label': 'Localisation',
+    'location.placeholder': 'Rechercher une ville ou une adresse…',
+    'location.useCurrent': 'Utiliser ma position actuelle',
   },
 
   ru: {
@@ -2775,5 +2781,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'messages.noUsers': 'Пользователи не найдены',
     'messages.noConversations': 'Нет диалогов',
     'messages.startChat': 'Начать чат',
+    'location.label': 'Местоположение',
+    'location.placeholder': 'Найти город или адрес…',
+    'location.useCurrent': 'Использовать моё местоположение',
   },
 };

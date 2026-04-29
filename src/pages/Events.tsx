@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
 import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
 import { useYatCategories } from '@/hooks/useYatCategories';
+import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
 const thematicCategories = [
   { name: 'Спорт / Sport', subcategories: sportCategories.map(s => s.name) },
@@ -67,7 +68,7 @@ const Events: React.FC = () => {
 
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
-  const [newLocation, setNewLocation] = useState('');
+  const [newLocation, setNewLocation] = useState<LocationValue | null>(null);
   const [newStartDate, setNewStartDate] = useState('');
   const [newEndDate, setNewEndDate] = useState('');
   const [newCapacity, setNewCapacity] = useState('');
@@ -123,7 +124,10 @@ const Events: React.FC = () => {
     if (!newTitle || !newStartDate || !newEndDate) { toast.error(t('events.fillRequired')); return; }
 
     const { error } = await supabase.from('events').insert({
-      title: newTitle, description: newDescription, location: newLocation,
+      title: newTitle, description: newDescription,
+      location: newLocation?.address || null,
+      latitude: newLocation?.latitude ?? null,
+      longitude: newLocation?.longitude ?? null,
       start_date: newStartDate, end_date: newEndDate,
       capacity: newCapacity ? parseInt(newCapacity) : null,
       is_virtual: newIsVirtual, organizer_id: userId,
@@ -134,7 +138,7 @@ const Events: React.FC = () => {
     else {
       toast.success(t('events.created'));
       setCreateOpen(false);
-      setNewTitle(''); setNewDescription(''); setNewLocation('');
+      setNewTitle(''); setNewDescription(''); setNewLocation(null);
       setNewStartDate(''); setNewEndDate(''); setNewCapacity('');
       setNewCategoryId(null);
       fetchEvents();
@@ -170,7 +174,7 @@ const Events: React.FC = () => {
                 <div className="space-y-3">
                   <Input placeholder={t('events.eventName')} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                   <Textarea placeholder={t('events.description')} value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
-                  <Input placeholder={t('events.location')} value={newLocation} onChange={e => setNewLocation(e.target.value)} />
+                  <LocationPicker value={newLocation} onChange={setNewLocation} placeholder={t('events.location')} />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('events.start')}</label>
