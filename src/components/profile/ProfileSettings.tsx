@@ -9,12 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Settings, Lock, Bell, Eye, LogOut, Trash2 } from "lucide-react";
+import { Settings, Lock, Bell, Eye, LogOut, Trash2, MapPin } from "lucide-react";
+import { LocationPicker, LocationValue } from "@/components/location/LocationPicker";
 
 interface Profile {
   id: string;
   name: string;
   email: string;
+  location?: string | null;
+  city?: string | null;
+  country?: string | null;
 }
 
 interface ProfileSettingsProps {
@@ -23,6 +27,11 @@ interface ProfileSettingsProps {
 }
 
 export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => {
+  const initialLocation: LocationValue | null = profile.location || profile.city || profile.country
+    ? { address: profile.location || [profile.city, profile.country].filter(Boolean).join(', '), city: profile.city ?? undefined, country: profile.country ?? undefined }
+    : null;
+  const [location, setLocation] = useState<LocationValue | null>(initialLocation);
+  const [savingLocation, setSavingLocation] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
