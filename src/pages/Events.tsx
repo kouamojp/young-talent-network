@@ -12,9 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { countries } from '@/data/countries';
 import { sportCategories } from '@/data/sportCategories';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
+import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
+import { useYatCategories } from '@/hooks/useYatCategories';
 
 const thematicCategories = [
   { name: 'Спорт / Sport', subcategories: sportCategories.map(s => s.name) },
