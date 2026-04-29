@@ -23,12 +23,27 @@ const Authentication: React.FC = () => {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [bioText, setBioText] = useState('');
+  const [suggestedCategoryIds, setSuggestedCategoryIds] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/profile');
     });
   }, [navigate]);
+
+  // Debounced AI category suggestions based on bio/skills text
+  useEffect(() => {
+    const text = bioText.trim();
+    if (text.length < 8) { setSuggestedCategoryIds([]); return; }
+    const handle = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('suggest-categories', { body: { text } });
+        if (!error && data?.suggestions) setSuggestedCategoryIds(data.suggestions);
+      } catch (e) { /* ignore */ }
+    }, 700);
+    return () => clearTimeout(handle);
+  }, [bioText]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
