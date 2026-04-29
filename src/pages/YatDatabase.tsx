@@ -12,7 +12,9 @@ import {
   Map, Coins, ShoppingBag, Globe, X
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
+import { useYatCategories } from '@/hooks/useYatCategories';
 
 type ParticipantType = 'all' | 'talent' | 'agent' | 'organization';
 
@@ -45,14 +47,27 @@ const sectionOptions = [
 ];
 
 const YatDatabase: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const { categories } = useYatCategories();
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<ParticipantType>('all');
   const [sectionFilter, setSectionFilter] = useState<string>('all');
   const [countryFilter, setCountryFilter] = useState('');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [subcategoryId, setSubcategoryId] = useState<string | null>(null);
   const [results, setResults] = useState<ParticipantResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [stats, setStats] = useState({ talents: 0, agents: 0, organizations: 0 });
+
+  // Initialize from ?category=slug
+  useEffect(() => {
+    const slug = searchParams.get('category');
+    if (slug && categories.length > 0) {
+      const found = categories.find((c) => c.slug === slug);
+      if (found) setCategoryId(found.id);
+    }
+  }, [searchParams, categories]);
 
   // Load stats on mount
   useEffect(() => {
