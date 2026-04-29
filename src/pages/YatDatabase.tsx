@@ -304,6 +304,13 @@ const YatDatabase: React.FC = () => {
               </Button>
             </div>
 
+            <CategorySearchFilter
+              category={categoryId}
+              subcategory={subcategoryId}
+              onCategoryChange={setCategoryId}
+              onSubcategoryChange={setSubcategoryId}
+            />
+
             <div className="flex flex-wrap gap-2 items-center">
               <span className="text-xs font-medium text-muted-foreground">Type:</span>
               {(['all', 'talent', 'agent', 'organization'] as const).map(t => (
