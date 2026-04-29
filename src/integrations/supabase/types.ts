@@ -1684,6 +1684,122 @@ export type Database = {
           },
         ]
       }
+      user_yat_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          subcategory_id: string | null
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          subcategory_id?: string | null
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          subcategory_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_yat_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "yat_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_yat_categories_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "yat_subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      yat_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          name_en: string
+          name_fr: string
+          name_ru: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_en: string
+          name_fr: string
+          name_ru: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name_en?: string
+          name_fr?: string
+          name_ru?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      yat_subcategories: {
+        Row: {
+          category_id: string
+          created_at: string
+          id: string
+          name_en: string
+          name_fr: string
+          name_ru: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          id?: string
+          name_en: string
+          name_fr: string
+          name_ru: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          id?: string
+          name_en?: string
+          name_fr?: string
+          name_ru?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yat_subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "yat_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
