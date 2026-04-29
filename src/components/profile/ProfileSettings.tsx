@@ -93,8 +93,46 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
     navigate("/auth");
   };
 
+  const handleSaveLocation = async () => {
+    setSavingLocation(true);
+    try {
+      const updates = {
+        location: location?.address ?? null,
+        city: location?.city ?? null,
+        country: location?.country ?? null,
+      };
+      const { error } = await supabase.from('profiles').update(updates).eq('id', profile.id);
+      if (error) throw error;
+      onUpdate(updates as Partial<Profile>);
+      toast({ title: "Succès", description: "Localisation mise à jour" });
+    } catch (e: any) {
+      toast({ title: "Erreur", description: e.message, variant: "destructive" });
+    } finally {
+      setSavingLocation(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Location */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Localisation
+          </CardTitle>
+          <CardDescription>
+            Votre localisation est synchronisée avec tous les services YAT (Karta, Events, Work, Marketplace…)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <LocationPicker value={location} onChange={setLocation} />
+          <Button onClick={handleSaveLocation} disabled={savingLocation}>
+            {savingLocation ? 'Enregistrement…' : 'Enregistrer la localisation'}
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Security Settings */}
       <Card>
         <CardHeader>
