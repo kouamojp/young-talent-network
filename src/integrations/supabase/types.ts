@@ -597,6 +597,7 @@ export type Database = {
         Row: {
           attendees_count: number | null
           capacity: number | null
+          category_id: string | null
           created_at: string
           description: string | null
           end_date: string
@@ -608,12 +609,14 @@ export type Database = {
           longitude: number | null
           organizer_id: string
           start_date: string
+          subcategory_id: string | null
           title: string
           updated_at: string
         }
         Insert: {
           attendees_count?: number | null
           capacity?: number | null
+          category_id?: string | null
           created_at?: string
           description?: string | null
           end_date: string
@@ -625,12 +628,14 @@ export type Database = {
           longitude?: number | null
           organizer_id: string
           start_date: string
+          subcategory_id?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           attendees_count?: number | null
           capacity?: number | null
+          category_id?: string | null
           created_at?: string
           description?: string | null
           end_date?: string
@@ -642,15 +647,30 @@ export type Database = {
           longitude?: number | null
           organizer_id?: string
           start_date?: string
+          subcategory_id?: string | null
           title?: string
           updated_at?: string
         }
         Relationships: [
           {
+            foreignKeyName: "events_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "yat_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "events_organizer_id_fkey"
             columns: ["organizer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "yat_subcategories"
             referencedColumns: ["id"]
           },
         ]
