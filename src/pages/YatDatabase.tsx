@@ -92,6 +92,20 @@ const YatDatabase: React.FC = () => {
     try {
       const allResults: ParticipantResult[] = [];
 
+      // If category filter active, pre-fetch user_ids matching that category
+      let userIdsByCategory: string[] | null = null;
+      if (categoryId) {
+        let q = supabase.from('user_yat_categories').select('user_id').eq('category_id', categoryId);
+        if (subcategoryId) q = q.eq('subcategory_id', subcategoryId);
+        const { data } = await q;
+        userIdsByCategory = (data || []).map((r: any) => r.user_id);
+        if (userIdsByCategory.length === 0) {
+          setResults([]);
+          setLoading(false);
+          return;
+        }
+      }
+
       // Fetch talents & agents from profiles
       if (typeFilter === 'all' || typeFilter === 'talent' || typeFilter === 'agent') {
         let profileQuery = supabase
@@ -101,6 +115,8 @@ const YatDatabase: React.FC = () => {
         if (typeFilter === 'talent') profileQuery = profileQuery.eq('user_type', 'talent');
         else if (typeFilter === 'agent') profileQuery = profileQuery.eq('user_type', 'agent');
         else profileQuery = profileQuery.in('user_type', ['talent', 'agent']);
+
+        if (userIdsByCategory) profileQuery = profileQuery.in('id', userIdsByCategory);
 
         if (query.trim()) {
           profileQuery = profileQuery.or(`name.ilike.%${query}%,bio.ilike.%${query}%,sport_type.ilike.%${query}%`);
@@ -112,7 +128,6 @@ const YatDatabase: React.FC = () => {
         const { data: profiles } = await profileQuery.limit(50).order('platform_rating', { ascending: false });
 
         if (profiles?.length) {
-          // Get presence sections for these users
           const ids = profiles.map(p => p.id);
           const { data: presenceData } = await supabase
             .from('talent_presence')
@@ -150,7 +165,7 @@ const YatDatabase: React.FC = () => {
       }
 
       // Fetch organizations
-      if (typeFilter === 'all' || typeFilter === 'organization') {
+      if ((typeFilter === 'all' || typeFilter === 'organization') && !categoryId) {
         let orgQuery = supabase
           .from('organization_profiles')
           .select('id, user_id, company_name, description, industry, headquarters, logo_url, verified');
@@ -166,7 +181,7 @@ const YatDatabase: React.FC = () => {
 
         if (orgs?.length) {
           for (const o of orgs) {
-            if (sectionFilter !== 'all') continue; // orgs don't have section presence
+            if (sectionFilter !== 'all') continue;
             allResults.push({
               id: o.id,
               name: o.company_name,
@@ -197,7 +212,8 @@ const YatDatabase: React.FC = () => {
   // Auto-search on filter change
   useEffect(() => {
     handleSearch();
-  }, [typeFilter, sectionFilter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeFilter, sectionFilter, categoryId, subcategoryId]);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
