@@ -52,11 +52,14 @@ interface EventItem {
 const Events: React.FC = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { categories } = useYatCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [subcategoryId, setSubcategoryId] = useState<string | null>(null);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
@@ -69,6 +72,25 @@ const Events: React.FC = () => {
   const [newEndDate, setNewEndDate] = useState('');
   const [newCapacity, setNewCapacity] = useState('');
   const [newIsVirtual, setNewIsVirtual] = useState(false);
+  const [newCategoryId, setNewCategoryId] = useState<string | null>(null);
+
+  // Sync from ?category=slug on mount/categories load
+  useEffect(() => {
+    const slug = searchParams.get('category');
+    if (slug && categories.length > 0) {
+      const found = categories.find((c) => c.slug === slug);
+      if (found && found.id !== categoryId) setCategoryId(found.id);
+    }
+    if (!slug && categoryId) setCategoryId(null);
+  }, [searchParams, categories]);
+
+  // Sync category state -> URL
+  useEffect(() => {
+    const slug = categoryId ? categories.find((c) => c.id === categoryId)?.slug : null;
+    const next = new URLSearchParams(searchParams);
+    if (slug) next.set('category', slug); else next.delete('category');
+    if (next.toString() !== searchParams.toString()) setSearchParams(next, { replace: true });
+  }, [categoryId, categories]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || null));
@@ -86,13 +108,15 @@ const Events: React.FC = () => {
 
     if (searchQuery.trim()) q = q.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
     if (regionFilter && regionFilter !== 'all') q = q.ilike('location', `%${regionFilter}%`);
+    if (categoryId) q = q.eq('category_id', categoryId);
+    if (subcategoryId) q = q.eq('subcategory_id', subcategoryId);
 
     const { data } = await q.limit(50);
     setEvents(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchEvents(); }, [activeTab, searchQuery, regionFilter]);
+  useEffect(() => { fetchEvents(); }, [activeTab, searchQuery, regionFilter, categoryId, subcategoryId]);
 
   const handleCreateEvent = async () => {
     if (!userId) { toast.error(t('events.loginRequired')); return; }
