@@ -12,6 +12,7 @@ import { Facebook, Users, Building, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
+import CategoryPicker from '@/components/categories/CategoryPicker';
 
 const Authentication: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const Authentication: React.FC = () => {
   const [userType, setUserType] = useState<'talent' | 'organization' | 'agent'>('talent');
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -90,6 +92,11 @@ const Authentication: React.FC = () => {
       });
       if (error) throw error;
       if (data.user) {
+        // Save selected categories
+        if (selectedCategories.length > 0) {
+          const rows = selectedCategories.map((category_id) => ({ user_id: data.user!.id, category_id }));
+          await supabase.from('user_yat_categories').insert(rows);
+        }
         toast({ title: t('auth.accountCreated'), description: t('auth.accountCreatedDesc') });
         navigate('/profile');
       }
@@ -247,6 +254,10 @@ const Authentication: React.FC = () => {
                   <div className="space-y-2">
                     <Label htmlFor="reg-password">{t('auth.password')}</Label>
                     <Input id="reg-password" name="password" type="password" required autoComplete="new-password" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('categories.yourCategories') || 'Your categories'}</Label>
+                    <CategoryPicker selected={selectedCategories} onChange={setSelectedCategories} max={3} />
                   </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
                     {getCreateButtonText()}

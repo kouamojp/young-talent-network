@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { allSections } from './sidebarData';
 import { MenuSectionItem } from './types';
 import { Separator } from '@/components/ui/separator';
+import SidebarCategories from './SidebarCategories';
 
 interface SidebarMainProps {
   onNavigate?: () => void;
@@ -89,6 +90,7 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
             </div>
           </div>
         ))}
+        <SidebarCategories onNavigate={onNavigate} />
       </nav>
     </aside>
   );
