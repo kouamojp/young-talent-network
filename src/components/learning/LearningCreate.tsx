@@ -314,6 +314,7 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
           </Button>
         </div>
       </form>
+      </Form>
     </div>
   );
 };
