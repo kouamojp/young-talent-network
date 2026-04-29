@@ -954,6 +954,99 @@ export type Database = {
           },
         ]
       }
+      page_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          page_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          page_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          page_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      page_likes: {
+        Row: {
+          created_at: string
+          id: string
+          page_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          page_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          page_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      post_drafts: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string
+          draft_type: string
+          id: string
+          media_urls: string[] | null
+          poll_options: string[] | null
+          poll_question: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          visibility: string
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          draft_type?: string
+          id?: string
+          media_urls?: string[] | null
+          poll_options?: string[] | null
+          poll_question?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          visibility?: string
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          draft_type?: string
+          id?: string
+          media_urls?: string[] | null
+          poll_options?: string[] | null
+          poll_question?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+        }
+        Relationships: []
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -998,8 +1091,10 @@ export type Database = {
           id: string
           likes_count: number | null
           media_urls: string[] | null
+          share_token: string | null
           updated_at: string
           user_id: string
+          visibility: string
         }
         Insert: {
           comments_count?: number | null
@@ -1008,8 +1103,10 @@ export type Database = {
           id?: string
           likes_count?: number | null
           media_urls?: string[] | null
+          share_token?: string | null
           updated_at?: string
           user_id: string
+          visibility?: string
         }
         Update: {
           comments_count?: number | null
@@ -1018,8 +1115,10 @@ export type Database = {
           id?: string
           likes_count?: number | null
           media_urls?: string[] | null
+          share_token?: string | null
           updated_at?: string
           user_id?: string
+          visibility?: string
         }
         Relationships: [
           {
@@ -1487,33 +1586,45 @@ export type Database = {
       user_pages: {
         Row: {
           category: string | null
+          comments_count: number
           content: string | null
           created_at: string
           id: string
           is_public: boolean | null
+          likes_count: number
+          share_token: string | null
           title: string
           updated_at: string
           user_id: string
+          visibility: string
         }
         Insert: {
           category?: string | null
+          comments_count?: number
           content?: string | null
           created_at?: string
           id?: string
           is_public?: boolean | null
+          likes_count?: number
+          share_token?: string | null
           title: string
           updated_at?: string
           user_id: string
+          visibility?: string
         }
         Update: {
           category?: string | null
+          comments_count?: number
           content?: string | null
           created_at?: string
           id?: string
           is_public?: boolean | null
+          likes_count?: number
+          share_token?: string | null
           title?: string
           updated_at?: string
           user_id?: string
+          visibility?: string
         }
         Relationships: []
       }

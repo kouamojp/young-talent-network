@@ -39,6 +39,7 @@ import Install from "./pages/Install";
 import SettingsPage from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
+import Article from "./pages/Article";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -104,6 +105,7 @@ const App = () => {
                 <Route path="/install" element={<Install />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/friends" element={<Friends />} />
+                <Route path="/article/:id" element={<Article />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
