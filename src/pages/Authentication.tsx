@@ -23,12 +23,27 @@ const Authentication: React.FC = () => {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [bioText, setBioText] = useState('');
+  const [suggestedCategoryIds, setSuggestedCategoryIds] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) navigate('/profile');
     });
   }, [navigate]);
+
+  // Debounced AI category suggestions based on bio/skills text
+  useEffect(() => {
+    const text = bioText.trim();
+    if (text.length < 8) { setSuggestedCategoryIds([]); return; }
+    const handle = setTimeout(async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('suggest-categories', { body: { text } });
+        if (!error && data?.suggestions) setSuggestedCategoryIds(data.suggestions);
+      } catch (e) { /* ignore */ }
+    }, 700);
+    return () => clearTimeout(handle);
+  }, [bioText]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -256,8 +271,24 @@ const Authentication: React.FC = () => {
                     <Input id="reg-password" name="password" type="password" required autoComplete="new-password" />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="reg-bio">{t('auth.skillsBio') || 'Your skills / bio'}</Label>
+                    <textarea
+                      id="reg-bio"
+                      rows={2}
+                      value={bioText}
+                      onChange={(e) => setBioText(e.target.value)}
+                      placeholder={t('auth.skillsBioPlaceholder') || 'Describe your skills (e.g. football coach, web developer, jazz singer)'}
+                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    />
+                  </div>
+                  <div className="space-y-2">
                     <Label>{t('categories.yourCategories') || 'Your categories'}</Label>
-                    <CategoryPicker selected={selectedCategories} onChange={setSelectedCategories} max={3} />
+                    <CategoryPicker
+                      selected={selectedCategories}
+                      onChange={setSelectedCategories}
+                      max={3}
+                      suggestions={suggestedCategoryIds}
+                    />
                   </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
                     {getCreateButtonText()}

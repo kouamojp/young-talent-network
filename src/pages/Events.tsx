@@ -12,9 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { countries } from '@/data/countries';
 import { sportCategories } from '@/data/sportCategories';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
+import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
+import { useYatCategories } from '@/hooks/useYatCategories';
 
 const thematicCategories = [
   { name: 'Спорт / Sport', subcategories: sportCategories.map(s => s.name) },
@@ -50,11 +52,14 @@ interface EventItem {
 const Events: React.FC = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
+  const { categories } = useYatCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('upcoming');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [regionFilter, setRegionFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [subcategoryId, setSubcategoryId] = useState<string | null>(null);
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
@@ -67,6 +72,25 @@ const Events: React.FC = () => {
   const [newEndDate, setNewEndDate] = useState('');
   const [newCapacity, setNewCapacity] = useState('');
   const [newIsVirtual, setNewIsVirtual] = useState(false);
+  const [newCategoryId, setNewCategoryId] = useState<string | null>(null);
+
+  // Sync from ?category=slug on mount/categories load
+  useEffect(() => {
+    const slug = searchParams.get('category');
+    if (slug && categories.length > 0) {
+      const found = categories.find((c) => c.slug === slug);
+      if (found && found.id !== categoryId) setCategoryId(found.id);
+    }
+    if (!slug && categoryId) setCategoryId(null);
+  }, [searchParams, categories]);
+
+  // Sync category state -> URL
+  useEffect(() => {
+    const slug = categoryId ? categories.find((c) => c.id === categoryId)?.slug : null;
+    const next = new URLSearchParams(searchParams);
+    if (slug) next.set('category', slug); else next.delete('category');
+    if (next.toString() !== searchParams.toString()) setSearchParams(next, { replace: true });
+  }, [categoryId, categories]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id || null));
@@ -84,13 +108,15 @@ const Events: React.FC = () => {
 
     if (searchQuery.trim()) q = q.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
     if (regionFilter && regionFilter !== 'all') q = q.ilike('location', `%${regionFilter}%`);
+    if (categoryId) q = q.eq('category_id', categoryId);
+    if (subcategoryId) q = q.eq('subcategory_id', subcategoryId);
 
     const { data } = await q.limit(50);
     setEvents(data || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchEvents(); }, [activeTab, searchQuery, regionFilter]);
+  useEffect(() => { fetchEvents(); }, [activeTab, searchQuery, regionFilter, categoryId, subcategoryId]);
 
   const handleCreateEvent = async () => {
     if (!userId) { toast.error(t('events.loginRequired')); return; }
@@ -101,6 +127,7 @@ const Events: React.FC = () => {
       start_date: newStartDate, end_date: newEndDate,
       capacity: newCapacity ? parseInt(newCapacity) : null,
       is_virtual: newIsVirtual, organizer_id: userId,
+      category_id: newCategoryId,
     });
 
     if (error) toast.error(error.message);
@@ -109,6 +136,7 @@ const Events: React.FC = () => {
       setCreateOpen(false);
       setNewTitle(''); setNewDescription(''); setNewLocation('');
       setNewStartDate(''); setNewEndDate(''); setNewCapacity('');
+      setNewCategoryId(null);
       fetchEvents();
     }
   };
@@ -158,10 +186,15 @@ const Events: React.FC = () => {
                     <input type="checkbox" id="virtual" checked={newIsVirtual} onChange={e => setNewIsVirtual(e.target.checked)} />
                     <label htmlFor="virtual" className="text-sm">{t('events.online')}</label>
                   </div>
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <Select value={newCategoryId ?? '__none__'} onValueChange={(v) => setNewCategoryId(v === '__none__' ? null : v)}>
                     <SelectTrigger className="text-xs"><SelectValue placeholder={t('events.category')} /></SelectTrigger>
                     <SelectContent>
-                      {thematicCategories.map(c => (<SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>))}
+                      <SelectItem value="__none__">{t('events.allCategories') || 'No category'}</SelectItem>
+                      {categories.map(c => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {language === 'fr' ? c.name_fr : language === 'ru' ? c.name_ru : c.name_en}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <Button onClick={handleCreateEvent} className="w-full">{t('events.create')}</Button>
@@ -179,21 +212,22 @@ const Events: React.FC = () => {
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              <Select value={regionFilter} onValueChange={setRegionFilter}>
-                <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('events.region')} /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('events.all')}</SelectItem>
-                  {countries.map(c => (<SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>))}
-                </SelectContent>
-              </Select>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('events.category')} /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('events.allCategories')}</SelectItem>
-                  {thematicCategories.map(c => (<SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>))}
-                </SelectContent>
-              </Select>
+            <div className="mt-3 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Select value={regionFilter} onValueChange={setRegionFilter}>
+                  <SelectTrigger className="text-xs h-9"><SelectValue placeholder={t('events.region')} /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('events.all')}</SelectItem>
+                    {countries.map(c => (<SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+                <CategorySearchFilter
+                  category={categoryId}
+                  subcategory={subcategoryId}
+                  onCategoryChange={setCategoryId}
+                  onSubcategoryChange={setSubcategoryId}
+                />
+              </div>
             </div>
           )}
         </div>
