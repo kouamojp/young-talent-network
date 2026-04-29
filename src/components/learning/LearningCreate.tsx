@@ -46,6 +46,7 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
         </h1>
       </div>
       
+      <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="bg-white/60 p-6 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">1. Basic Information</h2>
@@ -313,6 +314,7 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
           </Button>
         </div>
       </form>
+      </Form>
     </div>
   );
 };
