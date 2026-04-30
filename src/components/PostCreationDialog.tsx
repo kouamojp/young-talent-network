@@ -36,6 +36,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [drafts, setDrafts] = useState<any[]>([]);
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [articleTitle, setArticleTitle] = useState('');
