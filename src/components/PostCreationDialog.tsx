@@ -250,7 +250,15 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
               <div key={d.id} className="flex items-center justify-between gap-2 p-2 hover:bg-muted rounded">
                 <button onClick={() => loadDraft(d)} className="flex-1 text-left text-sm">
                   <div className="font-medium truncate">{d.title || d.content?.slice(0, 50) || d.poll_question || '(empty)'}</div>
-                  <div className="text-xs text-muted-foreground">{d.draft_type} · {new Date(d.updated_at).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    {d.draft_type} · {new Date(d.updated_at).toLocaleString()}
+                    {d.scheduled_for && (
+                      <span className="inline-flex items-center gap-0.5 text-primary ml-1">
+                        <Clock className="h-3 w-3" />
+                        {new Date(d.scheduled_for).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
                 </button>
                 <Button variant="ghost" size="icon" onClick={() => deleteDraft(d.id)}>
                   <X className="h-4 w-4" />
