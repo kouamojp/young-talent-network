@@ -1032,6 +1032,7 @@ export type Database = {
           media_urls: string[] | null
           poll_options: string[] | null
           poll_question: string | null
+          scheduled_for: string | null
           title: string | null
           updated_at: string
           user_id: string
@@ -1046,6 +1047,7 @@ export type Database = {
           media_urls?: string[] | null
           poll_options?: string[] | null
           poll_question?: string | null
+          scheduled_for?: string | null
           title?: string | null
           updated_at?: string
           user_id: string
@@ -1060,6 +1062,7 @@ export type Database = {
           media_urls?: string[] | null
           poll_options?: string[] | null
           poll_question?: string | null
+          scheduled_for?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string

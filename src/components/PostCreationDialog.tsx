@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock } from 'lucide-react';
+import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
@@ -36,6 +36,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [drafts, setDrafts] = useState<any[]>([]);
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [articleTitle, setArticleTitle] = useState('');
@@ -63,6 +64,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setPollQuestion(''); setPollOptions(['', '']);
     setTab('post'); setVisibility('public');
     setActiveDraftId(null); setShowDrafts(false);
+    setScheduledFor('');
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +111,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       visibility,
       poll_question: tab === 'poll' ? pollQuestion : null,
       poll_options: tab === 'poll' ? pollOptions.filter(o => o.trim()) : null,
+      scheduled_for: scheduledFor ? new Date(scheduledFor).toISOString() : null,
     };
     try {
       if (activeDraftId) {
@@ -134,7 +137,9 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setArticleCategory(d.category || '');
     setPollQuestion(d.poll_question || '');
     setPollOptions(d.poll_options?.length ? d.poll_options : ['', '']);
+    setScheduledFor(d.scheduled_for ? new Date(d.scheduled_for).toISOString().slice(0, 16) : '');
     setShowDrafts(false);
+    toast({ title: t('post.draftLoaded') || 'Draft loaded — edit and update', });
   };
 
   const deleteDraft = async (id: string) => {
@@ -245,7 +250,15 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
               <div key={d.id} className="flex items-center justify-between gap-2 p-2 hover:bg-muted rounded">
                 <button onClick={() => loadDraft(d)} className="flex-1 text-left text-sm">
                   <div className="font-medium truncate">{d.title || d.content?.slice(0, 50) || d.poll_question || '(empty)'}</div>
-                  <div className="text-xs text-muted-foreground">{d.draft_type} · {new Date(d.updated_at).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    {d.draft_type} · {new Date(d.updated_at).toLocaleString()}
+                    {d.scheduled_for && (
+                      <span className="inline-flex items-center gap-0.5 text-primary ml-1">
+                        <Clock className="h-3 w-3" />
+                        {new Date(d.scheduled_for).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
                 </button>
                 <Button variant="ghost" size="icon" onClick={() => deleteDraft(d.id)}>
                   <X className="h-4 w-4" />
@@ -364,14 +377,42 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           </TabsContent>
         </Tabs>
 
+        {(tab === 'post' || tab === 'article') && (
+          <div className="flex items-center gap-2 border rounded-lg p-2 mt-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <label className="text-xs text-muted-foreground whitespace-nowrap">
+              {t('post.scheduleFor') || 'Schedule for'}:
+            </label>
+            <Input
+              type="datetime-local"
+              value={scheduledFor}
+              onChange={(e) => setScheduledFor(e.target.value)}
+              className="h-8 text-xs flex-1"
+              min={new Date().toISOString().slice(0, 16)}
+            />
+            {scheduledFor && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setScheduledFor('')}>
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
+
+        {activeDraftId && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded p-2">
+            <Edit3 className="h-3 w-3" />
+            <span>{t('post.editingDraft') || 'Editing draft'}</span>
+          </div>
+        )}
+
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="outline" onClick={saveDraft} disabled={isSubmitting}>
             <Save className="h-4 w-4 mr-1" />
-            {t('post.saveDraft') || 'Save draft'}
+            {activeDraftId ? (t('post.updateDraft') || 'Update draft') : (t('post.saveDraft') || 'Save draft')}
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t('create.post') || 'Publish'}
+            {scheduledFor ? (t('post.schedule') || 'Schedule') : (t('create.post') || 'Publish')}
           </Button>
         </div>
       </DialogContent>
