@@ -7,33 +7,74 @@ import { Textarea } from '@/components/ui/textarea';
 import { ThumbsUp, MessageSquare, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const Article: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [page, setPage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [animateLike, setAnimateLike] = useState(false);
 
   useEffect(() => { if (id) load(); }, [id]);
+
+  // Realtime subscriptions for likes and comments
+  useEffect(() => {
+    if (!id) return;
+
+    const likesChannel = supabase
+      .channel(`page-likes-${id}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'page_likes', filter: `page_id=eq.${id}` },
+        async () => {
+          const { count } = await supabase
+            .from('page_likes')
+            .select('id', { count: 'exact', head: true })
+            .eq('page_id', id);
+          if (typeof count === 'number') setLikesCount(count);
+        }
+      )
+      .subscribe();
+
+    const commentsChannel = supabase
+      .channel(`page-comments-${id}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'page_comments', filter: `page_id=eq.${id}` },
+        () => loadComments()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(likesChannel);
+      supabase.removeChannel(commentsChannel);
+    };
+  }, [id]);
+
+  const loadComments = async () => {
+    const { data: cs } = await supabase.from('page_comments').select('*').eq('page_id', id!).order('created_at');
+    const userIds = [...new Set((cs || []).map((c: any) => c.user_id))];
+    if (userIds.length === 0) { setComments([]); return; }
+    const { data: profs } = await supabase.from('profiles').select('id,name,avatar_url').in('id', userIds);
+    const profMap = new Map((profs || []).map((p: any) => [p.id, p]));
+    setComments((cs || []).map((c: any) => ({ ...c, profile: profMap.get(c.user_id) })));
+  };
 
   const load = async () => {
     setLoading(true);
     const { data } = await supabase.from('user_pages').select('*').eq('id', id!).single();
     setPage(data);
     if (data) {
+      setLikesCount(data.likes_count || 0);
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: like } = await supabase.from('page_likes').select('id').eq('page_id', data.id).eq('user_id', user.id).maybeSingle();
         setIsLiked(!!like);
       }
-      const { data: cs } = await supabase.from('page_comments').select('*').eq('page_id', data.id).order('created_at');
-      const userIds = [...new Set((cs || []).map((c: any) => c.user_id))];
-      const { data: profs } = await supabase.from('profiles').select('id,name,avatar_url').in('id', userIds);
-      const profMap = new Map((profs || []).map((p: any) => [p.id, p]));
-      setComments((cs || []).map((c: any) => ({ ...c, profile: profMap.get(c.user_id) })));
+      await loadComments();
     }
     setLoading(false);
   };
@@ -41,14 +82,20 @@ const Article: React.FC = () => {
   const toggleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast({ title: 'Please log in', variant: 'destructive' }); return; }
-    if (isLiked) {
-      await supabase.from('page_likes').delete().eq('page_id', page.id).eq('user_id', user.id);
-      setIsLiked(false);
-      setPage((p: any) => ({ ...p, likes_count: Math.max((p.likes_count || 1) - 1, 0) }));
+
+    // Optimistic update
+    const wasLiked = isLiked;
+    setIsLiked(!wasLiked);
+    setLikesCount(c => wasLiked ? Math.max(c - 1, 0) : c + 1);
+    setAnimateLike(true);
+    setTimeout(() => setAnimateLike(false), 300);
+
+    if (wasLiked) {
+      const { error } = await supabase.from('page_likes').delete().eq('page_id', page.id).eq('user_id', user.id);
+      if (error) { setIsLiked(true); setLikesCount(c => c + 1); toast({ title: 'Failed', variant: 'destructive' }); }
     } else {
-      await supabase.from('page_likes').insert({ page_id: page.id, user_id: user.id });
-      setIsLiked(true);
-      setPage((p: any) => ({ ...p, likes_count: (p.likes_count || 0) + 1 }));
+      const { error } = await supabase.from('page_likes').insert({ page_id: page.id, user_id: user.id });
+      if (error) { setIsLiked(false); setLikesCount(c => Math.max(c - 1, 0)); toast({ title: 'Failed', variant: 'destructive' }); }
     }
   };
 
@@ -58,7 +105,8 @@ const Article: React.FC = () => {
     if (!user) { toast({ title: 'Please log in', variant: 'destructive' }); return; }
     setSubmitting(true);
     const { error } = await supabase.from('page_comments').insert({ page_id: page.id, user_id: user.id, content: newComment.trim() });
-    if (!error) { setNewComment(''); load(); }
+    if (!error) { setNewComment(''); }
+    else toast({ title: 'Failed to post comment', variant: 'destructive' });
     setSubmitting(false);
   };
 
@@ -72,25 +120,31 @@ const Article: React.FC = () => {
       <div className="prose prose-sm max-w-none whitespace-pre-wrap mb-8">{page.content}</div>
 
       <div className="flex items-center gap-2 border-t border-b py-3 mb-6">
-        <Button variant="ghost" size="sm" onClick={toggleLike}>
-          <ThumbsUp className={`h-5 w-5 mr-2 ${isLiked ? 'fill-primary text-primary' : ''}`} />
-          {page.likes_count || 0}
+        <Button
+          variant={isLiked ? 'default' : 'ghost'}
+          size="sm"
+          onClick={toggleLike}
+          className={cn('transition-all', animateLike && 'scale-110')}
+          aria-pressed={isLiked}
+        >
+          <ThumbsUp className={cn('h-5 w-5 mr-2 transition-transform', isLiked && 'fill-current')} />
+          <span className="tabular-nums">{likesCount}</span>
         </Button>
         <Button variant="ghost" size="sm">
           <MessageSquare className="h-5 w-5 mr-2" />
-          {page.comments_count || 0}
+          <span className="tabular-nums">{comments.length}</span>
         </Button>
       </div>
 
       <section>
-        <h2 className="font-semibold mb-3">Comments</h2>
+        <h2 className="font-semibold mb-3">Comments ({comments.length})</h2>
         <div className="flex gap-2 mb-4">
           <Textarea placeholder="Write a comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)} className="min-h-[60px]" />
           <Button onClick={submitComment} disabled={submitting || !newComment.trim()}>Post</Button>
         </div>
         <div className="space-y-3">
           {comments.map((c) => (
-            <div key={c.id} className="flex gap-2">
+            <div key={c.id} className="flex gap-2 animate-in fade-in slide-in-from-top-1">
               <Avatar className="h-8 w-8"><AvatarFallback>{c.profile?.name?.[0] || 'U'}</AvatarFallback></Avatar>
               <div className="flex-1 bg-muted rounded-lg p-2">
                 <p className="text-sm font-semibold">{c.profile?.name || 'User'}</p>
