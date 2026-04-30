@@ -137,7 +137,9 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setArticleCategory(d.category || '');
     setPollQuestion(d.poll_question || '');
     setPollOptions(d.poll_options?.length ? d.poll_options : ['', '']);
+    setScheduledFor(d.scheduled_for ? new Date(d.scheduled_for).toISOString().slice(0, 16) : '');
     setShowDrafts(false);
+    toast({ title: t('post.draftLoaded') || 'Draft loaded — edit and update', });
   };
 
   const deleteDraft = async (id: string) => {
