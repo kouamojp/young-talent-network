@@ -2,3 +2,6 @@ project_id = "ykklnxvfizmeepaqzkte"
 
 [functions.suggest-categories]
 verify_jwt = false
+
+[functions.seed-test-accounts]
+verify_jwt = false
