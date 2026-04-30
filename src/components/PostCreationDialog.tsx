@@ -111,6 +111,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       visibility,
       poll_question: tab === 'poll' ? pollQuestion : null,
       poll_options: tab === 'poll' ? pollOptions.filter(o => o.trim()) : null,
+      scheduled_for: scheduledFor ? new Date(scheduledFor).toISOString() : null,
     };
     try {
       if (activeDraftId) {
