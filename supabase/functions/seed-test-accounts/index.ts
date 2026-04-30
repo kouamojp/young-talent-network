@@ -29,16 +29,16 @@ Deno.serve(async (req) => {
       let user = list.users.find((u) => u.email === acc.email);
 
       if (!user) {
+        // Create with 'talent' to avoid trigger edge cases, then patch user_type after
         const { data, error } = await supabase.auth.admin.createUser({
           email: acc.email,
           password: acc.password,
           email_confirm: true,
-          user_metadata: { name: acc.name, user_type: acc.user_type },
+          user_metadata: { name: acc.name, user_type: "talent" },
         });
         if (error) { results.push({ email: acc.email, status: "error", error: error.message }); continue; }
         user = data.user!;
       } else {
-        // Reset password & confirm
         await supabase.auth.admin.updateUserById(user.id, {
           password: acc.password,
           email_confirm: true,
