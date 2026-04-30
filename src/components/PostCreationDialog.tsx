@@ -369,14 +369,42 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           </TabsContent>
         </Tabs>
 
+        {(tab === 'post' || tab === 'article') && (
+          <div className="flex items-center gap-2 border rounded-lg p-2 mt-2">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <label className="text-xs text-muted-foreground whitespace-nowrap">
+              {t('post.scheduleFor') || 'Schedule for'}:
+            </label>
+            <Input
+              type="datetime-local"
+              value={scheduledFor}
+              onChange={(e) => setScheduledFor(e.target.value)}
+              className="h-8 text-xs flex-1"
+              min={new Date().toISOString().slice(0, 16)}
+            />
+            {scheduledFor && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setScheduledFor('')}>
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        )}
+
+        {activeDraftId && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded p-2">
+            <Edit3 className="h-3 w-3" />
+            <span>{t('post.editingDraft') || 'Editing draft'}</span>
+          </div>
+        )}
+
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="outline" onClick={saveDraft} disabled={isSubmitting}>
             <Save className="h-4 w-4 mr-1" />
-            {t('post.saveDraft') || 'Save draft'}
+            {activeDraftId ? (t('post.updateDraft') || 'Update draft') : (t('post.saveDraft') || 'Save draft')}
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t('create.post') || 'Publish'}
+            {scheduledFor ? (t('post.schedule') || 'Schedule') : (t('create.post') || 'Publish')}
           </Button>
         </div>
       </DialogContent>
