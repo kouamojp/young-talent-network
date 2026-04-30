@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock } from 'lucide-react';
+import { import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
