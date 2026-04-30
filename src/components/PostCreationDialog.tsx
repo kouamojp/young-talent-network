@@ -64,6 +64,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setPollQuestion(''); setPollOptions(['', '']);
     setTab('post'); setVisibility('public');
     setActiveDraftId(null); setShowDrafts(false);
+    setScheduledFor('');
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
