@@ -107,6 +107,7 @@ const App = () => {
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/article/:id" element={<Article />} />
+                <Route path="/articles" element={<Articles />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
