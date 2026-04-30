@@ -22,6 +22,7 @@ import Learning from "./pages/Learning";
 import Live from "./pages/Live";
 import Search from "./pages/Search";
 import Authentication from "./pages/Authentication";
+import ResetPassword from "./pages/ResetPassword";
 import TalentsAroundMe from "./pages/TalentsAroundMe";
 import YatCoin from "./pages/YatCoin";
 import YatKarta from "./pages/YatKarta";
@@ -76,6 +77,7 @@ const App = () => {
                 <Route path="/feed" element={<Feed />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/auth" element={<Authentication />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/messages" element={<Messages />} />
                 <Route path="/calls" element={<Calls />} />
