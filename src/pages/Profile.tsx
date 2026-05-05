@@ -220,6 +220,8 @@ const Profile: React.FC = () => {
 
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
+          {userId && <ProfileSources userId={userId} />}
+
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
