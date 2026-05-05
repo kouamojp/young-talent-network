@@ -40,12 +40,12 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
   return (
     <Card className={`mb-6 border-2 ${isOpenToWork ? 'border-green-200 bg-green-50/50' : 'border-gray-200'}`}>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-3">
               <Briefcase className="h-5 w-5 text-purple-600" />
               <div className="flex items-center gap-2">
-                <span className="font-medium">Open to Work</span>
+                <span className="font-medium text-sm">Open to Work</span>
                 <Switch
                   checked={isOpenToWork}
                   onCheckedChange={onToggle}
@@ -54,9 +54,9 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
             </div>
 
             {isOpenToWork && (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <Select value={workStatus} onValueChange={onStatusChange}>
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
