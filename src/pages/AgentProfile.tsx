@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface AgentData {
   id: string;
@@ -65,6 +66,7 @@ interface OrgMembership {
 }
 
 const AgentProfile: React.FC = () => {
+  const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<AgentData | null>(null);
@@ -264,10 +266,10 @@ const AgentProfile: React.FC = () => {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="talents">Talents</TabsTrigger>
-            <TabsTrigger value="organizations">Organisations</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="overview">{t('agent.overview')}</TabsTrigger>
+            <TabsTrigger value="talents">{t('agent.talents')}</TabsTrigger>
+            <TabsTrigger value="organizations">{t('agent.organizations')}</TabsTrigger>
+            <TabsTrigger value="services">{t('agent.services')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">

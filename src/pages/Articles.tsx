@@ -8,11 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Loader2, ThumbsUp, MessageSquare, Search, Globe, Users, Link as LinkIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 type SortKey = 'recent' | 'oldest' | 'likes' | 'comments';
 type VisibilityFilter = 'all' | 'public' | 'friends' | 'link' | 'mine';
 
 const Articles: React.FC = () => {
+  const { t } = useLanguage();
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -76,15 +78,15 @@ const Articles: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto py-6 px-4">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Articles</h1>
-        <Badge variant="secondary">{filtered.length} results</Badge>
+        <h1 className="text-3xl font-bold">{t('articles.title')}</h1>
+        <Badge variant="secondary">{filtered.length} {t('common.results')}</Badge>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <div className="relative sm:col-span-2 lg:col-span-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search articles..."
+            placeholder={t('articles.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-8"
@@ -92,30 +94,30 @@ const Articles: React.FC = () => {
         </div>
 
         <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-          <SelectTrigger><SelectValue placeholder="Sort by" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t('common.sortBy')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="recent">Most recent</SelectItem>
-            <SelectItem value="oldest">Oldest first</SelectItem>
-            <SelectItem value="likes">Most liked</SelectItem>
-            <SelectItem value="comments">Most commented</SelectItem>
+            <SelectItem value="recent">{t('articles.mostRecent')}</SelectItem>
+            <SelectItem value="oldest">{t('articles.oldestFirst')}</SelectItem>
+            <SelectItem value="likes">{t('articles.mostLiked')}</SelectItem>
+            <SelectItem value="comments">{t('articles.mostCommented')}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={visibilityFilter} onValueChange={(v) => setVisibilityFilter(v as VisibilityFilter)}>
-          <SelectTrigger><SelectValue placeholder="Visibility" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t('common.visibility')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All visibilities</SelectItem>
-            <SelectItem value="public">Public only</SelectItem>
-            <SelectItem value="friends">Friends only</SelectItem>
-            <SelectItem value="link">By link</SelectItem>
-            <SelectItem value="mine">My articles</SelectItem>
+            <SelectItem value="all">{t('articles.allVisibilities')}</SelectItem>
+            <SelectItem value="public">{t('articles.publicOnly')}</SelectItem>
+            <SelectItem value="friends">{t('articles.friendsOnly')}</SelectItem>
+            <SelectItem value="link">{t('articles.byLink')}</SelectItem>
+            <SelectItem value="mine">{t('articles.myArticles')}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={t('common.category')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">{t('articles.allCategories')}</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c} value={c}>{c}</SelectItem>
             ))}

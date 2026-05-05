@@ -13,21 +13,23 @@ import {
   Bell,
   User
 } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const ProfileMenu: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { t } = useLanguage();
 
   const menuItems = [
-    { icon: Home, label: 'Новости', path: '/' },
-    { icon: MessageSquare, label: 'Сообщения', path: '/messages' },
-    { icon: Users, label: 'Сообщества', path: '/communities' },
-    { icon: Briefcase, label: 'Работа', path: '/work' },
-    { icon: Calendar, label: 'События', path: '/events' },
-    { icon: Search, label: 'Поиск', path: '/search' },
-    { icon: Bell, label: 'Уведомления', path: '/notifications' },
-    { icon: User, label: 'Профиль', path: '/profile' },
-    { icon: Settings, label: 'Настройки', path: '/settings' },
+    { icon: Home, labelKey: 'sidebar.myFeed', path: '/' },
+    { icon: MessageSquare, labelKey: 'sidebar.messenger', path: '/messages' },
+    { icon: Users, labelKey: 'sidebar.communities', path: '/communities' },
+    { icon: Briefcase, labelKey: 'sidebar.yatWork', path: '/work' },
+    { icon: Calendar, labelKey: 'sidebar.yatEvents', path: '/events' },
+    { icon: Search, labelKey: 'common.search', path: '/search' },
+    { icon: Bell, labelKey: 'nav.notifications', path: '/notifications' },
+    { icon: User, labelKey: 'sidebar.profile', path: '/profile' },
+    { icon: Settings, labelKey: 'sidebar.settings', path: '/settings' },
   ];
 
   const isActive = (path: string) => currentPath === path;
@@ -45,7 +47,7 @@ const ProfileMenu: React.FC = () => {
           }`}
         >
           <item.icon className="h-4 w-4" />
-          <span className="hidden lg:inline">{item.label}</span>
+          <span className="hidden lg:inline">{t(item.labelKey)}</span>
         </Link>
       ))}
     </nav>

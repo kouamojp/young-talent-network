@@ -8,8 +8,10 @@ import { ThumbsUp, MessageSquare, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const Article: React.FC = () => {
+  const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const [page, setPage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -137,10 +139,10 @@ const Article: React.FC = () => {
       </div>
 
       <section>
-        <h2 className="font-semibold mb-3">Comments ({comments.length})</h2>
+        <h2 className="font-semibold mb-3">{t('articles.comments')} ({comments.length})</h2>
         <div className="flex gap-2 mb-4">
-          <Textarea placeholder="Write a comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)} className="min-h-[60px]" />
-          <Button onClick={submitComment} disabled={submitting || !newComment.trim()}>Post</Button>
+          <Textarea placeholder={t('articles.writeComment')} value={newComment} onChange={(e) => setNewComment(e.target.value)} className="min-h-[60px]" />
+          <Button onClick={submitComment} disabled={submitting || !newComment.trim()}>{t('common.post')}</Button>
         </div>
         <div className="space-y-3">
           {comments.map((c) => (
