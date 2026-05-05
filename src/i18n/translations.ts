@@ -4,6 +4,7 @@ export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navbar
     'nav.search': 'Search YAT...',
+    'nav.notifications': 'Notifications',
     'nav.yourProfile': 'Your Profile',
     
     // Sidebar sections
@@ -1008,6 +1009,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
   fr: {
     'nav.search': 'Rechercher sur YAT...',
+    'nav.notifications': 'Notifications',
     'nav.yourProfile': 'Votre Profil',
     'sidebar.yourProfile': 'Votre Profil',
     'sidebar.servicesYat': 'Services YAT',
@@ -1988,6 +1990,7 @@ export const translations: Record<Language, Record<string, string>> = {
 
   ru: {
     'nav.search': 'Поиск в YAT...',
+    'nav.notifications': 'Уведомления',
     'nav.yourProfile': 'Ваш Профиль',
     'sidebar.yourProfile': 'Ваш Профиль',
     'sidebar.servicesYat': 'Сервисы YAT',
