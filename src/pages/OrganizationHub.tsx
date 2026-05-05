@@ -53,6 +53,7 @@ interface OrgTalent {
 }
 
 const OrganizationHub: React.FC = () => {
+  const { t } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [org, setOrg] = useState<OrgData | null>(null);
@@ -215,12 +216,12 @@ const OrganizationHub: React.FC = () => {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="agents">Agents</TabsTrigger>
-            <TabsTrigger value="talents">Talents</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="recruitment">Recrutement</TabsTrigger>
-            <TabsTrigger value="stats">Statistiques</TabsTrigger>
+            <TabsTrigger value="dashboard">{t('org.dashboard')}</TabsTrigger>
+            <TabsTrigger value="agents">{t('org.agents')}</TabsTrigger>
+            <TabsTrigger value="talents">{t('org.talents')}</TabsTrigger>
+            <TabsTrigger value="services">{t('org.services')}</TabsTrigger>
+            <TabsTrigger value="recruitment">{t('org.recruitment')}</TabsTrigger>
+            <TabsTrigger value="stats">{t('org.stats')}</TabsTrigger>
           </TabsList>
 
           {/* Dashboard */}
