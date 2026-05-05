@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Filter, ArrowLeft, Briefcase, FileText } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface SearchHeaderProps {
   path: string;
@@ -19,27 +20,29 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   onBack,
   viewMode = 'jobs'
 }) => {
+  const { t } = useLanguage();
+
   const getPlaceholder = () => {
     if (viewMode === 'jobs') {
       return path === 'talent' 
-        ? "Search for jobs, scholarships..." 
-        : "Search for talents applying to your jobs...";
+        ? t('work.searchJobs')
+        : t('work.searchTalentsApplying');
     } else {
       return path === 'talent' 
-        ? "Search for collaborator resumes..." 
-        : "Search for talent resumes...";
+        ? t('work.searchCollaborators')
+        : t('work.searchTalentResumes');
     }
   };
 
   const getTitle = () => {
     if (viewMode === 'jobs') {
       return path === 'talent' 
-        ? "Find Your Dream Opportunity" 
-        : "Manage Your Job Postings";
+        ? t('work.findDreamOpportunity')
+        : t('work.manageJobPostings');
     } else {
       return path === 'talent' 
-        ? "Find Collaborators" 
-        : "Discover Top Talent";
+        ? t('work.findCollaborators')
+        : t('work.discoverTopTalent');
     }
   };
 
@@ -70,11 +73,11 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
           />
         </div>
         <Button>
-          Search
+          {t('common.search')}
         </Button>
         <Button variant="outline">
           <Filter className="h-4 w-4 mr-2" />
-          Filters
+          {t('common.filters')}
         </Button>
       </div>
     </div>
