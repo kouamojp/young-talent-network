@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 import TalentHubSidebar from '@/components/talent-dashboard/TalentHubSidebar';
 import AnalyticsDashboard from '@/components/talent-dashboard/AnalyticsDashboard';
 import StatusToggle from '@/components/talent-dashboard/StatusToggle';
 
 const TalentDashboardMobile: React.FC = () => {
+  const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isOpenToWork, setIsOpenToWork] = useState(true);
   const [workStatus, setWorkStatus] = useState('Actively Looking');
