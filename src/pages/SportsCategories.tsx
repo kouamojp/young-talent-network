@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { CalendarIcon, Search, Star, User, Video } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const SportsCategories: React.FC = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sample sport categories
@@ -129,7 +131,7 @@ const SportsCategories: React.FC = () => {
       {/* Header section with teal background */}
       <div className="bg-gradient-to-r from-teal-500 to-blue-500 text-white py-12 px-4">
         <div className="container mx-auto max-w-6xl">
-          <h1 className="text-4xl font-bold mb-4">Sports Categories</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('sports.sportsCategories')}</h1>
           <p className="text-lg opacity-90 mb-6">Discover sports events, news, and connect with athletes worldwide</p>
           
           {/* Search bar */}
@@ -150,17 +152,17 @@ const SportsCategories: React.FC = () => {
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Tabs defaultValue="all" className="space-y-6">
           <TabsList className="bg-white border border-gray-200 p-1 mb-6">
-            <TabsTrigger value="all">All Categories</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="news">News</TabsTrigger>
-            <TabsTrigger value="videos">Videos</TabsTrigger>
-            <TabsTrigger value="athletes">Athletes</TabsTrigger>
+            <TabsTrigger value="all">{t('sports.allCategories')}</TabsTrigger>
+            <TabsTrigger value="events">{t('sports.events')}</TabsTrigger>
+            <TabsTrigger value="news">{t('sports.news')}</TabsTrigger>
+            <TabsTrigger value="videos">{t('sports.videos')}</TabsTrigger>
+            <TabsTrigger value="athletes">{t('sports.athletes')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-8">
             {/* Featured categories grid */}
             <section>
-              <h2 className="text-2xl font-semibold mb-4">Sports Categories</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('sports.sportsCategories')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sportCategories.map((category) => (
                   <Card key={category.id} className="hover:shadow-md transition-shadow">
