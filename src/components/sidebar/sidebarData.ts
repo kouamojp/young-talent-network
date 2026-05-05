@@ -29,71 +29,71 @@ import {
 import { MenuSectionItem } from './types';
 
 export interface MenuSection {
-  title: string;
+  titleKey: string;
   items: MenuSectionItem[];
 }
 
 // Main section
 export const mainNavigationItems: MenuSectionItem[] = [
   {
-    label: 'Profile',
-    description: 'Your digital talent hub',
+    label: 'sidebar.profile',
+    description: 'sidebar.profile.desc',
     icon: UserCircle,
     path: '/profile',
     iconColor: 'text-blue-500',
   },
   {
-    label: 'What is YAT?',
-    description: 'Discover the platform',
+    label: 'sidebar.whatIsYat',
+    description: 'sidebar.whatIsYat.desc',
     icon: Star,
     path: '/',
     iconColor: 'text-amber-500',
   },
   {
-    label: 'My Feed',
-    description: 'Your personalized stream',
+    label: 'sidebar.myFeed',
+    description: 'sidebar.myFeed.desc',
     icon: Home,
     path: '/feed',
     iconColor: 'text-emerald-500',
   },
   {
-    label: 'Messenger',
-    description: 'Secure chats & connections',
+    label: 'sidebar.messenger',
+    description: 'sidebar.messenger.desc',
     icon: MessageSquare,
     path: '/messages',
     iconColor: 'text-sky-500',
   },
   {
-    label: 'Calls',
-    description: 'Voice/video meetings',
+    label: 'sidebar.calls',
+    description: 'sidebar.calls.desc',
     icon: Phone,
     path: '/calls',
     iconColor: 'text-green-500',
   },
   {
-    label: 'Friends',
-    description: 'Your talent network',
+    label: 'sidebar.friends',
+    description: 'sidebar.friends.desc',
     icon: Users,
     path: '/friends',
     iconColor: 'text-indigo-500',
   },
   {
-    label: 'Settings',
-    description: 'Customize your experience',
+    label: 'sidebar.settings',
+    description: 'sidebar.settings.desc',
     icon: Settings,
     path: '/settings',
     iconColor: 'text-gray-500',
   },
   {
-    label: 'Media Hub',
-    description: 'Photos, music & videos',
+    label: 'sidebar.mediaHub',
+    description: 'sidebar.mediaHub.desc',
     icon: Image,
     path: '/media',
     iconColor: 'text-pink-500',
   },
   {
-    label: 'Communities',
-    description: 'Groups by interest',
+    label: 'sidebar.communities',
+    description: 'sidebar.communities.desc',
     icon: Users2,
     path: '/communities',
     iconColor: 'text-purple-500',
@@ -103,8 +103,8 @@ export const mainNavigationItems: MenuSectionItem[] = [
 // Services YAT
 export const yatServicesItems: MenuSectionItem[] = [
   {
-    label: 'YAT Work',
-    description: 'Jobs & opportunities',
+    label: 'sidebar.yatWork',
+    description: 'sidebar.yatWork.desc',
     icon: Briefcase,
     path: '/work',
     iconColor: 'text-orange-500',
@@ -112,36 +112,36 @@ export const yatServicesItems: MenuSectionItem[] = [
     badgeColor: 'bg-emerald-500 text-white',
   },
   {
-    label: 'YAT Events',
-    description: 'Sports & talent events',
+    label: 'sidebar.yatEvents',
+    description: 'sidebar.yatEvents.desc',
     icon: CalendarDays,
     path: '/events',
     iconColor: 'text-rose-500',
   },
   {
-    label: 'YAT Learning',
-    description: 'Courses & training',
+    label: 'sidebar.yatLearning',
+    description: 'sidebar.yatLearning.desc',
     icon: GraduationCap,
     path: '/learning',
     iconColor: 'text-violet-500',
   },
   {
-    label: 'Organizations',
-    description: 'Clubs & companies',
+    label: 'sidebar.organizations',
+    description: 'sidebar.organizations.desc',
     icon: Building2,
     path: '/organizations',
     iconColor: 'text-teal-500',
   },
   {
-    label: 'YAT Karta',
-    description: 'Global talent map',
+    label: 'sidebar.yatKarta',
+    description: 'sidebar.yatKarta.desc',
     icon: Map,
     path: '/karta',
     iconColor: 'text-cyan-500',
   },
   {
-    label: 'YAT Database',
-    description: 'Search all participants',
+    label: 'sidebar.yatDatabase',
+    description: 'sidebar.yatDatabase.desc',
     icon: Database,
     path: '/yat-database',
     iconColor: 'text-amber-600',
@@ -153,8 +153,8 @@ export const yatServicesItems: MenuSectionItem[] = [
 // Communities & Content
 export const servicesItems: MenuSectionItem[] = [
   {
-    label: 'Live',
-    description: 'Real-time talent streams',
+    label: 'sidebar.live',
+    description: 'sidebar.live.desc',
     icon: Radio,
     path: '/live',
     iconColor: 'text-red-500',
@@ -162,29 +162,29 @@ export const servicesItems: MenuSectionItem[] = [
     badgeColor: 'bg-red-500 text-white',
   },
   {
-    label: 'Online TV',
-    description: 'Talent TV channels',
+    label: 'sidebar.onlineTV',
+    description: 'sidebar.onlineTV.desc',
     icon: Tv,
     path: '/tv',
     iconColor: 'text-fuchsia-500',
   },
   {
-    label: 'Games',
-    description: 'Skill-based challenges',
+    label: 'sidebar.games',
+    description: 'sidebar.games.desc',
     icon: Gamepad2,
     path: '/test',
     iconColor: 'text-lime-500',
   },
   {
-    label: 'YAT COIN',
-    description: 'Talent economy',
+    label: 'sidebar.yatCoin',
+    description: 'sidebar.yatCoin.desc',
     icon: ShoppingBag,
     path: '/yat-coin',
     iconColor: 'text-yellow-500',
   },
   {
-    label: 'YAT Marketplace',
-    description: 'Buy & sell products/services',
+    label: 'sidebar.yatMarketplace',
+    description: 'sidebar.yatMarketplace.desc',
     icon: ShoppingBag,
     path: '/marketplace',
     iconColor: 'text-orange-600',
@@ -192,22 +192,22 @@ export const servicesItems: MenuSectionItem[] = [
     badgeColor: 'bg-orange-500 text-white',
   },
   {
-    label: 'YAT Social',
-    description: 'Your social networks hub',
+    label: 'sidebar.yatSocial',
+    description: 'sidebar.yatSocial.desc',
     icon: Globe,
     path: '/social',
     iconColor: 'text-blue-500',
   },
   {
-    label: 'Posts',
-    description: 'Your talent stories',
+    label: 'sidebar.posts',
+    description: 'sidebar.posts.desc',
     icon: FileText,
     path: '/news',
     iconColor: 'text-blue-400',
   },
   {
-    label: 'Social Universe',
-    description: 'Your online talent network',
+    label: 'sidebar.socialUniverse',
+    description: 'sidebar.socialUniverse.desc',
     icon: Globe,
     path: '/talents-around-me',
     iconColor: 'text-emerald-500',
@@ -218,7 +218,7 @@ export const servicesItems: MenuSectionItem[] = [
 export const connectItems: MenuSectionItem[] = [
   {
     label: 'Facebook',
-    description: 'Connect on Facebook',
+    description: 'sidebar.connectFacebook',
     icon: Globe,
     path: '#',
     url: 'https://facebook.com',
@@ -226,7 +226,7 @@ export const connectItems: MenuSectionItem[] = [
   },
   {
     label: 'Instagram',
-    description: 'Follow on Instagram',
+    description: 'sidebar.connectInstagram',
     icon: Globe,
     path: '#',
     url: 'https://instagram.com',
@@ -234,7 +234,7 @@ export const connectItems: MenuSectionItem[] = [
   },
   {
     label: 'X (Twitter)',
-    description: 'Follow on X',
+    description: 'sidebar.connectX',
     icon: Globe,
     path: '#',
     url: 'https://x.com',
@@ -242,7 +242,7 @@ export const connectItems: MenuSectionItem[] = [
   },
   {
     label: 'TikTok',
-    description: 'Follow on TikTok',
+    description: 'sidebar.connectTikTok',
     icon: Globe,
     path: '#',
     url: 'https://tiktok.com',
@@ -252,8 +252,8 @@ export const connectItems: MenuSectionItem[] = [
 
 const installItem: MenuSectionItem[] = [
   {
-    label: 'Installer YAT',
-    description: 'Ajouter à l\'écran d\'accueil',
+    label: 'sidebar.installYat',
+    description: 'sidebar.installYat.desc',
     icon: Download,
     path: '/install',
     iconColor: 'text-primary',
@@ -264,8 +264,8 @@ const installItem: MenuSectionItem[] = [
 
 const adminItems: MenuSectionItem[] = [
   {
-    label: 'Admin Panel',
-    description: 'Platform administration',
+    label: 'sidebar.adminPanel',
+    description: 'sidebar.adminPanel.desc',
     icon: Shield,
     path: '/admin',
     iconColor: 'text-red-600',
@@ -275,10 +275,10 @@ const adminItems: MenuSectionItem[] = [
 ];
 
 export const allSections: MenuSection[] = [
-  { title: 'Your Profile', items: mainNavigationItems },
-  { title: 'Services YAT', items: yatServicesItems },
-  { title: 'Communities & Content', items: servicesItems },
-  { title: 'Connect', items: connectItems },
-  { title: 'Application', items: installItem },
-  { title: 'Administration', items: adminItems },
+  { titleKey: 'sidebar.yourProfile', items: mainNavigationItems },
+  { titleKey: 'sidebar.servicesYat', items: yatServicesItems },
+  { titleKey: 'sidebar.communitiesContent', items: servicesItems },
+  { titleKey: 'sidebar.connect', items: connectItems },
+  { titleKey: 'sidebar.application', items: installItem },
+  { titleKey: 'sidebar.administration', items: adminItems },
 ];
