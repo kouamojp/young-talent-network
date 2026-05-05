@@ -63,7 +63,7 @@ const App = () => {
         <Navbar />
         
         {/* Main Layout Container */}
-        <div className="w-full pt-14 pb-16 md:pb-0">
+        <div className="w-full pt-14 pb-16 md:pb-0 overflow-x-hidden">
           <div className="max-w-[1400px] mx-auto flex">
             {/* Left Sidebar - desktop only */}
             <aside className="hidden md:block w-[260px] shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto border-r border-border bg-card">
@@ -71,7 +71,7 @@ const App = () => {
             </aside>
             
             {/* Main Content */}
-            <main className="flex-1 min-w-0 bg-background">
+            <main className="flex-1 min-w-0 bg-background overflow-x-hidden">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/feed" element={<Feed />} />
