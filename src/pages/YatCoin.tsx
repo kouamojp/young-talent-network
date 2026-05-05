@@ -26,17 +26,17 @@ const YatCoin: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50">
       <main className="container mx-auto px-4 py-12">
         <GlassMorphism className="p-6">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <Coins className="h-8 w-8 text-purple-600" />
+              <Coins className="h-8 w-8 text-purple-600 shrink-0" />
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{t('yatcoin.title')}</h1>
-                <p className="text-gray-600">{t('yatcoin.subtitle')}</p>
+                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{t('yatcoin.title')}</h1>
+                <p className="text-gray-600 text-sm">{t('yatcoin.subtitle')}</p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant={userType === 'talent' ? 'default' : 'outline'} onClick={() => setUserType('talent')}>{t('yatcoin.imTalent')}</Button>
-              <Button variant={userType === 'investor' ? 'default' : 'outline'} onClick={() => setUserType('investor')}>{t('yatcoin.imInvestor')}</Button>
+              <Button size="sm" variant={userType === 'talent' ? 'default' : 'outline'} onClick={() => setUserType('talent')}>{t('yatcoin.imTalent')}</Button>
+              <Button size="sm" variant={userType === 'investor' ? 'default' : 'outline'} onClick={() => setUserType('investor')}>{t('yatcoin.imInvestor')}</Button>
             </div>
           </div>
 
