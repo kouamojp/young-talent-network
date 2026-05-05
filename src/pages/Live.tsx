@@ -7,8 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { liveStreams, trendingStreams, followingStreams, streamCategories } from '@/components/live/data/liveData';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Live: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('live');
   const [regionFilter, setRegionFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
