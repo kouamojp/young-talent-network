@@ -14,6 +14,7 @@ type SortKey = 'recent' | 'oldest' | 'likes' | 'comments';
 type VisibilityFilter = 'all' | 'public' | 'friends' | 'link' | 'mine';
 
 const Articles: React.FC = () => {
+  const { t } = useLanguage();
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
