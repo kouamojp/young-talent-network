@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Loader2, ThumbsUp, MessageSquare, Search, Globe, Users, Link as LinkIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 type SortKey = 'recent' | 'oldest' | 'likes' | 'comments';
 type VisibilityFilter = 'all' | 'public' | 'friends' | 'link' | 'mine';
