@@ -696,6 +696,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Followers',
     'tv.follow': 'Follow',
     'tv.liveLabel': 'LIVE',
+    'tv.addStreamLink': 'Add TV Stream Link',
+    'tv.streamLinkPlaceholder': 'Paste stream URL (YouTube, Twitch, etc.)',
+    'tv.addLink': 'Add',
+    'tv.linkAdded': 'Stream link added!',
+    'tv.invalidLink': 'Please enter a valid URL',
 
     // Mobile bottom nav
     'bottomNav.home': 'Home',
