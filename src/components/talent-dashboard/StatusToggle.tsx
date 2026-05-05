@@ -76,11 +76,11 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
           {isOpenToWork && (
             <div className="flex items-center gap-2">
               {isEditingTagline ? (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Input
                     value={tagline}
                     onChange={(e) => setTagline(e.target.value)}
-                    className="w-64"
+                    className="w-full sm:w-64"
                     placeholder="Enter your tagline..."
                   />
                   <Button
