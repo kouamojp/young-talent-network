@@ -27,7 +27,7 @@ const TalentDashboardMobile: React.FC = () => {
             <Menu className="h-6 w-6" />
           </Button>
           <h1 className="font-bold text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Talent Dashboard
+            {t('talent.dashboard')}
           </h1>
           <div className="w-10" /> {/* Spacer for centering */}
         </div>
