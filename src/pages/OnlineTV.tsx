@@ -3,16 +3,34 @@ import Navbar from '@/components/Navbar';
 import SocialSidebar from '@/components/SocialSidebar';
 import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star, Link, Plus } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const OnlineTV: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState('live');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [tvLink, setTvLink] = useState('');
+  const [addedLinks, setAddedLinks] = useState<{ url: string; title: string }[]>([]);
+
+  const handleAddLink = () => {
+    if (!tvLink.trim()) return;
+    try {
+      new URL(tvLink);
+      setAddedLinks(prev => [...prev, { url: tvLink.trim(), title: tvLink.trim() }]);
+      setTvLink('');
+      toast.success(t('tv.linkAdded'));
+    } catch {
+      toast.error(t('tv.invalidLink'));
+    }
+  };
 
   const liveStreams = [
     { id: 1, title: "Young Musicians Concert", channel: "Y&T Music", thumbnail: "https://images.unsplash.com/photo-1541804627596-3b5b9ef58c93", viewers: 1245, category: "Music" },
