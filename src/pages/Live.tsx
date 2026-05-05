@@ -4,11 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown } from 'lucide-react';
+import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown, ArrowLeft } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { liveStreams, trendingStreams, followingStreams, streamCategories } from '@/components/live/data/liveData';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import LiveBroadcast from '@/components/live/LiveBroadcast';
 
 const Live: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Live: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
 
   const getFilteredStreams = () => {
     let streams = activeTab === 'popular' ? trendingStreams :
@@ -40,6 +42,30 @@ const Live: React.FC = () => {
 
   const streams = getFilteredStreams();
 
+  if (showBroadcast) {
+    return (
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
+        <div className="bg-muted/50 border-b border-border">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={() => setShowBroadcast(false)} className="gap-1.5">
+                <ArrowLeft className="h-4 w-4" />
+                Назад
+              </Button>
+              <div className="flex items-center gap-2">
+                <Radio className="h-5 w-5 text-destructive animate-pulse" />
+                <h1 className="text-xl font-bold text-foreground">Прямой эфир</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-4 max-w-2xl">
+          <LiveBroadcast />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
       {/* Header */}
@@ -50,10 +76,7 @@ const Live: React.FC = () => {
               <Radio className="h-5 w-5 text-destructive animate-pulse" />
               <h1 className="text-xl font-bold text-foreground">YAT LIVE</h1>
             </div>
-            <Button size="sm" className="gap-1.5 bg-destructive hover:bg-destructive/90" onClick={() => {
-              toast.info('Подготовка трансляции...');
-              navigate('/tv');
-            }}>
+            <Button size="sm" className="gap-1.5 bg-destructive hover:bg-destructive/90" onClick={() => setShowBroadcast(true)}>
               <Video className="h-4 w-4" />
               Запустить / Go Live
             </Button>
