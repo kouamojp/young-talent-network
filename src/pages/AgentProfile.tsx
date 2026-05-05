@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 interface AgentData {
   id: string;

@@ -8,6 +8,7 @@ import { ThumbsUp, MessageSquare, Loader2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const Article: React.FC = () => {
   const { id } = useParams<{ id: string }>();
