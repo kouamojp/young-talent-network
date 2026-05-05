@@ -8,6 +8,7 @@ import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
+import ProfileSources from '@/components/profile/ProfileSources';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
 import AddMediaDialog from '@/components/profile/AddMediaDialog';
@@ -218,6 +219,8 @@ const Profile: React.FC = () => {
           </Card>
 
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
+
+          {userId && <ProfileSources userId={userId} />}
 
           <Card>
             <CardHeader className="pb-3">

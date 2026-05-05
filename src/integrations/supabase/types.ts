@@ -1153,6 +1153,51 @@ export type Database = {
           },
         ]
       }
+      profile_sources: {
+        Row: {
+          auto_sync: boolean
+          created_at: string
+          error_message: string | null
+          extracted_data: Json | null
+          id: string
+          label: string | null
+          last_synced_at: string | null
+          source_type: string
+          status: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          auto_sync?: boolean
+          created_at?: string
+          error_message?: string | null
+          extracted_data?: Json | null
+          id?: string
+          label?: string | null
+          last_synced_at?: string | null
+          source_type?: string
+          status?: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          auto_sync?: boolean
+          created_at?: string
+          error_message?: string | null
+          extracted_data?: Json | null
+          id?: string
+          label?: string | null
+          last_synced_at?: string | null
+          source_type?: string
+          status?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
