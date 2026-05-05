@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
               <AvatarImage src="/placeholder.svg" />
               <AvatarFallback>U</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium hidden md:inline text-foreground">Your Profile</span>
+            <span className="text-sm font-medium hidden md:inline text-foreground">{t('nav.yourProfile')}</span>
           </Link>
           
           <div className="flex items-center space-x-2">
