@@ -2668,6 +2668,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Подписчиков',
     'tv.follow': 'Подписаться',
     'tv.liveLabel': 'ПРЯМОЙ ЭФИР',
+    'tv.addStreamLink': 'Добавить ссылку на ТВ-трансляцию',
+    'tv.streamLinkPlaceholder': 'Вставьте URL трансляции (YouTube, Twitch и т.д.)',
+    'tv.addLink': 'Добавить',
+    'tv.linkAdded': 'Ссылка на трансляцию добавлена!',
+    'tv.invalidLink': 'Введите корректный URL',
 
     // Mobile bottom nav
     'bottomNav.home': 'Главная',
