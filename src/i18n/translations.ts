@@ -1682,6 +1682,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Abonnés',
     'tv.follow': 'Suivre',
     'tv.liveLabel': 'EN DIRECT',
+    'tv.addStreamLink': 'Ajouter un lien de diffusion TV',
+    'tv.streamLinkPlaceholder': 'Coller l\'URL du stream (YouTube, Twitch, etc.)',
+    'tv.addLink': 'Ajouter',
+    'tv.linkAdded': 'Lien de diffusion ajouté !',
+    'tv.invalidLink': 'Veuillez entrer une URL valide',
 
     // Mobile bottom nav
     'bottomNav.home': 'Accueil',
