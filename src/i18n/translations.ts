@@ -696,6 +696,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Followers',
     'tv.follow': 'Follow',
     'tv.liveLabel': 'LIVE',
+    'tv.addStreamLink': 'Add TV Stream Link',
+    'tv.streamLinkPlaceholder': 'Paste stream URL (YouTube, Twitch, etc.)',
+    'tv.addLink': 'Add',
+    'tv.linkAdded': 'Stream link added!',
+    'tv.invalidLink': 'Please enter a valid URL',
 
     // Mobile bottom nav
     'bottomNav.home': 'Home',
@@ -1677,6 +1682,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Abonnés',
     'tv.follow': 'Suivre',
     'tv.liveLabel': 'EN DIRECT',
+    'tv.addStreamLink': 'Ajouter un lien de diffusion TV',
+    'tv.streamLinkPlaceholder': 'Coller l\'URL du stream (YouTube, Twitch, etc.)',
+    'tv.addLink': 'Ajouter',
+    'tv.linkAdded': 'Lien de diffusion ajouté !',
+    'tv.invalidLink': 'Veuillez entrer une URL valide',
 
     // Mobile bottom nav
     'bottomNav.home': 'Accueil',
@@ -2658,6 +2668,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'tv.followers': 'Подписчиков',
     'tv.follow': 'Подписаться',
     'tv.liveLabel': 'ПРЯМОЙ ЭФИР',
+    'tv.addStreamLink': 'Добавить ссылку на ТВ-трансляцию',
+    'tv.streamLinkPlaceholder': 'Вставьте URL трансляции (YouTube, Twitch и т.д.)',
+    'tv.addLink': 'Добавить',
+    'tv.linkAdded': 'Ссылка на трансляцию добавлена!',
+    'tv.invalidLink': 'Введите корректный URL',
 
     // Mobile bottom nav
     'bottomNav.home': 'Главная',

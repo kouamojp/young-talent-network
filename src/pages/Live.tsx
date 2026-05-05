@@ -7,8 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { liveStreams, trendingStreams, followingStreams, streamCategories } from '@/components/live/data/liveData';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Live: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('live');
   const [regionFilter, setRegionFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -47,7 +50,10 @@ const Live: React.FC = () => {
               <Radio className="h-5 w-5 text-destructive animate-pulse" />
               <h1 className="text-xl font-bold text-foreground">YAT LIVE</h1>
             </div>
-            <Button size="sm" className="gap-1.5 bg-destructive hover:bg-destructive/90">
+            <Button size="sm" className="gap-1.5 bg-destructive hover:bg-destructive/90" onClick={() => {
+              toast.info('Подготовка трансляции...');
+              navigate('/tv');
+            }}>
               <Video className="h-4 w-4" />
               Запустить / Go Live
             </Button>
