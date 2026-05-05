@@ -4,11 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown } from 'lucide-react';
+import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown, ArrowLeft } from 'lucide-react';
 import { countries } from '@/data/countries';
 import { liveStreams, trendingStreams, followingStreams, streamCategories } from '@/components/live/data/liveData';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import LiveBroadcast from '@/components/live/LiveBroadcast';
 
 const Live: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Live: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showBroadcast, setShowBroadcast] = useState(false);
 
   const getFilteredStreams = () => {
     let streams = activeTab === 'popular' ? trendingStreams :
