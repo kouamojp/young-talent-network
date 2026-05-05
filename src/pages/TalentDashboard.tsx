@@ -13,11 +13,13 @@ import TVSection from '@/components/talent-dashboard/TVSection';
 import EventsSection from '@/components/talent-dashboard/EventsSection';
 import OrganizationsSection from '@/components/talent-dashboard/OrganizationsSection';
 import TalentDashboardMobile from './TalentDashboardMobile';
+import { useLanguage } from '@/i18n/LanguageContext';
 
 const TalentDashboard: React.FC = () => {
   const [isOpenToWork, setIsOpenToWork] = useState(true);
   const [workStatus, setWorkStatus] = useState('Actively Looking');
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
 
   // Redirect to mobile version on mobile devices
   if (isMobile) {
@@ -29,9 +31,8 @@ const TalentDashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            Talent Dashboard
+            {t('talent.dashboard')}
           </h1>
-          <p className="text-gray-600">Manage your professional presence and opportunities</p>
         </div>
 
         <StatusToggle
@@ -45,12 +46,12 @@ const TalentDashboard: React.FC = () => {
 
         <Tabs defaultValue="work" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="work">Work</TabsTrigger>
-            <TabsTrigger value="learning">Learning</TabsTrigger>
-            <TabsTrigger value="live">Live</TabsTrigger>
-            <TabsTrigger value="tv">TV</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="organizations">Organizations</TabsTrigger>
+            <TabsTrigger value="work">{t('talent.work')}</TabsTrigger>
+            <TabsTrigger value="learning">{t('talent.learning')}</TabsTrigger>
+            <TabsTrigger value="live">{t('talent.live')}</TabsTrigger>
+            <TabsTrigger value="tv">{t('talent.tv')}</TabsTrigger>
+            <TabsTrigger value="events">{t('talent.events')}</TabsTrigger>
+            <TabsTrigger value="organizations">{t('talent.organizations')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="work">
