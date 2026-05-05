@@ -175,6 +175,40 @@ const OnlineTV: React.FC = () => {
             ))}
           </div>
         </GlassMorphism>
+
+        {/* Add TV Stream Link */}
+        <GlassMorphism className="p-6 mt-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Link className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-bold">{t('tv.addStreamLink')}</h2>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={tvLink}
+              onChange={e => setTvLink(e.target.value)}
+              placeholder={t('tv.streamLinkPlaceholder')}
+              className="flex-1"
+              onKeyDown={e => e.key === 'Enter' && handleAddLink()}
+            />
+            <Button onClick={handleAddLink} className="gap-1.5">
+              <Plus className="h-4 w-4" />
+              {t('tv.addLink')}
+            </Button>
+          </div>
+
+          {addedLinks.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {addedLinks.map((link, i) => (
+                <div key={i} className="flex items-center gap-2 bg-white/40 rounded-lg p-3">
+                  <Tv className="h-4 w-4 text-primary shrink-0" />
+                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline truncate flex-1">
+                    {link.url}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </GlassMorphism>
       </main>
     </div>
   );
