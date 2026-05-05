@@ -72,7 +72,7 @@ const Navbar: React.FC = () => {
             <span className="text-sm font-medium hidden md:inline text-foreground">{t('nav.yourProfile')}</span>
           </Link>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <PostCreationDialog
               trigger={
                 <Button

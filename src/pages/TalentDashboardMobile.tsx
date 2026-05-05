@@ -14,27 +14,9 @@ const TalentDashboardMobile: React.FC = () => {
   const [workStatus, setWorkStatus] = useState('Actively Looking');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(true)}
-            className="hover:bg-purple-100"
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-          <h1 className="font-bold text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            {t('talent.dashboard')}
-          </h1>
-          <div className="w-10" /> {/* Spacer for centering */}
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-background dark:via-background dark:to-background">
       {/* Content */}
-      <div className="pt-20 md:pt-6 px-4">
+      <div className="px-4 py-4">
         <StatusToggle
           isOpenToWork={isOpenToWork}
           workStatus={workStatus}
