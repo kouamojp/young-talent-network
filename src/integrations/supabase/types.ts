@@ -150,6 +150,48 @@ export type Database = {
           },
         ]
       }
+      agent_suggestions: {
+        Row: {
+          acted_on: boolean
+          action_data: Json | null
+          action_link: string | null
+          created_at: string
+          description: string | null
+          dismissed: boolean
+          expires_at: string | null
+          id: string
+          suggestion_type: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          acted_on?: boolean
+          action_data?: Json | null
+          action_link?: string | null
+          created_at?: string
+          description?: string | null
+          dismissed?: boolean
+          expires_at?: string | null
+          id?: string
+          suggestion_type?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          acted_on?: boolean
+          action_data?: Json | null
+          action_link?: string | null
+          created_at?: string
+          description?: string | null
+          dismissed?: boolean
+          expires_at?: string | null
+          id?: string
+          suggestion_type?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       agent_talent_contracts: {
         Row: {
           agent_id: string
@@ -244,6 +286,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      assistant_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      assistant_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistant_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "assistant_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
