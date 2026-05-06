@@ -2025,6 +2025,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'sidebar.friends.desc': 'Ваша сеть талантов',
     'sidebar.settings': 'Настройки',
     'sidebar.settings.desc': 'Настроить ваш опыт',
+    'sidebar.assistant': 'ИИ Ассистент',
+    'sidebar.assistant.desc': 'Ваш умный помощник',
     'sidebar.mediaHub': 'Медиа',
     'sidebar.mediaHub.desc': 'Фото, музыка и видео',
     'sidebar.communities': 'Сообщества',
