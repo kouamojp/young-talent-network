@@ -42,6 +42,8 @@ import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
 import Article from "./pages/Article";
 import Articles from "./pages/Articles";
+import Assistant from "./pages/Assistant";
+import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
