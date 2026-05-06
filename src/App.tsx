@@ -122,6 +122,9 @@ const App = () => {
         {/* Floating Create Button */}
         <FloatingCreateButton />
         
+        {/* AI Assistant Chat Bubble */}
+        <AIAssistantChat />
+        
         {/* Facebook-style Footer - desktop only */}
         <Footer />
         
