@@ -29,6 +29,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'sidebar.friends.desc': 'Your talent network',
     'sidebar.settings': 'Settings',
     'sidebar.settings.desc': 'Customize your experience',
+    'sidebar.assistant': 'AI Assistant',
+    'sidebar.assistant.desc': 'Your smart platform guide',
     'sidebar.mediaHub': 'Media Hub',
     'sidebar.mediaHub.desc': 'Photos, music & videos',
     'sidebar.communities': 'Communities',
