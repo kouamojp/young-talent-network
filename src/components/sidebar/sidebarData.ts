@@ -86,6 +86,13 @@ export const mainNavigationItems: MenuSectionItem[] = [
     iconColor: 'text-gray-500',
   },
   {
+    label: 'sidebar.assistant',
+    description: 'sidebar.assistant.desc',
+    icon: Sparkles,
+    path: '/assistant',
+    iconColor: 'text-violet-500',
+  },
+  {
     label: 'sidebar.mediaHub',
     description: 'sidebar.mediaHub.desc',
     icon: Image,
