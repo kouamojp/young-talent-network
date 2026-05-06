@@ -23,6 +23,7 @@ import {
   Database,
   Download,
   Shield,
+  Sparkles,
   LucideIcon
 } from 'lucide-react';
 
@@ -83,6 +84,13 @@ export const mainNavigationItems: MenuSectionItem[] = [
     icon: Settings,
     path: '/settings',
     iconColor: 'text-gray-500',
+  },
+  {
+    label: 'sidebar.assistant',
+    description: 'sidebar.assistant.desc',
+    icon: Sparkles,
+    path: '/assistant',
+    iconColor: 'text-violet-500',
   },
   {
     label: 'sidebar.mediaHub',

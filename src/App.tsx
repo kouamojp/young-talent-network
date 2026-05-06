@@ -42,6 +42,8 @@ import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
 import Article from "./pages/Article";
 import Articles from "./pages/Articles";
+import Assistant from "./pages/Assistant";
+import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -110,6 +112,7 @@ const App = () => {
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/article/:id" element={<Article />} />
                 <Route path="/articles" element={<Articles />} />
+                <Route path="/assistant" element={<Assistant />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
@@ -118,6 +121,9 @@ const App = () => {
         
         {/* Floating Create Button */}
         <FloatingCreateButton />
+        
+        {/* AI Assistant Chat Bubble */}
+        <AIAssistantChat />
         
         {/* Facebook-style Footer - desktop only */}
         <Footer />

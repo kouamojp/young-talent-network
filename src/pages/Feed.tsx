@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PostCreationDialog } from '@/components/PostCreationDialog';
 import PostCard from '@/components/PostCard';
 import RecentOrganizations from '@/components/RecentOrganizations';
+import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
 import { 
   Loader2, Users, Building2, Briefcase, TrendingUp, Star, 
   UserPlus, Bell, Sparkles, ArrowRight 
@@ -162,6 +163,7 @@ const FeedPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
+                <AgentSuggestionsWidget />
                 <RecentOrganizations />
                 {posts.length === 0 ? (
                   <Card className="border-dashed border-2">
