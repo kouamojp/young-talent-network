@@ -23,6 +23,7 @@ import {
   Database,
   Download,
   Shield,
+  Sparkles,
   LucideIcon
 } from 'lucide-react';
 
