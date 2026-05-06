@@ -163,6 +163,7 @@ const FeedPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
+                <AgentSuggestionsWidget />
                 <RecentOrganizations />
                 {posts.length === 0 ? (
                   <Card className="border-dashed border-2">
