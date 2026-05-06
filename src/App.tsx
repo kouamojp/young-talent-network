@@ -112,6 +112,7 @@ const App = () => {
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/article/:id" element={<Article />} />
                 <Route path="/articles" element={<Articles />} />
+                <Route path="/assistant" element={<Assistant />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
