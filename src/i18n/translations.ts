@@ -1037,6 +1037,8 @@ export const translations: Record<Language, Record<string, string>> = {
     'sidebar.friends.desc': 'Votre réseau de talents',
     'sidebar.settings': 'Paramètres',
     'sidebar.settings.desc': 'Personnaliser votre expérience',
+    'sidebar.assistant': 'Assistant IA',
+    'sidebar.assistant.desc': 'Votre guide intelligent',
     'sidebar.mediaHub': 'Médias',
     'sidebar.mediaHub.desc': 'Photos, musique & vidéos',
     'sidebar.communities': 'Communautés',
