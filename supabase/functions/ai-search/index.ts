@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,9 +13,60 @@ serve(async (req) => {
   }
 
   try {
-    const { query, context } = await req.json();
+    // --- Authentication ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing authorization header" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // --- Input Validation ---
+    const body = await req.json();
+    const query = body?.query;
+    const context = body?.context;
+
+    if (!query || typeof query !== "string") {
+      return new Response(JSON.stringify({ error: "query is required and must be a string" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const trimmedQuery = query.trim().slice(0, 500);
+    if (trimmedQuery.length < 1) {
+      return new Response(JSON.stringify({ error: "query must not be empty" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Sanitize context to a simple object with string values only
+    let safeContext: Record<string, string> = {};
+    if (context && typeof context === "object" && !Array.isArray(context)) {
+      for (const [key, value] of Object.entries(context)) {
+        if (typeof key === "string" && typeof value === "string" && key.length <= 50 && value.length <= 200) {
+          safeContext[key] = value;
+        }
+      }
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = `You are an intelligent search assistant for a social platform. 
@@ -39,7 +91,7 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Search query: ${query}\nContext: ${JSON.stringify(context)}` }
+          { role: "user", content: `Search query: ${trimmedQuery}\nContext: ${JSON.stringify(safeContext)}` }
         ],
       }),
     });
@@ -68,7 +120,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("AI search error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An internal error occurred" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
