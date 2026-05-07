@@ -50,7 +50,7 @@ const Profile: React.FC = () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { navigate('/auth'); return; }
       setUserId(authUser.id);
-      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes] = await Promise.all([
+      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes, badgesRes, coinsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', authUser.id).single(),
         supabase.from('talent_presence').select('*').eq('user_id', authUser.id),
         supabase.from('talent_resumes').select('*, categories(name, name_fr)').eq('user_id', authUser.id),
@@ -58,6 +58,8 @@ const Profile: React.FC = () => {
         supabase.from('talent_media').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }),
         supabase.from('talent_social_links').select('*').eq('user_id', authUser.id),
         (supabase.from('talent_education') as any).select('*').eq('user_id', authUser.id).order('start_year', { ascending: false }),
+        supabase.from('user_badges').select('*').eq('user_id', authUser.id).order('earned_at', { ascending: false }),
+        supabase.from('coin_transactions').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }).limit(50),
       ]);
       if (profileRes.data) setProfile(profileRes.data);
       if (presenceRes.data) setTalentPresence(presenceRes.data);
@@ -66,6 +68,8 @@ const Profile: React.FC = () => {
       if (mediaRes.data) setMedia(mediaRes.data);
       if (linksRes.data) setSocialLinks(linksRes.data);
       if (eduRes.data) setEducation(eduRes.data);
+      if (badgesRes.data) setUserBadges(badgesRes.data);
+      if (coinsRes.data) setCoinHistory(coinsRes.data);
     } catch (error) { console.error('Error fetching profile:', error); }
     finally { setLoading(false); }
   };
