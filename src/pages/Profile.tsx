@@ -224,6 +224,8 @@ const Profile: React.FC = () => {
             </CardContent>
           </Card>
 
+          {levelData && <UserLevelBadge levelData={levelData} />}
+
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
           {userId && <ProfileSources userId={userId} />}
