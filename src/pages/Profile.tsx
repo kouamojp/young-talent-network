@@ -4,7 +4,7 @@ import { user } from '@/components/profile/ProfileData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image, ShoppingBag, Award, History } from 'lucide-react';
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
@@ -39,6 +39,8 @@ const Profile: React.FC = () => {
   const [media, setMedia] = useState<any[]>([]);
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
   const [education, setEducation] = useState<any[]>([]);
+  const [userBadges, setUserBadges] = useState<any[]>([]);
+  const [coinHistory, setCoinHistory] = useState<any[]>([]);
   const { levelData } = useUserLevel(userId);
 
   useEffect(() => { fetchProfile(); }, []);
@@ -48,7 +50,7 @@ const Profile: React.FC = () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { navigate('/auth'); return; }
       setUserId(authUser.id);
-      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes] = await Promise.all([
+      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes, badgesRes, coinsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', authUser.id).single(),
         supabase.from('talent_presence').select('*').eq('user_id', authUser.id),
         supabase.from('talent_resumes').select('*, categories(name, name_fr)').eq('user_id', authUser.id),
@@ -56,6 +58,8 @@ const Profile: React.FC = () => {
         supabase.from('talent_media').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }),
         supabase.from('talent_social_links').select('*').eq('user_id', authUser.id),
         (supabase.from('talent_education') as any).select('*').eq('user_id', authUser.id).order('start_year', { ascending: false }),
+        supabase.from('user_badges').select('*').eq('user_id', authUser.id).order('earned_at', { ascending: false }),
+        supabase.from('coin_transactions').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }).limit(50),
       ]);
       if (profileRes.data) setProfile(profileRes.data);
       if (presenceRes.data) setTalentPresence(presenceRes.data);
@@ -64,6 +68,8 @@ const Profile: React.FC = () => {
       if (mediaRes.data) setMedia(mediaRes.data);
       if (linksRes.data) setSocialLinks(linksRes.data);
       if (eduRes.data) setEducation(eduRes.data);
+      if (badgesRes.data) setUserBadges(badgesRes.data);
+      if (coinsRes.data) setCoinHistory(coinsRes.data);
     } catch (error) { console.error('Error fetching profile:', error); }
     finally { setLoading(false); }
   };
@@ -225,6 +231,64 @@ const Profile: React.FC = () => {
           </Card>
 
           {levelData && <UserLevelBadge levelData={levelData} />}
+
+          {/* Earned Badges */}
+          {userBadges.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Award className="h-4 w-4" /> Бейджи
+                  <Badge variant="secondary">{userBadges.length}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {userBadges.map((b: any) => (
+                    <div key={b.id} className="flex flex-col items-center p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-center">
+                      <span className="text-2xl mb-1">{b.icon || '🏅'}</span>
+                      <p className="font-semibold text-xs">{b.badge_name}</p>
+                      {b.description && <p className="text-[10px] text-muted-foreground">{b.description}</p>}
+                      <p className="text-[10px] text-muted-foreground mt-1">{new Date(b.earned_at).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Coin History */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <History className="h-4 w-4" /> История YAT Coin
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {coinHistory.length > 0 ? (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {coinHistory.map((tx: any) => (
+                    <div key={tx.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className={tx.reason === 'post' ? 'text-blue-500' : 'text-pink-500'}>
+                          {tx.reason === 'post' ? '📝' : '❤️'}
+                        </span>
+                        <span className="capitalize">{tx.reason === 'post' ? 'Публикация' : 'Лайк'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground">+{tx.xp_earned} XP</span>
+                        <span className="font-semibold text-yellow-500 flex items-center gap-1">
+                          <Coins className="h-3 w-3" /> +{Number(tx.amount).toFixed(4)}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Ещё нет начислений. Создавайте посты и получайте лайки!</p>
+              )}
+            </CardContent>
+          </Card>
 
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
