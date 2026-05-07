@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CardBackgroundPicker } from "./CardBackgroundPicker";
+import { useUserLevel } from "@/hooks/useUserLevel";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -112,8 +114,17 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
     }
   };
 
+  const CardBackgroundSectionInner = () => {
+    const { levelData, refetch } = useUserLevel(profile.id);
+    if (!levelData) return null;
+    return <CardBackgroundPicker userId={profile.id} currentBackground={levelData.card_background} onUpdate={() => refetch()} />;
+  };
+
   return (
     <div className="space-y-6">
+      {/* Card Background */}
+      <CardBackgroundSectionInner />
+
       {/* Location */}
       <Card>
         <CardHeader>

@@ -8,6 +8,8 @@ import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv
 import { ProfileSkills } from '@/components/profile/ProfileSkills';
 import { ProfileInterests } from '@/components/profile/ProfileInterests';
 import { ProfileSettings } from '@/components/profile/ProfileSettings';
+import { useUserLevel } from '@/hooks/useUserLevel';
+import { UserLevelBadge } from '@/components/profile/UserLevelBadge';
 import ProfileSources from '@/components/profile/ProfileSources';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
@@ -37,6 +39,7 @@ const Profile: React.FC = () => {
   const [media, setMedia] = useState<any[]>([]);
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
   const [education, setEducation] = useState<any[]>([]);
+  const { levelData } = useUserLevel(userId);
 
   useEffect(() => { fetchProfile(); }, []);
 
@@ -173,7 +176,10 @@ const Profile: React.FC = () => {
             <div className="flex-1 pt-16 md:pt-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold">{displayProfile.name}</h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold">{displayProfile.name}</h1>
+                    {levelData && <UserLevelBadge levelData={levelData} compact />}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="outline">{userTypeLabel(displayProfile.user_type)}</Badge>
                     <span className="text-muted-foreground text-sm">{displayProfile.email}</span>
@@ -217,6 +223,8 @@ const Profile: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {levelData && <UserLevelBadge levelData={levelData} />}
 
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
