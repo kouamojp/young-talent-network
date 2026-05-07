@@ -114,10 +114,16 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
     }
   };
 
+  const CardBackgroundSectionInner = () => {
+    const { levelData, refetch } = useUserLevel(profile.id);
+    if (!levelData) return null;
+    return <CardBackgroundPicker userId={profile.id} currentBackground={levelData.card_background} onUpdate={() => refetch()} />;
+  };
+
   return (
     <div className="space-y-6">
       {/* Card Background */}
-      <CardBackgroundSection profileId={profile.id} />
+      <CardBackgroundSectionInner />
 
       {/* Location */}
       <Card>
