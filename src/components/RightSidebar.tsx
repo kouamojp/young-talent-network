@@ -3,6 +3,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Search, Plus } from 'lucide-react';
+import TopTalentsWidget from './TopTalentsWidget';
 
 // Sample data
 const contacts = [
@@ -21,6 +22,9 @@ const birthdays = [
 const RightSidebar: React.FC = () => {
   return (
     <div className="w-full space-y-4 p-4">
+      {/* Top Talents */}
+      <TopTalentsWidget />
+
       {/* Sponsored */}
       <div className="bg-card rounded-lg shadow-sm p-4 border border-border">
         <h3 className="font-semibold text-sm text-muted-foreground mb-3">Sponsored</h3>

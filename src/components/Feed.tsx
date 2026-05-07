@@ -7,6 +7,7 @@ import { PostCreationDialog } from './PostCreationDialog';
 import { StoriesBar } from './stories/StoriesBar';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import FeedLevelBar from './FeedLevelBar';
 
 interface Post {
   id: string;
@@ -68,6 +69,9 @@ const Feed: React.FC = () => {
   };
   return (
     <div className="w-full py-2 space-y-2">
+      {/* Level Progress */}
+      <FeedLevelBar />
+
       {/* Stories */}
       <StoriesBar />
 
