@@ -116,6 +116,9 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
 
   return (
     <div className="space-y-6">
+      {/* Card Background */}
+      <CardBackgroundSection profileId={profile.id} />
+
       {/* Location */}
       <Card>
         <CardHeader>
