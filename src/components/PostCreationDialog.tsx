@@ -165,15 +165,18 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
         }
         const mediaUrls = files.length ? await uploadFiles(user.id) : [];
         const finalContent = showLocation && location?.address ? `${content}\n📍 ${location.address}` : content;
+        const isScheduled = !!scheduledFor;
         const { error } = await supabase.from('posts').insert({
           content: finalContent.trim() || ' ',
           user_id: user.id,
           media_urls: mediaUrls.length ? mediaUrls : null,
           visibility,
           share_token: shareToken,
+          scheduled_for: isScheduled ? new Date(scheduledFor).toISOString() : null,
+          is_published: !isScheduled,
         });
         if (error) throw error;
-        toast({ title: t('post.created') || 'Post published!' });
+        toast({ title: isScheduled ? (t('post.scheduled') || `Scheduled for ${new Date(scheduledFor).toLocaleString()}`) : (t('post.created') || 'Post published!') });
       } else if (tab === 'article') {
         if (!articleTitle.trim() || !content.trim()) {
           toast({ title: t('post.articleError') || 'Title and content required', variant: 'destructive' });
