@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import RecentOrganizations from './RecentOrganizations';
 import { PostCreationDialog } from './PostCreationDialog';
+import { StoriesBar } from './stories/StoriesBar';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
@@ -67,6 +68,9 @@ const Feed: React.FC = () => {
   };
   return (
     <div className="w-full py-2 space-y-2">
+      {/* Stories */}
+      <StoriesBar />
+
       {/* Recently Added Organizations */}
       <RecentOrganizations />
       
