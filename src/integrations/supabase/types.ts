@@ -1918,6 +1918,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_name: string
+          badge_type: string
+          description: string | null
+          earned_at: string
+          icon: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_name: string
+          badge_type: string
+          description?: string | null
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_name?: string
+          badge_type?: string
+          description?: string | null
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_categories: {
         Row: {
           category_name: string
@@ -1960,6 +1990,39 @@ export type Database = {
           interest_type?: string
           interest_value?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_levels: {
+        Row: {
+          card_background: string | null
+          created_at: string
+          id: string
+          level: number
+          updated_at: string
+          user_id: string
+          xp_total: number
+          yat_coins: number
+        }
+        Insert: {
+          card_background?: string | null
+          created_at?: string
+          id?: string
+          level?: number
+          updated_at?: string
+          user_id: string
+          xp_total?: number
+          yat_coins?: number
+        }
+        Update: {
+          card_background?: string | null
+          created_at?: string
+          id?: string
+          level?: number
+          updated_at?: string
+          user_id?: string
+          xp_total?: number
+          yat_coins?: number
         }
         Relationships: []
       }
