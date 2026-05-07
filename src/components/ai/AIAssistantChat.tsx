@@ -169,7 +169,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-20 md:bottom-6 right-4 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+          className="fixed bottom-20 md:bottom-6 right-20 z-50 h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
         >
           <MessageCircle className="h-6 w-6" />
         </button>
@@ -177,7 +177,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-20 md:bottom-6 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-card border rounded-xl shadow-2xl overflow-hidden">
+        <div className="fixed bottom-20 md:bottom-20 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-card border rounded-xl shadow-2xl overflow-hidden">
           {chatContent}
         </div>
       )}
