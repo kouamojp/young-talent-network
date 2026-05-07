@@ -41,7 +41,7 @@ export const StoriesBar = () => {
   const [preview, setPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const colors = ['#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560', '#1b9c85', '#ff6b35', '#f7dc6f'];
 
