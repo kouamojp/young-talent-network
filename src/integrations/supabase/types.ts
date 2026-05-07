@@ -1357,8 +1357,10 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          is_published: boolean
           likes_count: number | null
           media_urls: string[] | null
+          scheduled_for: string | null
           share_token: string | null
           updated_at: string
           user_id: string
@@ -1369,8 +1371,10 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          is_published?: boolean
           likes_count?: number | null
           media_urls?: string[] | null
+          scheduled_for?: string | null
           share_token?: string | null
           updated_at?: string
           user_id: string
@@ -1381,8 +1385,10 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          is_published?: boolean
           likes_count?: number | null
           media_urls?: string[] | null
+          scheduled_for?: string | null
           share_token?: string | null
           updated_at?: string
           user_id?: string
@@ -1542,6 +1548,39 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      stories: {
+        Row: {
+          background_color: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          media_url: string | null
+          text_overlay: string | null
+          user_id: string
+          views_count: number | null
+        }
+        Insert: {
+          background_color?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_url?: string | null
+          text_overlay?: string | null
+          user_id: string
+          views_count?: number | null
+        }
+        Update: {
+          background_color?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_url?: string | null
+          text_overlay?: string | null
+          user_id?: string
+          views_count?: number | null
         }
         Relationships: []
       }
