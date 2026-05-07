@@ -176,7 +176,10 @@ const Profile: React.FC = () => {
             <div className="flex-1 pt-16 md:pt-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                  <h1 className="text-2xl font-bold">{displayProfile.name}</h1>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold">{displayProfile.name}</h1>
+                    {levelData && <UserLevelBadge levelData={levelData} compact />}
+                  </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="outline">{userTypeLabel(displayProfile.user_type)}</Badge>
                     <span className="text-muted-foreground text-sm">{displayProfile.email}</span>
