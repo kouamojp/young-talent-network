@@ -39,6 +39,8 @@ const Profile: React.FC = () => {
   const [media, setMedia] = useState<any[]>([]);
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
   const [education, setEducation] = useState<any[]>([]);
+  const [userBadges, setUserBadges] = useState<any[]>([]);
+  const [coinHistory, setCoinHistory] = useState<any[]>([]);
   const { levelData } = useUserLevel(userId);
 
   useEffect(() => { fetchProfile(); }, []);
