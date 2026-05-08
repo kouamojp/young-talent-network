@@ -7,8 +7,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3, Pencil } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +33,66 @@ const AdminPanel: React.FC = () => {
   const [weeklyGrowth, setWeeklyGrowth] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
   const [retentionRate, setRetentionRate] = useState(0);
+  const [editUser, setEditUser] = useState<any>(null);
+  const [editPost, setEditPost] = useState<any>(null);
+  const [editEvent, setEditEvent] = useState<any>(null);
+  const [editCommunity, setEditCommunity] = useState<any>(null);
+
+  const saveUser = async () => {
+    if (!editUser) return;
+    const { error } = await supabase.from('profiles').update({
+      name: editUser.name, bio: editUser.bio, city: editUser.city,
+      country: editUser.country, user_type: editUser.user_type,
+    }).eq('id', editUser.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editUser } : u));
+    setEditUser(null); toast({ title: 'User updated' });
+  };
+
+  const savePost = async () => {
+    if (!editPost) return;
+    const { error } = await supabase.from('posts').update({
+      content: editPost.content, visibility: editPost.visibility, is_published: editPost.is_published,
+    }).eq('id', editPost.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
+    setEditPost(null); toast({ title: 'Post updated' });
+  };
+
+  const saveEvent = async () => {
+    if (!editEvent) return;
+    const { error } = await supabase.from('events').update({
+      title: editEvent.title, description: editEvent.description, location: editEvent.location,
+    }).eq('id', editEvent.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...editEvent } : e));
+    setEditEvent(null); toast({ title: 'Event updated' });
+  };
+
+  const saveCommunity = async () => {
+    if (!editCommunity) return;
+    const { error } = await supabase.from('communities').update({
+      name: editCommunity.name, description: editCommunity.description, is_private: editCommunity.is_private,
+    }).eq('id', editCommunity.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setCommunities(prev => prev.map(c => c.id === editCommunity.id ? { ...c, ...editCommunity } : c));
+    setEditCommunity(null); toast({ title: 'Community updated' });
+  };
+
+  const deleteUser = async (id: string) => {
+    if (!confirm('Delete this user profile?')) return;
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setUsers(prev => prev.filter(u => u.id !== id));
+    toast({ title: 'User deleted' });
+  };
+
+  const deleteCommunity = async (id: string) => {
+    const { error } = await supabase.from('communities').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setCommunities(prev => prev.filter(c => c.id !== id));
+    toast({ title: 'Community deleted' });
+  };
 
   useEffect(() => {
     const checkRole = async () => {
@@ -331,7 +393,9 @@ const AdminPanel: React.FC = () => {
                       <TableCell>
                         <div className="flex gap-1">
                           <Button size="sm" variant="ghost" onClick={() => navigate(`/talent/${user.id}`)}><Eye className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => setEditUser({ ...user })}><Pencil className="h-4 w-4" /></Button>
                           <Button size="sm" variant="ghost" onClick={() => { setSelectedUserId(user.id); setRoleDialogOpen(true); }}><Lock className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteUser(user.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -357,7 +421,10 @@ const AdminPanel: React.FC = () => {
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
-                    <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditPost({ ...post })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
                   </div>
                 ))}
                 {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
@@ -378,7 +445,10 @@ const AdminPanel: React.FC = () => {
                       <p className="font-medium">{event.title}</p>
                       <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString()}</p>
                     </div>
-                    <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditEvent({ ...event })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
                   </div>
                 ))}
                 {events.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
@@ -410,6 +480,83 @@ const AdminPanel: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit User Dialog */}
+      <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit User</DialogTitle></DialogHeader>
+          {editUser && (
+            <div className="space-y-3">
+              <div><Label>Name</Label><Input value={editUser.name || ''} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} /></div>
+              <div><Label>Bio</Label><Textarea value={editUser.bio || ''} onChange={(e) => setEditUser({ ...editUser, bio: e.target.value })} /></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div><Label>City</Label><Input value={editUser.city || ''} onChange={(e) => setEditUser({ ...editUser, city: e.target.value })} /></div>
+                <div><Label>Country</Label><Input value={editUser.country || ''} onChange={(e) => setEditUser({ ...editUser, country: e.target.value })} /></div>
+              </div>
+              <div>
+                <Label>User Type</Label>
+                <Select value={editUser.user_type || 'talent'} onValueChange={(v) => setEditUser({ ...editUser, user_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="talent">Talent</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
+                    <SelectItem value="organization">Organization</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditUser(null)}>Cancel</Button>
+            <Button onClick={saveUser}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Post Dialog */}
+      <Dialog open={!!editPost} onOpenChange={(o) => !o && setEditPost(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit Post</DialogTitle></DialogHeader>
+          {editPost && (
+            <div className="space-y-3">
+              <div><Label>Content</Label><Textarea rows={5} value={editPost.content || ''} onChange={(e) => setEditPost({ ...editPost, content: e.target.value })} /></div>
+              <div>
+                <Label>Visibility</Label>
+                <Select value={editPost.visibility || 'public'} onValueChange={(v) => setEditPost({ ...editPost, visibility: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="friends">Friends</SelectItem>
+                    <SelectItem value="link">Link only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditPost(null)}>Cancel</Button>
+            <Button onClick={savePost}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Dialog */}
+      <Dialog open={!!editEvent} onOpenChange={(o) => !o && setEditEvent(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit Event</DialogTitle></DialogHeader>
+          {editEvent && (
+            <div className="space-y-3">
+              <div><Label>Title</Label><Input value={editEvent.title || ''} onChange={(e) => setEditEvent({ ...editEvent, title: e.target.value })} /></div>
+              <div><Label>Description</Label><Textarea value={editEvent.description || ''} onChange={(e) => setEditEvent({ ...editEvent, description: e.target.value })} /></div>
+              <div><Label>Location</Label><Input value={editEvent.location || ''} onChange={(e) => setEditEvent({ ...editEvent, location: e.target.value })} /></div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditEvent(null)}>Cancel</Button>
+            <Button onClick={saveEvent}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
