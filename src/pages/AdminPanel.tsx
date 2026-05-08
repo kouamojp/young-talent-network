@@ -421,7 +421,10 @@ const AdminPanel: React.FC = () => {
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
-                    <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditPost({ ...post })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
                   </div>
                 ))}
                 {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
