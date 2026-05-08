@@ -33,6 +33,66 @@ const AdminPanel: React.FC = () => {
   const [weeklyGrowth, setWeeklyGrowth] = useState(0);
   const [activeToday, setActiveToday] = useState(0);
   const [retentionRate, setRetentionRate] = useState(0);
+  const [editUser, setEditUser] = useState<any>(null);
+  const [editPost, setEditPost] = useState<any>(null);
+  const [editEvent, setEditEvent] = useState<any>(null);
+  const [editCommunity, setEditCommunity] = useState<any>(null);
+
+  const saveUser = async () => {
+    if (!editUser) return;
+    const { error } = await supabase.from('profiles').update({
+      name: editUser.name, bio: editUser.bio, city: editUser.city,
+      country: editUser.country, user_type: editUser.user_type,
+    }).eq('id', editUser.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editUser } : u));
+    setEditUser(null); toast({ title: 'User updated' });
+  };
+
+  const savePost = async () => {
+    if (!editPost) return;
+    const { error } = await supabase.from('posts').update({
+      content: editPost.content, visibility: editPost.visibility, is_published: editPost.is_published,
+    }).eq('id', editPost.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
+    setEditPost(null); toast({ title: 'Post updated' });
+  };
+
+  const saveEvent = async () => {
+    if (!editEvent) return;
+    const { error } = await supabase.from('events').update({
+      title: editEvent.title, description: editEvent.description, location: editEvent.location,
+    }).eq('id', editEvent.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...editEvent } : e));
+    setEditEvent(null); toast({ title: 'Event updated' });
+  };
+
+  const saveCommunity = async () => {
+    if (!editCommunity) return;
+    const { error } = await supabase.from('communities').update({
+      name: editCommunity.name, description: editCommunity.description, is_private: editCommunity.is_private,
+    }).eq('id', editCommunity.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setCommunities(prev => prev.map(c => c.id === editCommunity.id ? { ...c, ...editCommunity } : c));
+    setEditCommunity(null); toast({ title: 'Community updated' });
+  };
+
+  const deleteUser = async (id: string) => {
+    if (!confirm('Delete this user profile?')) return;
+    const { error } = await supabase.from('profiles').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setUsers(prev => prev.filter(u => u.id !== id));
+    toast({ title: 'User deleted' });
+  };
+
+  const deleteCommunity = async (id: string) => {
+    const { error } = await supabase.from('communities').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setCommunities(prev => prev.filter(c => c.id !== id));
+    toast({ title: 'Community deleted' });
+  };
 
   useEffect(() => {
     const checkRole = async () => {
