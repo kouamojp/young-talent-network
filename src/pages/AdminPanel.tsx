@@ -393,7 +393,9 @@ const AdminPanel: React.FC = () => {
                       <TableCell>
                         <div className="flex gap-1">
                           <Button size="sm" variant="ghost" onClick={() => navigate(`/talent/${user.id}`)}><Eye className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => setEditUser({ ...user })}><Pencil className="h-4 w-4" /></Button>
                           <Button size="sm" variant="ghost" onClick={() => { setSelectedUserId(user.id); setRoleDialogOpen(true); }}><Lock className="h-4 w-4" /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => deleteUser(user.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
