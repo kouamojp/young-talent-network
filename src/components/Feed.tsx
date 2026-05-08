@@ -72,6 +72,7 @@ const Feed: React.FC = () => {
     <div className="w-full py-2 space-y-2">
       {/* Level Progress */}
       <FeedLevelBar />
+      <AdBanner placement="feed" />
 
       {/* Stories */}
       <StoriesBar />
