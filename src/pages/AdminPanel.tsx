@@ -53,17 +53,33 @@ const AdminPanel: React.FC = () => {
   const savePost = async () => {
     if (!editPost) return;
     const { error } = await supabase.from('posts').update({
-      content: editPost.content, visibility: editPost.visibility, is_published: editPost.is_published,
+      content: editPost.content, visibility: editPost.visibility,
+      is_published: editPost.is_published, status: editPost.status,
     }).eq('id', editPost.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
     setEditPost(null); toast({ title: 'Post updated' });
   };
 
+  const setPostStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('posts').update({ status, is_published: status === 'published' }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setPosts(prev => prev.map(p => p.id === id ? { ...p, status, is_published: status === 'published' } : p));
+    toast({ title: `Post → ${status}` });
+  };
+
+  const setEventStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('events').update({ status }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setEvents(prev => prev.map(e => e.id === id ? { ...e, status } : e));
+    toast({ title: `Event → ${status}` });
+  };
+
   const saveEvent = async () => {
     if (!editEvent) return;
     const { error } = await supabase.from('events').update({
-      title: editEvent.title, description: editEvent.description, location: editEvent.location,
+      title: editEvent.title, description: editEvent.description,
+      location: editEvent.location, status: editEvent.status,
     }).eq('id', editEvent.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...editEvent } : e));
