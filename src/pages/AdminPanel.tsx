@@ -549,6 +549,71 @@ const AdminPanel: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Communities Tab */}
+        <TabsContent value="communities" className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle>Communities</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {communities.map(c => (
+                  <div key={c.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{c.name}</p>
+                        {c.is_private && <Badge variant="secondary" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />Private</Badge>}
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{c.description || '—'}</p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditCommunity({ ...c })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteCommunity(c.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {communities.length === 0 && <p className="text-muted-foreground text-center py-4">No communities</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Ads Tab */}
+        <TabsContent value="ads" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Реклама</CardTitle>
+              <Button size="sm" onClick={() => setEditAd({ title: '', placement: 'feed', is_active: true })}>
+                <Plus className="h-4 w-4 mr-1" />Новое
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {ads.map(ad => (
+                  <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                    {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium truncate">{ad.title}</p>
+                        <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
+                        <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
+                          {ad.is_active ? 'Активна' : 'Выкл'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
+                      <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
+                      <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {ads.length === 0 && <p className="text-muted-foreground text-center py-6">Нет рекламы. Нажмите «Новое» чтобы создать.</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Edit User Dialog */}
