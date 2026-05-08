@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      advertisements: {
+        Row: {
+          clicks_count: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ends_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_url: string | null
+          placement: string
+          starts_at: string
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          placement?: string
+          starts_at?: string
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          placement?: string
+          starts_at?: string
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
       agent_organization_memberships: {
         Row: {
           agent_id: string
@@ -825,6 +876,7 @@ export type Database = {
           longitude: number | null
           organizer_id: string
           start_date: string
+          status: string
           subcategory_id: string | null
           title: string
           updated_at: string
@@ -844,6 +896,7 @@ export type Database = {
           longitude?: number | null
           organizer_id: string
           start_date: string
+          status?: string
           subcategory_id?: string | null
           title: string
           updated_at?: string
@@ -863,6 +916,7 @@ export type Database = {
           longitude?: number | null
           organizer_id?: string
           start_date?: string
+          status?: string
           subcategory_id?: string | null
           title?: string
           updated_at?: string
@@ -1443,6 +1497,7 @@ export type Database = {
           media_urls: string[] | null
           scheduled_for: string | null
           share_token: string | null
+          status: string
           updated_at: string
           user_id: string
           visibility: string
@@ -1457,6 +1512,7 @@ export type Database = {
           media_urls?: string[] | null
           scheduled_for?: string | null
           share_token?: string | null
+          status?: string
           updated_at?: string
           user_id: string
           visibility?: string
@@ -1471,6 +1527,7 @@ export type Database = {
           media_urls?: string[] | null
           scheduled_for?: string | null
           share_token?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
           visibility?: string

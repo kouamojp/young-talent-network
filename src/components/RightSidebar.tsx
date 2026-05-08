@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Search, Plus } from 'lucide-react';
 import TopTalentsWidget from './TopTalentsWidget';
+import AdBanner from './AdBanner';
 
 // Sample data
 const contacts = [
@@ -89,6 +90,7 @@ const RightSidebar: React.FC = () => {
           ))}
         </ul>
       </div>
+      <AdBanner placement="sidebar" className="mt-4" />
     </div>
   );
 };

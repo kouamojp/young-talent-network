@@ -8,6 +8,7 @@ import { StoriesBar } from './stories/StoriesBar';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import FeedLevelBar from './FeedLevelBar';
+import AdBanner from './AdBanner';
 
 interface Post {
   id: string;
@@ -71,6 +72,7 @@ const Feed: React.FC = () => {
     <div className="w-full py-2 space-y-2">
       {/* Level Progress */}
       <FeedLevelBar />
+      <AdBanner placement="feed" />
 
       {/* Stories */}
       <StoriesBar />

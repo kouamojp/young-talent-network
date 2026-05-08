@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3, Pencil } from 'lucide-react';
+import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3, Pencil, Megaphone, Plus, EyeOff, FileEdit } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +38,8 @@ const AdminPanel: React.FC = () => {
   const [editPost, setEditPost] = useState<any>(null);
   const [editEvent, setEditEvent] = useState<any>(null);
   const [editCommunity, setEditCommunity] = useState<any>(null);
+  const [ads, setAds] = useState<any[]>([]);
+  const [editAd, setEditAd] = useState<any>(null);
 
   const saveUser = async () => {
     if (!editUser) return;
@@ -52,17 +55,33 @@ const AdminPanel: React.FC = () => {
   const savePost = async () => {
     if (!editPost) return;
     const { error } = await supabase.from('posts').update({
-      content: editPost.content, visibility: editPost.visibility, is_published: editPost.is_published,
+      content: editPost.content, visibility: editPost.visibility,
+      is_published: editPost.is_published, status: editPost.status,
     }).eq('id', editPost.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
     setEditPost(null); toast({ title: 'Post updated' });
   };
 
+  const setPostStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('posts').update({ status, is_published: status === 'published' }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setPosts(prev => prev.map(p => p.id === id ? { ...p, status, is_published: status === 'published' } : p));
+    toast({ title: `Post → ${status}` });
+  };
+
+  const setEventStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('events').update({ status }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setEvents(prev => prev.map(e => e.id === id ? { ...e, status } : e));
+    toast({ title: `Event → ${status}` });
+  };
+
   const saveEvent = async () => {
     if (!editEvent) return;
     const { error } = await supabase.from('events').update({
-      title: editEvent.title, description: editEvent.description, location: editEvent.location,
+      title: editEvent.title, description: editEvent.description,
+      location: editEvent.location, status: editEvent.status,
     }).eq('id', editEvent.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...editEvent } : e));
@@ -94,6 +113,39 @@ const AdminPanel: React.FC = () => {
     toast({ title: 'Community deleted' });
   };
 
+  const saveAd = async () => {
+    if (!editAd) return;
+    const payload = {
+      title: editAd.title, description: editAd.description, image_url: editAd.image_url,
+      link_url: editAd.link_url, placement: editAd.placement || 'feed',
+      is_active: !!editAd.is_active, ends_at: editAd.ends_at || null,
+    };
+    if (editAd.id) {
+      const { error } = await supabase.from('advertisements').update(payload).eq('id', editAd.id);
+      if (error) return toast({ title: error.message, variant: 'destructive' });
+      setAds(prev => prev.map(a => a.id === editAd.id ? { ...a, ...payload } : a));
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase.from('advertisements').insert({ ...payload, created_by: user?.id }).select().single();
+      if (error) return toast({ title: error.message, variant: 'destructive' });
+      if (data) setAds(prev => [data, ...prev]);
+    }
+    setEditAd(null); toast({ title: 'Ad saved' });
+  };
+
+  const deleteAd = async (id: string) => {
+    if (!confirm('Delete ad?')) return;
+    const { error } = await supabase.from('advertisements').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setAds(prev => prev.filter(a => a.id !== id));
+  };
+
+  const toggleAd = async (ad: any) => {
+    const { error } = await supabase.from('advertisements').update({ is_active: !ad.is_active }).eq('id', ad.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setAds(prev => prev.map(a => a.id === ad.id ? { ...a, is_active: !ad.is_active } : a));
+  };
+
   useEffect(() => {
     const checkRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -118,12 +170,14 @@ const AdminPanel: React.FC = () => {
   }, [loading, currentUserRole]);
 
   const fetchData = async () => {
-    const [usersRes, postsRes, eventsRes, communitiesRes] = await Promise.all([
+    const [usersRes, postsRes, eventsRes, communitiesRes, adsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(100),
       supabase.from('posts').select('*, profiles(name, avatar_url)').order('created_at', { ascending: false }).limit(50),
       supabase.from('events').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('communities').select('*').order('created_at', { ascending: false }).limit(50),
+      supabase.from('advertisements').select('*').order('created_at', { ascending: false }),
     ]);
+    if (adsRes.data) setAds(adsRes.data);
     if (usersRes.data) {
       setUsers(usersRes.data);
       // Calculate stats from real data
@@ -304,6 +358,8 @@ const AdminPanel: React.FC = () => {
           <TabsTrigger value="content">{t('admin.contentManagement') || 'Content'}</TabsTrigger>
           <TabsTrigger value="events">{t('admin.eventsManagement') || 'Events'}</TabsTrigger>
           <TabsTrigger value="moderation">{t('admin.contentModeration') || 'Moderation'}</TabsTrigger>
+          <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />Communities</TabsTrigger>
+          <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />Реклама</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -415,13 +471,19 @@ const AdminPanel: React.FC = () => {
                 {posts.map(post => (
                   <div key={post.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-medium text-sm">{post.profiles?.name || 'Unknown'}</span>
                         <span className="text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</span>
+                        <Badge variant={post.status === 'published' ? 'default' : post.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {post.status || 'published'}
+                        </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
                     <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setPostStatus(post.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setPostStatus(post.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setPostStatus(post.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditPost({ ...post })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
@@ -442,10 +504,18 @@ const AdminPanel: React.FC = () => {
                 {events.map(event => (
                   <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <p className="font-medium">{event.title}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium">{event.title}</p>
+                        <Badge variant={event.status === 'published' ? 'default' : event.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {event.status || 'published'}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString()}</p>
                     </div>
                     <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setEventStatus(event.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setEventStatus(event.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setEventStatus(event.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditEvent({ ...event })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
@@ -475,6 +545,71 @@ const AdminPanel: React.FC = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Communities Tab */}
+        <TabsContent value="communities" className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle>Communities</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {communities.map(c => (
+                  <div key={c.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{c.name}</p>
+                        {c.is_private && <Badge variant="secondary" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />Private</Badge>}
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-1">{c.description || '—'}</p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button size="sm" variant="outline" onClick={() => setEditCommunity({ ...c })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteCommunity(c.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {communities.length === 0 && <p className="text-muted-foreground text-center py-4">No communities</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Ads Tab */}
+        <TabsContent value="ads" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Реклама</CardTitle>
+              <Button size="sm" onClick={() => setEditAd({ title: '', placement: 'feed', is_active: true })}>
+                <Plus className="h-4 w-4 mr-1" />Новое
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {ads.map(ad => (
+                  <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                    {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium truncate">{ad.title}</p>
+                        <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
+                        <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
+                          {ad.is_active ? 'Активна' : 'Выкл'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
+                      <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
+                      <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {ads.length === 0 && <p className="text-muted-foreground text-center py-6">Нет рекламы. Нажмите «Новое» чтобы создать.</p>}
               </div>
             </CardContent>
           </Card>
@@ -531,6 +666,17 @@ const AdminPanel: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={editPost.status || 'published'} onValueChange={(v) => setEditPost({ ...editPost, status: v, is_published: v === 'published' })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Черновик</SelectItem>
+                    <SelectItem value="published">Опубликован</SelectItem>
+                    <SelectItem value="hidden">Скрыт</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -549,11 +695,83 @@ const AdminPanel: React.FC = () => {
               <div><Label>Title</Label><Input value={editEvent.title || ''} onChange={(e) => setEditEvent({ ...editEvent, title: e.target.value })} /></div>
               <div><Label>Description</Label><Textarea value={editEvent.description || ''} onChange={(e) => setEditEvent({ ...editEvent, description: e.target.value })} /></div>
               <div><Label>Location</Label><Input value={editEvent.location || ''} onChange={(e) => setEditEvent({ ...editEvent, location: e.target.value })} /></div>
+              <div>
+                <Label>Status</Label>
+                <Select value={editEvent.status || 'published'} onValueChange={(v) => setEditEvent({ ...editEvent, status: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Черновик</SelectItem>
+                    <SelectItem value="published">Опубликован</SelectItem>
+                    <SelectItem value="hidden">Скрыт</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditEvent(null)}>Cancel</Button>
             <Button onClick={saveEvent}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Community Dialog */}
+      <Dialog open={!!editCommunity} onOpenChange={(o) => !o && setEditCommunity(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Редактировать сообщество</DialogTitle></DialogHeader>
+          {editCommunity && (
+            <div className="space-y-3">
+              <div><Label>Название</Label><Input value={editCommunity.name || ''} onChange={(e) => setEditCommunity({ ...editCommunity, name: e.target.value })} /></div>
+              <div><Label>Описание</Label><Textarea rows={4} value={editCommunity.description || ''} onChange={(e) => setEditCommunity({ ...editCommunity, description: e.target.value })} /></div>
+              <div className="flex items-center justify-between">
+                <Label>Приватное сообщество</Label>
+                <Switch checked={!!editCommunity.is_private} onCheckedChange={(v) => setEditCommunity({ ...editCommunity, is_private: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditCommunity(null)}>Отмена</Button>
+            <Button onClick={saveCommunity}>Сохранить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Ad Dialog */}
+      <Dialog open={!!editAd} onOpenChange={(o) => !o && setEditAd(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>{editAd?.id ? 'Редактировать рекламу' : 'Новая реклама'}</DialogTitle></DialogHeader>
+          {editAd && (
+            <div className="space-y-3">
+              <div><Label>Заголовок *</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
+              <div><Label>Описание</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
+              <div><Label>URL изображения</Label><Input placeholder="https://..." value={editAd.image_url || ''} onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })} /></div>
+              <div><Label>Ссылка</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label>Размещение</Label>
+                  <Select value={editAd.placement || 'feed'} onValueChange={(v) => setEditAd({ ...editAd, placement: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feed">Лента</SelectItem>
+                      <SelectItem value="sidebar">Боковая панель</SelectItem>
+                      <SelectItem value="banner">Баннер</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Окончание</Label>
+                  <Input type="datetime-local" value={editAd.ends_at ? new Date(editAd.ends_at).toISOString().slice(0,16) : ''} onChange={(e) => setEditAd({ ...editAd, ends_at: e.target.value ? new Date(e.target.value).toISOString() : null })} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>Активна</Label>
+                <Switch checked={!!editAd.is_active} onCheckedChange={(v) => setEditAd({ ...editAd, is_active: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditAd(null)}>Отмена</Button>
+            <Button onClick={saveAd} disabled={!editAd?.title}>Сохранить</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
