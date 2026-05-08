@@ -90,6 +90,7 @@ const RightSidebar: React.FC = () => {
           ))}
         </ul>
       </div>
+      <AdBanner placement="sidebar" className="mt-4" />
     </div>
   );
 };
