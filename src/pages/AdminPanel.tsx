@@ -471,13 +471,19 @@ const AdminPanel: React.FC = () => {
                 {posts.map(post => (
                   <div key={post.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="font-medium text-sm">{post.profiles?.name || 'Unknown'}</span>
                         <span className="text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</span>
+                        <Badge variant={post.status === 'published' ? 'default' : post.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {post.status || 'published'}
+                        </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
                     <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setPostStatus(post.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setPostStatus(post.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setPostStatus(post.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditPost({ ...post })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
