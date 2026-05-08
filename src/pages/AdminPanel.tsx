@@ -480,6 +480,83 @@ const AdminPanel: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit User Dialog */}
+      <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit User</DialogTitle></DialogHeader>
+          {editUser && (
+            <div className="space-y-3">
+              <div><Label>Name</Label><Input value={editUser.name || ''} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} /></div>
+              <div><Label>Bio</Label><Textarea value={editUser.bio || ''} onChange={(e) => setEditUser({ ...editUser, bio: e.target.value })} /></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div><Label>City</Label><Input value={editUser.city || ''} onChange={(e) => setEditUser({ ...editUser, city: e.target.value })} /></div>
+                <div><Label>Country</Label><Input value={editUser.country || ''} onChange={(e) => setEditUser({ ...editUser, country: e.target.value })} /></div>
+              </div>
+              <div>
+                <Label>User Type</Label>
+                <Select value={editUser.user_type || 'talent'} onValueChange={(v) => setEditUser({ ...editUser, user_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="talent">Talent</SelectItem>
+                    <SelectItem value="agent">Agent</SelectItem>
+                    <SelectItem value="organization">Organization</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditUser(null)}>Cancel</Button>
+            <Button onClick={saveUser}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Post Dialog */}
+      <Dialog open={!!editPost} onOpenChange={(o) => !o && setEditPost(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit Post</DialogTitle></DialogHeader>
+          {editPost && (
+            <div className="space-y-3">
+              <div><Label>Content</Label><Textarea rows={5} value={editPost.content || ''} onChange={(e) => setEditPost({ ...editPost, content: e.target.value })} /></div>
+              <div>
+                <Label>Visibility</Label>
+                <Select value={editPost.visibility || 'public'} onValueChange={(v) => setEditPost({ ...editPost, visibility: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="friends">Friends</SelectItem>
+                    <SelectItem value="link">Link only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditPost(null)}>Cancel</Button>
+            <Button onClick={savePost}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Dialog */}
+      <Dialog open={!!editEvent} onOpenChange={(o) => !o && setEditEvent(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit Event</DialogTitle></DialogHeader>
+          {editEvent && (
+            <div className="space-y-3">
+              <div><Label>Title</Label><Input value={editEvent.title || ''} onChange={(e) => setEditEvent({ ...editEvent, title: e.target.value })} /></div>
+              <div><Label>Description</Label><Textarea value={editEvent.description || ''} onChange={(e) => setEditEvent({ ...editEvent, description: e.target.value })} /></div>
+              <div><Label>Location</Label><Input value={editEvent.location || ''} onChange={(e) => setEditEvent({ ...editEvent, location: e.target.value })} /></div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditEvent(null)}>Cancel</Button>
+            <Button onClick={saveEvent}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
