@@ -714,6 +714,67 @@ const AdminPanel: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Community Dialog */}
+      <Dialog open={!!editCommunity} onOpenChange={(o) => !o && setEditCommunity(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Редактировать сообщество</DialogTitle></DialogHeader>
+          {editCommunity && (
+            <div className="space-y-3">
+              <div><Label>Название</Label><Input value={editCommunity.name || ''} onChange={(e) => setEditCommunity({ ...editCommunity, name: e.target.value })} /></div>
+              <div><Label>Описание</Label><Textarea rows={4} value={editCommunity.description || ''} onChange={(e) => setEditCommunity({ ...editCommunity, description: e.target.value })} /></div>
+              <div className="flex items-center justify-between">
+                <Label>Приватное сообщество</Label>
+                <Switch checked={!!editCommunity.is_private} onCheckedChange={(v) => setEditCommunity({ ...editCommunity, is_private: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditCommunity(null)}>Отмена</Button>
+            <Button onClick={saveCommunity}>Сохранить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Ad Dialog */}
+      <Dialog open={!!editAd} onOpenChange={(o) => !o && setEditAd(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>{editAd?.id ? 'Редактировать рекламу' : 'Новая реклама'}</DialogTitle></DialogHeader>
+          {editAd && (
+            <div className="space-y-3">
+              <div><Label>Заголовок *</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
+              <div><Label>Описание</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
+              <div><Label>URL изображения</Label><Input placeholder="https://..." value={editAd.image_url || ''} onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })} /></div>
+              <div><Label>Ссылка</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label>Размещение</Label>
+                  <Select value={editAd.placement || 'feed'} onValueChange={(v) => setEditAd({ ...editAd, placement: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="feed">Лента</SelectItem>
+                      <SelectItem value="sidebar">Боковая панель</SelectItem>
+                      <SelectItem value="banner">Баннер</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Окончание</Label>
+                  <Input type="datetime-local" value={editAd.ends_at ? new Date(editAd.ends_at).toISOString().slice(0,16) : ''} onChange={(e) => setEditAd({ ...editAd, ends_at: e.target.value ? new Date(e.target.value).toISOString() : null })} />
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <Label>Активна</Label>
+                <Switch checked={!!editAd.is_active} onCheckedChange={(v) => setEditAd({ ...editAd, is_active: v })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditAd(null)}>Отмена</Button>
+            <Button onClick={saveAd} disabled={!editAd?.title}>Сохранить</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
