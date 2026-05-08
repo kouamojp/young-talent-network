@@ -38,6 +38,8 @@ const AdminPanel: React.FC = () => {
   const [editPost, setEditPost] = useState<any>(null);
   const [editEvent, setEditEvent] = useState<any>(null);
   const [editCommunity, setEditCommunity] = useState<any>(null);
+  const [ads, setAds] = useState<any[]>([]);
+  const [editAd, setEditAd] = useState<any>(null);
 
   const saveUser = async () => {
     if (!editUser) return;
