@@ -113,6 +113,39 @@ const AdminPanel: React.FC = () => {
     toast({ title: 'Community deleted' });
   };
 
+  const saveAd = async () => {
+    if (!editAd) return;
+    const payload = {
+      title: editAd.title, description: editAd.description, image_url: editAd.image_url,
+      link_url: editAd.link_url, placement: editAd.placement || 'feed',
+      is_active: !!editAd.is_active, ends_at: editAd.ends_at || null,
+    };
+    if (editAd.id) {
+      const { error } = await supabase.from('advertisements').update(payload).eq('id', editAd.id);
+      if (error) return toast({ title: error.message, variant: 'destructive' });
+      setAds(prev => prev.map(a => a.id === editAd.id ? { ...a, ...payload } : a));
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data, error } = await supabase.from('advertisements').insert({ ...payload, created_by: user?.id }).select().single();
+      if (error) return toast({ title: error.message, variant: 'destructive' });
+      if (data) setAds(prev => [data, ...prev]);
+    }
+    setEditAd(null); toast({ title: 'Ad saved' });
+  };
+
+  const deleteAd = async (id: string) => {
+    if (!confirm('Delete ad?')) return;
+    const { error } = await supabase.from('advertisements').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setAds(prev => prev.filter(a => a.id !== id));
+  };
+
+  const toggleAd = async (ad: any) => {
+    const { error } = await supabase.from('advertisements').update({ is_active: !ad.is_active }).eq('id', ad.id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setAds(prev => prev.map(a => a.id === ad.id ? { ...a, is_active: !ad.is_active } : a));
+  };
+
   useEffect(() => {
     const checkRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
