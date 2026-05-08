@@ -504,10 +504,18 @@ const AdminPanel: React.FC = () => {
                 {events.map(event => (
                   <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <p className="font-medium">{event.title}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium">{event.title}</p>
+                        <Badge variant={event.status === 'published' ? 'default' : event.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {event.status || 'published'}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString()}</p>
                     </div>
                     <div className="flex gap-1">
+                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setEventStatus(event.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setEventStatus(event.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setEventStatus(event.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditEvent({ ...event })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
