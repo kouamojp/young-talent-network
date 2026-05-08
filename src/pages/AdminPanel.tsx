@@ -666,6 +666,17 @@ const AdminPanel: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={editPost.status || 'published'} onValueChange={(v) => setEditPost({ ...editPost, status: v, is_published: v === 'published' })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Черновик</SelectItem>
+                    <SelectItem value="published">Опубликован</SelectItem>
+                    <SelectItem value="hidden">Скрыт</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           <DialogFooter>
