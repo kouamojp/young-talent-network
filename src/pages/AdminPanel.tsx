@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3, Pencil, Megaphone, Plus, EyeOff, FileEdit } from 'lucide-react';
+import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCircle, UserPlus, Eye, Lock, TrendingUp, Activity, BarChart3, Pencil, Megaphone, Plus, EyeOff, FileEdit, Upload, Loader2, ShoppingBag, MousePointerClick } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +40,45 @@ const AdminPanel: React.FC = () => {
   const [editCommunity, setEditCommunity] = useState<any>(null);
   const [ads, setAds] = useState<any[]>([]);
   const [editAd, setEditAd] = useState<any>(null);
+  const [adUploading, setAdUploading] = useState(false);
+  const [marketplaceListings, setMarketplaceListings] = useState<any[]>([]);
+
+  const AD_SIZE_HINTS: Record<string, string> = {
+    feed: 'Рекоменд. 1200×400 (3:1), до 2 МБ',
+    sidebar: 'Рекоменд. 400×400 (1:1), до 1 МБ',
+    banner: 'Рекоменд. 1600×300 (≈16:3), до 2 МБ',
+  };
+
+  const handleAdImageUpload = async (file: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast({ title: 'Файл больше 5 МБ', variant: 'destructive' }); return; }
+    setAdUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `ads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('ad-files').upload(path, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from('ad-files').getPublicUrl(path);
+      setEditAd((prev: any) => ({ ...(prev || {}), image_url: data.publicUrl }));
+      toast({ title: 'Изображение загружено' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Ошибка загрузки', variant: 'destructive' });
+    } finally { setAdUploading(false); }
+  };
+
+  const setListingStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('marketplace_listings').update({ status }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setMarketplaceListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+    toast({ title: `Объявление → ${status}` });
+  };
+
+  const deleteListing = async (id: string) => {
+    if (!confirm('Удалить объявление?')) return;
+    const { error } = await supabase.from('marketplace_listings').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setMarketplaceListings(prev => prev.filter(l => l.id !== id));
+  };
 
   const saveUser = async () => {
     if (!editUser) return;
@@ -170,14 +209,16 @@ const AdminPanel: React.FC = () => {
   }, [loading, currentUserRole]);
 
   const fetchData = async () => {
-    const [usersRes, postsRes, eventsRes, communitiesRes, adsRes] = await Promise.all([
+    const [usersRes, postsRes, eventsRes, communitiesRes, adsRes, listingsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(100),
       supabase.from('posts').select('*, profiles(name, avatar_url)').order('created_at', { ascending: false }).limit(50),
       supabase.from('events').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('communities').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('advertisements').select('*').order('created_at', { ascending: false }),
+      supabase.from('marketplace_listings').select('*, profiles(name)').order('created_at', { ascending: false }).limit(100),
     ]);
     if (adsRes.data) setAds(adsRes.data);
+    if (listingsRes.data) setMarketplaceListings(listingsRes.data);
     if (usersRes.data) {
       setUsers(usersRes.data);
       // Calculate stats from real data
@@ -359,6 +400,7 @@ const AdminPanel: React.FC = () => {
           <TabsTrigger value="events">{t('admin.eventsManagement') || 'Events'}</TabsTrigger>
           <TabsTrigger value="moderation">{t('admin.contentModeration') || 'Moderation'}</TabsTrigger>
           <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />Communities</TabsTrigger>
+          <TabsTrigger value="marketplace"><ShoppingBag className="h-4 w-4 mr-1" />Маркетплейс</TabsTrigger>
           <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />Реклама</TabsTrigger>
         </TabsList>
 
@@ -577,38 +619,144 @@ const AdminPanel: React.FC = () => {
           </Card>
         </TabsContent>
 
+        {/* Marketplace Tab */}
+        <TabsContent value="marketplace" className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />Объявления Marketplace</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {marketplaceListings.map(l => (
+                  <div key={l.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                    {l.media_urls?.[0] && <img src={l.media_urls[0]} alt="" className="h-14 w-20 object-cover rounded" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium truncate">{l.title}</p>
+                        <Badge variant={l.status === 'active' ? 'default' : l.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {l.status === 'active' ? 'Опубликовано' : l.status === 'hidden' ? 'Скрыто' : l.status === 'draft' ? 'Черновик' : l.status}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px]">{l.type}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{l.profiles?.name || '—'} · {l.currency}{l.price} · {l.category}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost" title="Опубликовать" onClick={() => setListingStatus(l.id, 'active')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Скрыть" onClick={() => setListingStatus(l.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Черновик" onClick={() => setListingStatus(l.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteListing(l.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {marketplaceListings.length === 0 && <p className="text-muted-foreground text-center py-6">Нет объявлений.</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Ads Tab */}
         <TabsContent value="ads" className="space-y-4">
+          {/* Top performers stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Всего показов</span>
+                  <Eye className="h-4 w-4 text-cyan-600" />
+                </div>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.views_count || 0), 0).toLocaleString()}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Всего кликов</span>
+                  <MousePointerClick className="h-4 w-4 text-emerald-600" />
+                </div>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.clicks_count || 0), 0).toLocaleString()}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Средний CTR</span>
+                  <BarChart3 className="h-4 w-4 text-orange-600" />
+                </div>
+                <p className="text-2xl font-bold">
+                  {(() => {
+                    const v = ads.reduce((s, a) => s + (a.views_count || 0), 0);
+                    const c = ads.reduce((s, a) => s + (a.clicks_count || 0), 0);
+                    return v > 0 ? `${((c / v) * 100).toFixed(2)}%` : '—';
+                  })()}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-base">🏆 Топ по кликам</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[...ads].sort((a, b) => (b.clicks_count || 0) - (a.clicks_count || 0)).slice(0, 5).map((ad, i) => (
+                    <div key={ad.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                      <span className="flex-1 truncate">{ad.title}</span>
+                      <Badge variant="outline">{ad.clicks_count || 0}</Badge>
+                    </div>
+                  ))}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle className="text-base">👁 Топ по показам</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[...ads].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 5).map((ad, i) => (
+                    <div key={ad.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                      <span className="flex-1 truncate">{ad.title}</span>
+                      <Badge variant="outline">{ad.views_count || 0}</Badge>
+                    </div>
+                  ))}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Реклама</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Все объявления</CardTitle>
               <Button size="sm" onClick={() => setEditAd({ title: '', placement: 'feed', is_active: true })}>
                 <Plus className="h-4 w-4 mr-1" />Новое
               </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {ads.map(ad => (
-                  <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
-                    {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium truncate">{ad.title}</p>
-                        <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
-                        <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
-                          {ad.is_active ? 'Активна' : 'Выкл'}
-                        </Badge>
+                {ads.map(ad => {
+                  const ctr = ad.views_count > 0 ? ((ad.clicks_count / ad.views_count) * 100).toFixed(1) : '—';
+                  return (
+                    <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                      {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium truncate">{ad.title}</p>
+                          <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
+                          <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
+                            {ad.is_active ? 'Активна' : 'Выкл'}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
+                        <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count} • CTR {ctr}{ctr !== '—' ? '%' : ''}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
-                      <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count}</p>
+                      <div className="flex items-center gap-1">
+                        <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
+                        <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
-                      <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {ads.length === 0 && <p className="text-muted-foreground text-center py-6">Нет рекламы. Нажмите «Новое» чтобы создать.</p>}
               </div>
             </CardContent>
@@ -744,7 +892,43 @@ const AdminPanel: React.FC = () => {
             <div className="space-y-3">
               <div><Label>Заголовок *</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
               <div><Label>Описание</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
-              <div><Label>URL изображения</Label><Input placeholder="https://..." value={editAd.image_url || ''} onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })} /></div>
+              <div>
+                <Label className="flex items-center justify-between">
+                  <span>Изображение</span>
+                  <span className="text-[10px] text-muted-foreground font-normal">{AD_SIZE_HINTS[editAd.placement || 'feed']}</span>
+                </Label>
+                <div className="flex gap-2 items-start mt-1">
+                  {editAd.image_url && (
+                    <img src={editAd.image_url} alt="" className="h-16 w-24 object-cover rounded border" />
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      placeholder="URL или загрузите файл"
+                      value={editAd.image_url || ''}
+                      onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })}
+                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="ad-file-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAdImageUpload(f); e.currentTarget.value = ''; }}
+                      />
+                      <Button size="sm" variant="outline" type="button" disabled={adUploading}
+                        onClick={() => document.getElementById('ad-file-input')?.click()}>
+                        {adUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Upload className="h-3.5 w-3.5 mr-1" />}
+                        Загрузить
+                      </Button>
+                      {editAd.image_url && (
+                        <Button size="sm" variant="ghost" type="button" onClick={() => setEditAd({ ...editAd, image_url: '' })}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div><Label>Ссылка</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-2">
                 <div>

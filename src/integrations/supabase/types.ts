@@ -2551,6 +2551,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_ad_click: { Args: { _ad_id: string }; Returns: undefined }
+      increment_ad_view: { Args: { _ad_id: string }; Returns: undefined }
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
