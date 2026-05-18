@@ -40,6 +40,45 @@ const AdminPanel: React.FC = () => {
   const [editCommunity, setEditCommunity] = useState<any>(null);
   const [ads, setAds] = useState<any[]>([]);
   const [editAd, setEditAd] = useState<any>(null);
+  const [adUploading, setAdUploading] = useState(false);
+  const [marketplaceListings, setMarketplaceListings] = useState<any[]>([]);
+
+  const AD_SIZE_HINTS: Record<string, string> = {
+    feed: 'Рекоменд. 1200×400 (3:1), до 2 МБ',
+    sidebar: 'Рекоменд. 400×400 (1:1), до 1 МБ',
+    banner: 'Рекоменд. 1600×300 (≈16:3), до 2 МБ',
+  };
+
+  const handleAdImageUpload = async (file: File) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast({ title: 'Файл больше 5 МБ', variant: 'destructive' }); return; }
+    setAdUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `ads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('ad-files').upload(path, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from('ad-files').getPublicUrl(path);
+      setEditAd((prev: any) => ({ ...(prev || {}), image_url: data.publicUrl }));
+      toast({ title: 'Изображение загружено' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Ошибка загрузки', variant: 'destructive' });
+    } finally { setAdUploading(false); }
+  };
+
+  const setListingStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from('marketplace_listings').update({ status }).eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setMarketplaceListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+    toast({ title: `Объявление → ${status}` });
+  };
+
+  const deleteListing = async (id: string) => {
+    if (!confirm('Удалить объявление?')) return;
+    const { error } = await supabase.from('marketplace_listings').delete().eq('id', id);
+    if (error) return toast({ title: error.message, variant: 'destructive' });
+    setMarketplaceListings(prev => prev.filter(l => l.id !== id));
+  };
 
   const saveUser = async () => {
     if (!editUser) return;
