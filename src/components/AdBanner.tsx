@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ interface AdBannerProps {
 
 export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) => {
   const [ads, setAds] = useState<any[]>([]);
+  const trackedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     (async () => {
@@ -25,12 +26,50 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
     })();
   }, [placement]);
 
+  // Track impressions once per ad per mount
+  useEffect(() => {
+    ads.forEach((ad) => {
+      if (trackedRef.current.has(ad.id)) return;
+      trackedRef.current.add(ad.id);
+      supabase.rpc("increment_ad_view", { _ad_id: ad.id });
+    });
+  }, [ads]);
+
   if (!ads.length) return null;
 
   const handleClick = async (ad: any) => {
-    await supabase.from("advertisements").update({ clicks_count: (ad.clicks_count || 0) + 1 }).eq("id", ad.id);
+    await supabase.rpc("increment_ad_click", { _ad_id: ad.id });
     if (ad.link_url) window.open(ad.link_url, "_blank", "noopener,noreferrer");
   };
+
+  // Compact layout for sidebar
+  if (placement === "sidebar") {
+    return (
+      <div className={`space-y-2 ${className}`}>
+        {ads.map((ad) => (
+          <Card
+            key={ad.id}
+            onClick={() => handleClick(ad)}
+            className="cursor-pointer overflow-hidden hover:shadow-md transition border-primary/20 p-2 flex gap-2 items-center"
+          >
+            {ad.image_url && (
+              <img src={ad.image_url} alt={ad.title} className="w-12 h-12 rounded object-cover shrink-0" />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1 mb-0.5">
+                <Badge variant="secondary" className="text-[9px] px-1 py-0">Ad</Badge>
+                {ad.link_url && <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />}
+              </div>
+              <h4 className="font-semibold text-xs truncate">{ad.title}</h4>
+              {ad.description && (
+                <p className="text-[10px] text-muted-foreground line-clamp-1">{ad.description}</p>
+              )}
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className={`space-y-3 ${className}`}>
