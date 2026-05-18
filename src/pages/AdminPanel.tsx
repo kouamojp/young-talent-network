@@ -892,7 +892,43 @@ const AdminPanel: React.FC = () => {
             <div className="space-y-3">
               <div><Label>Заголовок *</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
               <div><Label>Описание</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
-              <div><Label>URL изображения</Label><Input placeholder="https://..." value={editAd.image_url || ''} onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })} /></div>
+              <div>
+                <Label className="flex items-center justify-between">
+                  <span>Изображение</span>
+                  <span className="text-[10px] text-muted-foreground font-normal">{AD_SIZE_HINTS[editAd.placement || 'feed']}</span>
+                </Label>
+                <div className="flex gap-2 items-start mt-1">
+                  {editAd.image_url && (
+                    <img src={editAd.image_url} alt="" className="h-16 w-24 object-cover rounded border" />
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      placeholder="URL или загрузите файл"
+                      value={editAd.image_url || ''}
+                      onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })}
+                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="ad-file-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAdImageUpload(f); e.currentTarget.value = ''; }}
+                      />
+                      <Button size="sm" variant="outline" type="button" disabled={adUploading}
+                        onClick={() => document.getElementById('ad-file-input')?.click()}>
+                        {adUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Upload className="h-3.5 w-3.5 mr-1" />}
+                        Загрузить
+                      </Button>
+                      {editAd.image_url && (
+                        <Button size="sm" variant="ghost" type="button" onClick={() => setEditAd({ ...editAd, image_url: '' })}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div><Label>Ссылка</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
