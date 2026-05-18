@@ -209,14 +209,16 @@ const AdminPanel: React.FC = () => {
   }, [loading, currentUserRole]);
 
   const fetchData = async () => {
-    const [usersRes, postsRes, eventsRes, communitiesRes, adsRes] = await Promise.all([
+    const [usersRes, postsRes, eventsRes, communitiesRes, adsRes, listingsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(100),
       supabase.from('posts').select('*, profiles(name, avatar_url)').order('created_at', { ascending: false }).limit(50),
       supabase.from('events').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('communities').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('advertisements').select('*').order('created_at', { ascending: false }),
+      supabase.from('marketplace_listings').select('*, profiles(name)').order('created_at', { ascending: false }).limit(100),
     ]);
     if (adsRes.data) setAds(adsRes.data);
+    if (listingsRes.data) setMarketplaceListings(listingsRes.data);
     if (usersRes.data) {
       setUsers(usersRes.data);
       // Calculate stats from real data
