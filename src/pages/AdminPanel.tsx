@@ -619,38 +619,144 @@ const AdminPanel: React.FC = () => {
           </Card>
         </TabsContent>
 
+        {/* Marketplace Tab */}
+        <TabsContent value="marketplace" className="space-y-4">
+          <Card>
+            <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />Объявления Marketplace</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {marketplaceListings.map(l => (
+                  <div key={l.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                    {l.media_urls?.[0] && <img src={l.media_urls[0]} alt="" className="h-14 w-20 object-cover rounded" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium truncate">{l.title}</p>
+                        <Badge variant={l.status === 'active' ? 'default' : l.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
+                          {l.status === 'active' ? 'Опубликовано' : l.status === 'hidden' ? 'Скрыто' : l.status === 'draft' ? 'Черновик' : l.status}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px]">{l.type}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{l.profiles?.name || '—'} · {l.currency}{l.price} · {l.category}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost" title="Опубликовать" onClick={() => setListingStatus(l.id, 'active')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Скрыть" onClick={() => setListingStatus(l.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title="Черновик" onClick={() => setListingStatus(l.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
+                      <Button size="sm" variant="destructive" onClick={() => deleteListing(l.id)}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+                {marketplaceListings.length === 0 && <p className="text-muted-foreground text-center py-6">Нет объявлений.</p>}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Ads Tab */}
         <TabsContent value="ads" className="space-y-4">
+          {/* Top performers stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Всего показов</span>
+                  <Eye className="h-4 w-4 text-cyan-600" />
+                </div>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.views_count || 0), 0).toLocaleString()}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Всего кликов</span>
+                  <MousePointerClick className="h-4 w-4 text-emerald-600" />
+                </div>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.clicks_count || 0), 0).toLocaleString()}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">Средний CTR</span>
+                  <BarChart3 className="h-4 w-4 text-orange-600" />
+                </div>
+                <p className="text-2xl font-bold">
+                  {(() => {
+                    const v = ads.reduce((s, a) => s + (a.views_count || 0), 0);
+                    const c = ads.reduce((s, a) => s + (a.clicks_count || 0), 0);
+                    return v > 0 ? `${((c / v) * 100).toFixed(2)}%` : '—';
+                  })()}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader><CardTitle className="text-base">🏆 Топ по кликам</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[...ads].sort((a, b) => (b.clicks_count || 0) - (a.clicks_count || 0)).slice(0, 5).map((ad, i) => (
+                    <div key={ad.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                      <span className="flex-1 truncate">{ad.title}</span>
+                      <Badge variant="outline">{ad.clicks_count || 0}</Badge>
+                    </div>
+                  ))}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle className="text-base">👁 Топ по показам</CardTitle></CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[...ads].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 5).map((ad, i) => (
+                    <div key={ad.id} className="flex items-center gap-2 text-sm">
+                      <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                      <span className="flex-1 truncate">{ad.title}</span>
+                      <Badge variant="outline">{ad.views_count || 0}</Badge>
+                    </div>
+                  ))}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Реклама</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Все объявления</CardTitle>
               <Button size="sm" onClick={() => setEditAd({ title: '', placement: 'feed', is_active: true })}>
                 <Plus className="h-4 w-4 mr-1" />Новое
               </Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {ads.map(ad => (
-                  <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
-                    {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-medium truncate">{ad.title}</p>
-                        <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
-                        <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
-                          {ad.is_active ? 'Активна' : 'Выкл'}
-                        </Badge>
+                {ads.map(ad => {
+                  const ctr = ad.views_count > 0 ? ((ad.clicks_count / ad.views_count) * 100).toFixed(1) : '—';
+                  return (
+                    <div key={ad.id} className="flex items-center justify-between p-3 border rounded-lg gap-3">
+                      {ad.image_url && <img src={ad.image_url} alt="" className="h-14 w-20 object-cover rounded" />}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium truncate">{ad.title}</p>
+                          <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
+                          <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
+                            {ad.is_active ? 'Активна' : 'Выкл'}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
+                        <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count} • CTR {ctr}{ctr !== '—' ? '%' : ''}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
-                      <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count}</p>
+                      <div className="flex items-center gap-1">
+                        <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
+                        <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
-                      <Button size="sm" variant="outline" onClick={() => setEditAd({ ...ad })}><Pencil className="h-4 w-4" /></Button>
-                      <Button size="sm" variant="destructive" onClick={() => deleteAd(ad.id)}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {ads.length === 0 && <p className="text-muted-foreground text-center py-6">Нет рекламы. Нажмите «Новое» чтобы создать.</p>}
               </div>
             </CardContent>
