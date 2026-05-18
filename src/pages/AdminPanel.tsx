@@ -400,6 +400,7 @@ const AdminPanel: React.FC = () => {
           <TabsTrigger value="events">{t('admin.eventsManagement') || 'Events'}</TabsTrigger>
           <TabsTrigger value="moderation">{t('admin.contentModeration') || 'Moderation'}</TabsTrigger>
           <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />Communities</TabsTrigger>
+          <TabsTrigger value="marketplace"><ShoppingBag className="h-4 w-4 mr-1" />Маркетплейс</TabsTrigger>
           <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />Реклама</TabsTrigger>
         </TabsList>
 
