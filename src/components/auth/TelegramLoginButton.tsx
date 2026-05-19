@@ -30,13 +30,31 @@ const TelegramLoginButton: React.FC = () => {
 
   // Define global callback used by Telegram widget
   useEffect(() => {
+    const friendly = (raw: string): string => {
+      const m = (raw || '').toLowerCase();
+      if (m.includes('bad telegram signature') || m.includes('signature'))
+        return 'Неверная подпись Telegram. Попробуйте войти ещё раз.';
+      if (m.includes('outdated') || m.includes('auth_date') || m.includes('expired'))
+        return 'Срок действия данных Telegram истёк. Пожалуйста, повторите вход.';
+      if (m.includes('invalid payload') || m.includes('invalid'))
+        return 'Некорректные данные от Telegram. Попробуйте ещё раз.';
+      if (m.includes('not configured'))
+        return 'Telegram-вход временно недоступен. Попробуйте позже.';
+      if (m.includes('failed to generate token'))
+        return 'Не удалось создать сессию. Попробуйте ещё раз.';
+      if (m.includes('network') || m.includes('fetch'))
+        return 'Проблема с сетью. Проверьте подключение и повторите.';
+      return raw || 'Не удалось войти через Telegram.';
+    };
+
     window.onTelegramAuth = async (tgUser: any) => {
       try {
         const { data, error } = await supabase.functions.invoke('telegram-auth', {
           body: tgUser,
         });
-        if (error || !data?.token_hash) {
-          throw new Error(error?.message || data?.error || 'Telegram auth failed');
+        const serverMsg = (data as any)?.error;
+        if (error || serverMsg || !data?.token_hash) {
+          throw new Error(serverMsg || error?.message || 'Telegram auth failed');
         }
         const { error: otpErr } = await supabase.auth.verifyOtp({
           type: 'magiclink',
@@ -46,10 +64,10 @@ const TelegramLoginButton: React.FC = () => {
         toast({ title: 'Вход выполнен', description: 'Добро пожаловать!' });
         navigate('/profile');
       } catch (err: any) {
-        console.error(err);
+        console.error('Telegram auth error:', err);
         toast({
           title: 'Ошибка входа через Telegram',
-          description: err.message ?? String(err),
+          description: friendly(err?.message ?? String(err)),
           variant: 'destructive',
         });
       }
