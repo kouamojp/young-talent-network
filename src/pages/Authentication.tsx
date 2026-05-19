@@ -132,17 +132,33 @@ const Authentication: React.FC = () => {
     }
   };
 
-  const handleFacebookLogin = async () => {
+  const handleOAuth = async (provider: 'google' | 'apple') => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'facebook' });
-      if (error) throw error;
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw new Error(typeof result.error === 'string' ? result.error : 'OAuth error');
+      if (result.redirected) return;
+      navigate('/profile');
     } catch (error: any) {
-      toast({ title: t('auth.facebookFailed'), description: error.message, variant: "destructive" });
+      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const SocialButtons = () => (
+    <div className="grid grid-cols-1 gap-2">
+      <Button variant="outline" className="w-full" onClick={() => handleOAuth('google')} disabled={isLoading}>
+        <GoogleIcon /> Google
+      </Button>
+      <Button variant="outline" className="w-full" onClick={() => handleOAuth('apple')} disabled={isLoading}>
+        <Apple className="mr-2 h-4 w-4" /> Apple
+      </Button>
+    </div>
+  );
+
 
   const UserTypeSelector = () => (
     <div className="space-y-2">
