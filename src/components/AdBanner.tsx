@@ -45,25 +45,32 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
   // Compact layout for sidebar
   if (placement === "sidebar") {
     return (
-      <div className={`space-y-2 ${className}`}>
+      <div className={`w-full min-w-0 space-y-2 ${className}`}>
         {ads.map((ad) => (
           <Card
             key={ad.id}
             onClick={() => handleClick(ad)}
-            className="cursor-pointer overflow-hidden hover:shadow-md transition border-primary/20 p-2 flex gap-2 items-center"
+            className="w-full min-w-0 cursor-pointer overflow-hidden hover:shadow-md transition border-primary/20 p-2"
           >
-            {ad.image_url && (
-              <img src={ad.image_url} alt={ad.title} className="w-12 h-12 rounded object-cover shrink-0" />
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1 mb-0.5">
-                <Badge variant="secondary" className="text-[9px] px-1 py-0">Ad</Badge>
-                {ad.link_url && <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />}
-              </div>
-              <h4 className="font-semibold text-xs truncate">{ad.title}</h4>
-              {ad.description && (
-                <p className="text-[10px] text-muted-foreground line-clamp-1">{ad.description}</p>
+            <div className="flex min-w-0 items-start gap-2">
+              {ad.image_url && (
+                <img
+                  src={ad.image_url}
+                  alt={ad.title}
+                  className="h-14 w-14 shrink-0 rounded-md object-cover sm:h-16 sm:w-16"
+                  loading="lazy"
+                />
               )}
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <div className="mb-1 flex min-w-0 items-center gap-1">
+                  <Badge variant="secondary" className="shrink-0 px-1 py-0 text-[9px] leading-4">Реклама</Badge>
+                  {ad.link_url && <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />}
+                </div>
+                <h4 className="break-words text-xs font-semibold leading-snug line-clamp-2">{ad.title}</h4>
+                {ad.description && (
+                  <p className="mt-0.5 break-words text-[10px] leading-snug text-muted-foreground line-clamp-2">{ad.description}</p>
+                )}
+              </div>
             </div>
           </Card>
         ))}

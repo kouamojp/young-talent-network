@@ -5,6 +5,7 @@ import { MenuSectionItem } from './types';
 import { Separator } from '@/components/ui/separator';
 import SidebarCategories from './SidebarCategories';
 import { useLanguage } from '@/i18n/LanguageContext';
+import AdBanner from '@/components/AdBanner';
 
 interface SidebarMainProps {
   onNavigate?: () => void;
@@ -93,6 +94,9 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
           </div>
         ))}
         <SidebarCategories onNavigate={onNavigate} />
+        <div className="px-0.5 pb-3">
+          <AdBanner placement="sidebar" />
+        </div>
       </nav>
     </aside>
   );
