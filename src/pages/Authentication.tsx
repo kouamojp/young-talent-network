@@ -159,6 +159,7 @@ const Authentication: React.FC = () => {
         <Apple className="mr-2 h-4 w-4" /> Apple
       </Button>
       <VKLoginButton />
+      <TelegramLoginButton />
     </div>
   );
 
