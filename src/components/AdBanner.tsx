@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AdBannerProps {
   placement?: "feed" | "sidebar" | "banner";
