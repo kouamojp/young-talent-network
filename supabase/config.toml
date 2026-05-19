@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.seed-test-accounts]
 verify_jwt = false
+
+[functions.telegram-auth]
+verify_jwt = false
+
+[functions.vk-auth]
+verify_jwt = false
