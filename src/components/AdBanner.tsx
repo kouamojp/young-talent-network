@@ -9,8 +9,16 @@ interface AdBannerProps {
   className?: string;
 }
 
+interface Advertisement {
+  id: string;
+  title: string;
+  description?: string | null;
+  image_url?: string | null;
+  link_url?: string | null;
+}
+
 export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) => {
-  const [ads, setAds] = useState<any[]>([]);
+  const [ads, setAds] = useState<Advertisement[]>([]);
   const trackedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -37,7 +45,7 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
 
   if (!ads.length) return null;
 
-  const handleClick = async (ad: any) => {
+  const handleClick = async (ad: Advertisement) => {
     await supabase.rpc("increment_ad_click", { _ad_id: ad.id });
     if (ad.link_url) window.open(ad.link_url, "_blank", "noopener,noreferrer");
   };
