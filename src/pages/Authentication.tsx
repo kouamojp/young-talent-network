@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import CategoryPicker from '@/components/categories/CategoryPicker';
 import VKLoginButton from '@/components/auth/VKLoginButton';
+import TelegramLoginButton from '@/components/auth/TelegramLoginButton';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" aria-hidden="true">
