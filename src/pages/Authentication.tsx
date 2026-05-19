@@ -135,11 +135,11 @@ const Authentication: React.FC = () => {
   const handleOAuth = async (provider: 'google' | 'apple') => {
     setIsLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth(provider, {
+      const result: any = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: window.location.origin,
       });
-      if (result.error) throw new Error(typeof result.error === 'string' ? result.error : 'OAuth error');
-      if (result.redirected) return;
+      if (result?.error) throw new Error(typeof result.error === 'string' ? result.error : (result.error.message || 'OAuth error'));
+      if (result?.redirected) return;
       navigate('/profile');
     } catch (error: any) {
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
