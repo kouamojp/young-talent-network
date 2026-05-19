@@ -21,7 +21,14 @@ const TelegramLoginButton: React.FC = () => {
       try {
         const { data, error } = await supabase.functions.invoke('telegram-auth', { method: 'GET' });
         if (error) throw error;
-        if (data?.bot_username) setBotUsername(data.bot_username);
+        if (data?.bot_username) {
+          const clean = String(data.bot_username)
+            .replace(/^https?:\/\//i, '')
+            .replace(/^t\.me\//i, '')
+            .replace(/^@/, '')
+            .trim();
+          setBotUsername(clean);
+        }
       } catch (e) {
         console.error('telegram-auth config error', e);
       }
