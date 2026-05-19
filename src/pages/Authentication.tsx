@@ -14,6 +14,7 @@ import { lovable } from '@/integrations/lovable';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import CategoryPicker from '@/components/categories/CategoryPicker';
+import VKLoginButton from '@/components/auth/VKLoginButton';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" aria-hidden="true">
@@ -156,6 +157,7 @@ const Authentication: React.FC = () => {
       <Button variant="outline" className="w-full" onClick={() => handleOAuth('apple')} disabled={isLoading}>
         <Apple className="mr-2 h-4 w-4" /> Apple
       </Button>
+      <VKLoginButton />
     </div>
   );
 
