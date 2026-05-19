@@ -52,7 +52,12 @@ const TelegramLoginButton: React.FC = () => {
         const { data, error } = await supabase.functions.invoke('telegram-auth', {
           body: tgUser,
         });
-        const serverMsg = (data as any)?.error;
+        let serverMsg: string | undefined = (data as any)?.error;
+        if (error && (error as any).context?.json) {
+          try { serverMsg = (await (error as any).context.json())?.error; } catch {}
+        } else if (error && (error as any).context?.text) {
+          try { serverMsg = await (error as any).context.text(); } catch {}
+        }
         if (error || serverMsg || !data?.token_hash) {
           throw new Error(serverMsg || error?.message || 'Telegram auth failed');
         }
