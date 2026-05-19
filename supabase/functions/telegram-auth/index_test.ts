@@ -14,8 +14,8 @@ async function sha256Bytes(input: string): Promise<Uint8Array> {
   return new Uint8Array(d);
 }
 async function hmacHex(key: Uint8Array, msg: string): Promise<string> {
-  const k = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const s = await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg));
+  const k = await crypto.subtle.importKey("raw", key as BufferSource, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const s = await crypto.subtle.sign("HMAC", k, new TextEncoder().encode(msg) as BufferSource);
   return Array.from(new Uint8Array(s)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
