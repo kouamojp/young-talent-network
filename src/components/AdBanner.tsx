@@ -59,14 +59,50 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
           <Card
             key={ad.id}
             onClick={() => handleClick(ad)}
-            className="w-full min-w-0 cursor-pointer overflow-hidden hover:shadow-md transition border-primary/20 p-2"
+            className="w-full min-w-0 cursor-pointer overflow-hidden hover:shadow-md transition border-primary/20"
           >
-            <div className="flex min-w-0 items-start gap-2">
+            {/* Mobile: vertical compact layout */}
+            <div className="flex flex-col sm:hidden">
               {ad.image_url && (
                 <img
                   src={ad.image_url}
                   alt={ad.title}
-                  className="h-14 w-14 shrink-0 rounded-md object-cover sm:h-16 sm:w-16"
+                  className="h-20 w-full object-cover"
+                  loading="lazy"
+                />
+              )}
+              <div className="p-2 space-y-1">
+                <div className="flex items-center gap-1">
+                  <Badge variant="secondary" className="px-1 py-0 text-[9px] leading-4">Реклама</Badge>
+                  {ad.link_url && <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />}
+                </div>
+                <h4 className="break-words text-[11px] font-semibold leading-snug line-clamp-2">{ad.title}</h4>
+                {ad.description && (
+                  <p className="break-words text-[10px] leading-snug text-muted-foreground line-clamp-2">{ad.description}</p>
+                )}
+                {ad.link_url && (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="mt-1 h-6 w-full text-[10px]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClick(ad);
+                    }}
+                  >
+                    Подробнее
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Desktop/tablet: horizontal layout */}
+            <div className="hidden min-w-0 items-start gap-2 p-2 sm:flex">
+              {ad.image_url && (
+                <img
+                  src={ad.image_url}
+                  alt={ad.title}
+                  className="h-16 w-16 shrink-0 rounded-md object-cover"
                   loading="lazy"
                 />
               )}
