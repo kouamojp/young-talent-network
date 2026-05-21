@@ -7,6 +7,22 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
+import LinkPreview from './LinkPreview';
+
+const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
+
+function renderTextWithLinks(text: string) {
+  const parts = text.split(URL_REGEX);
+  return parts.map((part, i) =>
+    URL_REGEX.test(part) ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+        {part}
+      </a>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
+}
 
 interface Author {
   name: string;
