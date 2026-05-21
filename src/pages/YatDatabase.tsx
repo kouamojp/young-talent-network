@@ -383,6 +383,10 @@ const YatDatabase: React.FC = () => {
                 <Filter className="h-3.5 w-3.5" />
                 {loading ? 'Recherche...' : 'Rechercher'}
               </Button>
+              <Button onClick={applySimilarParams} variant="outline" className="gap-1.5" title="Применить мои параметры">
+                <Star className="h-3.5 w-3.5" />
+                Похожие параметры
+              </Button>
             </div>
 
             <CategorySearchFilter
