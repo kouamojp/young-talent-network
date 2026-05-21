@@ -70,12 +70,46 @@ const OrganizationHub: React.FC = () => {
   const fetchOrgData = async () => {
     setLoading(true);
     try {
-      // Fetch organization profile
-      const { data: orgData } = await supabase
+      // Try organization_profiles first (by id, then by user_id)
+      let { data: orgData } = await supabase
         .from('organization_profiles')
         .select('*')
         .eq('id', id!)
-        .single();
+        .maybeSingle();
+
+      if (!orgData) {
+        const { data: byUser } = await supabase
+          .from('organization_profiles')
+          .select('*')
+          .eq('user_id', id!)
+          .maybeSingle();
+        orgData = byUser;
+      }
+
+      // Fallback: build from profiles table (user_type='organization')
+      if (!orgData) {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('id, name, bio, city, country, location, avatar_url, cover_photo_url, website, phone, email, user_type')
+          .eq('id', id!)
+          .maybeSingle();
+        if (prof && prof.user_type === 'organization') {
+          orgData = {
+            id: prof.id,
+            user_id: prof.id,
+            company_name: prof.name,
+            industry: null,
+            company_size: null,
+            description: prof.bio,
+            headquarters: prof.location || [prof.city, prof.country].filter(Boolean).join(', ') || null,
+            website_url: prof.website,
+            linkedin_url: null,
+            logo_url: prof.avatar_url,
+            founded_year: null,
+            verified: false,
+          } as any;
+        }
+      }
 
       if (orgData) {
         setOrg(orgData as OrgData);
