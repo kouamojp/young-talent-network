@@ -7,6 +7,27 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
+import LinkPreview from './LinkPreview';
+
+const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
+const isUrl = (s: string) => /^https?:\/\//i.test(s);
+
+function extractUrls(text: string): string[] {
+  return Array.from(new Set(text.match(URL_REGEX) || []));
+}
+
+function renderTextWithLinks(text: string) {
+  const parts = text.split(URL_REGEX);
+  return parts.map((part, i) =>
+    isUrl(part) ? (
+      <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
+        {part}
+      </a>
+    ) : (
+      <React.Fragment key={i}>{part}</React.Fragment>
+    )
+  );
+}
 
 interface Author {
   name: string;
@@ -183,7 +204,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       {/* Post Content (description, max 500 chars) */}
       {rawText && (
         <div className="px-4 pb-3">
-          <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
+          <p className="text-[15px] whitespace-pre-wrap break-words">{renderTextWithLinks(displayText)}</p>
           {isLong && (
             <button
               onClick={() => setExpanded(e => !e)}
@@ -193,6 +214,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
               <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
             </button>
           )}
+        </div>
+      )}
+
+      {/* Link Previews */}
+      {extractUrls(rawText).slice(0, 3).length > 0 && (
+        <div className="px-4 pb-3 space-y-2">
+          {extractUrls(rawText).slice(0, 3).map((u) => (
+            <LinkPreview key={u} url={u} />
+          ))}
         </div>
       )}
 
