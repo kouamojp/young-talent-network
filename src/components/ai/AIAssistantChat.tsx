@@ -20,6 +20,8 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const location = useLocation();
+  const hideFloating = !fullPage && location.pathname.startsWith('/messages');
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
