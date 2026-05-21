@@ -306,6 +306,89 @@ const TalentPublicProfile: React.FC = () => {
           </div>
         </div>
 
+        {/* Categories */}
+        {categories.length > 0 && (
+          <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+            <SectionHeader icon={Tag} title="Catégories" />
+            <div className="p-3 flex flex-wrap gap-1.5">
+              {categories.map((uc: any) => (
+                <Badge
+                  key={uc.id}
+                  variant="secondary"
+                  className="text-xs"
+                  style={uc.yat_categories?.color ? { backgroundColor: `${uc.yat_categories.color}22`, color: uc.yat_categories.color, borderColor: `${uc.yat_categories.color}55` } : undefined}
+                >
+                  {uc.yat_categories?.icon && <span className="mr-1">{uc.yat_categories.icon}</span>}
+                  {catName(uc.yat_categories)}
+                  {uc.yat_subcategories && <span className="opacity-70"> · {catName(uc.yat_subcategories)}</span>}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Active sections */}
+        {presence.length > 0 && (
+          <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+            <SectionHeader icon={Layers} title="Présent dans les sections" />
+            <div className="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {presence.map((p: any) => {
+                const meta = SECTION_LABELS[p.section] || { label: p.section, icon: '•' };
+                return (
+                  <button
+                    key={p.section}
+                    onClick={() => navigate(`/${p.section === 'yat-coin' ? 'yat-coin' : p.section}`)}
+                    className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors hover:bg-primary/5 ${p.featured ? 'border-primary/40 bg-primary/5' : 'border-border/50 bg-muted/40'}`}
+                  >
+                    <span className="text-lg">{meta.icon}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">{meta.label}</p>
+                      {p.featured && <span className="text-[10px] text-primary">★ En vedette</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Posts feed */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+          <SectionHeader icon={Newspaper} title={`Publications (${posts.length})`} />
+          <div className="p-3 space-y-3">
+            {posts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">Aucune publication publique pour le moment.</p>
+            ) : (
+              posts.map((post: any) => (
+                <div key={post.id} className="p-3 rounded-lg border border-border/50 bg-muted/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={profile.avatar_url || ''} />
+                      <AvatarFallback className="text-[10px]">{profile.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">{profile.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                  </div>
+                  {post.content && <p className="text-sm text-foreground whitespace-pre-wrap mb-2">{post.content}</p>}
+                  {post.media_urls && post.media_urls.length > 0 && (
+                    <div className={`grid gap-1.5 mb-2 ${post.media_urls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                      {post.media_urls.slice(0, 4).map((url: string, i: number) => (
+                        <img key={i} src={url} alt="" className="w-full h-32 object-cover rounded-md" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4 text-[11px] text-muted-foreground pt-1 border-t border-border/30">
+                    <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {post.likes_count || 0}</span>
+                    <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {post.comments_count || 0}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* Media Gallery */}
         {media.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
