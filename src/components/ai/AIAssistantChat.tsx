@@ -165,6 +165,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   );
 
   if (fullPage) return chatContent;
+  if (hideFloating) return null;
 
   return (
     <>
