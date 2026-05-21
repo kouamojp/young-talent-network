@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
 import { useLanguage } from '@/i18n/LanguageContext';
