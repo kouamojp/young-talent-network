@@ -77,7 +77,7 @@ const YatDatabase: React.FC = () => {
       const [talentRes, agentRes, orgRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'talent'),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'agent'),
-        supabase.from('organization_profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'organization'),
       ]);
       setStats({
         talents: talentRes.count || 0,
