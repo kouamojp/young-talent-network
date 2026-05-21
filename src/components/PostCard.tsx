@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import { MessageSquare, ThumbsUp, Share, MoreHorizontal } from 'lucide-react';
+import { formatDistanceToNow, format } from 'date-fns';
+import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
