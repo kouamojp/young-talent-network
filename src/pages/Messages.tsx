@@ -85,7 +85,7 @@ const Messages: React.FC = () => {
     );
   }
 
-  const ConversationsList = () => (
+  const conversationsList = (
     <div className={`${isMobile ? 'w-full' : 'w-80'} border-r border-border bg-card flex flex-col h-full`}>
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
@@ -150,7 +150,7 @@ const Messages: React.FC = () => {
     </div>
   );
 
-  const ChatView = () => (
+  const chatView = (
     <div className="flex-1 flex flex-col h-full">
       {activeConversation ? (
         <>
@@ -206,11 +206,11 @@ const Messages: React.FC = () => {
   return (
     <div className="h-[calc(100vh-3.5rem)] bg-background flex overflow-hidden">
       {isMobile ? (
-        showChat ? <ChatView /> : <ConversationsList />
+        showChat ? chatView : conversationsList
       ) : (
         <>
-          <ConversationsList />
-          <ChatView />
+          {conversationsList}
+          {chatView}
         </>
       )}
     </div>
