@@ -89,51 +89,83 @@ const YatDatabase: React.FC = () => {
   }, []);
 
   // Load recommendations based on current user's params
-  useEffect(() => {
-    (async () => {
-      setRecoLoading(true);
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { setRecoLoading(false); return; }
-        const { data: me } = await supabase.from('profiles')
-          .select('id, sport_type, country, city, user_type').eq('id', user.id).single();
-        if (!me) { setRecoLoading(false); return; }
+  const loadRecommendations = React.useCallback(async () => {
+    setRecoLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setRecoLoading(false); return; }
+      const { data: me } = await supabase.from('profiles')
+        .select('id, sport_type, country, city, user_type').eq('id', user.id).single();
+      if (!me) { setRecoLoading(false); return; }
 
-        // similar categories
-        const { data: myCats } = await supabase.from('user_yat_categories')
-          .select('category_id').eq('user_id', user.id);
-        const catIds = (myCats || []).map((c: any) => c.category_id);
-        let similarIds: string[] = [];
-        if (catIds.length) {
-          const { data: sameCat } = await supabase.from('user_yat_categories')
-            .select('user_id').in('category_id', catIds).neq('user_id', user.id).limit(50);
-          similarIds = Array.from(new Set((sameCat || []).map((r: any) => r.user_id)));
-        }
+      const { data: myCats } = await supabase.from('user_yat_categories')
+        .select('category_id').eq('user_id', user.id);
+      const catIds = (myCats || []).map((c: any) => c.category_id);
+      let similarIds: string[] = [];
+      if (catIds.length) {
+        const { data: sameCat } = await supabase.from('user_yat_categories')
+          .select('user_id').in('category_id', catIds).neq('user_id', user.id).limit(50);
+        similarIds = Array.from(new Set((sameCat || []).map((r: any) => r.user_id)));
+      }
 
-        let q = supabase.from('profiles')
-          .select('id, name, avatar_url, bio, location, city, country, sport_type, platform_rating, user_type')
-          .neq('id', user.id)
-          .in('user_type', ['talent', 'agent']);
+      let q = supabase.from('profiles')
+        .select('id, name, avatar_url, bio, location, city, country, sport_type, platform_rating, user_type')
+        .neq('id', user.id)
+        .in('user_type', ['talent', 'agent']);
 
-        const orParts: string[] = [];
-        if (me.sport_type) orParts.push(`sport_type.eq.${me.sport_type}`);
-        if (me.country) orParts.push(`country.eq.${me.country}`);
-        if (me.city) orParts.push(`city.eq.${me.city}`);
-        if (similarIds.length) orParts.push(`id.in.(${similarIds.join(',')})`);
-        if (orParts.length) q = q.or(orParts.join(','));
+      const orParts: string[] = [];
+      if (me.sport_type) orParts.push(`sport_type.eq.${me.sport_type}`);
+      if (me.country) orParts.push(`country.eq.${me.country}`);
+      if (me.city) orParts.push(`city.eq.${me.city}`);
+      if (similarIds.length) orParts.push(`id.in.(${similarIds.join(',')})`);
+      if (orParts.length) q = q.or(orParts.join(','));
 
-        const { data } = await q.order('platform_rating', { ascending: false }).limit(6);
-        setRecommendations((data || []).map((p: any) => ({
-          id: p.id, name: p.name, avatar_url: p.avatar_url,
-          type: p.user_type, bio: p.bio, location: p.location,
-          city: p.city, country: p.country, sport_type: p.sport_type,
-          rating: Number(p.platform_rating) || 0, category: p.sport_type,
-          sections: [], extra: {},
-        })));
-      } catch (e) { console.error('reco', e); }
-      finally { setRecoLoading(false); }
-    })();
+      const { data } = await q.order('platform_rating', { ascending: false }).limit(6);
+      setRecommendations((data || []).map((p: any) => ({
+        id: p.id, name: p.name, avatar_url: p.avatar_url,
+        type: p.user_type, bio: p.bio, location: p.location,
+        city: p.city, country: p.country, sport_type: p.sport_type,
+        rating: Number(p.platform_rating) || 0, category: p.sport_type,
+        sections: [], extra: {},
+      })));
+    } catch (e) { console.error('reco', e); }
+    finally { setRecoLoading(false); }
   }, []);
+
+  useEffect(() => { loadRecommendations(); }, [loadRecommendations]);
+
+  // Refresh recommendations when profile type changes (or any profile-updated event)
+  useEffect(() => {
+    const handler = () => loadRecommendations();
+    window.addEventListener('profile-updated', handler);
+    let channel: any;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      channel = supabase.channel(`profile-${user.id}`)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          () => loadRecommendations())
+        .subscribe();
+    })();
+    return () => {
+      window.removeEventListener('profile-updated', handler);
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [loadRecommendations]);
+
+  // Apply current user's params as filters and run search
+  const applySimilarParams = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: me } = await supabase.from('profiles')
+      .select('sport_type, country, city').eq('id', user.id).single();
+    if (!me) return;
+    setQuery(me.sport_type || '');
+    setCountryFilter(me.city || me.country || '');
+    setTypeFilter('all');
+    setSectionFilter('all');
+    setTimeout(() => handleSearch(), 0);
+  };
 
   const handleSearch = async () => {
     setLoading(true);
