@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { 
   Settings as SettingsIcon, User, Bell, Shield, Palette, Globe, 
-  Lock, Eye, Moon, Sun, Loader2, LogOut, Trash2, Mail, Phone, MapPin
+  Lock, Eye, Moon, Sun, Loader2, LogOut, Trash2, Mail, Phone, MapPin, RefreshCw
 } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -65,6 +65,27 @@ const Settings: React.FC = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
+  };
+
+  const [clearing, setClearing] = useState(false);
+  const handleClearCache = async () => {
+    setClearing(true);
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if (typeof caches !== 'undefined') {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      try { localStorage.clear(); sessionStorage.clear(); } catch {}
+      toast({ title: 'Кэш очищен', description: 'Перезагружаем страницу...' });
+      setTimeout(() => window.location.reload(), 600);
+    } catch (e: any) {
+      toast({ title: 'Ошибка', description: e?.message || 'Не удалось очистить кэш', variant: 'destructive' });
+      setClearing(false);
+    }
   };
 
   if (loading) {
@@ -231,6 +252,22 @@ const Settings: React.FC = () => {
                     <Badge className="text-sm">{currentUser?.user_type}</Badge>
                     <span className="text-sm text-muted-foreground">{t('common.memberSince')} {new Date(currentUser?.created_at).toLocaleDateString()}</span>
                   </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5 text-primary" /> Кэш приложения
+                  </CardTitle>
+                  <CardDescription>
+                    Разрегистрирует service workers и очищает кэш браузера. Полезно при странном поведении или устаревшем контенте.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="gap-2" onClick={handleClearCache} disabled={clearing}>
+                    {clearing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    Очистить кэш
+                  </Button>
                 </CardContent>
               </Card>
               <Card className="border-destructive/30">
