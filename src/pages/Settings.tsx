@@ -291,6 +291,7 @@ const Settings: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
+              <LinkedAccountsManager />
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
