@@ -1349,6 +1349,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Chercher des opportunités',
     'feed.upcomingEvents': 'Événements à venir',
     'feed.testAptitudes': 'Tester mes aptitudes',
+    'feed.similarTalents': 'Talents comme vous',
 
     // Messages
     'messages.chats': 'Chats',
