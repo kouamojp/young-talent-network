@@ -204,7 +204,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       {/* Post Content (description, max 500 chars) */}
       {rawText && (
         <div className="px-4 pb-3">
-          <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
+          <p className="text-[15px] whitespace-pre-wrap break-words">{renderTextWithLinks(displayText)}</p>
           {isLong && (
             <button
               onClick={() => setExpanded(e => !e)}
@@ -214,6 +214,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
               <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
             </button>
           )}
+        </div>
+      )}
+
+      {/* Link Previews */}
+      {extractUrls(rawText).slice(0, 3).length > 0 && (
+        <div className="px-4 pb-3 space-y-2">
+          {extractUrls(rawText).slice(0, 3).map((u) => (
+            <LinkPreview key={u} url={u} />
+          ))}
         </div>
       )}
 
