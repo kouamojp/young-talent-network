@@ -363,6 +363,75 @@ const AgentProfile: React.FC = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="posts" className="space-y-4">
+            {posts.length === 0 ? (
+              <Card><CardContent className="p-12 text-center">
+                <Newspaper className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <h3 className="font-semibold text-lg">Aucune publication</h3>
+                <p className="text-muted-foreground">Cet agent n'a pas encore publié.</p>
+              </CardContent></Card>
+            ) : (
+              posts.map((p) => (
+                <Card key={p.id}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={agent.avatar_url || agent.profile?.avatar_url || ''} />
+                        <AvatarFallback>{agent.agency_name?.charAt(0) || 'A'}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-foreground text-sm">{agent.agency_name}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                    {p.content && <p className="text-sm text-foreground whitespace-pre-wrap">{p.content.slice(0, 500)}</p>}
+                    {p.media_urls && p.media_urls.length > 0 && (
+                      <div className={`grid gap-2 ${p.media_urls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                        {p.media_urls.slice(0, 4).map((url: string, i: number) => (
+                          <img key={i} src={url} alt="" className="w-full h-48 object-cover rounded-md" />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t">
+                      <span className="flex items-center gap-1"><Heart className="h-4 w-4" /> {p.likes_count || 0}</span>
+                      <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {p.comments_count || 0}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="sections" className="space-y-4">
+            {presence.length === 0 ? (
+              <Card><CardContent className="p-12 text-center">
+                <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <h3 className="font-semibold text-lg">Aucune section active</h3>
+                <p className="text-muted-foreground">Cet agent n'est actif dans aucune section.</p>
+              </CardContent></Card>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {presence.map((s) => {
+                  const meta = SECTION_LABELS[s.section];
+                  if (!meta) return null;
+                  const Icon = meta.icon;
+                  return (
+                    <Button
+                      key={s.section}
+                      variant={s.featured ? 'default' : 'outline'}
+                      className="h-auto py-4 flex flex-col gap-2"
+                      onClick={() => navigate(meta.path)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{meta.label}</span>
+                      {s.featured && <Badge variant="secondary" className="text-xs">En vedette</Badge>}
+                    </Button>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="talents" className="space-y-4">
             {contracts.length === 0 ? (
               <Card>
