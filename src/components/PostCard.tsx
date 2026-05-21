@@ -10,11 +10,16 @@ import { toast } from './ui/use-toast';
 import LinkPreview from './LinkPreview';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
+const isUrl = (s: string) => /^https?:\/\//i.test(s);
+
+function extractUrls(text: string): string[] {
+  return Array.from(new Set(text.match(URL_REGEX) || []));
+}
 
 function renderTextWithLinks(text: string) {
   const parts = text.split(URL_REGEX);
   return parts.map((part, i) =>
-    URL_REGEX.test(part) ? (
+    isUrl(part) ? (
       <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">
         {part}
       </a>
