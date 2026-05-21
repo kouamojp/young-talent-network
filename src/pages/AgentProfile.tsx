@@ -98,18 +98,48 @@ const AgentProfile: React.FC = () => {
   const fetchAgentData = async () => {
     setLoading(true);
     try {
-      const { data: agentData } = await supabase
+      let { data: agentData } = await supabase
         .from('agent_profiles')
         .select('*')
         .eq('user_id', id!)
-        .single();
+        .maybeSingle();
+
+      // Fallback: build from profiles if no agent_profiles row
+      if (!agentData) {
+        const { data: pf } = await supabase
+          .from('profiles')
+          .select('id, name, avatar_url, bio, city, country, location, cover_photo_url, website, phone, email, user_type, sport_type')
+          .eq('id', id!)
+          .maybeSingle();
+        if (pf) {
+          agentData = {
+            id: pf.id,
+            user_id: pf.id,
+            agency_name: pf.name || 'Agent',
+            specialization: pf.sport_type ? [pf.sport_type] : null,
+            license_number: null,
+            clients_represented: 0,
+            commission_rate: null,
+            verified: false,
+            services: [],
+            category: null,
+            bio: pf.bio,
+            avatar_url: pf.avatar_url,
+            location: pf.location || [pf.city, pf.country].filter(Boolean).join(', '),
+            phone: pf.phone,
+            email: pf.email,
+            website: pf.website,
+            deals_completed: 0,
+          } as any;
+        }
+      }
 
       if (agentData) {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('name, avatar_url, country, city')
           .eq('id', id!)
-          .single();
+          .maybeSingle();
 
         setAgent({ ...agentData, profile: profileData || undefined } as AgentData);
 
@@ -154,12 +184,42 @@ const AgentProfile: React.FC = () => {
           }));
           setMemberships(enrichedMemberships as OrgMembership[]);
         }
+
+        // Fetch posts
+        const { data: postsData } = await supabase
+          .from('posts')
+          .select('id, content, media_urls, created_at, likes_count, comments_count, visibility')
+          .eq('user_id', id!)
+          .eq('is_published', true)
+          .eq('visibility', 'public')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        setPosts(postsData || []);
+
+        // Fetch active sections
+        const { data: presenceData } = await supabase
+          .from('talent_presence')
+          .select('section, is_active, visibility, featured')
+          .eq('user_id', id!)
+          .eq('is_active', true)
+          .eq('visibility', 'public');
+        setPresence(presenceData || []);
       }
     } catch (err) {
       console.error('Error fetching agent data:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const SECTION_LABELS: Record<string, { label: string; icon: any; path: string }> = {
+    events: { label: 'Événements', icon: Calendar, path: '/events' },
+    tv: { label: 'TV', icon: Tv, path: '/tv' },
+    live: { label: 'LIVE', icon: Radio, path: '/live' },
+    work: { label: 'Travail', icon: Briefcase, path: '/work' },
+    learning: { label: 'Formation', icon: GraduationCap, path: '/learning' },
+    'yat-coin': { label: 'YAT Coin', icon: Coins, path: '/yat-coin' },
+    karta: { label: 'Karta', icon: MapIcon, path: '/karta' },
   };
 
   if (loading) {
