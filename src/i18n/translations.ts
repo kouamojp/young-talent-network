@@ -360,6 +360,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Search opportunities',
     'feed.upcomingEvents': 'Upcoming events',
     'feed.testAptitudes': 'Test my aptitudes',
+    'feed.similarTalents': 'Talents like you',
 
     // Messages page
     'messages.chats': 'Chats',
@@ -1348,6 +1349,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Chercher des opportunités',
     'feed.upcomingEvents': 'Événements à venir',
     'feed.testAptitudes': 'Tester mes aptitudes',
+    'feed.similarTalents': 'Talents comme vous',
 
     // Messages
     'messages.chats': 'Chats',
@@ -2336,6 +2338,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Искать возможности',
     'feed.upcomingEvents': 'Ближайшие мероприятия',
     'feed.testAptitudes': 'Проверить способности',
+    'feed.similarTalents': 'Таланты с такими параметрами как вы',
 
     // Messages
     'messages.chats': 'Чаты',
