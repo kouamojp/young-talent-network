@@ -77,7 +77,7 @@ const YatDatabase: React.FC = () => {
       const [talentRes, agentRes, orgRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'talent'),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'agent'),
-        supabase.from('organization_profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('user_type', 'organization'),
       ]);
       setStats({
         talents: talentRes.count || 0,
@@ -187,15 +187,16 @@ const YatDatabase: React.FC = () => {
         }
       }
 
-      // Fetch talents & agents from profiles
-      if (typeFilter === 'all' || typeFilter === 'talent' || typeFilter === 'agent') {
+      // Fetch talents, agents & organizations from profiles
+      {
         let profileQuery = supabase
           .from('profiles')
           .select('id, name, avatar_url, bio, location, city, country, sport_type, platform_rating, user_type');
 
         if (typeFilter === 'talent') profileQuery = profileQuery.eq('user_type', 'talent');
         else if (typeFilter === 'agent') profileQuery = profileQuery.eq('user_type', 'agent');
-        else profileQuery = profileQuery.in('user_type', ['talent', 'agent']);
+        else if (typeFilter === 'organization') profileQuery = profileQuery.eq('user_type', 'organization');
+        else profileQuery = profileQuery.in('user_type', ['talent', 'agent', 'organization']);
 
         if (userIdsByCategory) profileQuery = profileQuery.in('id', userIdsByCategory);
 
@@ -224,15 +225,18 @@ const YatDatabase: React.FC = () => {
 
           for (const p of profiles) {
             const sections = presenceMap[p.id] || [];
-            if (sectionFilter !== 'all' && !sections.includes(sectionFilter)) continue;
+            if (sectionFilter !== 'all') {
+              if (p.user_type === 'organization') continue;
+              if (!sections.includes(sectionFilter)) continue;
+            }
 
             allResults.push({
               id: p.id,
               name: p.name,
               avatar_url: p.avatar_url,
-              type: p.user_type as 'talent' | 'agent',
+              type: p.user_type as 'talent' | 'agent' | 'organization',
               bio: p.bio,
-              location: p.location,
+              location: p.location || [p.city, p.country].filter(Boolean).join(', ') || null,
               city: p.city,
               country: p.country,
               sport_type: p.sport_type,
@@ -240,43 +244,6 @@ const YatDatabase: React.FC = () => {
               category: p.sport_type,
               sections,
               extra: {},
-            });
-          }
-        }
-      }
-
-      // Fetch organizations
-      if ((typeFilter === 'all' || typeFilter === 'organization') && !categoryId) {
-        let orgQuery = supabase
-          .from('organization_profiles')
-          .select('id, user_id, company_name, description, industry, headquarters, logo_url, verified');
-
-        if (query.trim()) {
-          orgQuery = orgQuery.or(`company_name.ilike.%${query}%,description.ilike.%${query}%,industry.ilike.%${query}%`);
-        }
-        if (countryFilter.trim()) {
-          orgQuery = orgQuery.ilike('headquarters', `%${countryFilter}%`);
-        }
-
-        const { data: orgs } = await orgQuery.limit(50);
-
-        if (orgs?.length) {
-          for (const o of orgs) {
-            if (sectionFilter !== 'all') continue;
-            allResults.push({
-              id: o.id,
-              name: o.company_name,
-              avatar_url: o.logo_url,
-              type: 'organization',
-              bio: o.description,
-              location: o.headquarters,
-              city: null,
-              country: null,
-              sport_type: null,
-              rating: 0,
-              category: o.industry,
-              sections: [],
-              extra: { verified: o.verified, industry: o.industry, user_id: o.user_id },
             });
           }
         }
