@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, FileText, Camera, Film, Radio, X } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PostCreationDialog } from './PostCreationDialog';
 
 const FloatingCreateButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+  if (location.pathname.startsWith('/messages')) return null;
 
   const actions = [
     { icon: FileText, label: t('create.post'), color: 'bg-blue-500', action: 'post' },

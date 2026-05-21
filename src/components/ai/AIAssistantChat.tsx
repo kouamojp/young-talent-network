@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { MessageCircle, X, Send, Loader2, Sparkles, Minimize2, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,8 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const location = useLocation();
+  const hideFloating = !fullPage && location.pathname.startsWith('/messages');
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -162,6 +165,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   );
 
   if (fullPage) return chatContent;
+  if (hideFloating) return null;
 
   return (
     <>
