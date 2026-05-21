@@ -59,6 +59,8 @@ const YatDatabase: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [stats, setStats] = useState({ talents: 0, agents: 0, organizations: 0 });
+  const [recommendations, setRecommendations] = useState<ParticipantResult[]>([]);
+  const [recoLoading, setRecoLoading] = useState(false);
 
   // Initialize from ?category=slug
   useEffect(() => {
