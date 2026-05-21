@@ -28,7 +28,7 @@ const Friends: React.FC = () => {
       setCurrentUserId(user.id);
       
       const [connectionsRes, allUsersRes] = await Promise.all([
-        supabase.from('connections').select('*, profiles!connections_connected_user_id_fkey(id, name, avatar_url, user_type, country, sport_type)').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`),
+        supabase.from('connections').select('*, requester:profiles!connections_user_id_fkey(id, name, avatar_url, user_type, country, sport_type), receiver:profiles!connections_connected_user_id_fkey(id, name, avatar_url, user_type, country, sport_type)').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`),
         supabase.from('profiles').select('id, name, avatar_url, user_type, country, sport_type').neq('id', user.id).limit(50),
       ]);
 
@@ -48,7 +48,23 @@ const Friends: React.FC = () => {
     if (!error) {
       toast({ title: t('friends.requestSent') });
       setPendingRequests(prev => [...prev, { user_id: currentUserId, connected_user_id: userId, status: 'pending' }]);
+    } else {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
+  };
+
+  const acceptRequest = async (req: any) => {
+    const { error } = await supabase.from('connections').update({ status: 'accepted' }).eq('id', req.id);
+    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    setPendingRequests(prev => prev.filter(p => p.id !== req.id));
+    setConnections(prev => [...prev, { ...req, status: 'accepted', profiles: req.requester }]);
+    toast({ title: t('friends.accept') });
+  };
+
+  const declineRequest = async (req: any) => {
+    const { error } = await supabase.from('connections').delete().eq('id', req.id);
+    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    setPendingRequests(prev => prev.filter(p => p.id !== req.id));
   };
 
   const isConnected = (userId: string) => connections.some(c => c.user_id === userId || c.connected_user_id === userId);
