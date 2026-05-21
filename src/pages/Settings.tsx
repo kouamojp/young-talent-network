@@ -18,6 +18,7 @@ import {
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { YatServicesManager } from '@/components/profile/YatServicesManager';
+import { LinkedAccountsManager } from '@/components/profile/LinkedAccountsManager';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
