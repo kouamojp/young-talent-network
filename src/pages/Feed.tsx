@@ -232,6 +232,7 @@ const FeedPage: React.FC = () => {
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/work')}><Briefcase className="h-3.5 w-3.5 mr-2" /> {t('feed.searchOpportunities')}</Button>
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/events')}><Bell className="h-3.5 w-3.5 mr-2" /> {t('feed.upcomingEvents')}</Button>
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/test')}><Star className="h-3.5 w-3.5 mr-2" /> {t('feed.testAptitudes')}</Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/yat-database?similar=me')}><Users2 className="h-3.5 w-3.5 mr-2" /> {t('feed.similarTalents')}</Button>
                   </CardContent>
                 </Card>
               </div>
