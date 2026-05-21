@@ -12,7 +12,7 @@ import RecentOrganizations from '@/components/RecentOrganizations';
 import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
 import { 
   Loader2, Users, Building2, Briefcase, TrendingUp, Star, 
-  UserPlus, Bell, Sparkles, ArrowRight 
+  UserPlus, Bell, Sparkles, ArrowRight, Users2
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 
