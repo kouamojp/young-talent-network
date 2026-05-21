@@ -2338,6 +2338,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Искать возможности',
     'feed.upcomingEvents': 'Ближайшие мероприятия',
     'feed.testAptitudes': 'Проверить способности',
+    'feed.similarTalents': 'Таланты с такими параметрами как вы',
 
     // Messages
     'messages.chats': 'Чаты',
