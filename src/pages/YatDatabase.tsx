@@ -404,6 +404,40 @@ const YatDatabase: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Recommendations: similar to you */}
+        {recommendations.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Star className="h-4 w-4 text-primary" />
+                Рекомендации — похожие на вас
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {recommendations.map(r => (
+                  <Link key={`reco-${r.id}`} to={getProfileLink(r)} className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/60 transition-colors">
+                    <Avatar className="h-10 w-10 shrink-0">
+                      <AvatarImage src={r.avatar_url || ''} />
+                      <AvatarFallback>{r.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{r.name}</p>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <Badge variant="outline" className={`text-[9px] gap-0.5 ${getTypeBadgeColor(r.type)}`}>
+                          {getTypeIcon(r.type)}
+                          {r.type === 'talent' ? 'Talent' : 'Agent'}
+                        </Badge>
+                        {r.sport_type && <span className="text-[10px] text-muted-foreground truncate">{r.sport_type}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Results */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
