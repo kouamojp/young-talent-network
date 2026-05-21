@@ -72,6 +72,8 @@ const AgentProfile: React.FC = () => {
   const [agent, setAgent] = useState<AgentData | null>(null);
   const [contracts, setContracts] = useState<TalentContract[]>([]);
   const [memberships, setMemberships] = useState<OrgMembership[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [presence, setPresence] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
