@@ -254,6 +254,22 @@ const Settings: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <RefreshCw className="h-5 w-5 text-primary" /> Кэш приложения
+                  </CardTitle>
+                  <CardDescription>
+                    Разрегистрирует service workers и очищает кэш браузера. Полезно при странном поведении или устаревшем контенте.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" className="gap-2" onClick={handleClearCache} disabled={clearing}>
+                    {clearing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                    Очистить кэш
+                  </Button>
+                </CardContent>
+              </Card>
               <Card className="border-destructive/30">
                 <CardHeader><CardTitle className="text-lg flex items-center gap-2 text-destructive"><Trash2 className="h-5 w-5" /> {t('settings.dangerZone')}</CardTitle></CardHeader>
                 <CardContent className="space-y-3">
