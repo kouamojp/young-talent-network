@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -72,6 +72,8 @@ const AgentProfile: React.FC = () => {
   const [agent, setAgent] = useState<AgentData | null>(null);
   const [contracts, setContracts] = useState<TalentContract[]>([]);
   const [memberships, setMemberships] = useState<OrgMembership[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [presence, setPresence] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -96,18 +98,48 @@ const AgentProfile: React.FC = () => {
   const fetchAgentData = async () => {
     setLoading(true);
     try {
-      const { data: agentData } = await supabase
+      let { data: agentData } = await supabase
         .from('agent_profiles')
         .select('*')
         .eq('user_id', id!)
-        .single();
+        .maybeSingle();
+
+      // Fallback: build from profiles if no agent_profiles row
+      if (!agentData) {
+        const { data: pf } = await supabase
+          .from('profiles')
+          .select('id, name, avatar_url, bio, city, country, location, cover_photo_url, website, phone, email, user_type, sport_type')
+          .eq('id', id!)
+          .maybeSingle();
+        if (pf) {
+          agentData = {
+            id: pf.id,
+            user_id: pf.id,
+            agency_name: pf.name || 'Agent',
+            specialization: pf.sport_type ? [pf.sport_type] : null,
+            license_number: null,
+            clients_represented: 0,
+            commission_rate: null,
+            verified: false,
+            services: [],
+            category: null,
+            bio: pf.bio,
+            avatar_url: pf.avatar_url,
+            location: pf.location || [pf.city, pf.country].filter(Boolean).join(', '),
+            phone: pf.phone,
+            email: pf.email,
+            website: pf.website,
+            deals_completed: 0,
+          } as any;
+        }
+      }
 
       if (agentData) {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('name, avatar_url, country, city')
           .eq('id', id!)
-          .single();
+          .maybeSingle();
 
         setAgent({ ...agentData, profile: profileData || undefined } as AgentData);
 
@@ -152,12 +184,42 @@ const AgentProfile: React.FC = () => {
           }));
           setMemberships(enrichedMemberships as OrgMembership[]);
         }
+
+        // Fetch posts
+        const { data: postsData } = await supabase
+          .from('posts')
+          .select('id, content, media_urls, created_at, likes_count, comments_count, visibility')
+          .eq('user_id', id!)
+          .eq('is_published', true)
+          .eq('visibility', 'public')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        setPosts(postsData || []);
+
+        // Fetch active sections
+        const { data: presenceData } = await supabase
+          .from('talent_presence')
+          .select('section, is_active, visibility, featured')
+          .eq('user_id', id!)
+          .eq('is_active', true)
+          .eq('visibility', 'public');
+        setPresence(presenceData || []);
       }
     } catch (err) {
       console.error('Error fetching agent data:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const SECTION_LABELS: Record<string, { label: string; icon: any; path: string }> = {
+    events: { label: 'Événements', icon: Calendar, path: '/events' },
+    tv: { label: 'TV', icon: Tv, path: '/tv' },
+    live: { label: 'LIVE', icon: Radio, path: '/live' },
+    work: { label: 'Travail', icon: Briefcase, path: '/work' },
+    learning: { label: 'Formation', icon: GraduationCap, path: '/learning' },
+    'yat-coin': { label: 'YAT Coin', icon: Coins, path: '/yat-coin' },
+    karta: { label: 'Karta', icon: MapIcon, path: '/karta' },
   };
 
   if (loading) {
@@ -265,8 +327,10 @@ const AgentProfile: React.FC = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">{t('agent.overview')}</TabsTrigger>
+            <TabsTrigger value="posts">Publications</TabsTrigger>
+            <TabsTrigger value="sections">Sections</TabsTrigger>
             <TabsTrigger value="talents">{t('agent.talents')}</TabsTrigger>
             <TabsTrigger value="organizations">{t('agent.organizations')}</TabsTrigger>
             <TabsTrigger value="services">{t('agent.services')}</TabsTrigger>
@@ -296,6 +360,75 @@ const AgentProfile: React.FC = () => {
                   <span className="text-sm text-muted-foreground">Licence: {agent.license_number}</span>
                 </CardContent>
               </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="posts" className="space-y-4">
+            {posts.length === 0 ? (
+              <Card><CardContent className="p-12 text-center">
+                <Newspaper className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <h3 className="font-semibold text-lg">Aucune publication</h3>
+                <p className="text-muted-foreground">Cet agent n'a pas encore publié.</p>
+              </CardContent></Card>
+            ) : (
+              posts.map((p) => (
+                <Card key={p.id}>
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={agent.avatar_url || agent.profile?.avatar_url || ''} />
+                        <AvatarFallback>{agent.agency_name?.charAt(0) || 'A'}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium text-foreground text-sm">{agent.agency_name}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                    {p.content && <p className="text-sm text-foreground whitespace-pre-wrap">{p.content.slice(0, 500)}</p>}
+                    {p.media_urls && p.media_urls.length > 0 && (
+                      <div className={`grid gap-2 ${p.media_urls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                        {p.media_urls.slice(0, 4).map((url: string, i: number) => (
+                          <img key={i} src={url} alt="" className="w-full h-48 object-cover rounded-md" />
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t">
+                      <span className="flex items-center gap-1"><Heart className="h-4 w-4" /> {p.likes_count || 0}</span>
+                      <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {p.comments_count || 0}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+
+          <TabsContent value="sections" className="space-y-4">
+            {presence.length === 0 ? (
+              <Card><CardContent className="p-12 text-center">
+                <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <h3 className="font-semibold text-lg">Aucune section active</h3>
+                <p className="text-muted-foreground">Cet agent n'est actif dans aucune section.</p>
+              </CardContent></Card>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {presence.map((s) => {
+                  const meta = SECTION_LABELS[s.section];
+                  if (!meta) return null;
+                  const Icon = meta.icon;
+                  return (
+                    <Button
+                      key={s.section}
+                      variant={s.featured ? 'default' : 'outline'}
+                      className="h-auto py-4 flex flex-col gap-2"
+                      onClick={() => navigate(meta.path)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span>{meta.label}</span>
+                      {s.featured && <Badge variant="secondary" className="text-xs">En vedette</Badge>}
+                    </Button>
+                  );
+                })}
+              </div>
             )}
           </TabsContent>
 
