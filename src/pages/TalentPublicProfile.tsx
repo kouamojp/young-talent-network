@@ -38,9 +38,20 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
   </div>
 );
 
+const SECTION_LABELS: Record<string, { label: string; icon: string }> = {
+  events: { label: 'Events', icon: '📅' },
+  tv: { label: 'TV', icon: '📺' },
+  live: { label: 'LIVE', icon: '🔴' },
+  work: { label: 'Work', icon: '💼' },
+  learning: { label: 'Learning', icon: '🎓' },
+  'yat-coin': { label: 'YAT Coin', icon: '🪙' },
+  karta: { label: 'Karta', icon: '🗺️' },
+};
+
 const TalentPublicProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [profile, setProfile] = useState<any>(null);
   const [education, setEducation] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
@@ -48,6 +59,9 @@ const TalentPublicProfile: React.FC = () => {
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [ratings, setRatings] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [presence, setPresence] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [myRating, setMyRating] = useState(0);
   const [myComment, setMyComment] = useState('');
@@ -64,7 +78,7 @@ const TalentPublicProfile: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
 
-      const [profileRes, eduRes, achRes, mediaRes, linksRes, skillsRes, ratingsRes] = await Promise.all([
+      const [profileRes, eduRes, achRes, mediaRes, linksRes, skillsRes, ratingsRes, catsRes, presenceRes, postsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', id).single(),
         supabase.from('talent_education').select('*').eq('user_id', id).order('start_year', { ascending: false }),
         supabase.from('talent_achievements').select('*').eq('user_id', id).order('date', { ascending: false }),
@@ -72,6 +86,9 @@ const TalentPublicProfile: React.FC = () => {
         supabase.from('talent_social_links').select('*').eq('user_id', id),
         supabase.from('user_skills').select('skill_id, skills(name)').eq('user_id', id),
         supabase.from('talent_ratings').select('*, profiles!talent_ratings_rater_id_fkey(name, avatar_url)').eq('talent_id', id).order('created_at', { ascending: false }),
+        supabase.from('user_yat_categories').select('id, yat_categories(id, slug, name_en, name_fr, name_ru, icon, color), yat_subcategories(id, name_en, name_fr, name_ru)').eq('user_id', id),
+        supabase.from('talent_presence').select('section, is_active, featured, bio, skills').eq('user_id', id).eq('is_active', true).eq('visibility', 'public'),
+        supabase.from('posts').select('id, content, media_urls, created_at, likes_count, comments_count, visibility').eq('user_id', id).eq('is_published', true).eq('visibility', 'public').order('created_at', { ascending: false }).limit(10),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -80,6 +97,9 @@ const TalentPublicProfile: React.FC = () => {
       if (mediaRes.data) setMedia(mediaRes.data);
       if (linksRes.data) setSocialLinks(linksRes.data);
       if (skillsRes.data) setSkills(skillsRes.data.map((s: any) => s.skills?.name).filter(Boolean));
+      if (catsRes.data) setCategories(catsRes.data);
+      if (presenceRes.data) setPresence(presenceRes.data);
+      if (postsRes.data) setPosts(postsRes.data);
       if (ratingsRes.data) {
         setRatings(ratingsRes.data);
         if (user) {
@@ -92,6 +112,11 @@ const TalentPublicProfile: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const catName = (c: any) => {
+    if (!c) return '';
+    return language === 'fr' ? c.name_fr : language === 'ru' ? c.name_ru : c.name_en;
   };
 
   const submitRating = async () => {
