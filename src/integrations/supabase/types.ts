@@ -726,17 +726,26 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string
+          created_by: string | null
           id: string
+          is_group: boolean
+          name: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           id?: string
+          is_group?: boolean
+          name?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           id?: string
+          is_group?: boolean
+          name?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1222,7 +1231,10 @@ export type Database = {
           content: string
           conversation_id: string
           created_at: string
+          forwarded_from_id: string | null
           id: string
+          media_type: string | null
+          media_url: string | null
           read: boolean | null
           sender_id: string
         }
@@ -1230,7 +1242,10 @@ export type Database = {
           content: string
           conversation_id: string
           created_at?: string
+          forwarded_from_id?: string | null
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read?: boolean | null
           sender_id: string
         }
@@ -1238,7 +1253,10 @@ export type Database = {
           content?: string
           conversation_id?: string
           created_at?: string
+          forwarded_from_id?: string | null
           id?: string
+          media_type?: string | null
+          media_url?: string | null
           read?: boolean | null
           sender_id?: string
         }
@@ -2575,6 +2593,10 @@ export type Database = {
     Functions: {
       create_conversation_with_participant: {
         Args: { _other_user_id: string }
+        Returns: string
+      }
+      create_group_conversation: {
+        Args: { _name: string; _user_ids: string[] }
         Returns: string
       }
       has_role: {
