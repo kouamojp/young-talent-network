@@ -28,7 +28,7 @@ const Friends: React.FC = () => {
       setCurrentUserId(user.id);
       
       const [connectionsRes, allUsersRes] = await Promise.all([
-        supabase.from('connections').select('*, profiles!connections_connected_user_id_fkey(id, name, avatar_url, user_type, country, sport_type)').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`),
+        supabase.from('connections').select('*, requester:profiles!connections_user_id_fkey(id, name, avatar_url, user_type, country, sport_type), receiver:profiles!connections_connected_user_id_fkey(id, name, avatar_url, user_type, country, sport_type)').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`),
         supabase.from('profiles').select('id, name, avatar_url, user_type, country, sport_type').neq('id', user.id).limit(50),
       ]);
 
@@ -48,7 +48,23 @@ const Friends: React.FC = () => {
     if (!error) {
       toast({ title: t('friends.requestSent') });
       setPendingRequests(prev => [...prev, { user_id: currentUserId, connected_user_id: userId, status: 'pending' }]);
+    } else {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     }
+  };
+
+  const acceptRequest = async (req: any) => {
+    const { error } = await supabase.from('connections').update({ status: 'accepted' }).eq('id', req.id);
+    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    setPendingRequests(prev => prev.filter(p => p.id !== req.id));
+    setConnections(prev => [...prev, { ...req, status: 'accepted', profiles: req.requester }]);
+    toast({ title: t('friends.accept') });
+  };
+
+  const declineRequest = async (req: any) => {
+    const { error } = await supabase.from('connections').delete().eq('id', req.id);
+    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    setPendingRequests(prev => prev.filter(p => p.id !== req.id));
   };
 
   const isConnected = (userId: string) => connections.some(c => c.user_id === userId || c.connected_user_id === userId);
@@ -88,7 +104,7 @@ const Friends: React.FC = () => {
             </div>
           ) : (
             connections.map(conn => {
-              const friend = conn.profiles;
+              const friend = conn.user_id === currentUserId ? conn.receiver : conn.requester;
               if (!friend) return null;
               return (
                 <Card key={conn.id}>
@@ -121,25 +137,39 @@ const Friends: React.FC = () => {
               <p>{t('friends.noRequests')}</p>
             </div>
           ) : (
-            pendingRequests.map(req => (
-              <Card key={req.id}>
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12"><AvatarFallback>U</AvatarFallback></Avatar>
-                    <div>
-                      <p className="font-medium">{t('friends.pendingRequest')}</p>
-                      <Badge variant="secondary">{t('friends.pending')}</Badge>
+            pendingRequests.map(req => {
+              const incoming = req.connected_user_id === currentUserId;
+              const other = incoming ? req.requester : req.receiver;
+              return (
+                <Card key={req.id}>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={other?.avatar_url} />
+                        <AvatarFallback>{other?.name?.[0] || 'U'}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{other?.name || t('friends.pendingRequest')}</p>
+                        <Badge variant="secondary">{incoming ? t('friends.requests') : t('friends.pending')}</Badge>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button size="sm"><UserCheck className="h-4 w-4 mr-1" />{t('friends.accept')}</Button>
-                    <Button size="sm" variant="outline"><UserX className="h-4 w-4 mr-1" />{t('friends.decline')}</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                    <div className="flex gap-2">
+                      {incoming ? (
+                        <>
+                          <Button size="sm" onClick={() => acceptRequest(req)}><UserCheck className="h-4 w-4 mr-1" />{t('friends.accept')}</Button>
+                          <Button size="sm" variant="outline" onClick={() => declineRequest(req)}><UserX className="h-4 w-4 mr-1" />{t('friends.decline')}</Button>
+                        </>
+                      ) : (
+                        <Button size="sm" variant="outline" onClick={() => declineRequest(req)}><UserX className="h-4 w-4 mr-1" />{t('friends.cancel') || 'Cancel'}</Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
         </TabsContent>
+
 
         <TabsContent value="discover" className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
