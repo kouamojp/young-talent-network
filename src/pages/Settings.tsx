@@ -18,6 +18,7 @@ import {
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { YatServicesManager } from '@/components/profile/YatServicesManager';
+import { LinkedAccountsManager } from '@/components/profile/LinkedAccountsManager';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -264,6 +265,7 @@ const Settings: React.FC = () => {
                         if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
                         toast({ title: 'Готово', description: 'Профиль обновлён до Агента' });
                         setCurrentUser({ ...currentUser, user_type: 'agent' });
+                        window.dispatchEvent(new CustomEvent('profile-updated', { detail: { user_type: 'agent' } }));
                       }}>Стать агентом</Button>
                     </div>
                   )}
@@ -279,6 +281,7 @@ const Settings: React.FC = () => {
                         if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
                         toast({ title: 'Готово', description: 'Профиль обновлён до Организации. Заполните данные организации.' });
                         setCurrentUser({ ...currentUser, user_type: 'organization' });
+                        window.dispatchEvent(new CustomEvent('profile-updated', { detail: { user_type: 'organization' } }));
                         setTimeout(() => navigate('/organizations'), 800);
                       }}>Стать организацией</Button>
                     </div>
@@ -288,6 +291,7 @@ const Settings: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
+              <LinkedAccountsManager />
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
