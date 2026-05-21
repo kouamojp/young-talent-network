@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { 
   Settings as SettingsIcon, User, Bell, Shield, Palette, Globe, 
-  Lock, Eye, Moon, Sun, Loader2, LogOut, Trash2, Mail, Phone, MapPin
+  Lock, Eye, Moon, Sun, Loader2, LogOut, Trash2, Mail, Phone, MapPin, RefreshCw
 } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
