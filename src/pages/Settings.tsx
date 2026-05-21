@@ -67,6 +67,27 @@ const Settings: React.FC = () => {
     navigate('/auth');
   };
 
+  const [clearing, setClearing] = useState(false);
+  const handleClearCache = async () => {
+    setClearing(true);
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if (typeof caches !== 'undefined') {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      try { localStorage.clear(); sessionStorage.clear(); } catch {}
+      toast({ title: 'Кэш очищен', description: 'Перезагружаем страницу...' });
+      setTimeout(() => window.location.reload(), 600);
+    } catch (e: any) {
+      toast({ title: 'Ошибка', description: e?.message || 'Не удалось очистить кэш', variant: 'destructive' });
+      setClearing(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center min-h-[60vh]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   }
