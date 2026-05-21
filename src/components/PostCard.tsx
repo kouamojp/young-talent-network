@@ -131,6 +131,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       setIsSubmitting(false);
     }
   };
+  // Parse out location (📍) appended to content
+  const locationMatch = post.content.match(/\n?📍\s*(.+)$/);
+  const locationText = locationMatch?.[1]?.trim() || null;
+  const rawText = locationMatch ? post.content.replace(locationMatch[0], '').trim() : post.content;
+
+  const MAX_DESC = 500;
+  const [expanded, setExpanded] = useState(false);
+  const isLong = rawText.length > MAX_DESC;
+  const displayText = !expanded && isLong ? rawText.slice(0, MAX_DESC).trimEnd() + '…' : rawText;
+
+  const postDate = new Date(post.timestamp);
+
   return (
     <div className="bg-card rounded-lg shadow-sm border border-border">
       {/* Post Header */}
@@ -143,9 +155,23 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
             </Avatar>
             <div className="ml-3">
               <h3 className="font-semibold text-[15px]">{post.author.name}</h3>
-              <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
-              </span>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1" title={format(postDate, 'PPpp')}>
+                  <Calendar className="h-3 w-3" />
+                  {format(postDate, 'd MMM yyyy, HH:mm')}
+                </span>
+                <span>·</span>
+                <span>{formatDistanceToNow(postDate, { addSuffix: true })}</span>
+                {locationText && (
+                  <>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-1 text-primary">
+                      <MapPin className="h-3 w-3" />
+                      {locationText}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <button className="text-muted-foreground hover:text-foreground transition-colors">
@@ -153,11 +179,22 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           </button>
         </div>
       </div>
-      
-      {/* Post Content */}
-      <div className="px-4 pb-3">
-        <p className="text-[15px] whitespace-pre-wrap">{post.content}</p>
-      </div>
+
+      {/* Post Content (description, max 500 chars) */}
+      {rawText && (
+        <div className="px-4 pb-3">
+          <p className="text-[15px] whitespace-pre-wrap break-words">{displayText}</p>
+          {isLong && (
+            <button
+              onClick={() => setExpanded(e => !e)}
+              className="mt-1 text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
+            >
+              {expanded ? 'Voir moins' : 'Voir plus'}
+              <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Post Media */}
       {post.media_urls && post.media_urls.length > 0 && (
