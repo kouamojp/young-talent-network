@@ -360,6 +360,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'feed.searchOpportunities': 'Search opportunities',
     'feed.upcomingEvents': 'Upcoming events',
     'feed.testAptitudes': 'Test my aptitudes',
+    'feed.similarTalents': 'Talents like you',
 
     // Messages page
     'messages.chats': 'Chats',
