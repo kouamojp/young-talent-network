@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText } from 'lucide-react';
+import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText, Tag, Layers, Newspaper, Heart, MessageCircle } from 'lucide-react';
+import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/hooks/use-toast';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
@@ -37,9 +38,20 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
   </div>
 );
 
+const SECTION_LABELS: Record<string, { label: string; icon: string }> = {
+  events: { label: 'Events', icon: '📅' },
+  tv: { label: 'TV', icon: '📺' },
+  live: { label: 'LIVE', icon: '🔴' },
+  work: { label: 'Work', icon: '💼' },
+  learning: { label: 'Learning', icon: '🎓' },
+  'yat-coin': { label: 'YAT Coin', icon: '🪙' },
+  karta: { label: 'Karta', icon: '🗺️' },
+};
+
 const TalentPublicProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [profile, setProfile] = useState<any>(null);
   const [education, setEducation] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
@@ -47,6 +59,9 @@ const TalentPublicProfile: React.FC = () => {
   const [socialLinks, setSocialLinks] = useState<any[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
   const [ratings, setRatings] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [presence, setPresence] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [myRating, setMyRating] = useState(0);
   const [myComment, setMyComment] = useState('');
@@ -63,7 +78,7 @@ const TalentPublicProfile: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
 
-      const [profileRes, eduRes, achRes, mediaRes, linksRes, skillsRes, ratingsRes] = await Promise.all([
+      const [profileRes, eduRes, achRes, mediaRes, linksRes, skillsRes, ratingsRes, catsRes, presenceRes, postsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', id).single(),
         supabase.from('talent_education').select('*').eq('user_id', id).order('start_year', { ascending: false }),
         supabase.from('talent_achievements').select('*').eq('user_id', id).order('date', { ascending: false }),
@@ -71,6 +86,9 @@ const TalentPublicProfile: React.FC = () => {
         supabase.from('talent_social_links').select('*').eq('user_id', id),
         supabase.from('user_skills').select('skill_id, skills(name)').eq('user_id', id),
         supabase.from('talent_ratings').select('*, profiles!talent_ratings_rater_id_fkey(name, avatar_url)').eq('talent_id', id).order('created_at', { ascending: false }),
+        supabase.from('user_yat_categories').select('id, yat_categories(id, slug, name_en, name_fr, name_ru, icon, color), yat_subcategories(id, name_en, name_fr, name_ru)').eq('user_id', id),
+        supabase.from('talent_presence').select('section, is_active, featured, bio, skills').eq('user_id', id).eq('is_active', true).eq('visibility', 'public'),
+        supabase.from('posts').select('id, content, media_urls, created_at, likes_count, comments_count, visibility').eq('user_id', id).eq('is_published', true).eq('visibility', 'public').order('created_at', { ascending: false }).limit(10),
       ]);
 
       if (profileRes.data) setProfile(profileRes.data);
@@ -79,6 +97,9 @@ const TalentPublicProfile: React.FC = () => {
       if (mediaRes.data) setMedia(mediaRes.data);
       if (linksRes.data) setSocialLinks(linksRes.data);
       if (skillsRes.data) setSkills(skillsRes.data.map((s: any) => s.skills?.name).filter(Boolean));
+      if (catsRes.data) setCategories(catsRes.data);
+      if (presenceRes.data) setPresence(presenceRes.data);
+      if (postsRes.data) setPosts(postsRes.data);
       if (ratingsRes.data) {
         setRatings(ratingsRes.data);
         if (user) {
@@ -91,6 +112,11 @@ const TalentPublicProfile: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const catName = (c: any) => {
+    if (!c) return '';
+    return language === 'fr' ? c.name_fr : language === 'ru' ? c.name_ru : c.name_en;
   };
 
   const submitRating = async () => {
@@ -276,6 +302,89 @@ const TalentPublicProfile: React.FC = () => {
                   </table>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Categories */}
+        {categories.length > 0 && (
+          <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+            <SectionHeader icon={Tag} title="Catégories" />
+            <div className="p-3 flex flex-wrap gap-1.5">
+              {categories.map((uc: any) => (
+                <Badge
+                  key={uc.id}
+                  variant="secondary"
+                  className="text-xs"
+                  style={uc.yat_categories?.color ? { backgroundColor: `${uc.yat_categories.color}22`, color: uc.yat_categories.color, borderColor: `${uc.yat_categories.color}55` } : undefined}
+                >
+                  {uc.yat_categories?.icon && <span className="mr-1">{uc.yat_categories.icon}</span>}
+                  {catName(uc.yat_categories)}
+                  {uc.yat_subcategories && <span className="opacity-70"> · {catName(uc.yat_subcategories)}</span>}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Active sections */}
+        {presence.length > 0 && (
+          <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+            <SectionHeader icon={Layers} title="Présent dans les sections" />
+            <div className="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {presence.map((p: any) => {
+                const meta = SECTION_LABELS[p.section] || { label: p.section, icon: '•' };
+                return (
+                  <button
+                    key={p.section}
+                    onClick={() => navigate(`/${p.section === 'yat-coin' ? 'yat-coin' : p.section}`)}
+                    className={`flex items-center gap-2 p-2.5 rounded-lg border text-left transition-colors hover:bg-primary/5 ${p.featured ? 'border-primary/40 bg-primary/5' : 'border-border/50 bg-muted/40'}`}
+                  >
+                    <span className="text-lg">{meta.icon}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">{meta.label}</p>
+                      {p.featured && <span className="text-[10px] text-primary">★ En vedette</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Posts feed */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+          <SectionHeader icon={Newspaper} title={`Publications (${posts.length})`} />
+          <div className="p-3 space-y-3">
+            {posts.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">Aucune publication publique pour le moment.</p>
+            ) : (
+              posts.map((post: any) => (
+                <div key={post.id} className="p-3 rounded-lg border border-border/50 bg-muted/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={profile.avatar_url || ''} />
+                      <AvatarFallback className="text-[10px]">{profile.name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-foreground truncate">{profile.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                  </div>
+                  {post.content && <p className="text-sm text-foreground whitespace-pre-wrap mb-2">{post.content}</p>}
+                  {post.media_urls && post.media_urls.length > 0 && (
+                    <div className={`grid gap-1.5 mb-2 ${post.media_urls.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                      {post.media_urls.slice(0, 4).map((url: string, i: number) => (
+                        <img key={i} src={url} alt="" className="w-full h-32 object-cover rounded-md" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4 text-[11px] text-muted-foreground pt-1 border-t border-border/30">
+                    <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {post.likes_count || 0}</span>
+                    <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {post.comments_count || 0}</span>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
