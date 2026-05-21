@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_links: {
+        Row: {
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          linked_user_id: string
+          owner_user_id: string
+          status: string
+          sync_fields: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          linked_user_id: string
+          owner_user_id: string
+          status?: string
+          sync_fields?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          linked_user_id?: string
+          owner_user_id?: string
+          status?: string
+          sync_fields?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       advertisements: {
         Row: {
           clicks_count: number
