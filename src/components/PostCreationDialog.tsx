@@ -320,6 +320,34 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           </TabsList>
 
           <TabsContent value="post" className="space-y-3 mt-4">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-8"
+                  placeholder={t('post.linkPlaceholder') || 'Paste a link to auto-generate a post...'}
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  disabled={importing}
+                />
+              </div>
+              <Button type="button" variant="outline" onClick={importFromLink} disabled={importing || !linkUrl.trim()}>
+                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span className="ml-1 hidden sm:inline">{t('post.import') || 'Import'}</span>
+              </Button>
+            </div>
+            {linkPreview && (
+              <div className="flex gap-2 p-2 border rounded-lg bg-muted/30">
+                {linkPreview.image && <img src={linkPreview.image} alt="" className="w-16 h-16 object-cover rounded" />}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>
+                  <div className="text-sm font-medium truncate">{linkPreview.title}</div>
+                </div>
+                <button onClick={() => setLinkPreview(null)} className="p-1 hover:bg-muted rounded">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
             <Textarea
               placeholder={t('post.placeholder') || "What's on your mind?"}
               value={content}
