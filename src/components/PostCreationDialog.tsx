@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3 } from 'lucide-react';
+import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
@@ -37,7 +37,27 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
   const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkPreview, setLinkPreview] = useState<{ title?: string; image?: string | null; siteName?: string } | null>(null);
+  const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const importFromLink = async () => {
+    if (!linkUrl.trim()) return;
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('post-from-link', { body: { url: linkUrl.trim() } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setContent((prev) => (prev ? prev + '\n\n' : '') + (data.content || ''));
+      setLinkPreview({ title: data.title, image: data.image, siteName: data.siteName });
+      toast({ title: t('post.linkImported') || 'Content imported from link' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const [articleTitle, setArticleTitle] = useState('');
   const [articleCategory, setArticleCategory] = useState('');
