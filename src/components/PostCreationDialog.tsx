@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3 } from 'lucide-react';
+import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
@@ -37,7 +37,27 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
   const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkPreview, setLinkPreview] = useState<{ title?: string; image?: string | null; siteName?: string } | null>(null);
+  const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const importFromLink = async () => {
+    if (!linkUrl.trim()) return;
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('post-from-link', { body: { url: linkUrl.trim() } });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setContent((prev) => (prev ? prev + '\n\n' : '') + (data.content || ''));
+      setLinkPreview({ title: data.title, image: data.image, siteName: data.siteName });
+      toast({ title: t('post.linkImported') || 'Content imported from link' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const [articleTitle, setArticleTitle] = useState('');
   const [articleCategory, setArticleCategory] = useState('');
@@ -65,6 +85,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setTab('post'); setVisibility('public');
     setActiveDraftId(null); setShowDrafts(false);
     setScheduledFor('');
+    setLinkUrl(''); setLinkPreview(null);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -300,6 +321,34 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           </TabsList>
 
           <TabsContent value="post" className="space-y-3 mt-4">
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-8"
+                  placeholder={t('post.linkPlaceholder') || 'Paste a link to auto-generate a post...'}
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  disabled={importing}
+                />
+              </div>
+              <Button type="button" variant="outline" onClick={importFromLink} disabled={importing || !linkUrl.trim()}>
+                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span className="ml-1 hidden sm:inline">{t('post.import') || 'Import'}</span>
+              </Button>
+            </div>
+            {linkPreview && (
+              <div className="flex gap-2 p-2 border rounded-lg bg-muted/30">
+                {linkPreview.image && <img src={linkPreview.image} alt="" className="w-16 h-16 object-cover rounded" />}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>
+                  <div className="text-sm font-medium truncate">{linkPreview.title}</div>
+                </div>
+                <button onClick={() => setLinkPreview(null)} className="p-1 hover:bg-muted rounded">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
             <Textarea
               placeholder={t('post.placeholder') || "What's on your mind?"}
               value={content}
