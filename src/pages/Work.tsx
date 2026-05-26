@@ -11,6 +11,7 @@ import OrganizationView from '@/components/work/OrganizationView';
 import SearchHeader from '@/components/work/SearchHeader';
 import TalentSearchCards from '@/components/TalentSearchCards';
 import SuccessStories from '@/components/work/SuccessStories';
+import WorkAIPanel from '@/components/work/WorkAIPanel';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 const Work: React.FC = () => {
@@ -152,6 +153,7 @@ const Work: React.FC = () => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6 mt-6">
+              <WorkAIPanel />
               <WorkHubEntry />
             </TabsContent>
 
