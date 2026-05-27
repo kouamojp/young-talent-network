@@ -111,10 +111,11 @@ const Friends: React.FC = () => {
       </div>
 
       <Tabs defaultValue="friends" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex flex-wrap">
           <TabsTrigger value="friends">{t('friends.myFriends')} ({connections.length})</TabsTrigger>
           <TabsTrigger value="requests">{t('friends.requests')} ({pendingRequests.length})</TabsTrigger>
           <TabsTrigger value="discover">{t('friends.discover')}</TabsTrigger>
+          <TabsTrigger value="feed"><Newspaper className="h-3.5 w-3.5 mr-1" />Publications similaires</TabsTrigger>
         </TabsList>
 
         <div className="relative">
