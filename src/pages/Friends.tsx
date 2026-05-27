@@ -222,6 +222,45 @@ const Friends: React.FC = () => {
             ))}
           </div>
         </TabsContent>
+
+        <TabsContent value="feed" className="space-y-3">
+          {loadingPosts ? (
+            <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+          ) : similarPosts.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Newspaper className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>Aucune publication trouvée pour vos paramètres. Complétez votre profil pour de meilleurs résultats.</p>
+            </div>
+          ) : (
+            similarPosts.map(post => (
+              <Card key={post.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/talent/${post.profiles?.id}`)}>
+                      <AvatarImage src={post.profiles?.avatar_url} />
+                      <AvatarFallback>{post.profiles?.name?.[0] || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{post.profiles?.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        {post.profiles?.sport_type && <Badge variant="secondary" className="text-[10px]">{post.profiles.sport_type}</Badge>}
+                        <span>{new Date(post.created_at).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm whitespace-pre-wrap line-clamp-6">{post.content}</p>
+                  {post.media_urls?.[0] && (
+                    <img src={post.media_urls[0]} alt="" className="rounded-lg max-h-80 w-full object-cover" />
+                  )}
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t">
+                    <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5" />{post.likes_count || 0}</span>
+                    <span className="flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" />{post.comments_count || 0}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );
