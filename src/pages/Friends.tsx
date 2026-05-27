@@ -20,16 +20,19 @@ const Friends: React.FC = () => {
   const [connections, setConnections] = useState<any[]>([]);
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [similarPosts, setSimilarPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/auth'); return; }
       setCurrentUserId(user.id);
-      
-      const [connectionsRes, allUsersRes] = await Promise.all([
+
+      const [connectionsRes, allUsersRes, meRes] = await Promise.all([
         supabase.from('connections').select('*, requester:profiles!connections_user_id_fkey(id, name, avatar_url, user_type, country, sport_type), receiver:profiles!connections_connected_user_id_fkey(id, name, avatar_url, user_type, country, sport_type)').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`),
         supabase.from('profiles').select('id, name, avatar_url, user_type, country, sport_type').neq('id', user.id).limit(50),
+        supabase.from('profiles').select('sport_type, country, user_type, category_id').eq('id', user.id).single(),
       ]);
 
       if (connectionsRes.data) {
@@ -37,6 +40,29 @@ const Friends: React.FC = () => {
         setPendingRequests(connectionsRes.data.filter(c => c.status === 'pending'));
       }
       if (allUsersRes.data) setAllUsers(allUsersRes.data);
+
+      // Fetch similar posts: from users sharing sport_type / country / user_type
+      const me = meRes.data;
+      if (me) {
+        setLoadingPosts(true);
+        let q = supabase.from('profiles').select('id').neq('id', user.id).limit(200);
+        if (me.sport_type) q = q.eq('sport_type', me.sport_type);
+        else if (me.user_type) q = q.eq('user_type', me.user_type);
+        const { data: similarUsers } = await q;
+        const ids = (similarUsers || []).map((p: any) => p.id);
+        if (ids.length) {
+          const { data: posts } = await supabase
+            .from('posts')
+            .select('id, content, media_urls, likes_count, comments_count, created_at, user_id, profiles:profiles!posts_user_id_fkey(id, name, avatar_url, sport_type, country)')
+            .in('user_id', ids)
+            .eq('is_published', true)
+            .eq('visibility', 'public')
+            .order('created_at', { ascending: false })
+            .limit(30);
+          setSimilarPosts(posts || []);
+        }
+        setLoadingPosts(false);
+      }
       setLoading(false);
     };
     init();
