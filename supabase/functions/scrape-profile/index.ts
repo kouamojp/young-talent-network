@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       let extractedData: Record<string, unknown> = {};
 
       if (lovableApiKey) {
-        const aiResponse = await fetch("https://ai-gateway.lovable.dev/v1/chat/completions", {
+        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${lovableApiKey}`,
