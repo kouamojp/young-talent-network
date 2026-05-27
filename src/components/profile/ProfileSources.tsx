@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Globe, Plus, RefreshCw, Trash2, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { SearchSelfOnlineDialog } from './SearchSelfOnlineDialog';
 
 interface ProfileSource {
   id: string;
@@ -234,7 +235,8 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
             </CardTitle>
             <CardDescription className="text-xs mt-1">{l('desc')}</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <SearchSelfOnlineDialog userId={userId} onAdded={fetchSources} />
             {sources.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleSyncAll} disabled={syncingIds.size > 0}>
                 <RefreshCw className={`h-3 w-3 mr-1 ${syncingIds.size > 0 ? 'animate-spin' : ''}`} />
