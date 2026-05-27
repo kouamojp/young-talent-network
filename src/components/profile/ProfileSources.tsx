@@ -314,6 +314,11 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
                         <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
                       </Button>
                       {hasData && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" title={lang === 'ru' ? 'Создать публикацию' : lang === 'fr' ? 'Créer une publication' : 'Create post'} onClick={() => handleCreatePost(source)} disabled={publishingId === source.id}>
+                          {publishingId === source.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                        </Button>
+                      )}
+                      {hasData && (
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setExpandedId(isExpanded ? null : source.id)}>
                           {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                         </Button>
