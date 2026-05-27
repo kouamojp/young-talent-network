@@ -73,7 +73,15 @@ Deno.serve(async (req) => {
       });
 
       if (!pageResponse.ok) {
-        throw new Error(`Failed to fetch URL: ${pageResponse.status}`);
+        const msg = `Failed to fetch URL: ${pageResponse.status}`;
+        await adminClient
+          .from("profile_sources")
+          .update({ status: "error", error_message: msg })
+          .eq("id", source_id);
+        return new Response(
+          JSON.stringify({ error: msg, fallback: true, status: pageResponse.status }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
 
       const html = await pageResponse.text();
