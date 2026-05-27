@@ -211,9 +211,6 @@ const Events: React.FC = () => {
               <DialogTrigger asChild>
                 <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" />{t('events.create')}</Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
-                <div className="space-y-3">
               <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
@@ -238,6 +235,8 @@ const Events: React.FC = () => {
                   <Input placeholder="Image URL" value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="text-xs" />
                   <Input placeholder={t('events.eventName')} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                   <Textarea placeholder={t('events.description')} value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
+                  <LocationPicker value={newLocation} onChange={setNewLocation} placeholder={t('events.location')} />
+                  <Input placeholder="Price (e.g. 25 EUR)" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="text-sm" />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('events.start')}</label>
