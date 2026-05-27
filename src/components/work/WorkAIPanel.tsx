@@ -214,11 +214,20 @@ export const WorkAIPanel: React.FC = () => {
               </div>
               <div className="text-sm mt-1 text-muted-foreground line-clamp-2">{s.reason}</div>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-bold text-primary">{s.score}</div>
-              <div className="text-xs text-muted-foreground">/100</div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <div className="text-right">
+                <span className="text-lg font-bold text-primary">{s.score}</span>
+                <span className="text-xs text-muted-foreground">/100</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => applyToJob(s.job?.id)}
+                disabled={!s.job?.id || actingId === s.job?.id}
+              >
+                {actingId === s.job?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                <span className="ml-1">{t('work.apply') || 'Postuler'}</span>
+              </Button>
             </div>
-          </div>
         ))}
       </div>
     </Card>
