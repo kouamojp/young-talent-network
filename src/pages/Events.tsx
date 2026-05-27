@@ -74,6 +74,41 @@ const Events: React.FC = () => {
   const [newCapacity, setNewCapacity] = useState('');
   const [newIsVirtual, setNewIsVirtual] = useState(false);
   const [newCategoryId, setNewCategoryId] = useState<string | null>(null);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newPrice, setNewPrice] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
+  const [extracting, setExtracting] = useState(false);
+
+  const toLocalInput = (iso: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const handleExtractFromUrl = async () => {
+    if (!sourceUrl.trim()) { toast.error('URL required'); return; }
+    setExtracting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('scrape-event', { body: { url: sourceUrl.trim() } });
+      if (error) throw error;
+      if (data?.error) { toast.error(data.error); return; }
+      if (data.title) setNewTitle(data.title);
+      if (data.description) setNewDescription(data.description);
+      if (data.image) setNewImageUrl(data.image);
+      if (data.start_date) setNewStartDate(toLocalInput(data.start_date));
+      if (data.end_date) setNewEndDate(toLocalInput(data.end_date));
+      if (data.location) setNewLocation({ address: data.location, latitude: null as any, longitude: null as any } as any);
+      if (data.price) setNewPrice(data.currency ? `${data.price} ${data.currency}` : String(data.price));
+      if (data.is_virtual) setNewIsVirtual(true);
+      toast.success('Extracted ✓');
+    } catch (e: any) {
+      toast.error(e.message || 'Extraction failed');
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   // Sync from ?category=slug on mount/categories load
   useEffect(() => {
@@ -123,8 +158,14 @@ const Events: React.FC = () => {
     if (!userId) { toast.error(t('events.loginRequired')); return; }
     if (!newTitle || !newStartDate || !newEndDate) { toast.error(t('events.fillRequired')); return; }
 
+    const extras = [
+      newPrice ? `💰 ${newPrice}` : null,
+      sourceUrl ? `🔗 ${sourceUrl}` : null,
+    ].filter(Boolean).join('\n');
+    const fullDescription = extras ? `${newDescription}\n\n${extras}`.trim() : newDescription;
+
     const { error } = await supabase.from('events').insert({
-      title: newTitle, description: newDescription,
+      title: newTitle, description: fullDescription,
       location: newLocation?.address || null,
       latitude: newLocation?.latitude ?? null,
       longitude: newLocation?.longitude ?? null,
@@ -132,6 +173,7 @@ const Events: React.FC = () => {
       capacity: newCapacity ? parseInt(newCapacity) : null,
       is_virtual: newIsVirtual, organizer_id: userId,
       category_id: newCategoryId,
+      image_url: newImageUrl || null,
     });
 
     if (error) toast.error(error.message);
@@ -140,7 +182,7 @@ const Events: React.FC = () => {
       setCreateOpen(false);
       setNewTitle(''); setNewDescription(''); setNewLocation(null);
       setNewStartDate(''); setNewEndDate(''); setNewCapacity('');
-      setNewCategoryId(null);
+      setNewCategoryId(null); setNewImageUrl(''); setNewPrice(''); setSourceUrl('');
       fetchEvents();
     }
   };
@@ -169,12 +211,32 @@ const Events: React.FC = () => {
               <DialogTrigger asChild>
                 <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" />{t('events.create')}</Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg">
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
+                  <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-2 space-y-2">
+                    <label className="text-xs font-medium text-foreground">🔗 Import from URL</label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="https://eventbrite.com/..."
+                        value={sourceUrl}
+                        onChange={e => setSourceUrl(e.target.value)}
+                        className="text-sm"
+                      />
+                      <Button type="button" size="sm" onClick={handleExtractFromUrl} disabled={extracting || !sourceUrl}>
+                        {extracting ? '...' : 'Extract'}
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">AI extracts title, dates, location, price, image & description.</p>
+                  </div>
+                  {newImageUrl && (
+                    <img src={newImageUrl} alt="" className="w-full h-32 object-cover rounded-lg border border-border" />
+                  )}
+                  <Input placeholder="Image URL" value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="text-xs" />
                   <Input placeholder={t('events.eventName')} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                   <Textarea placeholder={t('events.description')} value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
                   <LocationPicker value={newLocation} onChange={setNewLocation} placeholder={t('events.location')} />
+                  <Input placeholder="Price (e.g. 25 EUR)" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="text-sm" />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('events.start')}</label>
