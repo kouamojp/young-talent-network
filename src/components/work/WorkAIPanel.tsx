@@ -228,6 +228,7 @@ export const WorkAIPanel: React.FC = () => {
                 <span className="ml-1">{t('work.apply') || 'Postuler'}</span>
               </Button>
             </div>
+          </div>
         ))}
       </div>
     </Card>
