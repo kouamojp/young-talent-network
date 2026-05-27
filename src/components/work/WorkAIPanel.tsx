@@ -142,27 +142,40 @@ export const WorkAIPanel: React.FC = () => {
         {matches.length > 0 && (
           <div className="space-y-2 max-h-[600px] overflow-y-auto">
             {matches.map((m, idx) => (
-              <Link to={`/talent/${m.profile?.id}`} key={m.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg border transition-colors">
+              <div key={m.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg border transition-colors">
                 <div className="font-bold text-muted-foreground w-6">#{idx + 1}</div>
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={m.profile?.avatar_url} />
-                  <AvatarFallback>{m.profile?.name?.[0] || '?'}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold truncate">{m.profile?.name}</div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
-                    {m.profile?.sport_type && <Badge variant="secondary" className="text-xs">{m.profile.sport_type}</Badge>}
-                    {(m.profile?.city || m.profile?.country) && (
-                      <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{[m.profile.city, m.profile.country].filter(Boolean).join(', ')}</span>
-                    )}
+                <Link to={`/talent/${m.profile?.id}`} className="contents">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={m.profile?.avatar_url} />
+                    <AvatarFallback>{m.profile?.name?.[0] || '?'}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{m.profile?.name}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                      {m.profile?.sport_type && <Badge variant="secondary" className="text-xs">{m.profile.sport_type}</Badge>}
+                      {(m.profile?.city || m.profile?.country) && (
+                        <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{[m.profile.city, m.profile.country].filter(Boolean).join(', ')}</span>
+                      )}
+                    </div>
+                    <div className="text-xs mt-1 line-clamp-2">{m.reason}</div>
                   </div>
-                  <div className="text-xs mt-1 line-clamp-2">{m.reason}</div>
+                </Link>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-primary">{m.score}</span>
+                    <span className="text-xs text-muted-foreground">/100</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => contactCandidate(e, m.profile?.id)}
+                    disabled={actingId === m.profile?.id}
+                  >
+                    {actingId === m.profile?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3" />}
+                    <span className="ml-1">{t('work.contact') || 'Contacter'}</span>
+                  </Button>
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-primary">{m.score}</div>
-                  <div className="text-xs text-muted-foreground">/100</div>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
