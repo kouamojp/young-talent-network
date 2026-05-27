@@ -167,7 +167,10 @@ const Events: React.FC = () => {
       capacity: newCapacity ? parseInt(newCapacity) : null,
       is_virtual: newIsVirtual, organizer_id: userId,
       category_id: newCategoryId,
-    });
+      image_url: newImageUrl || null,
+      ...(sourceUrl ? { source_url: sourceUrl } : {}),
+      ...(newPrice ? { price: newPrice } : {}),
+    } as any);
 
     if (error) toast.error(error.message);
     else {
@@ -175,7 +178,7 @@ const Events: React.FC = () => {
       setCreateOpen(false);
       setNewTitle(''); setNewDescription(''); setNewLocation(null);
       setNewStartDate(''); setNewEndDate(''); setNewCapacity('');
-      setNewCategoryId(null);
+      setNewCategoryId(null); setNewImageUrl(''); setNewPrice(''); setSourceUrl('');
       fetchEvents();
     }
   };
