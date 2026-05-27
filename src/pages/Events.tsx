@@ -158,8 +158,14 @@ const Events: React.FC = () => {
     if (!userId) { toast.error(t('events.loginRequired')); return; }
     if (!newTitle || !newStartDate || !newEndDate) { toast.error(t('events.fillRequired')); return; }
 
+    const extras = [
+      newPrice ? `💰 ${newPrice}` : null,
+      sourceUrl ? `🔗 ${sourceUrl}` : null,
+    ].filter(Boolean).join('\n');
+    const fullDescription = extras ? `${newDescription}\n\n${extras}`.trim() : newDescription;
+
     const { error } = await supabase.from('events').insert({
-      title: newTitle, description: newDescription,
+      title: newTitle, description: fullDescription,
       location: newLocation?.address || null,
       latitude: newLocation?.latitude ?? null,
       longitude: newLocation?.longitude ?? null,
@@ -168,9 +174,7 @@ const Events: React.FC = () => {
       is_virtual: newIsVirtual, organizer_id: userId,
       category_id: newCategoryId,
       image_url: newImageUrl || null,
-      ...(sourceUrl ? { source_url: sourceUrl } : {}),
-      ...(newPrice ? { price: newPrice } : {}),
-    } as any);
+    });
 
     if (error) toast.error(error.message);
     else {
