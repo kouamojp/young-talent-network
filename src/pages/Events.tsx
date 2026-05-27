@@ -214,9 +214,30 @@ const Events: React.FC = () => {
               <DialogContent className="max-w-lg">
                 <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
+              <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-2 space-y-2">
+                    <label className="text-xs font-medium text-foreground">🔗 Import from URL</label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="https://eventbrite.com/..."
+                        value={sourceUrl}
+                        onChange={e => setSourceUrl(e.target.value)}
+                        className="text-sm"
+                      />
+                      <Button type="button" size="sm" onClick={handleExtractFromUrl} disabled={extracting || !sourceUrl}>
+                        {extracting ? '...' : 'Extract'}
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">AI extracts title, dates, location, price, image & description.</p>
+                  </div>
+                  {newImageUrl && (
+                    <img src={newImageUrl} alt="" className="w-full h-32 object-cover rounded-lg border border-border" />
+                  )}
+                  <Input placeholder="Image URL" value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="text-xs" />
                   <Input placeholder={t('events.eventName')} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                   <Textarea placeholder={t('events.description')} value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
-                  <LocationPicker value={newLocation} onChange={setNewLocation} placeholder={t('events.location')} />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('events.start')}</label>
