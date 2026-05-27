@@ -60,10 +60,25 @@ const Marketplace: React.FC = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('marketplace_listings')
-      .select('*, profiles(name, avatar_url)')
+      .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
-    if (!error && data) setListings(data as any);
+    if (error) {
+      console.error('marketplace fetch error', error);
+      setLoading(false);
+      return;
+    }
+    const items = (data || []) as any[];
+    const userIds = Array.from(new Set(items.map(i => i.user_id).filter(Boolean)));
+    if (userIds.length) {
+      const { data: profs } = await supabase
+        .from('profiles')
+        .select('id, name, avatar_url')
+        .in('id', userIds);
+      const map = new Map((profs || []).map((p: any) => [p.id, p]));
+      items.forEach(it => { it.profiles = map.get(it.user_id) || null; });
+    }
+    setListings(items as any);
     setLoading(false);
   };
 
