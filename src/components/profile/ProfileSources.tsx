@@ -161,6 +161,46 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
     setSources(prev => prev.map(s => s.id === sourceId ? { ...s, auto_sync: value } : s));
   };
 
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+
+  const handleCreatePost = async (source: ProfileSource) => {
+    const data = source.extracted_data || {};
+    const parts: string[] = [];
+    if (data.name) parts.push(String(data.name));
+    if (data.bio) parts.push(String(data.bio));
+    if (!parts.length && (data as any).raw_text) parts.push(String((data as any).raw_text).slice(0, 500));
+    const achievements = Array.isArray((data as any).achievements) ? (data as any).achievements : [];
+    if (achievements.length) {
+      parts.push('\n🏆 ' + achievements.slice(0, 3).map((a: any) => a.title || a).filter(Boolean).join(' • '));
+    }
+    parts.push(`\n🔗 ${source.url}`);
+    const content = parts.join('\n').trim();
+
+    if (!content) {
+      toast({ title: lang === 'ru' ? 'Нет данных' : lang === 'fr' ? 'Aucune donnée' : 'No data', variant: 'destructive' });
+      return;
+    }
+
+    const photos = Array.isArray((data as any).photos) ? (data as any).photos.filter((p: any) => typeof p === 'string').slice(0, 6) : [];
+
+    setPublishingId(source.id);
+    const { error } = await supabase.from('posts').insert({
+      user_id: userId,
+      content,
+      media_urls: photos.length ? photos : null,
+      visibility: 'public',
+      is_published: true,
+      status: 'published',
+    });
+    setPublishingId(null);
+
+    if (error) {
+      toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: lang === 'ru' ? 'Публикация создана' : lang === 'fr' ? 'Publication créée' : 'Post created' });
+    }
+  };
+
   const labels = {
     title: { en: 'External Sources', fr: 'Sources externes', ru: 'Внешние источники' },
     desc: { en: 'Add links to auto-fill your profile from external platforms', fr: 'Ajoutez des liens pour remplir automatiquement votre profil', ru: 'Добавьте ссылки для автозаполнения профиля с внешних платформ' },
