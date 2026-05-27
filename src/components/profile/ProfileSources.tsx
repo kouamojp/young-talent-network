@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { Globe, Plus, RefreshCw, Trash2, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Globe, Plus, RefreshCw, Trash2, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ProfileSource {
@@ -161,6 +161,46 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
     setSources(prev => prev.map(s => s.id === sourceId ? { ...s, auto_sync: value } : s));
   };
 
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+
+  const handleCreatePost = async (source: ProfileSource) => {
+    const data = source.extracted_data || {};
+    const parts: string[] = [];
+    if (data.name) parts.push(String(data.name));
+    if (data.bio) parts.push(String(data.bio));
+    if (!parts.length && (data as any).raw_text) parts.push(String((data as any).raw_text).slice(0, 500));
+    const achievements = Array.isArray((data as any).achievements) ? (data as any).achievements : [];
+    if (achievements.length) {
+      parts.push('\n🏆 ' + achievements.slice(0, 3).map((a: any) => a.title || a).filter(Boolean).join(' • '));
+    }
+    parts.push(`\n🔗 ${source.url}`);
+    const content = parts.join('\n').trim();
+
+    if (!content) {
+      toast({ title: lang === 'ru' ? 'Нет данных' : lang === 'fr' ? 'Aucune donnée' : 'No data', variant: 'destructive' });
+      return;
+    }
+
+    const photos = Array.isArray((data as any).photos) ? (data as any).photos.filter((p: any) => typeof p === 'string').slice(0, 6) : [];
+
+    setPublishingId(source.id);
+    const { error } = await supabase.from('posts').insert({
+      user_id: userId,
+      content,
+      media_urls: photos.length ? photos : null,
+      visibility: 'public',
+      is_published: true,
+      status: 'published',
+    });
+    setPublishingId(null);
+
+    if (error) {
+      toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: lang === 'ru' ? 'Публикация создана' : lang === 'fr' ? 'Publication créée' : 'Post created' });
+    }
+  };
+
   const labels = {
     title: { en: 'External Sources', fr: 'Sources externes', ru: 'Внешние источники' },
     desc: { en: 'Add links to auto-fill your profile from external platforms', fr: 'Ajoutez des liens pour remplir automatiquement votre profil', ru: 'Добавьте ссылки для автозаполнения профиля с внешних платформ' },
@@ -273,6 +313,11 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSync(source.id)} disabled={isSyncing}>
                         <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
                       </Button>
+                      {hasData && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" title={lang === 'ru' ? 'Создать публикацию' : lang === 'fr' ? 'Créer une publication' : 'Create post'} onClick={() => handleCreatePost(source)} disabled={publishingId === source.id}>
+                          {publishingId === source.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                        </Button>
+                      )}
                       {hasData && (
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setExpandedId(isExpanded ? null : source.id)}>
                           {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
