@@ -20,12 +20,43 @@ interface JobLite {
 
 export const WorkAIPanel: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [userType, setUserType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<JobLite[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const contactCandidate = async (e: React.MouseEvent, talentId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!talentId) return;
+    setActingId(talentId);
+    try {
+      const { data, error } = await supabase.rpc('create_conversation_with_participant', { _other_user_id: talentId });
+      if (error) throw error;
+      navigate('/messages', { state: { conversationId: data } });
+    } catch (err: any) {
+      toast({ title: err.message || 'Failed', variant: 'destructive' });
+    } finally { setActingId(null); }
+  };
+
+  const applyToJob = async (jobId: string) => {
+    if (!jobId) return;
+    setActingId(jobId);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate('/auth'); return; }
+      const { error } = await supabase.from('job_applications').insert({
+        job_id: jobId, applicant_id: user.id, cover_letter: 'Candidature envoyée via les recommandations IA YAT Work.'
+      });
+      if (error) throw error;
+      toast({ title: t('work.applicationSent') || 'Candidature envoyée ✓' });
+    } catch (err: any) {
+      toast({ title: err.message || 'Failed', variant: 'destructive' });
+    } finally { setActingId(null); }
+  };
 
   useEffect(() => {
     (async () => {
