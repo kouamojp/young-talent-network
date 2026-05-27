@@ -235,7 +235,8 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
             </CardTitle>
             <CardDescription className="text-xs mt-1">{l('desc')}</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <SearchSelfOnlineDialog userId={userId} onAdded={fetchSources} />
             {sources.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleSyncAll} disabled={syncingIds.size > 0}>
                 <RefreshCw className={`h-3 w-3 mr-1 ${syncingIds.size > 0 ? 'animate-spin' : ''}`} />
