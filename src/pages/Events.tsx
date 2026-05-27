@@ -74,6 +74,41 @@ const Events: React.FC = () => {
   const [newCapacity, setNewCapacity] = useState('');
   const [newIsVirtual, setNewIsVirtual] = useState(false);
   const [newCategoryId, setNewCategoryId] = useState<string | null>(null);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newPrice, setNewPrice] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
+  const [extracting, setExtracting] = useState(false);
+
+  const toLocalInput = (iso: string | null) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const handleExtractFromUrl = async () => {
+    if (!sourceUrl.trim()) { toast.error('URL required'); return; }
+    setExtracting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('scrape-event', { body: { url: sourceUrl.trim() } });
+      if (error) throw error;
+      if (data?.error) { toast.error(data.error); return; }
+      if (data.title) setNewTitle(data.title);
+      if (data.description) setNewDescription(data.description);
+      if (data.image) setNewImageUrl(data.image);
+      if (data.start_date) setNewStartDate(toLocalInput(data.start_date));
+      if (data.end_date) setNewEndDate(toLocalInput(data.end_date));
+      if (data.location) setNewLocation({ address: data.location, latitude: null as any, longitude: null as any } as any);
+      if (data.price) setNewPrice(data.currency ? `${data.price} ${data.currency}` : String(data.price));
+      if (data.is_virtual) setNewIsVirtual(true);
+      toast.success('Extracted ✓');
+    } catch (e: any) {
+      toast.error(e.message || 'Extraction failed');
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   // Sync from ?category=slug on mount/categories load
   useEffect(() => {
