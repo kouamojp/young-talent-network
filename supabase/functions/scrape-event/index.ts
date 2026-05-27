@@ -18,8 +18,13 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { url } = await req.json();
-    if (!url || !/^https?:\/\//i.test(url)) {
+    let { url } = await req.json();
+    if (typeof url !== 'string' || !url.trim()) {
+      return new Response(JSON.stringify({ error: 'Invalid URL' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    url = url.trim();
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    try { new URL(url); } catch {
       return new Response(JSON.stringify({ error: 'Invalid URL' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
