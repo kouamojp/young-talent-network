@@ -3,11 +3,11 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Sparkles, Loader2, MapPin, Briefcase, TrendingUp, Users } from 'lucide-react';
+import { Sparkles, Loader2, MapPin, Briefcase, TrendingUp, Users, MessageSquare, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface JobLite {
   id?: string;
@@ -20,12 +20,43 @@ interface JobLite {
 
 export const WorkAIPanel: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [userType, setUserType] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [matches, setMatches] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<JobLite[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string>('');
+  const [actingId, setActingId] = useState<string | null>(null);
+
+  const contactCandidate = async (e: React.MouseEvent, talentId: string) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!talentId) return;
+    setActingId(talentId);
+    try {
+      const { data, error } = await supabase.rpc('create_conversation_with_participant', { _other_user_id: talentId });
+      if (error) throw error;
+      navigate('/messages', { state: { conversationId: data } });
+    } catch (err: any) {
+      toast({ title: err.message || 'Failed', variant: 'destructive' });
+    } finally { setActingId(null); }
+  };
+
+  const applyToJob = async (jobId: string) => {
+    if (!jobId) return;
+    setActingId(jobId);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate('/auth'); return; }
+      const { error } = await supabase.from('job_applications').insert({
+        job_id: jobId, applicant_id: user.id, cover_letter: 'Candidature envoyée via les recommandations IA YAT Work.'
+      });
+      if (error) throw error;
+      toast({ title: t('work.applicationSent') || 'Candidature envoyée ✓' });
+    } catch (err: any) {
+      toast({ title: err.message || 'Failed', variant: 'destructive' });
+    } finally { setActingId(null); }
+  };
 
   useEffect(() => {
     (async () => {
@@ -111,27 +142,40 @@ export const WorkAIPanel: React.FC = () => {
         {matches.length > 0 && (
           <div className="space-y-2 max-h-[600px] overflow-y-auto">
             {matches.map((m, idx) => (
-              <Link to={`/talent/${m.profile?.id}`} key={m.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg border transition-colors">
+              <div key={m.id} className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg border transition-colors">
                 <div className="font-bold text-muted-foreground w-6">#{idx + 1}</div>
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={m.profile?.avatar_url} />
-                  <AvatarFallback>{m.profile?.name?.[0] || '?'}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold truncate">{m.profile?.name}</div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
-                    {m.profile?.sport_type && <Badge variant="secondary" className="text-xs">{m.profile.sport_type}</Badge>}
-                    {(m.profile?.city || m.profile?.country) && (
-                      <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{[m.profile.city, m.profile.country].filter(Boolean).join(', ')}</span>
-                    )}
+                <Link to={`/talent/${m.profile?.id}`} className="contents">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={m.profile?.avatar_url} />
+                    <AvatarFallback>{m.profile?.name?.[0] || '?'}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{m.profile?.name}</div>
+                    <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                      {m.profile?.sport_type && <Badge variant="secondary" className="text-xs">{m.profile.sport_type}</Badge>}
+                      {(m.profile?.city || m.profile?.country) && (
+                        <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{[m.profile.city, m.profile.country].filter(Boolean).join(', ')}</span>
+                      )}
+                    </div>
+                    <div className="text-xs mt-1 line-clamp-2">{m.reason}</div>
                   </div>
-                  <div className="text-xs mt-1 line-clamp-2">{m.reason}</div>
+                </Link>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-primary">{m.score}</span>
+                    <span className="text-xs text-muted-foreground">/100</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => contactCandidate(e, m.profile?.id)}
+                    disabled={actingId === m.profile?.id}
+                  >
+                    {actingId === m.profile?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <MessageSquare className="h-3 w-3" />}
+                    <span className="ml-1">{t('work.contact') || 'Contacter'}</span>
+                  </Button>
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-primary">{m.score}</div>
-                  <div className="text-xs text-muted-foreground">/100</div>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
@@ -170,9 +214,19 @@ export const WorkAIPanel: React.FC = () => {
               </div>
               <div className="text-sm mt-1 text-muted-foreground line-clamp-2">{s.reason}</div>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-bold text-primary">{s.score}</div>
-              <div className="text-xs text-muted-foreground">/100</div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <div className="text-right">
+                <span className="text-lg font-bold text-primary">{s.score}</span>
+                <span className="text-xs text-muted-foreground">/100</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => applyToJob(s.job?.id)}
+                disabled={!s.job?.id || actingId === s.job?.id}
+              >
+                {actingId === s.job?.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+                <span className="ml-1">{t('work.apply') || 'Postuler'}</span>
+              </Button>
             </div>
           </div>
         ))}
