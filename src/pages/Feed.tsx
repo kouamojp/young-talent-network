@@ -182,6 +182,7 @@ const FeedPage: React.FC = () => {
               </div>
 
               <div className="space-y-4">
+                <ActivityHistoryWidget />
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
