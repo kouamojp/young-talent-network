@@ -54,6 +54,9 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
   initialData,
   isLoading = false
 }) => {
+  const { language } = useLanguage();
+  const lang = (language as 'en' | 'fr' | 'ru') || 'en';
+
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: {
@@ -66,12 +69,36 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
       salary: initialData?.salary || '',
       applicationDeadline: initialData?.applicationDeadline || '',
       tags: initialData?.tags || '',
+      sport: (initialData as any)?.sport || '',
+      sportRole: (initialData as any)?.sportRole || '',
+      minRank: (initialData as any)?.minRank || '',
+      leagueLevel: (initialData as any)?.leagueLevel || '',
     },
   });
+
+  const selectedSport = form.watch('sport');
+  const sportSchema = useMemo(
+    () => SPORT_SCHEMAS.find((s) => s.id === selectedSport),
+    [selectedSport],
+  );
+  const roleField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'role' || f.key === 'position'),
+    [sportSchema],
+  );
+  const rankField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'rank'),
+    [sportSchema],
+  );
+  const leaguesField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'leagues'),
+    [sportSchema],
+  );
 
   const handleSubmit = (data: JobFormValues) => {
     onSubmit(data);
   };
+
+
 
   return (
     <Card>
