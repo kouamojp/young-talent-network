@@ -106,39 +106,43 @@ const Search: React.FC = () => {
           </Button>
         </div>
 
-        <div className="flex gap-4">
-          <div className={`shrink-0 space-y-3 ${showFilters ? 'block' : 'hidden'} md:block md:w-56`}>
-            <div className="bg-card border border-border rounded-xl p-3 space-y-3">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">{t('search.filters')}</h3>
-              <div>
-                <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.country')}</label>
-                <Select value={country} onValueChange={setCountry}>
-                  <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('search.all')} /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('search.all')}</SelectItem>
-                    {countries.map(c => (<SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>))}
-                  </SelectContent>
-                </Select>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className={`shrink-0 ${showFilters ? 'block' : 'hidden'} md:block md:w-56`}>
+            <div className="bg-card border border-border rounded-xl p-3 space-y-3 md:space-y-3">
+              <h3 className="text-xs font-bold text-foreground uppercase tracking-wide hidden md:block">{t('search.filters')}</h3>
+              <div className="flex flex-col md:flex-col gap-2 md:gap-3 md:space-y-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-1 gap-2 md:gap-3">
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.country')}</label>
+                    <Select value={country} onValueChange={setCountry}>
+                      <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('search.all')} /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('search.all')}</SelectItem>
+                        {countries.map(c => (<SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.city')}</label>
+                    <Input value={city} onChange={e => setCity(e.target.value)} placeholder={t('search.city')} className="text-xs h-8" />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.sport')}</label>
+                    <Select value={sportFilter} onValueChange={setSportFilter}>
+                      <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('search.all')} /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t('search.all')}</SelectItem>
+                        {sportCategories.map(cat => (<SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Button onClick={handleSearch} disabled={loading} size="sm" className="w-full text-xs">
+                  {loading ? t('search.searching') : t('search.find')}
+                </Button>
               </div>
-              <div>
-                <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.city')}</label>
-                <Input value={city} onChange={e => setCity(e.target.value)} placeholder={t('search.city')} className="text-xs h-8" />
-              </div>
-              <div>
-                <label className="text-[11px] font-medium text-muted-foreground mb-1 block">{t('search.sport')}</label>
-                <Select value={sportFilter} onValueChange={setSportFilter}>
-                  <SelectTrigger className="text-xs h-8"><SelectValue placeholder={t('search.all')} /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('search.all')}</SelectItem>
-                    {sportCategories.map(cat => (<SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={handleSearch} disabled={loading} size="sm" className="w-full text-xs">
-                {loading ? t('search.searching') : t('search.find')}
-              </Button>
             </div>
-            <div className="bg-card border border-border rounded-xl p-3 space-y-3">
+            <div className="bg-card border border-border rounded-xl p-3 space-y-3 hidden md:block mt-3">
               <h3 className="text-xs font-bold text-foreground uppercase tracking-wide">{t('search.additionalFilters')}</h3>
               <div className="flex items-center justify-between">
                 <label className="text-[11px] text-muted-foreground">{t('search.map')}</label>
@@ -148,6 +152,7 @@ const Search: React.FC = () => {
               </div>
             </div>
           </div>
+
 
           <div className="flex-1 min-w-0">
             {searched && (
