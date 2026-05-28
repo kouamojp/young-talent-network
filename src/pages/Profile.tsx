@@ -221,7 +221,13 @@ const Profile: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Stories bar — Facebook/VK style */}
+      <div className="mb-6">
+        <StoriesBar />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
         <div className="lg:col-span-1">
           <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={handleSectionChange} />
         </div>
