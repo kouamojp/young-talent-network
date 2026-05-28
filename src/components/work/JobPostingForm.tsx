@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import {
   Form,
   FormControl,
@@ -14,35 +16,32 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { Briefcase, Calendar, MapPin, Clock } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, Clock, Trophy, Target } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { SPORT_SCHEMAS } from '@/components/profile/sport-profile-schema';
+import { useLanguage } from '@/i18n/LanguageContext';
+
 
 const jobFormSchema = z.object({
-  title: z.string().min(3, {
-    message: "Job title must be at least 3 characters.",
-  }),
-  company: z.string().min(2, {
-    message: "Company name is required",
-  }),
-  location: z.string().min(2, {
-    message: "Location is required",
-  }),
-  type: z.string().min(2, {
-    message: "Job type is required",
-  }),
-  description: z.string().min(20, {
-    message: "Description must be at least 20 characters.",
-  }),
-  requirements: z.string().min(10, {
-    message: "Requirements must be at least 10 characters.",
-  }),
+  title: z.string().min(3, { message: "Job title must be at least 3 characters." }),
+  company: z.string().min(2, { message: "Company name is required" }),
+  location: z.string().min(2, { message: "Location is required" }),
+  type: z.string().min(2, { message: "Job type is required" }),
+  description: z.string().min(20, { message: "Description must be at least 20 characters." }),
+  requirements: z.string().min(10, { message: "Requirements must be at least 10 characters." }),
   salary: z.string().optional(),
   applicationDeadline: z.string().optional(),
   tags: z.string().optional(),
+  // Sport-specific recruitment criteria (optional)
+  sport: z.string().optional(),
+  sportRole: z.string().optional(),
+  minRank: z.string().optional(),
+  leagueLevel: z.string().optional(),
 });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
+
 
 interface JobPostingFormProps {
   onSubmit: (data: JobFormValues) => void;
@@ -55,6 +54,9 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
   initialData,
   isLoading = false
 }) => {
+  const { language } = useLanguage();
+  const lang = (language as 'en' | 'fr' | 'ru') || 'en';
+
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: {
@@ -67,12 +69,36 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
       salary: initialData?.salary || '',
       applicationDeadline: initialData?.applicationDeadline || '',
       tags: initialData?.tags || '',
+      sport: (initialData as any)?.sport || '',
+      sportRole: (initialData as any)?.sportRole || '',
+      minRank: (initialData as any)?.minRank || '',
+      leagueLevel: (initialData as any)?.leagueLevel || '',
     },
   });
+
+  const selectedSport = form.watch('sport');
+  const sportSchema = useMemo(
+    () => SPORT_SCHEMAS.find((s) => s.id === selectedSport),
+    [selectedSport],
+  );
+  const roleField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'role' || f.key === 'position'),
+    [sportSchema],
+  );
+  const rankField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'rank'),
+    [sportSchema],
+  );
+  const leaguesField = useMemo(
+    () => sportSchema?.fields.find((f) => f.key === 'leagues'),
+    [sportSchema],
+  );
 
   const handleSubmit = (data: JobFormValues) => {
     onSubmit(data);
   };
+
+
 
   return (
     <Card>
@@ -242,7 +268,136 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               )}
             />
             
+            {/* Sport-specific recruitment criteria */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <Trophy className="h-4 w-4" />
+                Sport-specific criteria
+                <Badge variant="outline" className="ml-auto text-[10px]">Optional</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Target athletes with matching sport profile (powers candidate matching).
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="sport"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sport</FormLabel>
+                      <Select
+                        value={field.value || ''}
+                        onValueChange={(v) => {
+                          field.onChange(v === '__none__' ? '' : v);
+                          form.setValue('sportRole', '');
+                          form.setValue('minRank', '');
+                          form.setValue('leagueLevel', '');
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Any sport" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="__none__">Any sport</SelectItem>
+                          {SPORT_SCHEMAS.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>{s.label[lang]}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {roleField && (
+                  <FormField
+                    control={form.control}
+                    name="sportRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-1">
+                          <Target className="h-3 w-3" />
+                          {roleField.label[lang]}
+                        </FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any role" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any role</SelectItem>
+                            {roleField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {rankField && (
+                  <FormField
+                    control={form.control}
+                    name="minRank"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum rank</FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any rank" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any rank</SelectItem>
+                            {rankField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {leaguesField && (
+                  <FormField
+                    control={form.control}
+                    name="leagueLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>League level</FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any league" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any league</SelectItem>
+                            {leaguesField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+
             <div className="flex justify-end space-x-2">
+
               <Button variant="outline" type="button">
                 Cancel
               </Button>
