@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import {
   Form,
   FormControl,
@@ -14,9 +16,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
-import { Briefcase, Calendar, MapPin, Clock } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, Clock, Trophy, Target } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { SPORT_SCHEMAS } from '@/components/profile/sport-profile-schema';
+import { useLanguage } from '@/i18n/LanguageContext';
+
 
 const jobFormSchema = z.object({
   title: z.string().min(3, {
