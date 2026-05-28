@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PostCreationDialog } from '@/components/PostCreationDialog';
 import PostCard from '@/components/PostCard';
 import RecentOrganizations from '@/components/RecentOrganizations';
+import ActivityHistoryWidget from '@/components/ActivityHistoryWidget';
 import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
 import { 
   Loader2, Users, Building2, Briefcase, TrendingUp, Star, 
@@ -181,6 +182,7 @@ const FeedPage: React.FC = () => {
               </div>
 
               <div className="space-y-4">
+                <ActivityHistoryWidget />
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
