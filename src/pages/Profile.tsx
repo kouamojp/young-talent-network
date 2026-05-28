@@ -295,6 +295,8 @@ const Profile: React.FC = () => {
 
           {userId && <ProfileSources userId={userId} />}
 
+          {userId && <SportProfileEditor userId={userId} />}
+
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
