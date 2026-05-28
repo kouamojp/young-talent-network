@@ -162,8 +162,10 @@ const Profile: React.FC = () => {
         <div className="h-40 bg-gradient-to-r from-primary/80 to-primary relative">
           {displayProfile.cover_photo_url && <img src={displayProfile.cover_photo_url} alt="Cover" className="w-full h-full object-cover" />}
           {userId && (
-            <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon" variant="secondary"
-              onUploaded={async (url) => { await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId); setProfile((p: any) => ({ ...p, cover_photo_url: url })); }} />
+            <div className="absolute top-3 right-3 z-10 rounded-full bg-background/70 backdrop-blur-sm shadow-md">
+              <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon" variant="secondary"
+                onUploaded={async (url) => { await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId); setProfile((p: any) => ({ ...p, cover_photo_url: url })); }} />
+            </div>
           )}
         </div>
         <CardContent className="pt-0 pb-6">
