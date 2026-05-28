@@ -312,4 +312,66 @@ export const SPORT_SCHEMAS: SportSchema[] = [
       ...COMMON_TAIL,
     ],
   },
+
+  // ============================================================
+  // Sport ROLES (non-athlete) — based on "Регистрация в спорте" spec
+  // ============================================================
+  {
+    id: 'role_coach',
+    label: { en: '👨‍🏫 Coach', fr: '👨‍🏫 Entraîneur', ru: '👨‍🏫 Тренер' },
+    fields: [
+      { key: 'sport', label: { en: 'Sport', fr: 'Sport', ru: 'Вид спорта' }, type: 'text' },
+      { key: 'education', label: { en: 'Education', fr: 'Formation', ru: 'Образование' }, type: 'textarea' },
+      { key: 'category', label: { en: 'Category', fr: 'Catégorie', ru: 'Категория' }, type: 'text' },
+      { key: 'years_experience', label: { en: 'Years of coaching', fr: 'Années d\'expérience', ru: 'Тренерский стаж (лет)' }, type: 'number' },
+      { key: 'specialty', label: { en: 'Coaching specialty', fr: 'Spécialité', ru: 'Специальность тренера' }, type: 'select', options: [
+        { value: 'head', label: { en: 'Head coach', fr: 'Entraîneur principal', ru: 'Главный тренер' } },
+        { value: 'assistant', label: { en: 'Assistant head coach', fr: 'Adjoint', ru: 'Помощник главного тренера' } },
+        { value: 'fitness', label: { en: 'Strength & conditioning', fr: 'Préparateur physique', ru: 'Тренер по физ. подготовке' } },
+        { value: 'rehab', label: { en: 'Rehab coach', fr: 'Réathlétisation', ru: 'Тренер-реабилитолог' } },
+        { value: 'goalkeeper', label: { en: 'Goalkeeper coach', fr: 'Entr. des gardiens', ru: 'Тренер вратарей' } },
+        { value: 'other', label: { en: 'Other', fr: 'Autre', ru: 'Другое' } },
+      ]},
+      { key: 'clubs', label: { en: 'Clubs / teams worked with', fr: 'Clubs / équipes', ru: 'Клубы / команды' }, type: 'textarea' },
+      ...COMMON_TAIL,
+    ],
+  },
+  {
+    id: 'role_referee',
+    label: { en: '🟨 Referee', fr: '🟨 Arbitre', ru: '🟨 Судья' },
+    fields: [
+      { key: 'sport', label: { en: 'Sport', fr: 'Sport', ru: 'Вид спорта' }, type: 'text' },
+      { key: 'category', label: { en: 'Category', fr: 'Catégorie', ru: 'Категория' }, type: 'text' },
+      { key: 'years_experience', label: { en: 'Years of experience', fr: 'Années d\'expérience', ru: 'Стаж (лет)' }, type: 'number' },
+      { key: 'competitions_officiated', label: { en: 'Competitions officiated', fr: 'Compétitions arbitrées', ru: 'Соревнования, которые судили' }, type: 'textarea' },
+      ...COMMON_TAIL,
+    ],
+  },
+  {
+    id: 'role_sport_psychologist',
+    label: { en: '🧠 Sport psychologist', fr: '🧠 Psychologue du sport', ru: '🧠 Спортивный психолог' },
+    fields: [
+      { key: 'education', label: { en: 'Education', fr: 'Formation', ru: 'Образование' }, type: 'textarea' },
+      { key: 'qualification', label: { en: 'Qualification', fr: 'Qualification', ru: 'Квалификация' }, type: 'text' },
+      { key: 'years_experience', label: { en: 'Years of practice', fr: 'Années de pratique', ru: 'Стаж (лет)' }, type: 'number' },
+      { key: 'experience', label: { en: 'Experience as a sport psychologist', fr: 'Expérience comme psy du sport', ru: 'Опыт работы спортивным психологом' }, type: 'textarea' },
+      ...COMMON_TAIL,
+    ],
+  },
+  {
+    id: 'role_sport_journalist',
+    label: { en: '🎙️ Sport journalist', fr: '🎙️ Journaliste sportif', ru: '🎙️ Спортивный журналист' },
+    fields: [
+      { key: 'education', label: { en: 'Education', fr: 'Formation', ru: 'Образование' }, type: 'textarea' },
+      { key: 'field', label: { en: 'Field', fr: 'Domaine', ru: 'Сфера деятельности' }, type: 'select', options: [
+        { value: 'correspondent', label: { en: 'Correspondent', fr: 'Correspondant', ru: 'Корреспондент' } },
+        { value: 'commentator', label: { en: 'Commentator', fr: 'Commentateur', ru: 'Комментатор' } },
+        { value: 'photographer', label: { en: 'Photographer', fr: 'Photographe', ru: 'Фотограф' } },
+        { value: 'reporter', label: { en: 'Reporter', fr: 'Reporter', ru: 'Репортёр' } },
+      ]},
+      { key: 'years_experience', label: { en: 'Years of experience', fr: 'Années d\'expérience', ru: 'Опыт работы (лет)' }, type: 'number' },
+      { key: 'previous_media', label: { en: 'Previous media outlets', fr: 'Médias précédents', ru: 'СМИ, в которых работали ранее' }, type: 'textarea' },
+      ...COMMON_TAIL,
+    ],
+  },
 ];
