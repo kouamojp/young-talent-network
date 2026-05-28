@@ -88,10 +88,21 @@ const Events: React.FC = () => {
   };
 
   const handleExtractFromUrl = async () => {
-    if (!sourceUrl.trim()) { toast.error('URL required'); return; }
+    let raw = sourceUrl.trim();
+    if (!raw) { toast.error('URL required'); return; }
+    if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
+    try {
+      const u = new URL(raw);
+      if (!/^https?:$/.test(u.protocol) || !u.hostname.includes('.')) throw new Error();
+      raw = u.toString();
+    } catch {
+      toast.error('Invalid URL');
+      return;
+    }
+    setSourceUrl(raw);
     setExtracting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('scrape-event', { body: { url: sourceUrl.trim() } });
+      const { data, error } = await supabase.functions.invoke('scrape-event', { body: { url: raw } });
       if (error) throw error;
       if (data?.error) { toast.error(data.error); return; }
       if (data.title) setNewTitle(data.title);
