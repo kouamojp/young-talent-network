@@ -24,30 +24,24 @@ import { useLanguage } from '@/i18n/LanguageContext';
 
 
 const jobFormSchema = z.object({
-  title: z.string().min(3, {
-    message: "Job title must be at least 3 characters.",
-  }),
-  company: z.string().min(2, {
-    message: "Company name is required",
-  }),
-  location: z.string().min(2, {
-    message: "Location is required",
-  }),
-  type: z.string().min(2, {
-    message: "Job type is required",
-  }),
-  description: z.string().min(20, {
-    message: "Description must be at least 20 characters.",
-  }),
-  requirements: z.string().min(10, {
-    message: "Requirements must be at least 10 characters.",
-  }),
+  title: z.string().min(3, { message: "Job title must be at least 3 characters." }),
+  company: z.string().min(2, { message: "Company name is required" }),
+  location: z.string().min(2, { message: "Location is required" }),
+  type: z.string().min(2, { message: "Job type is required" }),
+  description: z.string().min(20, { message: "Description must be at least 20 characters." }),
+  requirements: z.string().min(10, { message: "Requirements must be at least 10 characters." }),
   salary: z.string().optional(),
   applicationDeadline: z.string().optional(),
   tags: z.string().optional(),
+  // Sport-specific recruitment criteria (optional)
+  sport: z.string().optional(),
+  sportRole: z.string().optional(),
+  minRank: z.string().optional(),
+  leagueLevel: z.string().optional(),
 });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
+
 
 interface JobPostingFormProps {
   onSubmit: (data: JobFormValues) => void;
