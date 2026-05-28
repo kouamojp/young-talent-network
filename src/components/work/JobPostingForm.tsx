@@ -268,7 +268,136 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               )}
             />
             
+            {/* Sport-specific recruitment criteria */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <Trophy className="h-4 w-4" />
+                Sport-specific criteria
+                <Badge variant="outline" className="ml-auto text-[10px]">Optional</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Target athletes with matching sport profile (powers candidate matching).
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="sport"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sport</FormLabel>
+                      <Select
+                        value={field.value || ''}
+                        onValueChange={(v) => {
+                          field.onChange(v === '__none__' ? '' : v);
+                          form.setValue('sportRole', '');
+                          form.setValue('minRank', '');
+                          form.setValue('leagueLevel', '');
+                        }}
+                      >
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Any sport" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="__none__">Any sport</SelectItem>
+                          {SPORT_SCHEMAS.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>{s.label[lang]}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {roleField && (
+                  <FormField
+                    control={form.control}
+                    name="sportRole"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-1">
+                          <Target className="h-3 w-3" />
+                          {roleField.label[lang]}
+                        </FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any role" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any role</SelectItem>
+                            {roleField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {rankField && (
+                  <FormField
+                    control={form.control}
+                    name="minRank"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Minimum rank</FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any rank" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any rank</SelectItem>
+                            {rankField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {leaguesField && (
+                  <FormField
+                    control={form.control}
+                    name="leagueLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>League level</FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
+                        >
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Any league" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="__none__">Any league</SelectItem>
+                            {leaguesField.options?.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+
             <div className="flex justify-end space-x-2">
+
               <Button variant="outline" type="button">
                 Cancel
               </Button>
