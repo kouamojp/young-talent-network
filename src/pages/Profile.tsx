@@ -11,6 +11,7 @@ import { ProfileSettings } from '@/components/profile/ProfileSettings';
 import { useUserLevel } from '@/hooks/useUserLevel';
 import { UserLevelBadge } from '@/components/profile/UserLevelBadge';
 import ProfileSources from '@/components/profile/ProfileSources';
+import SportProfileEditor from '@/components/profile/SportProfileEditor';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
 import AddMediaDialog from '@/components/profile/AddMediaDialog';
@@ -293,6 +294,8 @@ const Profile: React.FC = () => {
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
           {userId && <ProfileSources userId={userId} />}
+
+          {userId && <SportProfileEditor userId={userId} />}
 
           <Card>
             <CardHeader className="pb-3">

@@ -2107,6 +2107,36 @@ export type Database = {
         }
         Relationships: []
       }
+      talent_sport_profiles: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          is_public: boolean
+          sport: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          is_public?: boolean
+          sport: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          is_public?: boolean
+          sport?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_name: string
