@@ -19,6 +19,9 @@ interface MarketplaceListing {
   title: string;
   description: string | null;
   price: number;
+  original_price: number | null;
+  stock_status: string;
+  condition: string | null;
   currency: string;
   category: string;
   type: string;
@@ -30,7 +33,20 @@ interface MarketplaceListing {
   profiles?: { name: string; avatar_url: string | null };
 }
 
-const categories = ['All', 'Coaching', 'Equipment', 'Creative', 'Nutrition', 'Events', 'Digital', 'Other'];
+const categories = ['All', 'Coaching', 'Equipment', 'Creative', 'Nutrition', 'Events', 'Digital', 'Fashion', 'Electronics', 'Home', 'Beauty', 'Other'];
+
+const FEATURED_CATEGORIES = [
+  { name: 'Coaching', icon: '🎯' },
+  { name: 'Equipment', icon: '⚽' },
+  { name: 'Creative', icon: '🎨' },
+  { name: 'Nutrition', icon: '🥗' },
+  { name: 'Events', icon: '🎤' },
+  { name: 'Digital', icon: '💻' },
+  { name: 'Fashion', icon: '👗' },
+  { name: 'Electronics', icon: '📱' },
+  { name: 'Home', icon: '🏠' },
+  { name: 'Beauty', icon: '💄' },
+];
 
 const Marketplace: React.FC = () => {
   const { t } = useLanguage();
