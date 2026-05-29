@@ -61,6 +61,9 @@ const Marketplace: React.FC = () => {
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formPrice, setFormPrice] = useState('');
+  const [formOriginalPrice, setFormOriginalPrice] = useState('');
+  const [formStockStatus, setFormStockStatus] = useState('in_stock');
+  const [formCondition, setFormCondition] = useState('new');
   const [formType, setFormType] = useState('product');
   const [formCategory, setFormCategory] = useState('');
   const [formLocation, setFormLocation] = useState('');
