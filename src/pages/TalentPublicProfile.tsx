@@ -5,9 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText, Tag, Layers, Newspaper, Heart, MessageCircle } from 'lucide-react';
+import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText, Tag, Layers, Newspaper, Heart, MessageCircle, Activity } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/hooks/use-toast';
+import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
   <div className="flex gap-0.5">
