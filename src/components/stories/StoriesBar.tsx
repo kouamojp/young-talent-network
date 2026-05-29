@@ -288,7 +288,7 @@ export const StoriesBar = () => {
 
   const insertEmoji = (emoji: string) => {
     const el = textRef.current;
-    if (!el) { setText(t => t + emoji); return; }
+    if (!el) { setText(prev => prev + emoji); return; }
     const start = el.selectionStart ?? text.length;
     const end = el.selectionEnd ?? text.length;
     const next = text.slice(0, start) + emoji + text.slice(end);
