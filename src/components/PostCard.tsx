@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
-import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown, Copy, Trash2, Flag } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
+import ShareMenu from './share/ShareMenu';
 import LinkPreview from './LinkPreview';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
