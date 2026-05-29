@@ -2,7 +2,9 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit, MessageSquare, UserPlus } from 'lucide-react';
+import { Edit, Share2 } from 'lucide-react';
+import ShareMenu from '@/components/share/ShareMenu';
+import { toast } from '@/components/ui/use-toast';
 
 interface ProfileHeaderProps {
   user: {
