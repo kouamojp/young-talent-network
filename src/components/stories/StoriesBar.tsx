@@ -75,8 +75,20 @@ export const StoriesBar = () => {
 
   // Like/comment local state (per story id)
   const [liked, setLiked] = useState<Record<string, boolean>>({});
-  const [showComment, setShowComment] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsHasMore, setCommentsHasMore] = useState(false);
+  const [commentsPosting, setCommentsPosting] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const COMMENTS_PAGE = 15;
+
+  // gesture refs
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdRepeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const holdActiveRef = useRef(false);
 
   // Creation state
   const [creating, setCreating] = useState(false);
@@ -230,12 +242,26 @@ export const StoriesBar = () => {
 
   const scheduleAdvance = (group: GroupedStories, index: number, mediaIdx: number) => {
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (paused) return;
     const story = group.stories[index];
     const list = getMediaList(story);
     const current = list[mediaIdx];
-    // For videos: let them play out (onEnded triggers advance). Otherwise 5s.
     if (current?.type === 'video') return;
     timerRef.current = setTimeout(() => advance(1), 5000);
+  };
+
+  const advanceGroup = (dir: number) => {
+    setViewing(v => {
+      if (!v) return v;
+      const idx = groups.findIndex(g => g.user_id === v.group.user_id);
+      const nextIdx = idx + dir;
+      if (nextIdx < 0 || nextIdx >= groups.length) return null;
+      const next = { group: groups[nextIdx], index: 0, mediaIdx: 0 };
+      setVideoError(false); setVideoLoaded(false);
+      setShowComments(false); setComments([]);
+      scheduleAdvance(next.group, 0, 0);
+      return next;
+    });
   };
 
   const advance = (dir: number) => {
@@ -372,10 +398,93 @@ export const StoriesBar = () => {
   };
 
   const submitComment = async () => {
-    if (!commentText.trim() || !currentStory) return;
-    // No story_comments table — show feedback. Could be wired to messages later.
-    toast({ title: 'Commentaire envoyé !' });
-    setCommentText(''); setShowComment(false);
+    if (!commentText.trim() || !currentStory || !currentUser) {
+      if (!currentUser) toast({ title: 'Connectez-vous pour commenter', variant: 'destructive' });
+      return;
+    }
+    setCommentsPosting(true);
+    const { data, error } = await supabase.from('story_comments').insert({
+      story_id: currentStory.id,
+      user_id: currentUser.id,
+      content: commentText.trim(),
+    }).select().single();
+    setCommentsPosting(false);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => [...prev, { ...data, profile: currentUser }]);
+    setCommentText('');
+  };
+
+  const loadComments = async (storyId: string, reset = true) => {
+    setCommentsLoading(true);
+    const offset = reset ? 0 : comments.length;
+    const { data } = await supabase
+      .from('story_comments')
+      .select('*')
+      .eq('story_id', storyId)
+      .order('created_at', { ascending: true })
+      .range(offset, offset + COMMENTS_PAGE - 1);
+    const list = data || [];
+    const ids = [...new Set(list.map((c: any) => c.user_id))];
+    const { data: profs } = ids.length
+      ? await supabase.from('profiles').select('id,name,avatar_url').in('id', ids)
+      : { data: [] as any[] };
+    const pmap = new Map((profs || []).map(p => [p.id, p]));
+    const enriched = list.map((c: any) => ({ ...c, profile: pmap.get(c.user_id) }));
+    setComments(prev => reset ? enriched : [...prev, ...enriched]);
+    setCommentsHasMore(list.length === COMMENTS_PAGE);
+    setCommentsLoading(false);
+  };
+
+  // Load comments when panel opens / story changes
+  useEffect(() => {
+    if (showComments && currentStory) loadComments(currentStory.id, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showComments, currentStory?.id]);
+
+  // Pause auto-advance while comments are open or paused via long-press
+  useEffect(() => {
+    if (paused || showComments) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    } else if (viewing) {
+      scheduleAdvance(viewing.group, viewing.index, viewing.mediaIdx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, showComments]);
+
+  // ===== Gesture handlers (swipe between groups, long-press to fast nav) =====
+  const startHold = (dir: number) => {
+    holdActiveRef.current = false;
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = setTimeout(() => {
+      holdActiveRef.current = true;
+      setPaused(true);
+      if (holdRepeatRef.current) clearInterval(holdRepeatRef.current);
+      holdRepeatRef.current = setInterval(() => advance(dir), 300);
+    }, 350);
+  };
+  const endHold = () => {
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    if (holdRepeatRef.current) clearInterval(holdRepeatRef.current);
+    holdTimerRef.current = null;
+    holdRepeatRef.current = null;
+    setPaused(false);
+  };
+  const wasHold = () => holdActiveRef.current;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t0 = e.touches[0];
+    touchStartRef.current = { x: t0.clientX, y: t0.clientY, t: Date.now() };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const s = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!s) return;
+    const t1 = e.changedTouches[0];
+    const dx = t1.clientX - s.x;
+    const dy = t1.clientY - s.y;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      advanceGroup(dx < 0 ? 1 : -1);
+    }
   };
 
   return (
@@ -412,7 +521,12 @@ export const StoriesBar = () => {
       <Dialog open={!!viewing} onOpenChange={() => { setViewing(null); if (timerRef.current) clearTimeout(timerRef.current); }}>
         <DialogContent className="max-w-md md:max-w-lg p-0 overflow-hidden bg-black border-none aspect-[9/16] max-h-[95vh]">
           {currentStory && (
-            <div className="relative w-full h-full" style={{ backgroundColor: currentStory.background_color }}>
+            <div
+              className="relative w-full h-full"
+              style={{ backgroundColor: currentStory.background_color }}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
               {/* Progress bars - one per media item */}
               <div className="absolute top-2 left-2 right-2 flex gap-1 z-20">
                 {currentMediaList.map((_, i) => (
@@ -515,9 +629,23 @@ export const StoriesBar = () => {
                 </div>
               )}
 
-              {/* Navigation taps */}
-              <button onClick={() => advance(-1)} className="absolute left-0 top-16 bottom-32 w-1/3 z-10" aria-label="Précédent" />
-              <button onClick={() => advance(1)} className="absolute right-0 top-16 bottom-32 w-1/3 z-10" aria-label="Suivant" />
+              {/* Navigation taps + long-press for fast advance/rewind */}
+              <button
+                className="absolute left-0 top-16 bottom-32 w-1/3 z-10"
+                aria-label="Précédent"
+                onPointerDown={() => startHold(-1)}
+                onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(-1); }}
+                onPointerLeave={endHold}
+                onPointerCancel={endHold}
+              />
+              <button
+                className="absolute right-0 top-16 bottom-32 w-1/3 z-10"
+                aria-label="Suivant"
+                onPointerDown={() => startHold(1)}
+                onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(1); }}
+                onPointerLeave={endHold}
+                onPointerCancel={endHold}
+              />
 
               {/* Media nav arrows visible */}
               {currentMediaList.length > 1 && (
@@ -531,12 +659,69 @@ export const StoriesBar = () => {
                 </>
               )}
 
+              {paused && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-black/50 text-white text-xs rounded-full px-3 py-1 pointer-events-none">
+                  ⏸ En pause
+                </div>
+              )}
+
+              {/* Comments panel */}
+              {showComments && (
+                <div className="absolute inset-x-0 bottom-0 top-1/3 z-30 bg-background/95 backdrop-blur-md rounded-t-2xl flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
+                  <div className="flex items-center justify-between px-4 py-2 border-b">
+                    <p className="text-sm font-semibold">Commentaires</p>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowComments(false)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
+                    {comments.length === 0 && !commentsLoading && (
+                      <p className="text-xs text-center text-muted-foreground py-6">Aucun commentaire. Soyez le premier !</p>
+                    )}
+                    {comments.map((c) => (
+                      <div key={c.id} className="flex gap-2">
+                        <Avatar className="h-7 w-7">
+                          <AvatarImage src={c.profile?.avatar_url || undefined} />
+                          <AvatarFallback className="text-[10px]">{c.profile?.name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 bg-muted rounded-lg px-2.5 py-1.5">
+                          <p className="text-[11px] font-semibold">{c.profile?.name || 'User'}</p>
+                          <p className="text-xs whitespace-pre-wrap break-words">{c.content}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {commentsLoading && (
+                      <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+                    )}
+                    {commentsHasMore && !commentsLoading && currentStory && (
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => loadComments(currentStory.id, false)}>
+                        Charger plus
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex gap-2 p-2 border-t bg-background">
+                    <input
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
+                      placeholder="Ajouter un commentaire..."
+                      className="flex-1 bg-muted rounded-full px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-primary"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={submitComment} disabled={commentsPosting || !commentText.trim()}>
+                      {commentsPosting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Envoyer'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Action bar */}
               <div className="absolute bottom-0 left-0 right-0 z-20 p-3 bg-gradient-to-t from-black/70 to-transparent flex items-center gap-2">
                 <input
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); }}
+                  onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); setShowComments(true); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
                   placeholder="Envoyer un message..."
                   className="flex-1 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 rounded-full px-3 py-1.5 text-xs border border-white/20 outline-none focus:border-white/60"
@@ -544,7 +729,7 @@ export const StoriesBar = () => {
                 <button onClick={() => toggleLike(currentStory)} className="text-white p-1.5">
                   <Heart className={`h-5 w-5 ${liked[currentStory.id] ? 'fill-red-500 text-red-500' : ''}`} />
                 </button>
-                <button onClick={() => setShowComment(s => !s)} className="text-white p-1.5">
+                <button onClick={() => setShowComments(s => !s)} className="text-white p-1.5">
                   <MessageCircle className="h-5 w-5" />
                 </button>
                 <button onClick={() => handleShare(currentStory)} className="text-white p-1.5">
