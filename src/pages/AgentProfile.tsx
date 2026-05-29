@@ -401,6 +401,37 @@ const AgentProfile: React.FC = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t">
                       <span className="flex items-center gap-1"><Heart className="h-4 w-4" /> {p.likes_count || 0}</span>
                       <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {p.comments_count || 0}</span>
+                      {(currentUserId === p.user_id || currentUserId === id) && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="ml-auto flex items-center gap-1 text-destructive hover:underline text-xs">
+                              <Trash2 className="h-3.5 w-3.5" /> Supprimer
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer cette publication ?</AlertDialogTitle>
+                              <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={async () => {
+                                  const { error } = await supabase.from('posts').delete().eq('id', p.id);
+                                  if (error) {
+                                    toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+                                  } else {
+                                    toast({ title: 'Publication supprimée' });
+                                    setPosts(prev => prev.filter((x: any) => x.id !== p.id));
+                                  }
+                                }}
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
