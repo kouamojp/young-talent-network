@@ -398,10 +398,93 @@ export const StoriesBar = () => {
   };
 
   const submitComment = async () => {
-    if (!commentText.trim() || !currentStory) return;
-    // No story_comments table — show feedback. Could be wired to messages later.
-    toast({ title: 'Commentaire envoyé !' });
-    setCommentText(''); setShowComment(false);
+    if (!commentText.trim() || !currentStory || !currentUser) {
+      if (!currentUser) toast({ title: 'Connectez-vous pour commenter', variant: 'destructive' });
+      return;
+    }
+    setCommentsPosting(true);
+    const { data, error } = await supabase.from('story_comments').insert({
+      story_id: currentStory.id,
+      user_id: currentUser.id,
+      content: commentText.trim(),
+    }).select().single();
+    setCommentsPosting(false);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => [...prev, { ...data, profile: currentUser }]);
+    setCommentText('');
+  };
+
+  const loadComments = async (storyId: string, reset = true) => {
+    setCommentsLoading(true);
+    const offset = reset ? 0 : comments.length;
+    const { data } = await supabase
+      .from('story_comments')
+      .select('*')
+      .eq('story_id', storyId)
+      .order('created_at', { ascending: true })
+      .range(offset, offset + COMMENTS_PAGE - 1);
+    const list = data || [];
+    const ids = [...new Set(list.map((c: any) => c.user_id))];
+    const { data: profs } = ids.length
+      ? await supabase.from('profiles').select('id,name,avatar_url').in('id', ids)
+      : { data: [] as any[] };
+    const pmap = new Map((profs || []).map(p => [p.id, p]));
+    const enriched = list.map((c: any) => ({ ...c, profile: pmap.get(c.user_id) }));
+    setComments(prev => reset ? enriched : [...prev, ...enriched]);
+    setCommentsHasMore(list.length === COMMENTS_PAGE);
+    setCommentsLoading(false);
+  };
+
+  // Load comments when panel opens / story changes
+  useEffect(() => {
+    if (showComments && currentStory) loadComments(currentStory.id, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showComments, currentStory?.id]);
+
+  // Pause auto-advance while comments are open or paused via long-press
+  useEffect(() => {
+    if (paused || showComments) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    } else if (viewing) {
+      scheduleAdvance(viewing.group, viewing.index, viewing.mediaIdx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused, showComments]);
+
+  // ===== Gesture handlers (swipe between groups, long-press to fast nav) =====
+  const startHold = (dir: number) => {
+    holdActiveRef.current = false;
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = setTimeout(() => {
+      holdActiveRef.current = true;
+      setPaused(true);
+      if (holdRepeatRef.current) clearInterval(holdRepeatRef.current);
+      holdRepeatRef.current = setInterval(() => advance(dir), 300);
+    }, 350);
+  };
+  const endHold = () => {
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    if (holdRepeatRef.current) clearInterval(holdRepeatRef.current);
+    holdTimerRef.current = null;
+    holdRepeatRef.current = null;
+    setPaused(false);
+  };
+  const wasHold = () => holdActiveRef.current;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t0 = e.touches[0];
+    touchStartRef.current = { x: t0.clientX, y: t0.clientY, t: Date.now() };
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const s = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!s) return;
+    const t1 = e.changedTouches[0];
+    const dx = t1.clientX - s.x;
+    const dy = t1.clientY - s.y;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      advanceGroup(dx < 0 ? 1 : -1);
+    }
   };
 
   return (
