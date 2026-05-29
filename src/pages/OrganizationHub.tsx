@@ -251,8 +251,10 @@ const OrganizationHub: React.FC = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 text-center text-sm">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
             <TabsTrigger value="dashboard">{t('org.dashboard')}</TabsTrigger>
+            <TabsTrigger value="posts">Publications</TabsTrigger>
+            <TabsTrigger value="activity">Activités</TabsTrigger>
             <TabsTrigger value="agents">{t('org.agents')}</TabsTrigger>
             <TabsTrigger value="talents">{t('org.talents')}</TabsTrigger>
             <TabsTrigger value="services">{t('org.services')}</TabsTrigger>
