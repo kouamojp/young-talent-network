@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Camera, Video, Music, Upload, Filter, Play, ChevronDown, Image as ImageIcon } from 'lucide-react';
+import { Camera, Video, Music, Upload, Filter, Play, ChevronDown, Image as ImageIcon, Zap } from 'lucide-react';
+import ShortsFeed from '@/components/media/ShortsFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { countries } from '@/data/countries';
 import { toast } from 'sonner';
@@ -93,11 +94,13 @@ const Media: React.FC = () => {
 
       <div className="container mx-auto px-4 py-4">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4 w-full grid grid-cols-3 text-xs">
+          <TabsList className="mb-4 w-full grid grid-cols-4 text-xs">
+            <TabsTrigger value="shorts" className="gap-1 text-xs"><Zap className="h-3.5 w-3.5" /> Shorts</TabsTrigger>
             <TabsTrigger value="photo" className="gap-1 text-xs"><Camera className="h-3.5 w-3.5" /> {t('media.photo')}</TabsTrigger>
             <TabsTrigger value="video" className="gap-1 text-xs"><Video className="h-3.5 w-3.5" /> {t('media.video')}</TabsTrigger>
             <TabsTrigger value="music" className="gap-1 text-xs"><Music className="h-3.5 w-3.5" /> {t('media.music')}</TabsTrigger>
           </TabsList>
+          <TabsContent value="shorts"><ShortsFeed /></TabsContent>
           <TabsContent value="photo"><MediaGrid items={media} loading={loading} type="photo" /></TabsContent>
           <TabsContent value="video"><MediaGrid items={media} loading={loading} type="video" /></TabsContent>
           <TabsContent value="music"><MusicList items={media} loading={loading} /></TabsContent>
