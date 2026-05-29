@@ -81,8 +81,12 @@ export const StoriesBar = () => {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsHasMore, setCommentsHasMore] = useState(false);
   const [commentsPosting, setCommentsPosting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
   const [paused, setPaused] = useState(false);
   const COMMENTS_PAGE = 15;
+  const commentsScrollRef = useRef<HTMLDivElement | null>(null);
+  const commentsSentinelRef = useRef<HTMLDivElement | null>(null);
 
   // gesture refs
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
