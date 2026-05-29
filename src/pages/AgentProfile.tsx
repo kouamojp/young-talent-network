@@ -406,6 +406,52 @@ const AgentProfile: React.FC = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="talent-posts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Newspaper className="h-5 w-5 text-primary" />
+                  Publications des talents ({contracts.length} talents)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AggregatedPostsFeed
+                  userIds={contracts.map(c => c.talent_id)}
+                  labels={Object.fromEntries(contracts.map(c => [c.talent_id, 'Talent']))}
+                  emptyMessage="Aucune publication des talents sous contrat."
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  Activités de l'agent
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ProfileActivityFeed userIds={id ? [id] : []} />
+              </CardContent>
+            </Card>
+            {contracts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" />
+                    Activités des talents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ProfileActivityFeed userIds={contracts.map(c => c.talent_id)} />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+
           <TabsContent value="sections" className="space-y-4">
             {presence.length === 0 ? (
               <Card><CardContent className="p-12 text-center">
