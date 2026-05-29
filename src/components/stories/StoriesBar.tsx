@@ -75,8 +75,20 @@ export const StoriesBar = () => {
 
   // Like/comment local state (per story id)
   const [liked, setLiked] = useState<Record<string, boolean>>({});
-  const [showComment, setShowComment] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentsHasMore, setCommentsHasMore] = useState(false);
+  const [commentsPosting, setCommentsPosting] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const COMMENTS_PAGE = 15;
+
+  // gesture refs
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdRepeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const holdActiveRef = useRef(false);
 
   // Creation state
   const [creating, setCreating] = useState(false);
