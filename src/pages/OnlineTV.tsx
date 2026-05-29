@@ -170,7 +170,7 @@ const OnlineTV: React.FC = () => {
                 <h3 className="font-semibold">Creator Name</h3>
                 <p className="text-xs text-gray-600 mb-2">Music Producer</p>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full mb-3 inline-block">12K {t('tv.followers')}</span>
-                <Button size="sm" className="w-full">{t('tv.follow')}</Button>
+                <Button size="sm" className="w-full" onClick={() => toast('Vous suivez ce créateur')}>{t('tv.follow')}</Button>
               </div>
             ))}
           </div>
