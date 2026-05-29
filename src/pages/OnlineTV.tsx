@@ -77,8 +77,8 @@ const OnlineTV: React.FC = () => {
                     <span className="text-sm">{t('tv.liveLabel')} • 1.2K {t('tv.watching')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20"><Heart className="h-5 w-5" /></Button>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20"><Share2 className="h-5 w-5" /></Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => toast({ title: 'Ajouté à vos favoris ❤️' })}><Heart className="h-5 w-5" /></Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); toast({ title: 'Lien copié' }); } catch {} }}><Share2 className="h-5 w-5" /></Button>
                   </div>
                 </div>
               </div>
