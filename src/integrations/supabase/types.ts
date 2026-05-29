@@ -1175,6 +1175,7 @@ export type Database = {
       marketplace_listings: {
         Row: {
           category: string
+          condition: string | null
           created_at: string
           currency: string
           description: string | null
@@ -1182,8 +1183,10 @@ export type Database = {
           likes_count: number
           location: string | null
           media_urls: string[] | null
+          original_price: number | null
           price: number
           status: string
+          stock_status: string
           title: string
           type: string
           updated_at: string
@@ -1192,6 +1195,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          condition?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -1199,8 +1203,10 @@ export type Database = {
           likes_count?: number
           location?: string | null
           media_urls?: string[] | null
+          original_price?: number | null
           price?: number
           status?: string
+          stock_status?: string
           title: string
           type?: string
           updated_at?: string
@@ -1209,6 +1215,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          condition?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -1216,8 +1223,10 @@ export type Database = {
           likes_count?: number
           location?: string | null
           media_urls?: string[] | null
+          original_price?: number | null
           price?: number
           status?: string
+          stock_status?: string
           title?: string
           type?: string
           updated_at?: string
