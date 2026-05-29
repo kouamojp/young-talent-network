@@ -139,6 +139,17 @@ const MediaGrid: React.FC<{ items: MediaItem[]; loading: boolean; type: string }
 
 const MusicList: React.FC<{ items: MediaItem[]; loading: boolean }> = ({ items, loading }) => {
   const { t } = useLanguage();
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const audioRefs = React.useRef<Record<string, HTMLAudioElement | null>>({});
+
+  const toggle = (id: string) => {
+    const a = audioRefs.current[id];
+    if (!a) return;
+    if (playingId === id) { a.pause(); setPlayingId(null); return; }
+    Object.entries(audioRefs.current).forEach(([k, el]) => { if (k !== id && el) el.pause(); });
+    a.play().then(() => setPlayingId(id)).catch(() => toast.error('Lecture impossible'));
+  };
+
   if (loading) return <div className="text-center py-12 text-muted-foreground text-sm">{t('media.loading')}</div>;
   if (items.length === 0) return (
     <div className="text-center py-16 text-muted-foreground"><Music className="h-10 w-10 mx-auto mb-2 opacity-30" /><p className="text-sm">{t('media.noMusic')}</p></div>
@@ -148,8 +159,22 @@ const MusicList: React.FC<{ items: MediaItem[]; loading: boolean }> = ({ items, 
       {items.map(item => (
         <div key={item.id} className="bg-card border border-border rounded-lg p-3 flex items-center gap-3 hover:bg-muted/50 transition-colors">
           <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0"><Music className="h-5 w-5 text-primary" /></div>
-          <div className="flex-1 min-w-0"><p className="text-sm font-medium text-foreground truncate">{item.title}</p><p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p></div>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0"><Play className="h-4 w-4" /></Button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
+            <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
+            <audio
+              ref={el => (audioRefs.current[item.id] = el)}
+              src={item.url}
+              preload="none"
+              onEnded={() => setPlayingId(null)}
+              onError={() => { if (playingId === item.id) setPlayingId(null); toast.error('Audio indisponible'); }}
+              className="w-full mt-2"
+              controls={playingId === item.id}
+            />
+          </div>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 shrink-0" onClick={() => toggle(item.id)}>
+            <Play className="h-4 w-4" />
+          </Button>
         </div>
       ))}
     </div>
