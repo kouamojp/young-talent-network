@@ -5,10 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText, Tag, Layers, Newspaper, Heart, MessageCircle, Activity } from 'lucide-react';
+import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase, Calendar, Phone, Mail, User, FileText, Tag, Layers, Newspaper, Heart, MessageCircle, Activity, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/hooks/use-toast';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
   <div className="flex gap-0.5">
@@ -383,6 +384,37 @@ const TalentPublicProfile: React.FC = () => {
                   <div className="flex items-center gap-4 text-[11px] text-muted-foreground pt-1 border-t border-border/30">
                     <span className="flex items-center gap-1"><Heart className="h-3 w-3" /> {post.likes_count || 0}</span>
                     <span className="flex items-center gap-1"><MessageCircle className="h-3 w-3" /> {post.comments_count || 0}</span>
+                    {currentUserId === post.user_id || currentUserId === id ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="ml-auto flex items-center gap-1 text-destructive hover:underline">
+                            <Trash2 className="h-3 w-3" /> Supprimer
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer cette publication ?</AlertDialogTitle>
+                            <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={async () => {
+                                const { error } = await supabase.from('posts').delete().eq('id', post.id);
+                                if (error) {
+                                  toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+                                } else {
+                                  toast({ title: 'Publication supprimée' });
+                                  setPosts(prev => prev.filter(p => p.id !== post.id));
+                                }
+                              }}
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : null}
                   </div>
                 </div>
               ))

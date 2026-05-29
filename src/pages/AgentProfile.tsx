@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon, Activity } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon, Activity, Trash2 } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
 import { useLanguage } from '@/i18n/LanguageContext';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
+import { toast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface AgentData {
   id: string;
@@ -399,6 +401,37 @@ const AgentProfile: React.FC = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t">
                       <span className="flex items-center gap-1"><Heart className="h-4 w-4" /> {p.likes_count || 0}</span>
                       <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> {p.comments_count || 0}</span>
+                      {(currentUserId === p.user_id || currentUserId === id) && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="ml-auto flex items-center gap-1 text-destructive hover:underline text-xs">
+                              <Trash2 className="h-3.5 w-3.5" /> Supprimer
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer cette publication ?</AlertDialogTitle>
+                              <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={async () => {
+                                  const { error } = await supabase.from('posts').delete().eq('id', p.id);
+                                  if (error) {
+                                    toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+                                  } else {
+                                    toast({ title: 'Publication supprimée' });
+                                    setPosts(prev => prev.filter((x: any) => x.id !== p.id));
+                                  }
+                                }}
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
