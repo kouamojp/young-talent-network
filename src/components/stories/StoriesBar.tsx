@@ -419,6 +419,7 @@ export const StoriesBar = () => {
   };
 
   const loadComments = async (storyId: string, reset = true) => {
+    if (commentsLoading) return;
     setCommentsLoading(true);
     const offset = reset ? 0 : comments.length;
     const { data } = await supabase
@@ -439,11 +440,51 @@ export const StoriesBar = () => {
     setCommentsLoading(false);
   };
 
+  const startEditComment = (c: any) => {
+    setEditingCommentId(c.id);
+    setEditingCommentText(c.content);
+  };
+
+  const saveEditComment = async () => {
+    if (!editingCommentId || !editingCommentText.trim()) return;
+    const { error } = await supabase
+      .from('story_comments')
+      .update({ content: editingCommentText.trim() })
+      .eq('id', editingCommentId);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => prev.map(c => c.id === editingCommentId ? { ...c, content: editingCommentText.trim() } : c));
+    setEditingCommentId(null);
+    setEditingCommentText('');
+    toast({ title: 'Commentaire modifié' });
+  };
+
+  const deleteComment = async (id: string) => {
+    const { error } = await supabase.from('story_comments').delete().eq('id', id);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => prev.filter(c => c.id !== id));
+    toast({ title: 'Commentaire supprimé' });
+  };
+
   // Load comments when panel opens / story changes
   useEffect(() => {
     if (showComments && currentStory) loadComments(currentStory.id, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showComments, currentStory?.id]);
+
+  // Infinite scroll for comments
+  useEffect(() => {
+    if (!showComments || !commentsHasMore || !currentStory) return;
+    const sentinel = commentsSentinelRef.current;
+    if (!sentinel) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !commentsLoading) {
+        loadComments(currentStory.id, false);
+      }
+    }, { root: commentsScrollRef.current, rootMargin: '120px' });
+    obs.observe(sentinel);
+    return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showComments, commentsHasMore, commentsLoading, comments.length, currentStory?.id]);
 
   // Pause auto-advance while comments are open or paused via long-press
   useEffect(() => {
