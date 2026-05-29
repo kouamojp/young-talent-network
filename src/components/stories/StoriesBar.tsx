@@ -521,7 +521,12 @@ export const StoriesBar = () => {
       <Dialog open={!!viewing} onOpenChange={() => { setViewing(null); if (timerRef.current) clearTimeout(timerRef.current); }}>
         <DialogContent className="max-w-md md:max-w-lg p-0 overflow-hidden bg-black border-none aspect-[9/16] max-h-[95vh]">
           {currentStory && (
-            <div className="relative w-full h-full" style={{ backgroundColor: currentStory.background_color }}>
+            <div
+              className="relative w-full h-full"
+              style={{ backgroundColor: currentStory.background_color }}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
               {/* Progress bars - one per media item */}
               <div className="absolute top-2 left-2 right-2 flex gap-1 z-20">
                 {currentMediaList.map((_, i) => (
