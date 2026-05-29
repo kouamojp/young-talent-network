@@ -45,7 +45,7 @@ const TalentDashboard: React.FC = () => {
         <AnalyticsDashboard />
 
         <Tabs defaultValue="work" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-6 text-center text-sm">
             <TabsTrigger value="work">{t('talent.work')}</TabsTrigger>
             <TabsTrigger value="learning">{t('talent.learning')}</TabsTrigger>
             <TabsTrigger value="live">{t('talent.live')}</TabsTrigger>
