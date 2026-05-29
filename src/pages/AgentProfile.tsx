@@ -301,7 +301,7 @@ const AgentProfile: React.FC = () => {
                 {isOwner && (
                   <ContractCreationDialog agentId={id!} onContractCreated={fetchAgentData} />
                 )}
-                <Button variant="outline" className="gap-2">
+                <Button variant="outline" className="gap-2" onClick={() => navigate(`/messages?to=${id}`)}>
                   <Handshake className="h-4 w-4" /> Contacter
                 </Button>
               </div>

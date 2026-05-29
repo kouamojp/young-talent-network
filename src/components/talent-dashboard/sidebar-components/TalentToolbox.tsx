@@ -2,12 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search, Zap, Megaphone, AlertTriangle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface TalentToolboxProps {
   onToast: (title: string, description: string) => void;
 }
 
 const TalentToolbox: React.FC<TalentToolboxProps> = ({ onToast }) => {
+  const navigate = useNavigate();
   const handleSOS = () => {
     onToast(
       "🆘 SOS Boost activated!",
@@ -37,11 +39,11 @@ const TalentToolbox: React.FC<TalentToolboxProps> = ({ onToast }) => {
         <h3 className="font-semibold mb-3">🛠️ Toolbox</h3>
         
         <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button variant="ghost" className="text-white hover:bg-white/10">
+          <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => navigate('/recruitment')}>
             <Search className="h-4 w-4 mr-1" />
             🔍 Discovery
           </Button>
-          <Button variant="ghost" className="text-white hover:bg-white/10">
+          <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => navigate('/assistant')}>
             <Zap className="h-4 w-4 mr-1" />
             🧠 Talent GPT
           </Button>
@@ -50,10 +52,10 @@ const TalentToolbox: React.FC<TalentToolboxProps> = ({ onToast }) => {
         <div className="space-y-2">
           <h4 className="text-sm font-medium">⚡ Quick Actions</h4>
           <div className="grid grid-cols-1 gap-1">
-            <Button variant="ghost" className="text-white hover:bg-white/10 justify-start">
+            <Button variant="ghost" className="text-white hover:bg-white/10 justify-start" onClick={() => navigate('/yat-coin')}>
               💸 Cash Out
             </Button>
-            <Button variant="ghost" className="text-white hover:bg-white/10 justify-start">
+            <Button variant="ghost" className="text-white hover:bg-white/10 justify-start" onClick={() => navigate('/media?tab=shorts')}>
               <Megaphone className="h-4 w-4 mr-2" />
               📣 Go Viral
             </Button>
