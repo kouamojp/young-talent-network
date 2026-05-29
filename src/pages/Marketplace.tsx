@@ -161,11 +161,14 @@ const Marketplace: React.FC = () => {
         title: formTitle,
         description: formDesc || null,
         price: parseFloat(formPrice) || 0,
+        original_price: formOriginalPrice ? parseFloat(formOriginalPrice) : null,
+        stock_status: formStockStatus,
+        condition: formCondition,
         type: formType,
         category: formCategory || 'Other',
         location: formLocation || null,
         media_urls: uploadedUrls,
-      });
+      } as any);
 
       if (error) throw error;
 
@@ -181,7 +184,8 @@ const Marketplace: React.FC = () => {
   };
 
   const resetForm = () => {
-    setFormTitle(''); setFormDesc(''); setFormPrice('');
+    setFormTitle(''); setFormDesc(''); setFormPrice(''); setFormOriginalPrice('');
+    setFormStockStatus('in_stock'); setFormCondition('new');
     setFormType('product'); setFormCategory(''); setFormLocation('');
     mediaPreviews.forEach(url => URL.revokeObjectURL(url));
     setMediaFiles([]); setMediaPreviews([]);
