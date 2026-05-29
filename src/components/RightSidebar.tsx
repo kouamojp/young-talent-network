@@ -63,12 +63,12 @@ const RightSidebar: React.FC = () => {
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-sm text-muted-foreground">Contacts</h3>
           <div className="flex space-x-2">
-            <button className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors">
+            <a href="/friends" className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors" title="Rechercher">
               <Search className="h-4 w-4" />
-            </button>
-            <button className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors">
+            </a>
+            <a href="/friends" className="text-muted-foreground hover:bg-muted rounded-full p-1 transition-colors" title="Ajouter">
               <Plus className="h-4 w-4" />
-            </button>
+            </a>
           </div>
         </div>
         <ul className="space-y-1">
