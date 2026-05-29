@@ -329,8 +329,10 @@ const AgentProfile: React.FC = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 text-center text-sm">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
             <TabsTrigger value="posts">Publications</TabsTrigger>
+            <TabsTrigger value="talent-posts">Pubs talents</TabsTrigger>
+            <TabsTrigger value="activity">Activités</TabsTrigger>
             <TabsTrigger value="overview">{t('agent.overview')}</TabsTrigger>
             <TabsTrigger value="sections">Sections</TabsTrigger>
             <TabsTrigger value="talents">{t('agent.talents')}</TabsTrigger>
