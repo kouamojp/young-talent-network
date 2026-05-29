@@ -263,6 +263,47 @@ export const StoriesBar = () => {
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
+  // ===== Preload next & next-of-next media to make transitions instant =====
+  useEffect(() => {
+    if (!viewing) return;
+    const preloadOne = (item?: StoryMediaItem) => {
+      if (!item) return;
+      if (item.type === 'image') {
+        const img = new Image();
+        img.src = item.url;
+      } else {
+        const v = document.createElement('video');
+        v.preload = 'auto';
+        v.src = item.url;
+        // hint browser to start fetching
+        try { v.load(); } catch {}
+      }
+    };
+    const list = getMediaList(viewing.group.stories[viewing.index]);
+    // next within same story
+    preloadOne(list[viewing.mediaIdx + 1]);
+    preloadOne(list[viewing.mediaIdx + 2]);
+    // first item of next story
+    const nextStory = viewing.group.stories[viewing.index + 1];
+    if (nextStory) {
+      const nextList = getMediaList(nextStory);
+      preloadOne(nextList[0]);
+      preloadOne(nextList[1]);
+    }
+  }, [viewing?.index, viewing?.mediaIdx, viewing?.group.user_id]);
+
+  // Preload first media of each story group on bar mount (so first open is instant)
+  useEffect(() => {
+    if (!groups.length) return;
+    const idle = (cb: () => void) => (window as any).requestIdleCallback ? (window as any).requestIdleCallback(cb) : setTimeout(cb, 200);
+    idle(() => {
+      groups.slice(0, 8).forEach(g => {
+        const first = getMediaList(g.stories[0])[0];
+        if (first?.type === 'image') { const i = new Image(); i.src = first.url; }
+      });
+    });
+  }, [groups]);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const list = Array.from(e.target.files || []);
     if (!list.length) return;
