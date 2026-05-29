@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Users, Search, Plus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Link } from 'react-router-dom';
 
 // Sample data
 const contacts = [
@@ -80,18 +81,24 @@ const RightSidebarMenu: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-medium text-muted-foreground text-sm">Contacts</h3>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                    <Search className="h-4 w-4" />
+                  <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setOpen(false)}>
+                    <Link to="/friends" aria-label="Rechercher des amis">
+                      <Search className="h-4 w-4" />
+                    </Link>
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                    <Plus className="h-4 w-4" />
+                  <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setOpen(false)}>
+                    <Link to="/friends?tab=requests" aria-label="Ajouter un ami">
+                      <Plus className="h-4 w-4" />
+                    </Link>
                   </Button>
                 </div>
               </div>
               <div className="space-y-1">
                 {contacts.map(contact => (
-                  <div
+                  <Link
                     key={contact.id}
+                    to={`/messages?to=${contact.id}`}
+                    onClick={() => setOpen(false)}
                     className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-accent transition-colors cursor-pointer"
                   >
                     <div className="relative">
@@ -106,7 +113,7 @@ const RightSidebarMenu: React.FC = () => {
                       />
                     </div>
                     <span className="text-sm font-medium">{contact.name}</span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
