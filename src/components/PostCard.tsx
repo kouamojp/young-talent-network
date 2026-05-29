@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
-import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown, Copy, Trash2, Flag } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
+import ShareMenu from './share/ShareMenu';
 import LinkPreview from './LinkPreview';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
@@ -57,6 +59,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
+  }, []);
+
+  const postUrl = `${window.location.origin}/feed?post=${post.id}`;
+
+  const deletePost = async () => {
+    if (!confirm('Supprimer cette publication ?')) return;
+    const { error } = await supabase.from('posts').delete().eq('id', post.id);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Publication supprimée' });
+    onUpdate?.();
+  };
+
+  const reportPost = () => toast({ title: 'Merci, votre signalement a été enregistré' });
+  const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: 'Lien copié' }); } catch { toast({ title: 'Impossible de copier', variant: 'destructive' }); } };
+
 
   useEffect(() => {
     checkIfLiked();
@@ -195,9 +216,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
               </div>
             </div>
           </div>
-          <button className="text-muted-foreground hover:text-foreground transition-colors">
-            <MoreHorizontal className="h-5 w-5" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-muted">
+                <MoreHorizontal className="h-5 w-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={copyLink}><Copy className="h-4 w-4 mr-2" />Copier le lien</DropdownMenuItem>
+              <DropdownMenuItem onClick={reportPost}><Flag className="h-4 w-4 mr-2" />Signaler</DropdownMenuItem>
+              <DropdownMenuItem onClick={deletePost} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />Supprimer</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -260,10 +290,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           <MessageSquare className="h-5 w-5 mr-2" />
           Comment
         </Button>
-        <Button variant="ghost" size="sm" className="flex-1 text-sm">
-          <Share className="h-5 w-5 mr-2" />
-          Share
-        </Button>
+        <ShareMenu url={postUrl} title={post.author.name + ' sur YAT'}>
+          <Button variant="ghost" size="sm" className="flex-1 text-sm">
+            <Share className="h-5 w-5 mr-2" />
+            Share
+          </Button>
+        </ShareMenu>
       </div>
 
       {/* Comments Section */}

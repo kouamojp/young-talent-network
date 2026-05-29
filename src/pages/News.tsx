@@ -81,7 +81,7 @@ const News: React.FC = () => {
             <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5" /> {post.likes_count || 0}</span>
             <span className="flex items-center gap-1"><MessageSquare className="h-3.5 w-3.5" /> {post.comments_count || 0}</span>
           </div>
-          <Button variant="ghost" size="sm" className="text-xs h-7"><Share2 className="h-3.5 w-3.5 mr-1" /> {t('news.share')}</Button>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={async () => { try { await navigator.clipboard.writeText(`${window.location.origin}/news#${post.id}`); } catch {} }}><Share2 className="h-3.5 w-3.5 mr-1" /> {t('news.share')}</Button>
         </div>
       </CardContent>
     </Card>

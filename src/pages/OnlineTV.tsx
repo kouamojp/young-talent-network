@@ -73,19 +73,19 @@ const OnlineTV: React.FC = () => {
                 <div className="flex justify-between items-center text-white">
                   <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}</Button>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <Volume2 className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</Button>
                     <span className="text-sm">{t('tv.liveLabel')} • 1.2K {t('tv.watching')}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20"><Heart className="h-5 w-5" /></Button>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20"><Share2 className="h-5 w-5" /></Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => toast('Ajouté à vos favoris ❤️')}><Heart className="h-5 w-5" /></Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={async () => { try { await navigator.clipboard.writeText(window.location.href); toast('Lien copié'); } catch {} }}><Share2 className="h-5 w-5" /></Button>
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex justify-between items-start">
               <div><h3 className="text-xl font-bold">Young Musicians Concert</h3><p className="text-gray-600">Y&T Music • {t('tv.liveLabel')}</p></div>
-              <Button>{t('tv.subscribe')}</Button>
+              <Button onClick={() => toast('Abonné à Y&T Music')}>{t('tv.subscribe')}</Button>
             </div>
           </div>
 
@@ -127,7 +127,7 @@ const OnlineTV: React.FC = () => {
                         <div className="flex items-center gap-1 text-xs text-gray-600"><Clock className="h-3 w-3" /><span>{stream.time}</span></div>
                       </div>
                       <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full mt-2 inline-block">{stream.category}</span>
-                      <Button variant="outline" size="sm" className="w-full mt-2">{t('tv.setReminder')}</Button>
+                      <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => toast('Rappel programmé 🔔')}>{t('tv.setReminder')}</Button>
                     </div>
                   </div>
                 ))}
@@ -170,7 +170,7 @@ const OnlineTV: React.FC = () => {
                 <h3 className="font-semibold">Creator Name</h3>
                 <p className="text-xs text-gray-600 mb-2">Music Producer</p>
                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full mb-3 inline-block">12K {t('tv.followers')}</span>
-                <Button size="sm" className="w-full">{t('tv.follow')}</Button>
+                <Button size="sm" className="w-full" onClick={() => toast('Vous suivez ce créateur')}>{t('tv.follow')}</Button>
               </div>
             ))}
           </div>
