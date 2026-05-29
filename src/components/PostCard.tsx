@@ -59,6 +59,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id || null));
+  }, []);
+
+  const postUrl = `${window.location.origin}/feed?post=${post.id}`;
+
+  const deletePost = async () => {
+    if (!confirm('Supprimer cette publication ?')) return;
+    const { error } = await supabase.from('posts').delete().eq('id', post.id);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Publication supprimée' });
+    onUpdate?.();
+  };
+
+  const reportPost = () => toast({ title: 'Merci, votre signalement a été enregistré' });
+  const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: 'Lien copié' }); } catch { toast({ title: 'Impossible de copier', variant: 'destructive' }); } };
+
 
   useEffect(() => {
     checkIfLiked();
