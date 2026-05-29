@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Star, MapPin, ShoppingBag, Heart, MessageSquare, Eye, Upload, X, Image, Film, FileText, Loader2, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, Plus, Star, MapPin, ShoppingBag, Heart, MessageSquare, Eye, Upload, X, Image, Film, FileText, Loader2, Trash2, Package, Tag, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,9 @@ interface MarketplaceListing {
   title: string;
   description: string | null;
   price: number;
+  original_price: number | null;
+  stock_status: string;
+  condition: string | null;
   currency: string;
   category: string;
   type: string;
@@ -29,7 +33,20 @@ interface MarketplaceListing {
   profiles?: { name: string; avatar_url: string | null };
 }
 
-const categories = ['All', 'Coaching', 'Equipment', 'Creative', 'Nutrition', 'Events', 'Digital', 'Other'];
+const categories = ['All', 'Coaching', 'Equipment', 'Creative', 'Nutrition', 'Events', 'Digital', 'Fashion', 'Electronics', 'Home', 'Beauty', 'Other'];
+
+const FEATURED_CATEGORIES = [
+  { name: 'Coaching', icon: '🎯' },
+  { name: 'Equipment', icon: '⚽' },
+  { name: 'Creative', icon: '🎨' },
+  { name: 'Nutrition', icon: '🥗' },
+  { name: 'Events', icon: '🎤' },
+  { name: 'Digital', icon: '💻' },
+  { name: 'Fashion', icon: '👗' },
+  { name: 'Electronics', icon: '📱' },
+  { name: 'Home', icon: '🏠' },
+  { name: 'Beauty', icon: '💄' },
+];
 
 const Marketplace: React.FC = () => {
   const { t } = useLanguage();
@@ -44,6 +61,9 @@ const Marketplace: React.FC = () => {
   const [formTitle, setFormTitle] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formPrice, setFormPrice] = useState('');
+  const [formOriginalPrice, setFormOriginalPrice] = useState('');
+  const [formStockStatus, setFormStockStatus] = useState('in_stock');
+  const [formCondition, setFormCondition] = useState('new');
   const [formType, setFormType] = useState('product');
   const [formCategory, setFormCategory] = useState('');
   const [formLocation, setFormLocation] = useState('');
@@ -141,11 +161,14 @@ const Marketplace: React.FC = () => {
         title: formTitle,
         description: formDesc || null,
         price: parseFloat(formPrice) || 0,
+        original_price: formOriginalPrice ? parseFloat(formOriginalPrice) : null,
+        stock_status: formStockStatus,
+        condition: formCondition,
         type: formType,
         category: formCategory || 'Other',
         location: formLocation || null,
         media_urls: uploadedUrls,
-      });
+      } as any);
 
       if (error) throw error;
 
@@ -161,7 +184,8 @@ const Marketplace: React.FC = () => {
   };
 
   const resetForm = () => {
-    setFormTitle(''); setFormDesc(''); setFormPrice('');
+    setFormTitle(''); setFormDesc(''); setFormPrice(''); setFormOriginalPrice('');
+    setFormStockStatus('in_stock'); setFormCondition('new');
     setFormType('product'); setFormCategory(''); setFormLocation('');
     mediaPreviews.forEach(url => URL.revokeObjectURL(url));
     setMediaFiles([]); setMediaPreviews([]);
@@ -273,12 +297,29 @@ const Marketplace: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div><Label>{t('marketplace.price')}</Label><Input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} placeholder="0" /></div>
                     <div>
+                      <Label>Prix initial (optionnel)</Label>
+                      <Input type="number" value={formOriginalPrice} onChange={e => setFormOriginalPrice(e.target.value)} placeholder="Pour afficher remise" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
                       <Label>{t('marketplace.type')}</Label>
                       <Select value={formType} onValueChange={setFormType}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="product">{t('marketplace.product')}</SelectItem>
                           <SelectItem value="service">{t('marketplace.service')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Stock</Label>
+                      <Select value={formStockStatus} onValueChange={setFormStockStatus}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="in_stock">En stock</SelectItem>
+                          <SelectItem value="low_stock">Stock limité</SelectItem>
+                          <SelectItem value="out_of_stock">Rupture de stock</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -294,9 +335,21 @@ const Marketplace: React.FC = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label>Локация</Label>
-                      <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder="Paris, France" />
+                      <Label>État</Label>
+                      <Select value={formCondition} onValueChange={setFormCondition}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">Neuf</SelectItem>
+                          <SelectItem value="like_new">Comme neuf</SelectItem>
+                          <SelectItem value="used">Occasion</SelectItem>
+                          <SelectItem value="refurbished">Reconditionné</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+                  </div>
+                  <div>
+                    <Label>Localisation</Label>
+                    <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder="Paris, France" />
                   </div>
                   <Button className="w-full" onClick={handlePublish} disabled={publishing}>
                     {publishing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Публикация...</> : t('marketplace.publish')}
@@ -328,27 +381,70 @@ const Marketplace: React.FC = () => {
         </div>
       </div>
 
+      {/* Featured Categories (Nengoo-inspired) */}
+      <div className="px-4 py-4 max-w-5xl mx-auto">
+        <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+          <Tag className="h-4 w-4 text-primary" /> Catégories populaires
+        </h2>
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+          {FEATURED_CATEGORIES.map(cat => {
+            const active = selectedCategory === cat.name;
+            return (
+              <button
+                key={cat.name}
+                onClick={() => setSelectedCategory(active ? 'All' : cat.name)}
+                className={`shrink-0 flex flex-col items-center justify-center gap-1 w-20 h-20 rounded-xl border transition-all ${active ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105' : 'bg-card border-border hover:border-primary/40 hover:bg-accent'}`}
+              >
+                <span className="text-2xl">{cat.icon}</span>
+                <span className="text-[10px] font-medium text-center line-clamp-1 px-1">{cat.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Listings Grid */}
-      <div className="px-4 py-6 max-w-5xl mx-auto">
+      <div className="px-4 pb-6 max-w-5xl mx-auto">
         {loading ? (
           <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(item => (
-              <div key={item.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow group">
+            {filtered.map(item => {
+              const discount = item.original_price && item.original_price > item.price
+                ? Math.round((1 - item.price / item.original_price) * 100)
+                : 0;
+              const stock = item.stock_status || 'in_stock';
+              return (
+              <div key={item.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg transition-all group">
                 <div className="h-48 bg-gradient-to-br from-muted to-accent flex items-center justify-center relative overflow-hidden">
                   {getMediaPreview(item.media_urls) || (
                     <ShoppingBag className="h-12 w-12 text-muted-foreground/30" />
                   )}
+                  {/* Stock badge top-left */}
+                  <div className={`absolute top-2 left-2 rounded-full px-2 py-0.5 text-[10px] font-semibold flex items-center gap-1 ${
+                    stock === 'in_stock' ? 'bg-emerald-500 text-white' :
+                    stock === 'low_stock' ? 'bg-amber-500 text-white' :
+                    'bg-destructive text-destructive-foreground'
+                  }`}>
+                    {stock === 'in_stock' ? <><CheckCircle2 className="h-2.5 w-2.5" /> En stock</> :
+                     stock === 'low_stock' ? <><Package className="h-2.5 w-2.5" /> Stock limité</> :
+                     <><XCircle className="h-2.5 w-2.5" /> Rupture</>}
+                  </div>
+                  {/* Discount badge top-right */}
+                  {discount > 0 && (
+                    <div className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-[11px] font-bold shadow">
+                      -{discount}%
+                    </div>
+                  )}
                   {item.media_urls && item.media_urls.length > 1 && (
-                    <div className="absolute top-2 right-2 bg-black/60 text-white rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
                       <Image className="h-3 w-3" /> {item.media_urls.length}
                     </div>
                   )}
                 </div>
                 <div className="p-4 space-y-2">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="font-semibold text-sm text-foreground line-clamp-1">{item.title}</h3>
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">{item.description}</p>
                     </div>
@@ -360,24 +456,35 @@ const Marketplace: React.FC = () => {
                     <div className="flex items-center gap-2 text-xs text-muted-foreground"><MapPin className="h-3 w-3" /> {item.location}</div>
                   )}
                   <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="text-lg font-bold text-primary">{item.currency}{item.price}</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-bold text-primary">{item.currency}{item.price}</span>
+                      {discount > 0 && (
+                        <span className="text-xs text-muted-foreground line-through">{item.currency}{item.original_price}</span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-0.5"><Heart className="h-3 w-3" />{item.likes_count}</span>
                       <span className="flex items-center gap-0.5"><Eye className="h-3 w-3" />{item.views_count}</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                        {item.profiles?.name?.charAt(0) || 'U'}
+                    <Link to={`/talent/${item.user_id}`} className="flex items-center gap-1.5 group/author hover:text-primary transition-colors">
+                      <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground overflow-hidden">
+                        {item.profiles?.avatar_url ? (
+                          <img src={item.profiles.avatar_url} alt="" className="h-full w-full object-cover" />
+                        ) : (item.profiles?.name?.charAt(0) || 'U')}
                       </div>
-                      <span className="text-xs text-muted-foreground">{item.profiles?.name || 'User'}</span>
-                    </div>
-                    <Button size="sm" variant="outline" className="h-7 text-xs gap-1"><MessageSquare className="h-3 w-3" /> {t('marketplace.contact')}</Button>
+                      <span className="text-xs text-muted-foreground group-hover/author:text-primary">{item.profiles?.name || 'User'}</span>
+                    </Link>
+                    <Link to={`/messages?to=${item.user_id}`}>
+                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1" disabled={stock === 'out_of_stock'}>
+                        <MessageSquare className="h-3 w-3" /> {t('marketplace.contact')}
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
         )}
         {!loading && filtered.length === 0 && (

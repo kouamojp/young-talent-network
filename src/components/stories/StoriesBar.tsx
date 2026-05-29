@@ -81,8 +81,12 @@ export const StoriesBar = () => {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentsHasMore, setCommentsHasMore] = useState(false);
   const [commentsPosting, setCommentsPosting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
   const [paused, setPaused] = useState(false);
   const COMMENTS_PAGE = 15;
+  const commentsScrollRef = useRef<HTMLDivElement | null>(null);
+  const commentsSentinelRef = useRef<HTMLDivElement | null>(null);
 
   // gesture refs
   const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
@@ -415,6 +419,7 @@ export const StoriesBar = () => {
   };
 
   const loadComments = async (storyId: string, reset = true) => {
+    if (commentsLoading) return;
     setCommentsLoading(true);
     const offset = reset ? 0 : comments.length;
     const { data } = await supabase
@@ -435,11 +440,51 @@ export const StoriesBar = () => {
     setCommentsLoading(false);
   };
 
+  const startEditComment = (c: any) => {
+    setEditingCommentId(c.id);
+    setEditingCommentText(c.content);
+  };
+
+  const saveEditComment = async () => {
+    if (!editingCommentId || !editingCommentText.trim()) return;
+    const { error } = await supabase
+      .from('story_comments')
+      .update({ content: editingCommentText.trim() })
+      .eq('id', editingCommentId);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => prev.map(c => c.id === editingCommentId ? { ...c, content: editingCommentText.trim() } : c));
+    setEditingCommentId(null);
+    setEditingCommentText('');
+    toast({ title: 'Commentaire modifié' });
+  };
+
+  const deleteComment = async (id: string) => {
+    const { error } = await supabase.from('story_comments').delete().eq('id', id);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    setComments(prev => prev.filter(c => c.id !== id));
+    toast({ title: 'Commentaire supprimé' });
+  };
+
   // Load comments when panel opens / story changes
   useEffect(() => {
     if (showComments && currentStory) loadComments(currentStory.id, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showComments, currentStory?.id]);
+
+  // Infinite scroll for comments
+  useEffect(() => {
+    if (!showComments || !commentsHasMore || !currentStory) return;
+    const sentinel = commentsSentinelRef.current;
+    if (!sentinel) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !commentsLoading) {
+        loadComments(currentStory.id, false);
+      }
+    }, { root: commentsScrollRef.current, rootMargin: '120px' });
+    obs.observe(sentinel);
+    return () => obs.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showComments, commentsHasMore, commentsLoading, comments.length, currentStory?.id]);
 
   // Pause auto-advance while comments are open or paused via long-press
   useEffect(() => {
@@ -674,31 +719,65 @@ export const StoriesBar = () => {
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
+                  <div ref={commentsScrollRef} className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
                     {comments.length === 0 && !commentsLoading && (
                       <p className="text-xs text-center text-muted-foreground py-6">Aucun commentaire. Soyez le premier !</p>
                     )}
-                    {comments.map((c) => (
-                      <div key={c.id} className="flex gap-2">
-                        <Avatar className="h-7 w-7">
-                          <AvatarImage src={c.profile?.avatar_url || undefined} />
-                          <AvatarFallback className="text-[10px]">{c.profile?.name?.[0] || 'U'}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 bg-muted rounded-lg px-2.5 py-1.5">
-                          <p className="text-[11px] font-semibold">{c.profile?.name || 'User'}</p>
-                          <p className="text-xs whitespace-pre-wrap break-words">{c.content}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</p>
+                    {comments.map((c) => {
+                      const isMine = currentUser?.id === c.user_id;
+                      const isEditing = editingCommentId === c.id;
+                      return (
+                        <div key={c.id} className="flex gap-2 group">
+                          <Avatar className="h-7 w-7">
+                            <AvatarImage src={c.profile?.avatar_url || undefined} />
+                            <AvatarFallback className="text-[10px]">{c.profile?.name?.[0] || 'U'}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 bg-muted rounded-lg px-2.5 py-1.5">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-[11px] font-semibold">{c.profile?.name || 'User'}</p>
+                              {isMine && !isEditing && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-foreground">
+                                      <MoreVertical className="h-3.5 w-3.5" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => startEditComment(c)}>
+                                      <Pencil className="h-3.5 w-3.5 mr-2" /> Modifier
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => deleteComment(c.id)} className="text-destructive">
+                                      <Trash2 className="h-3.5 w-3.5 mr-2" /> Supprimer
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </div>
+                            {isEditing ? (
+                              <div className="space-y-1.5 mt-1">
+                                <Textarea
+                                  value={editingCommentText}
+                                  onChange={(e) => setEditingCommentText(e.target.value)}
+                                  className="text-xs min-h-[48px] resize-none"
+                                  autoFocus
+                                />
+                                <div className="flex gap-1.5 justify-end">
+                                  <Button size="sm" variant="ghost" className="h-6 text-[11px] px-2" onClick={() => { setEditingCommentId(null); setEditingCommentText(''); }}>Annuler</Button>
+                                  <Button size="sm" className="h-6 text-[11px] px-2" onClick={saveEditComment} disabled={!editingCommentText.trim()}>Enregistrer</Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-xs whitespace-pre-wrap break-words">{c.content}</p>
+                            )}
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {commentsLoading && (
                       <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
                     )}
-                    {commentsHasMore && !commentsLoading && currentStory && (
-                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => loadComments(currentStory.id, false)}>
-                        Charger plus
-                      </Button>
-                    )}
+                    {commentsHasMore && <div ref={commentsSentinelRef} className="h-4" />}
                   </div>
                   <div className="flex gap-2 p-2 border-t bg-background">
                     <input
