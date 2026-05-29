@@ -297,12 +297,29 @@ const Marketplace: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div><Label>{t('marketplace.price')}</Label><Input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} placeholder="0" /></div>
                     <div>
+                      <Label>Prix initial (optionnel)</Label>
+                      <Input type="number" value={formOriginalPrice} onChange={e => setFormOriginalPrice(e.target.value)} placeholder="Pour afficher remise" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
                       <Label>{t('marketplace.type')}</Label>
                       <Select value={formType} onValueChange={setFormType}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="product">{t('marketplace.product')}</SelectItem>
                           <SelectItem value="service">{t('marketplace.service')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Stock</Label>
+                      <Select value={formStockStatus} onValueChange={setFormStockStatus}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="in_stock">En stock</SelectItem>
+                          <SelectItem value="low_stock">Stock limité</SelectItem>
+                          <SelectItem value="out_of_stock">Rupture de stock</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -318,9 +335,21 @@ const Marketplace: React.FC = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label>Локация</Label>
-                      <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder="Paris, France" />
+                      <Label>État</Label>
+                      <Select value={formCondition} onValueChange={setFormCondition}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">Neuf</SelectItem>
+                          <SelectItem value="like_new">Comme neuf</SelectItem>
+                          <SelectItem value="used">Occasion</SelectItem>
+                          <SelectItem value="refurbished">Reconditionné</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+                  </div>
+                  <div>
+                    <Label>Localisation</Label>
+                    <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder="Paris, France" />
                   </div>
                   <Button className="w-full" onClick={handlePublish} disabled={publishing}>
                     {publishing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Публикация...</> : t('marketplace.publish')}
