@@ -7,10 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon, Activity } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
 import { useLanguage } from '@/i18n/LanguageContext';
+import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
+import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
 
 interface AgentData {
   id: string;
@@ -327,8 +329,10 @@ const AgentProfile: React.FC = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 text-center text-sm">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
             <TabsTrigger value="posts">Publications</TabsTrigger>
+            <TabsTrigger value="talent-posts">Pubs talents</TabsTrigger>
+            <TabsTrigger value="activity">Activités</TabsTrigger>
             <TabsTrigger value="overview">{t('agent.overview')}</TabsTrigger>
             <TabsTrigger value="sections">Sections</TabsTrigger>
             <TabsTrigger value="talents">{t('agent.talents')}</TabsTrigger>
@@ -401,6 +405,52 @@ const AgentProfile: React.FC = () => {
               ))
             )}
           </TabsContent>
+
+          <TabsContent value="talent-posts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Newspaper className="h-5 w-5 text-primary" />
+                  Publications des talents ({contracts.length} talents)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AggregatedPostsFeed
+                  userIds={contracts.map(c => c.talent_id)}
+                  labels={Object.fromEntries(contracts.map(c => [c.talent_id, 'Talent']))}
+                  emptyMessage="Aucune publication des talents sous contrat."
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" />
+                  Activités de l'agent
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ProfileActivityFeed userIds={id ? [id] : []} />
+              </CardContent>
+            </Card>
+            {contracts.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" />
+                    Activités des talents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ProfileActivityFeed userIds={contracts.map(c => c.talent_id)} />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
 
           <TabsContent value="sections" className="space-y-4">
             {presence.length === 0 ? (

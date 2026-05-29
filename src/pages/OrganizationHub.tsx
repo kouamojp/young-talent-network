@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye } from 'lucide-react';
+import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye, Newspaper, Activity } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
+import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
 
 interface OrgData {
   id: string;
@@ -249,8 +251,10 @@ const OrganizationHub: React.FC = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 text-center text-sm">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
             <TabsTrigger value="dashboard">{t('org.dashboard')}</TabsTrigger>
+            <TabsTrigger value="posts">Publications</TabsTrigger>
+            <TabsTrigger value="activity">Activités</TabsTrigger>
             <TabsTrigger value="agents">{t('org.agents')}</TabsTrigger>
             <TabsTrigger value="talents">{t('org.talents')}</TabsTrigger>
             <TabsTrigger value="services">{t('org.services')}</TabsTrigger>
@@ -281,7 +285,78 @@ const OrganizationHub: React.FC = () => {
             )}
           </TabsContent>
 
+          {/* Publications - org + agents + talents */}
+          <TabsContent value="posts" className="space-y-4">
+            {(() => {
+              const orgUserId = org.user_id;
+              const agentIds = agents.map(a => a.agent_id);
+              const talentIds = talents.map(t => t.talent_id);
+              const allIds = Array.from(new Set([orgUserId, ...agentIds, ...talentIds].filter(Boolean)));
+              const labels: Record<string, string> = {};
+              labels[orgUserId] = 'Organisation';
+              agentIds.forEach(aid => { labels[aid] = 'Agent'; });
+              talentIds.forEach(tid => { labels[tid] = 'Talent'; });
+              return (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Newspaper className="h-5 w-5 text-primary" />
+                      Publications (organisation, agents et talents)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <AggregatedPostsFeed
+                      userIds={allIds}
+                      labels={labels}
+                      limit={30}
+                      emptyMessage="Aucune publication de l'organisation, de ses agents ou de ses talents."
+                    />
+                  </CardContent>
+                </Card>
+              );
+            })()}
+          </TabsContent>
+
+          {/* Activités - org + agents + talents */}
+          <TabsContent value="activity" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Activity className="h-5 w-5 text-primary" /> Activités de l'organisation
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ProfileActivityFeed userIds={[org.user_id]} />
+              </CardContent>
+            </Card>
+            {agents.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" /> Activités des agents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ProfileActivityFeed userIds={agents.map(a => a.agent_id)} />
+                </CardContent>
+              </Card>
+            )}
+            {talents.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-primary" /> Activités des talents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <ProfileActivityFeed userIds={talents.map(t => t.talent_id)} />
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           {/* Agents & Agences */}
+
           <TabsContent value="agents" className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground">Agents & Agences ({agents.length})</h3>
             {agents.length === 0 ? (
