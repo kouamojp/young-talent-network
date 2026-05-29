@@ -21,7 +21,12 @@ interface MediaItem {
 
 const Media: React.FC = () => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('photo');
+  const initialTab = (() => {
+    if (typeof window === 'undefined') return 'photo';
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    return tab && ['photo', 'video', 'music', 'shorts'].includes(tab) ? tab : 'photo';
+  })();
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');

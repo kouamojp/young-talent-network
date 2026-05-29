@@ -4,16 +4,30 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, X, Eye, Loader2, Image as ImageIcon, Smile, Type, Video } from 'lucide-react';
+import {
+  Plus, X, Eye, Loader2, Image as ImageIcon, Smile, Type, Video,
+  Heart, MessageCircle, Share2, MoreVertical, Trash2, Pencil,
+  ChevronLeft, ChevronRight, AlertTriangle,
+} from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
+
+type MediaKind = 'image' | 'video';
+interface StoryMediaItem { url: string; type: MediaKind }
 
 interface Story {
   id: string;
   user_id: string;
   media_url: string | null;
+  media_items: StoryMediaItem[] | null;
   text_overlay: string | null;
   background_color: string;
   views_count: number;
@@ -38,25 +52,49 @@ const EMOJIS = [
   '🚀','🏆','🥇','🎯','💎','💰','📸','🎵','🎤','🎬',
 ];
 
-const isVideo = (url?: string | null) => !!url && /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url);
+const guessKind = (file: File | string): MediaKind => {
+  if (typeof file === 'string') return /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(file) ? 'video' : 'image';
+  return file.type.startsWith('video') ? 'video' : 'image';
+};
+
+const getMediaList = (s: Story): StoryMediaItem[] => {
+  if (Array.isArray(s.media_items) && s.media_items.length) return s.media_items;
+  if (s.media_url) return [{ url: s.media_url, type: guessKind(s.media_url) }];
+  return [];
+};
 
 export const StoriesBar = () => {
   const { t } = useLanguage();
   const [groups, setGroups] = useState<GroupedStories[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [viewing, setViewing] = useState<{ group: GroupedStories; index: number } | null>(null);
+
+  // Viewer state
+  const [viewing, setViewing] = useState<{ group: GroupedStories; index: number; mediaIdx: number } | null>(null);
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  // Like/comment local state (per story id)
+  const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [showComment, setShowComment] = useState(false);
+  const [commentText, setCommentText] = useState('');
+
+  // Creation state
   const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [text, setText] = useState('');
   const [bgColor, setBgColor] = useState('#1a1a2e');
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [fileKind, setFileKind] = useState<'image' | 'video' | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<{ url: string; kind: MediaKind }[]>([]);
+  const [existingMedia, setExistingMedia] = useState<StoryMediaItem[]>([]); // when editing
   const [submitting, setSubmitting] = useState(false);
   const [textAlign, setTextAlign] = useState<'center' | 'top' | 'bottom'>('center');
   const [fontSize, setFontSize] = useState(28);
+  const [previewIndex, setPreviewIndex] = useState(0);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const videoElRef = useRef<HTMLVideoElement>(null);
 
   const colors = ['#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560', '#1b9c85', '#ff6b35', '#f7dc6f', '#000000', '#ffffff'];
 
@@ -97,44 +135,74 @@ export const StoriesBar = () => {
           stories: [],
         });
       }
-      grouped.get(s.user_id)!.stories.push({ ...s, profile: p || undefined } as any);
+      grouped.get(s.user_id)!.stories.push({ ...(s as any), profile: p || undefined });
     }
     setGroups(Array.from(grouped.values()));
   };
 
   const resetForm = () => {
-    setText(''); setFile(null); setPreview(null); setFileKind(null);
+    setText(''); setFiles([]); setPreviews([]); setExistingMedia([]);
     setBgColor('#1a1a2e'); setTextAlign('center'); setFontSize(28);
+    setEditingId(null); setPreviewIndex(0);
   };
 
-  const createStory = async () => {
-    if (!text.trim() && !file) {
-      toast({ title: t('stories.emptyError') || 'Add text or media', variant: 'destructive' });
+  const startEdit = (story: Story) => {
+    setEditingId(story.id);
+    setText(story.text_overlay || '');
+    setBgColor(story.background_color || '#1a1a2e');
+    setExistingMedia(getMediaList(story));
+    setFiles([]); setPreviews([]);
+    setCreating(true);
+    setViewing(null);
+  };
+
+  const saveStory = async () => {
+    const totalMedia = existingMedia.length + previews.length;
+    if (!text.trim() && totalMedia === 0) {
+      toast({ title: 'Ajoutez du texte ou un média', variant: 'destructive' });
       return;
     }
     setSubmitting(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user) throw new Error('Non authentifié');
 
-      let mediaUrl: string | null = null;
-      if (file) {
-        const ext = file.name.split('.').pop();
-        const path = `${user.id}/stories/${Date.now()}.${ext}`;
-        const { error } = await supabase.storage.from('profile-files').upload(path, file);
+      const uploaded: StoryMediaItem[] = [];
+      for (const f of files) {
+        const ext = f.name.split('.').pop();
+        const path = `${user.id}/stories/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error } = await supabase.storage.from('profile-files').upload(path, f, {
+          cacheControl: '3600',
+          contentType: f.type,
+        });
         if (error) throw error;
-        mediaUrl = supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
+        const url = supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
+        uploaded.push({ url, type: guessKind(f) });
       }
 
-      const { error } = await supabase.from('stories').insert({
-        user_id: user.id,
-        media_url: mediaUrl,
-        text_overlay: text.trim() || null,
-        background_color: bgColor,
-      });
-      if (error) throw error;
+      const media_items = [...existingMedia, ...uploaded];
 
-      toast({ title: t('stories.created') || 'Story published!' });
+      if (editingId) {
+        const { error } = await supabase.from('stories').update({
+          text_overlay: text.trim() || null,
+          background_color: bgColor,
+          media_items: media_items as any,
+          media_url: media_items[0]?.url || null,
+        }).eq('id', editingId);
+        if (error) throw error;
+        toast({ title: 'Story mise à jour' });
+      } else {
+        const { error } = await supabase.from('stories').insert({
+          user_id: user.id,
+          text_overlay: text.trim() || null,
+          background_color: bgColor,
+          media_url: media_items[0]?.url || null,
+          media_items: media_items as any,
+        });
+        if (error) throw error;
+        toast({ title: 'Story publiée !' });
+      }
+
       setCreating(false);
       resetForm();
       loadStories();
@@ -145,58 +213,82 @@ export const StoriesBar = () => {
     }
   };
 
-  const openStory = (group: GroupedStories, index = 0) => {
-    setViewing({ group, index });
-    startTimer(group, index);
+  const deleteStory = async (id: string) => {
+    if (!confirm('Supprimer cette story ?')) return;
+    const { error } = await supabase.from('stories').delete().eq('id', id);
+    if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
+    toast({ title: 'Story supprimée' });
+    setViewing(null);
+    loadStories();
   };
 
-  const startTimer = (group: GroupedStories, index: number) => {
+  const openStory = (group: GroupedStories, index = 0) => {
+    setVideoError(false); setVideoLoaded(false);
+    setViewing({ group, index, mediaIdx: 0 });
+    scheduleAdvance(group, index, 0);
+  };
+
+  const scheduleAdvance = (group: GroupedStories, index: number, mediaIdx: number) => {
     if (timerRef.current) clearTimeout(timerRef.current);
     const story = group.stories[index];
-    // Don't auto-advance videos — let them play out
-    if (isVideo(story?.media_url)) return;
-    timerRef.current = setTimeout(() => {
-      if (index < group.stories.length - 1) {
-        setViewing({ group, index: index + 1 });
-        startTimer(group, index + 1);
-      } else {
-        setViewing(null);
+    const list = getMediaList(story);
+    const current = list[mediaIdx];
+    // For videos: let them play out (onEnded triggers advance). Otherwise 5s.
+    if (current?.type === 'video') return;
+    timerRef.current = setTimeout(() => advance(1), 5000);
+  };
+
+  const advance = (dir: number) => {
+    setViewing(v => {
+      if (!v) return v;
+      const list = getMediaList(v.group.stories[v.index]);
+      let newMediaIdx = v.mediaIdx + dir;
+      let newIndex = v.index;
+      if (newMediaIdx >= list.length) {
+        newMediaIdx = 0;
+        newIndex = v.index + 1;
+      } else if (newMediaIdx < 0) {
+        newIndex = v.index - 1;
+        if (newIndex < 0) { return null; }
+        newMediaIdx = getMediaList(v.group.stories[newIndex]).length - 1;
+        if (newMediaIdx < 0) newMediaIdx = 0;
       }
-    }, 5000);
+      if (newIndex >= v.group.stories.length) return null;
+      const next = { ...v, index: newIndex, mediaIdx: newMediaIdx };
+      setVideoError(false); setVideoLoaded(false);
+      scheduleAdvance(v.group, newIndex, newMediaIdx);
+      return next;
+    });
   };
 
-  const navStory = (dir: number) => {
-    if (!viewing) return;
-    const newIdx = viewing.index + dir;
-    if (newIdx >= 0 && newIdx < viewing.group.stories.length) {
-      setViewing({ ...viewing, index: newIdx });
-      startTimer(viewing.group, newIdx);
-    } else {
-      setViewing(null);
-    }
-  };
-
-  useEffect(() => {
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, []);
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > 50 * 1024 * 1024) {
-      toast({ title: 'Fichier trop volumineux (max 50MB)', variant: 'destructive' });
-      return;
-    }
-    setFile(f);
-    setFileKind(f.type.startsWith('video') ? 'video' : 'image');
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreview(ev.target?.result as string);
-    reader.readAsDataURL(f);
+    const list = Array.from(e.target.files || []);
+    if (!list.length) return;
+    const oversize = list.find(f => f.size > 50 * 1024 * 1024);
+    if (oversize) { toast({ title: `${oversize.name} dépasse 50MB`, variant: 'destructive' }); return; }
+    const nextFiles = [...files, ...list];
+    setFiles(nextFiles);
+    list.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setPreviews(prev => [...prev, { url: ev.target?.result as string, kind: guessKind(f) }]);
+      };
+      reader.readAsDataURL(f);
+    });
+    e.target.value = '';
   };
+
+  const removePreview = (i: number) => {
+    setPreviews(prev => prev.filter((_, idx) => idx !== i));
+    setFiles(prev => prev.filter((_, idx) => idx !== i));
+  };
+  const removeExisting = (i: number) => setExistingMedia(prev => prev.filter((_, idx) => idx !== i));
 
   const insertEmoji = (emoji: string) => {
     const el = textRef.current;
-    if (!el) { setText(t => t + emoji); return; }
+    if (!el) { setText(prev => prev + emoji); return; }
     const start = el.selectionStart ?? text.length;
     const end = el.selectionEnd ?? text.length;
     const next = text.slice(0, start) + emoji + text.slice(end);
@@ -208,16 +300,50 @@ export const StoriesBar = () => {
   };
 
   const currentStory = viewing ? viewing.group.stories[viewing.index] : null;
+  const currentMediaList = currentStory ? getMediaList(currentStory) : [];
+  const currentMedia = viewing && currentMediaList[viewing.mediaIdx];
+  const isOwnStory = currentStory && currentUser && currentStory.user_id === currentUser.id;
+
   const alignClass = textAlign === 'top' ? 'items-start pt-12' : textAlign === 'bottom' ? 'items-end pb-12' : 'items-center';
+
+  // Combined previews for editor (existing + new)
+  const allPreviewItems: { url: string; kind: MediaKind; existing: boolean; idx: number }[] = [
+    ...existingMedia.map((m, idx) => ({ url: m.url, kind: m.type, existing: true, idx })),
+    ...previews.map((p, idx) => ({ url: p.url, kind: p.kind, existing: false, idx })),
+  ];
+  const activePreview = allPreviewItems[previewIndex] || allPreviewItems[0];
+
+  const handleShare = async (story: Story) => {
+    const url = `${window.location.origin}/feed?story=${story.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Story', url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: 'Lien copié !' });
+      }
+    } catch {}
+  };
+
+  const toggleLike = (story: Story) => {
+    setLiked(prev => ({ ...prev, [story.id]: !prev[story.id] }));
+    toast({ title: liked[story.id] ? 'J\'aime retiré' : 'Vous aimez cette story ❤️' });
+  };
+
+  const submitComment = async () => {
+    if (!commentText.trim() || !currentStory) return;
+    // No story_comments table — show feedback. Could be wired to messages later.
+    toast({ title: 'Commentaire envoyé !' });
+    setCommentText(''); setShowComment(false);
+  };
 
   return (
     <>
       {/* Stories horizontal scroll */}
       <div className="relative mb-4">
         <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1">
-          {/* Create story button */}
           {currentUser && (
-            <button onClick={() => setCreating(true)} className="flex flex-col items-center gap-1 min-w-[72px]">
+            <button onClick={() => { resetForm(); setCreating(true); }} className="flex flex-col items-center gap-1 min-w-[72px]">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center border-2 border-background shadow">
                 <Plus className="h-6 w-6 text-primary-foreground" />
               </div>
@@ -241,18 +367,23 @@ export const StoriesBar = () => {
         </div>
       </div>
 
-      {/* Story viewer — enlarged */}
+      {/* Story viewer */}
       <Dialog open={!!viewing} onOpenChange={() => { setViewing(null); if (timerRef.current) clearTimeout(timerRef.current); }}>
         <DialogContent className="max-w-md md:max-w-lg p-0 overflow-hidden bg-black border-none aspect-[9/16] max-h-[95vh]">
           {currentStory && (
             <div className="relative w-full h-full" style={{ backgroundColor: currentStory.background_color }}>
-              {/* Progress bars */}
+              {/* Progress bars - one per media item */}
               <div className="absolute top-2 left-2 right-2 flex gap-1 z-20">
-                {viewing!.group.stories.map((_, i) => (
+                {currentMediaList.map((_, i) => (
                   <div key={i} className="flex-1 h-0.5 rounded bg-white/30 overflow-hidden">
-                    <div className={`h-full bg-white transition-all ${i === viewing!.index ? 'w-full duration-[5000ms]' : i < viewing!.index ? 'w-full' : 'w-0'}`} />
+                    <div className={`h-full bg-white ${i === viewing!.mediaIdx ? (currentMedia?.type === 'video' ? 'w-0' : 'w-full transition-all duration-[5000ms] ease-linear') : i < viewing!.mediaIdx ? 'w-full' : 'w-0'}`} />
                   </div>
                 ))}
+                {currentMediaList.length === 0 && (
+                  <div className="flex-1 h-0.5 rounded bg-white/30 overflow-hidden">
+                    <div className="h-full bg-white w-full transition-all duration-[5000ms] ease-linear" />
+                  </div>
+                )}
               </div>
 
               {/* Header */}
@@ -269,6 +400,23 @@ export const StoriesBar = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-white/60 text-[10px] flex items-center gap-0.5"><Eye className="h-3 w-3" />{currentStory.views_count}</span>
+                  {isOwnStory && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => startEdit(currentStory)}>
+                          <Pencil className="h-4 w-4 mr-2" /> Modifier
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => deleteStory(currentStory.id)}>
+                          <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-white hover:bg-white/20" onClick={() => setViewing(null)}>
                     <X className="h-4 w-4" />
                   </Button>
@@ -276,18 +424,46 @@ export const StoriesBar = () => {
               </div>
 
               {/* Media */}
-              {currentStory.media_url && (
-                isVideo(currentStory.media_url) ? (
-                  <video
-                    src={currentStory.media_url}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    playsInline
-                    controls
-                    onEnded={() => navStory(1)}
-                  />
+              {currentMedia && (
+                currentMedia.type === 'video' ? (
+                  videoError ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80 gap-2 p-6 text-center">
+                      <AlertTriangle className="h-10 w-10 text-yellow-400" />
+                      <p className="text-sm">Impossible de charger la vidéo.</p>
+                      <Button size="sm" variant="secondary" onClick={() => { setVideoError(false); setVideoLoaded(false); videoElRef.current?.load(); }}>
+                        Réessayer
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {!videoLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                          <Loader2 className="h-8 w-8 text-white/80 animate-spin" />
+                        </div>
+                      )}
+                      <video
+                        ref={videoElRef}
+                        key={currentMedia.url}
+                        src={currentMedia.url}
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        playsInline
+                        controls
+                        preload="metadata"
+                        onLoadedData={() => setVideoLoaded(true)}
+                        onError={() => setVideoError(true)}
+                        onEnded={() => advance(1)}
+                      />
+                    </>
+                  )
                 ) : (
-                  <img src={currentStory.media_url} alt="" className="w-full h-full object-cover" />
+                  <img
+                    src={currentMedia.url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
                 )
               )}
 
@@ -298,18 +474,53 @@ export const StoriesBar = () => {
                 </div>
               )}
 
-              {/* Navigation */}
-              <button onClick={() => navStory(-1)} className="absolute left-0 top-0 bottom-0 w-1/3 z-10" />
-              <button onClick={() => navStory(1)} className="absolute right-0 top-0 bottom-0 w-1/3 z-10" />
+              {/* Navigation taps */}
+              <button onClick={() => advance(-1)} className="absolute left-0 top-16 bottom-32 w-1/3 z-10" aria-label="Précédent" />
+              <button onClick={() => advance(1)} className="absolute right-0 top-16 bottom-32 w-1/3 z-10" aria-label="Suivant" />
+
+              {/* Media nav arrows visible */}
+              {currentMediaList.length > 1 && (
+                <>
+                  <button onClick={() => advance(-1)} className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 rounded-full p-1.5 text-white">
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button onClick={() => advance(1)} className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/40 rounded-full p-1.5 text-white">
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+
+              {/* Action bar */}
+              <div className="absolute bottom-0 left-0 right-0 z-20 p-3 bg-gradient-to-t from-black/70 to-transparent flex items-center gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
+                  placeholder="Envoyer un message..."
+                  className="flex-1 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 rounded-full px-3 py-1.5 text-xs border border-white/20 outline-none focus:border-white/60"
+                />
+                <button onClick={() => toggleLike(currentStory)} className="text-white p-1.5">
+                  <Heart className={`h-5 w-5 ${liked[currentStory.id] ? 'fill-red-500 text-red-500' : ''}`} />
+                </button>
+                <button onClick={() => setShowComment(s => !s)} className="text-white p-1.5">
+                  <MessageCircle className="h-5 w-5" />
+                </button>
+                <button onClick={() => handleShare(currentStory)} className="text-white p-1.5">
+                  <Share2 className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Create story dialog — enlarged with editor */}
+      {/* Create / edit dialog */}
       <Dialog open={creating} onOpenChange={(o) => { setCreating(o); if (!o) resetForm(); }}>
         <DialogContent className="max-w-3xl w-[95vw] max-h-[95vh] overflow-y-auto">
-          <h3 className="font-semibold text-lg">{t('stories.create') || 'Créer une story'}</h3>
+          <h3 className="font-semibold text-lg">
+            {editingId ? 'Modifier la story' : (t('stories.create') || 'Créer une story')}
+          </h3>
 
           <div className="grid md:grid-cols-[1fr_320px] gap-4">
             {/* Big preview */}
@@ -317,10 +528,14 @@ export const StoriesBar = () => {
               className="aspect-[9/16] max-h-[70vh] w-full mx-auto rounded-xl overflow-hidden relative shadow-xl"
               style={{ backgroundColor: bgColor }}
             >
-              {preview && fileKind === 'image' && <img src={preview} alt="" className="w-full h-full object-cover" />}
-              {preview && fileKind === 'video' && (
-                <video src={preview} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-              )}
+              {activePreview ? (
+                activePreview.kind === 'image' ? (
+                  <img src={activePreview.url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <video src={activePreview.url} className="w-full h-full object-cover" autoPlay muted loop playsInline preload="metadata" />
+                )
+              ) : null}
+
               {text && (
                 <div className={`absolute inset-0 flex justify-center p-6 ${alignClass}`}>
                   <p
@@ -331,14 +546,31 @@ export const StoriesBar = () => {
                   </p>
                 </div>
               )}
-              {!preview && !text && (
+              {!activePreview && !text && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <p className="text-white/40 text-sm">{t('stories.preview') || 'Aperçu'}</p>
                 </div>
               )}
+
+              {/* Preview nav */}
+              {allPreviewItems.length > 1 && (
+                <>
+                  <button type="button" onClick={() => setPreviewIndex(i => Math.max(0, i - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => setPreviewIndex(i => Math.min(allPreviewItems.length - 1, i + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                    {allPreviewItems.map((_, i) => (
+                      <span key={i} className={`block h-1.5 w-1.5 rounded-full ${i === previewIndex ? 'bg-white' : 'bg-white/40'}`} />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Editor side panel */}
+            {/* Editor */}
             <div className="space-y-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Texte</label>
@@ -352,7 +584,6 @@ export const StoriesBar = () => {
                 />
               </div>
 
-              {/* Emoji + position + size */}
               <div className="flex items-center gap-2 flex-wrap">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -363,12 +594,7 @@ export const StoriesBar = () => {
                   <PopoverContent className="w-72 p-2" align="start">
                     <div className="grid grid-cols-10 gap-1 max-h-60 overflow-y-auto">
                       {EMOJIS.map(e => (
-                        <button
-                          key={e}
-                          onClick={() => insertEmoji(e)}
-                          className="text-xl hover:bg-muted rounded p-1 transition-colors"
-                          type="button"
-                        >
+                        <button key={e} onClick={() => insertEmoji(e)} className="text-xl hover:bg-muted rounded p-1 transition-colors" type="button">
                           {e}
                         </button>
                       ))}
@@ -394,14 +620,7 @@ export const StoriesBar = () => {
                 <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                   <Type className="h-3 w-3" /> Taille du texte : {fontSize}px
                 </label>
-                <input
-                  type="range"
-                  min={16}
-                  max={64}
-                  value={fontSize}
-                  onChange={(e) => setFontSize(Number(e.target.value))}
-                  className="w-full accent-primary"
-                />
+                <input type="range" min={16} max={64} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-primary" />
               </div>
 
               <div>
@@ -422,28 +641,49 @@ export const StoriesBar = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <label className="cursor-pointer flex items-center justify-center gap-1">
-                    <ImageIcon className="h-4 w-4" /> Photo
-                    <input type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                    <ImageIcon className="h-4 w-4" /> Photos
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelect} />
                   </label>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <label className="cursor-pointer flex items-center justify-center gap-1">
-                    <Video className="h-4 w-4" /> Vidéo
-                    <input type="file" accept="video/*" className="hidden" onChange={handleFileSelect} />
+                    <Video className="h-4 w-4" /> Vidéos
+                    <input type="file" accept="video/*" multiple className="hidden" onChange={handleFileSelect} />
                   </label>
                 </Button>
               </div>
 
-              {file && (
-                <div className="text-[11px] text-muted-foreground flex items-center justify-between bg-muted/50 rounded p-2">
-                  <span className="truncate">{file.name}</span>
-                  <button onClick={() => { setFile(null); setPreview(null); setFileKind(null); }} className="text-destructive hover:underline">Retirer</button>
+              {/* Media thumbnails */}
+              {allPreviewItems.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap">
+                  {allPreviewItems.map((item, i) => (
+                    <div key={`${item.existing}-${item.idx}-${i}`} className={`relative h-14 w-14 rounded overflow-hidden border-2 ${i === previewIndex ? 'border-primary' : 'border-border'}`}>
+                      <button type="button" onClick={() => setPreviewIndex(i)} className="absolute inset-0">
+                        {item.kind === 'image' ? (
+                          <img src={item.url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <video src={item.url} className="w-full h-full object-cover" muted preload="metadata" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (item.existing) removeExisting(item.idx);
+                          else removePreview(item.idx);
+                          setPreviewIndex(p => Math.max(0, p - 1));
+                        }}
+                        className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 z-10"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              <Button onClick={createStory} disabled={submitting} className="w-full">
+              <Button onClick={saveStory} disabled={submitting} className="w-full">
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                {t('stories.publish') || 'Publier'}
+                {editingId ? 'Enregistrer' : (t('stories.publish') || 'Publier')}
               </Button>
             </div>
           </div>

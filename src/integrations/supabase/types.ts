@@ -1746,6 +1746,7 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
+          media_items: Json
           media_url: string | null
           text_overlay: string | null
           user_id: string
@@ -1756,6 +1757,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          media_items?: Json
           media_url?: string | null
           text_overlay?: string | null
           user_id: string
@@ -1766,6 +1768,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          media_items?: Json
           media_url?: string | null
           text_overlay?: string | null
           user_id?: string

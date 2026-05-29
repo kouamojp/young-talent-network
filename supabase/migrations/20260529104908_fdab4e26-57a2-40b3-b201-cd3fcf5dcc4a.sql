@@ -1,0 +1,1 @@
+ALTER TABLE public.stories ADD COLUMN IF NOT EXISTS media_items jsonb NOT NULL DEFAULT '[]'::jsonb;

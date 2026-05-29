@@ -158,7 +158,10 @@ const ShortsFeed: React.FC = () => {
                   </div>
                   <span className="text-xs mt-1 font-semibold">{short.likes || 0}</span>
                 </button>
-                <button className="flex flex-col items-center text-white">
+                <button
+                  onClick={() => toast.info('Commentaires bientôt disponibles')}
+                  className="flex flex-col items-center text-white"
+                >
                   <div className="bg-black/40 backdrop-blur-sm rounded-full p-2.5">
                     <MessageCircle className="h-6 w-6" />
                   </div>
