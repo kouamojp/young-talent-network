@@ -629,9 +629,23 @@ export const StoriesBar = () => {
                 </div>
               )}
 
-              {/* Navigation taps */}
-              <button onClick={() => advance(-1)} className="absolute left-0 top-16 bottom-32 w-1/3 z-10" aria-label="Précédent" />
-              <button onClick={() => advance(1)} className="absolute right-0 top-16 bottom-32 w-1/3 z-10" aria-label="Suivant" />
+              {/* Navigation taps + long-press for fast advance/rewind */}
+              <button
+                className="absolute left-0 top-16 bottom-32 w-1/3 z-10"
+                aria-label="Précédent"
+                onPointerDown={() => startHold(-1)}
+                onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(-1); }}
+                onPointerLeave={endHold}
+                onPointerCancel={endHold}
+              />
+              <button
+                className="absolute right-0 top-16 bottom-32 w-1/3 z-10"
+                aria-label="Suivant"
+                onPointerDown={() => startHold(1)}
+                onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(1); }}
+                onPointerLeave={endHold}
+                onPointerCancel={endHold}
+              />
 
               {/* Media nav arrows visible */}
               {currentMediaList.length > 1 && (
@@ -645,12 +659,69 @@ export const StoriesBar = () => {
                 </>
               )}
 
+              {paused && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-black/50 text-white text-xs rounded-full px-3 py-1 pointer-events-none">
+                  ⏸ En pause
+                </div>
+              )}
+
+              {/* Comments panel */}
+              {showComments && (
+                <div className="absolute inset-x-0 bottom-0 top-1/3 z-30 bg-background/95 backdrop-blur-md rounded-t-2xl flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
+                  <div className="flex items-center justify-between px-4 py-2 border-b">
+                    <p className="text-sm font-semibold">Commentaires</p>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowComments(false)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
+                    {comments.length === 0 && !commentsLoading && (
+                      <p className="text-xs text-center text-muted-foreground py-6">Aucun commentaire. Soyez le premier !</p>
+                    )}
+                    {comments.map((c) => (
+                      <div key={c.id} className="flex gap-2">
+                        <Avatar className="h-7 w-7">
+                          <AvatarImage src={c.profile?.avatar_url || undefined} />
+                          <AvatarFallback className="text-[10px]">{c.profile?.name?.[0] || 'U'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 bg-muted rounded-lg px-2.5 py-1.5">
+                          <p className="text-[11px] font-semibold">{c.profile?.name || 'User'}</p>
+                          <p className="text-xs whitespace-pre-wrap break-words">{c.content}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {commentsLoading && (
+                      <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+                    )}
+                    {commentsHasMore && !commentsLoading && currentStory && (
+                      <Button variant="ghost" size="sm" className="w-full text-xs" onClick={() => loadComments(currentStory.id, false)}>
+                        Charger plus
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex gap-2 p-2 border-t bg-background">
+                    <input
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
+                      placeholder="Ajouter un commentaire..."
+                      className="flex-1 bg-muted rounded-full px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-primary"
+                      autoFocus
+                    />
+                    <Button size="sm" onClick={submitComment} disabled={commentsPosting || !commentText.trim()}>
+                      {commentsPosting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Envoyer'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Action bar */}
               <div className="absolute bottom-0 left-0 right-0 z-20 p-3 bg-gradient-to-t from-black/70 to-transparent flex items-center gap-2">
                 <input
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); }}
+                  onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); setShowComments(true); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
                   placeholder="Envoyer un message..."
                   className="flex-1 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 rounded-full px-3 py-1.5 text-xs border border-white/20 outline-none focus:border-white/60"
@@ -658,7 +729,7 @@ export const StoriesBar = () => {
                 <button onClick={() => toggleLike(currentStory)} className="text-white p-1.5">
                   <Heart className={`h-5 w-5 ${liked[currentStory.id] ? 'fill-red-500 text-red-500' : ''}`} />
                 </button>
-                <button onClick={() => setShowComment(s => !s)} className="text-white p-1.5">
+                <button onClick={() => setShowComments(s => !s)} className="text-white p-1.5">
                   <MessageCircle className="h-5 w-5" />
                 </button>
                 <button onClick={() => handleShare(currentStory)} className="text-white p-1.5">
