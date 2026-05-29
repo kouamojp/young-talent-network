@@ -118,8 +118,11 @@ const Navbar: React.FC = () => {
               variant="ghost" 
               size="icon"
               className="rounded-full bg-muted hover:bg-muted/80"
+              asChild
             >
-              <Bell className="h-5 w-5 text-foreground" />
+              <Link to="/messages">
+                <Bell className="h-5 w-5 text-foreground" />
+              </Link>
             </Button>
             <Button 
               variant="ghost" 
