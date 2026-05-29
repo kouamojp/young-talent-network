@@ -85,7 +85,7 @@ const OnlineTV: React.FC = () => {
             </div>
             <div className="flex justify-between items-start">
               <div><h3 className="text-xl font-bold">Young Musicians Concert</h3><p className="text-gray-600">Y&T Music • {t('tv.liveLabel')}</p></div>
-              <Button>{t('tv.subscribe')}</Button>
+              <Button onClick={() => toast('Abonné à Y&T Music')}>{t('tv.subscribe')}</Button>
             </div>
           </div>
 
