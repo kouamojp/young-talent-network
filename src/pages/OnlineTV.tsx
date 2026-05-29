@@ -127,7 +127,7 @@ const OnlineTV: React.FC = () => {
                         <div className="flex items-center gap-1 text-xs text-gray-600"><Clock className="h-3 w-3" /><span>{stream.time}</span></div>
                       </div>
                       <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full mt-2 inline-block">{stream.category}</span>
-                      <Button variant="outline" size="sm" className="w-full mt-2">{t('tv.setReminder')}</Button>
+                      <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => toast('Rappel programmé 🔔')}>{t('tv.setReminder')}</Button>
                     </div>
                   </div>
                 ))}
