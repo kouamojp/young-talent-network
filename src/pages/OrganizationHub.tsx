@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye } from 'lucide-react';
+import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye, Newspaper, Activity } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
+import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
 
 interface OrgData {
   id: string;
