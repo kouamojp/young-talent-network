@@ -242,12 +242,26 @@ export const StoriesBar = () => {
 
   const scheduleAdvance = (group: GroupedStories, index: number, mediaIdx: number) => {
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (paused) return;
     const story = group.stories[index];
     const list = getMediaList(story);
     const current = list[mediaIdx];
-    // For videos: let them play out (onEnded triggers advance). Otherwise 5s.
     if (current?.type === 'video') return;
     timerRef.current = setTimeout(() => advance(1), 5000);
+  };
+
+  const advanceGroup = (dir: number) => {
+    setViewing(v => {
+      if (!v) return v;
+      const idx = groups.findIndex(g => g.user_id === v.group.user_id);
+      const nextIdx = idx + dir;
+      if (nextIdx < 0 || nextIdx >= groups.length) return null;
+      const next = { group: groups[nextIdx], index: 0, mediaIdx: 0 };
+      setVideoError(false); setVideoLoaded(false);
+      setShowComments(false); setComments([]);
+      scheduleAdvance(next.group, 0, 0);
+      return next;
+    });
   };
 
   const advance = (dir: number) => {
