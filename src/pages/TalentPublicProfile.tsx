@@ -390,6 +390,13 @@ const TalentPublicProfile: React.FC = () => {
           </div>
         </div>
 
+        {/* Activités dans les autres sections */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
+          <SectionHeader icon={Activity} title="Activités dans les autres sections" />
+          <ProfileActivityFeed userIds={id ? [id] : []} />
+        </div>
+
+
         {/* Media Gallery */}
         {media.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
