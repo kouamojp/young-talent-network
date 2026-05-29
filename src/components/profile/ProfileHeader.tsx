@@ -62,15 +62,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       
       <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
         <div className="flex gap-2">
-          <Button className="bg-[#1877F2] hover:bg-[#166FE5]">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Follow
-          </Button>
-          <Button variant="outline" className="text-[#1877F2]">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            Message
-          </Button>
+          <ShareMenu url={`${window.location.origin}/profile`} title={`${user.name} sur YAT`}>
+            <Button variant="outline" className="text-[#1877F2]">
+              <Share2 className="mr-2 h-4 w-4" />
+              Partager le profil
+            </Button>
+          </ShareMenu>
         </div>
+
         
         {!isEditMode && (
           <Button variant="outline" onClick={() => setIsEditMode(true)}>
