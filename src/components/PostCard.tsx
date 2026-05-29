@@ -290,10 +290,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           <MessageSquare className="h-5 w-5 mr-2" />
           Comment
         </Button>
-        <Button variant="ghost" size="sm" className="flex-1 text-sm">
-          <Share className="h-5 w-5 mr-2" />
-          Share
-        </Button>
+        <ShareMenu url={postUrl} title={post.author.name + ' sur YAT'}>
+          <Button variant="ghost" size="sm" className="flex-1 text-sm">
+            <Share className="h-5 w-5 mr-2" />
+            Share
+          </Button>
+        </ShareMenu>
       </div>
 
       {/* Comments Section */}
