@@ -7,12 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon, Activity } from 'lucide-react';
+import { ArrowLeft, Briefcase, Users, Star, MapPin, Globe, Phone, Mail, Building, TrendingUp, Award, Handshake, Eye, Newspaper, Layers, Heart, MessageCircle, Calendar, Tv, Radio, GraduationCap, Coins, Map as MapIcon, Activity, Trash2 } from 'lucide-react';
 import ContractCreationDialog from '@/components/agent/ContractCreationDialog';
 import PendingContractsManager from '@/components/agent/PendingContractsManager';
 import { useLanguage } from '@/i18n/LanguageContext';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
+import { toast } from '@/hooks/use-toast';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface AgentData {
   id: string;
