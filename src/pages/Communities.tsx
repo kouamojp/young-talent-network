@@ -199,8 +199,7 @@ const Communities: React.FC = () => {
                     </div>
                     <ShareMenu
                       url={`${window.location.origin}/communities#post-${post.id}`}
-                      title={`${post.author.name} dans ${post.community}`}
-                      text={post.content}
+                      title={`${post.author.name} dans ${post.community}: ${post.content}`}
                     >
                       <button className="text-gray-600 hover:text-primary">{t('communities.share')}</button>
                     </ShareMenu>
