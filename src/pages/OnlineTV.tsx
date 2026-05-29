@@ -73,7 +73,7 @@ const OnlineTV: React.FC = () => {
                 <div className="flex justify-between items-center text-white">
                   <div className="flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}</Button>
-                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <Volume2 className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</Button>
+                    <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={() => setIsMuted(!isMuted)}>{isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</Button>
                     <span className="text-sm">{t('tv.liveLabel')} • 1.2K {t('tv.watching')}</span>
                   </div>
                   <div className="flex items-center gap-2">
