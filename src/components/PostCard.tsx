@@ -36,6 +36,7 @@ interface Author {
   name: string;
   avatar: string;
   id?: string;
+  user_type?: string;
 }
 
 interface Post {
