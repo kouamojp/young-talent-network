@@ -20,19 +20,25 @@ const OnlineTV: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [tvLink, setTvLink] = useState('');
-  const [addedLinks, setAddedLinks] = useState<{ url: string; title: string }[]>([]);
+  const [tvTitle, setTvTitle] = useState('');
+  const [tvDescription, setTvDescription] = useState('');
+  const [addedLinks, setAddedLinks] = useState<{ url: string; title: string; description: string }[]>([]);
 
   const handleAddLink = () => {
     if (!tvLink.trim()) return;
     try {
       new URL(tvLink);
-      setAddedLinks(prev => [...prev, { url: tvLink.trim(), title: tvLink.trim() }]);
+      setAddedLinks(prev => [...prev, { url: tvLink.trim(), title: tvTitle.trim() || tvLink.trim(), description: tvDescription.trim() }]);
       setTvLink('');
+      setTvTitle('');
+      setTvDescription('');
       toast.success(t('tv.linkAdded'));
     } catch {
       toast.error(t('tv.invalidLink'));
     }
   };
+
+  const removeLink = (i: number) => setAddedLinks(prev => prev.filter((_, idx) => idx !== i));
 
   const liveStreams = [
     { id: 1, title: "Young Musicians Concert", channel: "Y&T Music", thumbnail: "https://images.unsplash.com/photo-1541804627596-3b5b9ef58c93", viewers: 1245, category: "Music" },
