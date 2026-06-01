@@ -5,10 +5,12 @@ import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star, Link, Plus } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star, Link, Plus, Users, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import ShareToFriendsDialog from '@/components/share/ShareToFriendsDialog';
 
 const OnlineTV: React.FC = () => {
   const { t } = useLanguage();
