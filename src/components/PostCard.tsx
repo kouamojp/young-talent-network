@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
 import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown, Copy, Trash2, Flag } from 'lucide-react';
 import { Button } from './ui/button';
@@ -34,6 +35,7 @@ function renderTextWithLinks(text: string) {
 interface Author {
   name: string;
   avatar: string;
+  id?: string;
 }
 
 interface Post {
@@ -45,6 +47,7 @@ interface Post {
   comments: number;
   shares: number;
   media_urls?: string[] | null;
+  user_id?: string;
 }
 
 interface PostCardProps {
@@ -53,6 +56,9 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
+  const navigate = useNavigate();
+  const authorId = post.author.id || post.user_id;
+  const goToProfile = () => { if (authorId) navigate(`/talent/${authorId}`); };
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
@@ -191,12 +197,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={post.author.avatar} alt={post.author.name} />
-              <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
-            </Avatar>
+            <button onClick={goToProfile} className="shrink-0" aria-label={`Voir le profil de ${post.author.name}`}>
+              <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/40 transition">
+                <AvatarImage src={post.author.avatar} alt={post.author.name} />
+                <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+            </button>
             <div className="ml-3">
-              <h3 className="font-semibold text-[15px]">{post.author.name}</h3>
+              <button onClick={goToProfile} className="font-semibold text-[15px] hover:underline text-left">
+                {post.author.name}
+              </button>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1" title={format(postDate, 'PPpp')}>
                   <Calendar className="h-3 w-3" />
