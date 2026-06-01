@@ -213,12 +213,12 @@ const Friends: React.FC = () => {
               <Card key={user.id}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(user)}>
                       <AvatarImage src={user.avatar_url} />
                       <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{user.name}</p>
+                      <button onClick={() => goToProfile(user)} className="font-medium hover:underline text-left">{user.name}</button>
                       <p className="text-xs text-muted-foreground">{user.country || ''} • {user.user_type}</p>
                     </div>
                   </div>
