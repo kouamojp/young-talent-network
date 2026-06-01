@@ -114,7 +114,8 @@ const Feed: React.FC = () => {
                 id: post.id,
                 author: {
                   name: post.profiles.name,
-                  avatar: post.profiles.avatar_url || '/placeholder.svg'
+                  avatar: post.profiles.avatar_url || '/placeholder.svg',
+                  id: post.user_id,
                 },
                 content: post.content,
                 timestamp: post.created_at,
@@ -122,6 +123,7 @@ const Feed: React.FC = () => {
                 comments: post.comments_count,
                 shares: 0,
                 media_urls: post.media_urls,
+                user_id: post.user_id,
               }}
               onUpdate={fetchPosts}
             />
