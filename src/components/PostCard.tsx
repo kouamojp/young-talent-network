@@ -178,10 +178,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       setLikesCount(prev => prev + (wasLiked ? 1 : -1));
       toast({ title: "Failed to update like", variant: "destructive" });
     }
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      toast({ title: "Failed to update like", variant: "destructive" });
-    }
   };
 
   const fetchComments = async () => {
