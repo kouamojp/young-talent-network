@@ -170,7 +170,7 @@ const Profile: React.FC = () => {
             </div>
           )}
         </div>
-        <CardContent className="pt-0 pb-6 relative z-10">
+        <CardContent className="pt-0 relative z-10 bg-sky-50 pb-[5px] pr-[5px] pl-[5px]">
           <div className="flex flex-col md:flex-row gap-6 md:items-end -mt-16">
             <div className="relative flex-shrink-0 z-20">
               <Avatar className="h-32 w-32 border-4 border-card shadow-lg bg-card">
