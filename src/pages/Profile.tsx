@@ -161,7 +161,7 @@ const Profile: React.FC = () => {
       </Button>
 
       <Card className="overflow-hidden mb-6">
-        <div className="h-40 bg-gradient-to-r from-primary/80 to-primary relative">
+        <div className="h-48 sm:h-60 md:h-72 bg-gradient-to-r from-primary/80 to-primary relative">
           {displayProfile.cover_photo_url && <img src={displayProfile.cover_photo_url} alt="Cover" className="w-full h-full object-cover" />}
           {userId && (
             <div className="absolute top-3 right-3 z-10 rounded-full bg-background/70 backdrop-blur-sm shadow-md">
@@ -170,10 +170,10 @@ const Profile: React.FC = () => {
             </div>
           )}
         </div>
-        <CardContent className="pt-0 pb-6">
-          <div className="flex flex-col md:flex-row gap-6 -mt-16">
-            <div className="relative flex-shrink-0">
-              <Avatar className="h-32 w-32 border-4 border-card shadow-lg">
+        <CardContent className="pt-0 pb-6 relative z-10">
+          <div className="flex flex-col md:flex-row gap-6 md:items-end -mt-16">
+            <div className="relative flex-shrink-0 z-20">
+              <Avatar className="h-32 w-32 border-4 border-card shadow-lg bg-card">
                 <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
                 <AvatarFallback className="text-3xl">{displayProfile.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
@@ -184,7 +184,7 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="flex-1 pt-16 md:pt-4">
+            <div className="flex-1 pt-4 md:pt-0 md:pb-2 min-w-0">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">

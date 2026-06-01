@@ -14,6 +14,15 @@ import { toast } from '@/components/ui/use-toast';
 const Friends: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const profileUrl = (u: { id?: string; user_type?: string } | null | undefined) => {
+    if (!u?.id) return '#';
+    if (u.user_type === 'organization') return `/organization/${u.id}`;
+    if (u.user_type === 'agent') return `/agent/${u.id}`;
+    return `/talent/${u.id}`;
+  };
+  const goToProfile = (u: { id?: string; user_type?: string } | null | undefined) => {
+    if (u?.id) navigate(profileUrl(u));
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -137,18 +146,18 @@ const Friends: React.FC = () => {
                 <Card key={conn.id}>
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(friend)}>
                         <AvatarImage src={friend.avatar_url} />
                         <AvatarFallback>{friend.name?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{friend.name}</p>
+                        <button onClick={() => goToProfile(friend)} className="font-medium hover:underline text-left">{friend.name}</button>
                         <p className="text-sm text-muted-foreground">{friend.country || ''} • {friend.user_type}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => navigate('/messages')}><MessageSquare className="h-4 w-4" /></Button>
-                      <Button size="sm" variant="outline" onClick={() => navigate(`/talent/${friend.id}`)}>{t('common.view')}</Button>
+                      <Button size="sm" variant="outline" onClick={() => goToProfile(friend)}>{t('common.view')}</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -171,12 +180,12 @@ const Friends: React.FC = () => {
                 <Card key={req.id}>
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(other)}>
                         <AvatarImage src={other?.avatar_url} />
                         <AvatarFallback>{other?.name?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{other?.name || t('friends.pendingRequest')}</p>
+                        <button onClick={() => goToProfile(other)} className="font-medium hover:underline text-left">{other?.name || t('friends.pendingRequest')}</button>
                         <Badge variant="secondary">{incoming ? t('friends.requests') : t('friends.pending')}</Badge>
                       </div>
                     </div>
@@ -204,12 +213,12 @@ const Friends: React.FC = () => {
               <Card key={user.id}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(user)}>
                       <AvatarImage src={user.avatar_url} />
                       <AvatarFallback>{user.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{user.name}</p>
+                      <button onClick={() => goToProfile(user)} className="font-medium hover:underline text-left">{user.name}</button>
                       <p className="text-xs text-muted-foreground">{user.country || ''} • {user.user_type}</p>
                     </div>
                   </div>
@@ -236,12 +245,12 @@ const Friends: React.FC = () => {
               <Card key={post.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/talent/${post.profiles?.id}`)}>
+                    <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(post.profiles)}>
                       <AvatarImage src={post.profiles?.avatar_url} />
                       <AvatarFallback>{post.profiles?.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{post.profiles?.name}</p>
+                      <button onClick={() => goToProfile(post.profiles)} className="font-medium text-sm truncate hover:underline text-left">{post.profiles?.name}</button>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {post.profiles?.sport_type && <Badge variant="secondary" className="text-[10px]">{post.profiles.sport_type}</Badge>}
                         <span>{new Date(post.created_at).toLocaleDateString('fr-FR')}</span>
