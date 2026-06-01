@@ -70,6 +70,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   };
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes);
+  const [commentsCount, setCommentsCount] = useState(post.comments);
+  const [sharesCount, setSharesCount] = useState(post.shares);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
