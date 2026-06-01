@@ -5,10 +5,12 @@ import GlassMorphism from '@/components/GlassMorphism';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star, Link, Plus } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Calendar, Clock, Heart, Share2, Tv, Radio, Video, Star, Link, Plus, Users, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import ShareToFriendsDialog from '@/components/share/ShareToFriendsDialog';
 
 const OnlineTV: React.FC = () => {
   const { t } = useLanguage();
@@ -18,19 +20,25 @@ const OnlineTV: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [tvLink, setTvLink] = useState('');
-  const [addedLinks, setAddedLinks] = useState<{ url: string; title: string }[]>([]);
+  const [tvTitle, setTvTitle] = useState('');
+  const [tvDescription, setTvDescription] = useState('');
+  const [addedLinks, setAddedLinks] = useState<{ url: string; title: string; description: string }[]>([]);
 
   const handleAddLink = () => {
     if (!tvLink.trim()) return;
     try {
       new URL(tvLink);
-      setAddedLinks(prev => [...prev, { url: tvLink.trim(), title: tvLink.trim() }]);
+      setAddedLinks(prev => [...prev, { url: tvLink.trim(), title: tvTitle.trim() || tvLink.trim(), description: tvDescription.trim() }]);
       setTvLink('');
+      setTvTitle('');
+      setTvDescription('');
       toast.success(t('tv.linkAdded'));
     } catch {
       toast.error(t('tv.invalidLink'));
     }
   };
+
+  const removeLink = (i: number) => setAddedLinks(prev => prev.filter((_, idx) => idx !== i));
 
   const liveStreams = [
     { id: 1, title: "Young Musicians Concert", channel: "Y&T Music", thumbnail: "https://images.unsplash.com/photo-1541804627596-3b5b9ef58c93", viewers: 1245, category: "Music" },
@@ -182,15 +190,25 @@ const OnlineTV: React.FC = () => {
             <Link className="h-5 w-5 text-primary" />
             <h2 className="text-xl font-bold">{t('tv.addStreamLink')}</h2>
           </div>
-          <div className="flex gap-2">
+          <div className="space-y-2">
+            <Input
+              value={tvTitle}
+              onChange={e => setTvTitle(e.target.value)}
+              placeholder="Titre du flux (optionnel)"
+            />
             <Input
               value={tvLink}
               onChange={e => setTvLink(e.target.value)}
               placeholder={t('tv.streamLinkPlaceholder')}
-              className="flex-1"
               onKeyDown={e => e.key === 'Enter' && handleAddLink()}
             />
-            <Button onClick={handleAddLink} className="gap-1.5">
+            <Textarea
+              value={tvDescription}
+              onChange={e => setTvDescription(e.target.value)}
+              placeholder="Description (optionnel)"
+              className="min-h-[70px]"
+            />
+            <Button onClick={handleAddLink} className="gap-1.5 w-full sm:w-auto">
               <Plus className="h-4 w-4" />
               {t('tv.addLink')}
             </Button>
@@ -199,11 +217,23 @@ const OnlineTV: React.FC = () => {
           {addedLinks.length > 0 && (
             <div className="mt-4 space-y-2">
               {addedLinks.map((link, i) => (
-                <div key={i} className="flex items-center gap-2 bg-white/40 rounded-lg p-3">
-                  <Tv className="h-4 w-4 text-primary shrink-0" />
-                  <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline truncate flex-1">
-                    {link.url}
-                  </a>
+                <div key={i} className="flex items-start gap-3 bg-white/40 rounded-lg p-3">
+                  <Tv className="h-4 w-4 text-primary shrink-0 mt-1" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{link.title}</p>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline truncate block">
+                      {link.url}
+                    </a>
+                    {link.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{link.description}</p>}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <ShareToFriendsDialog url={link.url} title={link.title} description={link.description}>
+                      <Button size="sm" variant="outline" className="gap-1"><Users className="h-3 w-3" />Amis</Button>
+                    </ShareToFriendsDialog>
+                    <Button size="icon" variant="ghost" onClick={() => removeLink(i)} aria-label="Supprimer">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

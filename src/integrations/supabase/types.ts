@@ -1607,6 +1607,30 @@ export type Database = {
           },
         ]
       }
+      post_shares: {
+        Row: {
+          channel: string | null
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          channel?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           comments_count: number | null
@@ -1618,6 +1642,7 @@ export type Database = {
           media_urls: string[] | null
           scheduled_for: string | null
           share_token: string | null
+          shares_count: number
           status: string
           updated_at: string
           user_id: string
@@ -1633,6 +1658,7 @@ export type Database = {
           media_urls?: string[] | null
           scheduled_for?: string | null
           share_token?: string | null
+          shares_count?: number
           status?: string
           updated_at?: string
           user_id: string
@@ -1648,6 +1674,7 @@ export type Database = {
           media_urls?: string[] | null
           scheduled_for?: string | null
           share_token?: string | null
+          shares_count?: number
           status?: string
           updated_at?: string
           user_id?: string
