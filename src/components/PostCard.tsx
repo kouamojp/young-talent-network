@@ -330,8 +330,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
         </div>
         
         <div className="flex space-x-3">
-          <span>{comments.length || post.comments} comments</span>
-          <span>{post.shares} shares</span>
+          <span>{commentsCount} comments</span>
+          <span>{sharesCount} shares</span>
         </div>
       </div>
       
@@ -345,8 +345,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           <MessageSquare className="h-5 w-5 mr-2" />
           Comment
         </Button>
-        <ShareMenu url={postUrl} title={post.author.name + ' sur YAT'}>
+        <ShareToFriendsDialog url={postUrl} title={post.author.name + ' sur YAT'} description={rawText.slice(0, 200)} onShared={() => recordShare('messaging')}>
           <Button variant="ghost" size="sm" className="flex-1 text-sm">
+            <Users className="h-5 w-5 mr-2" />
+            Amis
+          </Button>
+        </ShareToFriendsDialog>
+        <ShareMenu url={postUrl} title={post.author.name + ' sur YAT'}>
+          <Button variant="ghost" size="sm" className="flex-1 text-sm" onClick={() => recordShare('external')}>
             <Share className="h-5 w-5 mr-2" />
             Share
           </Button>
