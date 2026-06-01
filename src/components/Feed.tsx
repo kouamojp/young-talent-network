@@ -118,6 +118,7 @@ const Feed: React.FC = () => {
                   name: post.profiles.name,
                   avatar: post.profiles.avatar_url || '/placeholder.svg',
                   id: post.user_id,
+                  user_type: post.profiles.user_type,
                 },
                 content: post.content,
                 timestamp: post.created_at,
