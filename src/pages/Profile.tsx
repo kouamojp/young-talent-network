@@ -184,7 +184,7 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="flex-1 pt-16 md:pt-4 space-y-4">
+            <div className="flex-1 pt-16 md:pt-4">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
