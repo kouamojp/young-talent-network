@@ -534,33 +534,67 @@ export const StoriesBar = () => {
 
   return (
     <>
-      {/* Stories horizontal scroll */}
+      {/* Stories horizontal scroll — Facebook style cards */}
       <div className="relative mb-4">
-        <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-1">
+        <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-1">
           {currentUser && (
-            <button onClick={() => { resetForm(); setCreating(true); }} className="flex flex-col items-center gap-1 min-w-[72px]">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center border-2 border-background shadow">
-                <Plus className="h-6 w-6 text-primary-foreground" />
+            <button
+              onClick={() => { resetForm(); setCreating(true); }}
+              className="relative shrink-0 w-[110px] h-[180px] rounded-xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-md transition group"
+            >
+              <div className="absolute inset-0">
+                {currentUser.avatar_url ? (
+                  <img src={currentUser.avatar_url} alt="" className="w-full h-[68%] object-cover" />
+                ) : (
+                  <div className="w-full h-[68%] bg-gradient-to-br from-primary/40 to-primary/10" />
+                )}
               </div>
-              <span className="text-[10px] text-muted-foreground truncate w-16 text-center">
-                {t('stories.add') || 'Your story'}
-              </span>
+              <div className="absolute left-1/2 -translate-x-1/2 top-[58%] w-9 h-9 rounded-full bg-primary border-4 border-card flex items-center justify-center shadow">
+                <Plus className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 pt-6 pb-2 px-2 bg-gradient-to-t from-card via-card/90 to-transparent">
+                <p className="text-[11px] font-semibold text-center text-foreground truncate">
+                  {t('stories.create') || 'Créer une story'}
+                </p>
+              </div>
             </button>
           )}
 
-          {groups.map(g => (
-            <button key={g.user_id} onClick={() => openStory(g)} className="flex flex-col items-center gap-1 min-w-[72px]">
-              <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
-                <Avatar className="w-full h-full border-2 border-background">
-                  <AvatarImage src={g.avatar_url || undefined} />
-                  <AvatarFallback>{g.name[0]}</AvatarFallback>
-                </Avatar>
-              </div>
-              <span className="text-[10px] text-muted-foreground truncate w-16 text-center">{g.name.split(' ')[0]}</span>
-            </button>
-          ))}
+          {groups.map(g => {
+            const cover = getMediaList(g.stories[0])[0];
+            const bg = g.stories[0]?.background_color || '#1a1a2e';
+            return (
+              <button
+                key={g.user_id}
+                onClick={() => openStory(g)}
+                className="relative shrink-0 w-[110px] h-[180px] rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-md transition group"
+                style={{ backgroundColor: bg }}
+              >
+                {cover ? (
+                  cover.type === 'image' ? (
+                    <img src={cover.url} alt={g.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <video src={cover.url} muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover" />
+                  )
+                ) : g.avatar_url ? (
+                  <img src={g.avatar_url} alt={g.name} className="absolute inset-0 w-full h-full object-cover opacity-70" />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute top-2 left-2 w-9 h-9 rounded-full p-0.5 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+                  <Avatar className="w-full h-full border-2 border-background">
+                    <AvatarImage src={g.avatar_url || undefined} />
+                    <AvatarFallback className="text-[10px]">{g.name[0]}</AvatarFallback>
+                  </Avatar>
+                </div>
+                <p className="absolute bottom-2 left-2 right-2 text-[11px] font-semibold text-white drop-shadow-lg truncate">
+                  {g.name}
+                </p>
+              </button>
+            );
+          })}
         </div>
       </div>
+
 
       {/* Story viewer */}
       <Dialog open={!!viewing} onOpenChange={() => { setViewing(null); if (timerRef.current) clearTimeout(timerRef.current); }}>
