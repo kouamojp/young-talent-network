@@ -245,12 +245,12 @@ const Friends: React.FC = () => {
               <Card key={post.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 cursor-pointer" onClick={() => navigate(`/talent/${post.profiles?.id}`)}>
+                    <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(post.profiles)}>
                       <AvatarImage src={post.profiles?.avatar_url} />
                       <AvatarFallback>{post.profiles?.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{post.profiles?.name}</p>
+                      <button onClick={() => goToProfile(post.profiles)} className="font-medium text-sm truncate hover:underline text-left">{post.profiles?.name}</button>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {post.profiles?.sport_type && <Badge variant="secondary" className="text-[10px]">{post.profiles.sport_type}</Badge>}
                         <span>{new Date(post.created_at).toLocaleDateString('fr-FR')}</span>
