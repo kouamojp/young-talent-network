@@ -56,7 +56,8 @@ const Feed: React.FC = () => {
           *,
           profiles (
             name,
-            avatar_url
+            avatar_url,
+            user_type
           )
         `)
         .order('created_at', { ascending: false });
