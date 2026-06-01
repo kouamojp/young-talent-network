@@ -56,6 +56,9 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
+  const navigate = useNavigate();
+  const authorId = post.author.id || post.user_id;
+  const goToProfile = () => { if (authorId) navigate(`/talent/${authorId}`); };
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
