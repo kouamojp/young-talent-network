@@ -180,12 +180,12 @@ const Friends: React.FC = () => {
                 <Card key={req.id}>
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(other)}>
                         <AvatarImage src={other?.avatar_url} />
                         <AvatarFallback>{other?.name?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{other?.name || t('friends.pendingRequest')}</p>
+                        <button onClick={() => goToProfile(other)} className="font-medium hover:underline text-left">{other?.name || t('friends.pendingRequest')}</button>
                         <Badge variant="secondary">{incoming ? t('friends.requests') : t('friends.pending')}</Badge>
                       </div>
                     </div>
