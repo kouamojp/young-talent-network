@@ -98,10 +98,47 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
   useEffect(() => {
     checkIfLiked();
+    refreshCounts();
     if (showComments) {
       fetchComments();
     }
   }, [post.id, showComments]);
+
+  // Realtime: subscribe to counter changes on this post
+  useEffect(() => {
+    const channel = supabase
+      .channel(`post-counts-${post.id}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts', filter: `id=eq.${post.id}` }, (payload: any) => {
+        const n = payload.new || {};
+        if (typeof n.likes_count === 'number') setLikesCount(n.likes_count);
+        if (typeof n.comments_count === 'number') setCommentsCount(n.comments_count);
+        if (typeof n.shares_count === 'number') setSharesCount(n.shares_count);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments', filter: `post_id=eq.${post.id}` }, () => {
+        if (showComments) fetchComments();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [post.id, showComments]);
+
+  const refreshCounts = async () => {
+    const { data } = await supabase
+      .from('posts')
+      .select('likes_count, comments_count, shares_count')
+      .eq('id', post.id)
+      .maybeSingle();
+    if (data) {
+      setLikesCount(data.likes_count ?? 0);
+      setCommentsCount(data.comments_count ?? 0);
+      setSharesCount((data as any).shares_count ?? 0);
+    }
+  };
+
+  const recordShare = async (channel: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from('post_shares').insert({ post_id: post.id, user_id: user.id, channel } as any);
+  };
 
   const checkIfLiked = async () => {
     const { data: { user } } = await supabase.auth.getUser();
