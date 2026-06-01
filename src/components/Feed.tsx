@@ -10,19 +10,20 @@ import { Loader2 } from 'lucide-react';
 import FeedLevelBar from './FeedLevelBar';
 import AdBanner from './AdBanner';
 
-interface Post {
-  id: string;
-  content: string;
-  created_at: string;
-  likes_count: number;
-  comments_count: number;
-  user_id: string;
-  media_urls: string[] | null;
-  profiles: {
-    name: string;
-    avatar_url: string | null;
-  };
-}
+  interface Post {
+    id: string;
+    content: string;
+    created_at: string;
+    likes_count: number;
+    comments_count: number;
+    user_id: string;
+    media_urls: string[] | null;
+    profiles: {
+      name: string;
+      avatar_url: string | null;
+      user_type: string;
+    };
+  }
 
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -55,7 +56,8 @@ const Feed: React.FC = () => {
           *,
           profiles (
             name,
-            avatar_url
+            avatar_url,
+            user_type
           )
         `)
         .order('created_at', { ascending: false });
@@ -116,6 +118,7 @@ const Feed: React.FC = () => {
                   name: post.profiles.name,
                   avatar: post.profiles.avatar_url || '/placeholder.svg',
                   id: post.user_id,
+                  user_type: post.profiles.user_type,
                 },
                 content: post.content,
                 timestamp: post.created_at,
