@@ -146,12 +146,12 @@ const Friends: React.FC = () => {
                 <Card key={conn.id}>
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary/40 transition" onClick={() => goToProfile(friend)}>
                         <AvatarImage src={friend.avatar_url} />
                         <AvatarFallback>{friend.name?.[0] || 'U'}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{friend.name}</p>
+                        <button onClick={() => goToProfile(friend)} className="font-medium hover:underline text-left">{friend.name}</button>
                         <p className="text-sm text-muted-foreground">{friend.country || ''} • {friend.user_type}</p>
                       </div>
                     </div>
