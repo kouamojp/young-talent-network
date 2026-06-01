@@ -10,19 +10,20 @@ import { Loader2 } from 'lucide-react';
 import FeedLevelBar from './FeedLevelBar';
 import AdBanner from './AdBanner';
 
-interface Post {
-  id: string;
-  content: string;
-  created_at: string;
-  likes_count: number;
-  comments_count: number;
-  user_id: string;
-  media_urls: string[] | null;
-  profiles: {
-    name: string;
-    avatar_url: string | null;
-  };
-}
+  interface Post {
+    id: string;
+    content: string;
+    created_at: string;
+    likes_count: number;
+    comments_count: number;
+    user_id: string;
+    media_urls: string[] | null;
+    profiles: {
+      name: string;
+      avatar_url: string | null;
+      user_type: string;
+    };
+  }
 
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
