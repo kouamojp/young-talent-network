@@ -19,6 +19,7 @@ import AddEducationDialog from '@/components/profile/AddEducationDialog';
 import AutoResumeCard from '@/components/profile/AutoResumeCard';
 import FileUploadButton from '@/components/profile/FileUploadButton';
 import { StoriesBar } from '@/components/stories/StoriesBar';
+import { PostCreationDialog } from '@/components/PostCreationDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
