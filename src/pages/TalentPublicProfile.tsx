@@ -160,7 +160,7 @@ const TalentPublicProfile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-6 max-w-5xl">
+      <main className="container max-w-5xl py-[10px] pr-[5px] pl-[5px] mx-0 px-0">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
@@ -181,7 +181,7 @@ const TalentPublicProfile: React.FC = () => {
               </Avatar>
 
               {/* Title Info */}
-              <div className="flex-1 pt-12 md:pt-1">
+              <div className="flex-1 pt-12 md:pt-0">
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                   <h1 className="text-2xl font-bold text-foreground">{profile.name}</h1>
                   {Number(profile.platform_rating) > 0 && (

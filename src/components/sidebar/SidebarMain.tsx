@@ -77,7 +77,7 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
 
   return (
     <aside className="w-full h-full bg-card">
-      <nav className="p-2.5 space-y-3">
+      <nav className="p-2.5 space-y-3 py-[5px] pt-0 pb-0 pl-[5px] pr-[5px]">
         {allSections.map((section, idx) => (
           <div key={section.titleKey}>
             {idx > 0 && <Separator className="mb-2.5" />}
