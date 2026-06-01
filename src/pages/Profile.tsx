@@ -222,10 +222,30 @@ const Profile: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Stories bar — Facebook/VK style */}
+      {/* What's new — quick post creation */}
+      <div className="mb-4 bg-card rounded-lg shadow-sm p-3 border border-border">
+        <div className="flex items-center space-x-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
+            <AvatarFallback>{displayProfile.name?.[0] || 'U'}</AvatarFallback>
+          </Avatar>
+          <PostCreationDialog
+            trigger={
+              <Button variant="outline" className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted">
+                {t('feed.whatsNew') || "Quoi de neuf ?"}
+              </Button>
+            }
+            userAvatar={displayProfile.avatar_url || displayProfile.avatar}
+            userName={displayProfile.name}
+          />
+        </div>
+      </div>
+
+      {/* Stories bar — Facebook style */}
       <div className="mb-6">
         <StoriesBar />
       </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
 
