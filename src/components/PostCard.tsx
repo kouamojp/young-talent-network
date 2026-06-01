@@ -35,6 +35,7 @@ function renderTextWithLinks(text: string) {
 interface Author {
   name: string;
   avatar: string;
+  id?: string;
 }
 
 interface Post {
@@ -46,6 +47,7 @@ interface Post {
   comments: number;
   shares: number;
   media_urls?: string[] | null;
+  user_id?: string;
 }
 
 interface PostCardProps {
