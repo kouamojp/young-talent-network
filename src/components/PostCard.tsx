@@ -161,22 +161,23 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       return;
     }
 
+    // Optimistic toggle; realtime UPDATE on posts will reconcile counters
+    const wasLiked = isLiked;
+    setIsLiked(!wasLiked);
+    setLikesCount(prev => prev + (wasLiked ? -1 : 1));
     try {
-      if (isLiked) {
-        await supabase
-          .from('post_likes')
-          .delete()
-          .eq('post_id', post.id)
-          .eq('user_id', user.id);
-        setLikesCount(prev => prev - 1);
+      if (wasLiked) {
+        await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id);
       } else {
-        await supabase
-          .from('post_likes')
-          .insert({ post_id: post.id, user_id: user.id });
-        setLikesCount(prev => prev + 1);
+        await supabase.from('post_likes').insert({ post_id: post.id, user_id: user.id });
       }
-      setIsLiked(!isLiked);
       onUpdate?.();
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      setIsLiked(wasLiked);
+      setLikesCount(prev => prev + (wasLiked ? 1 : -1));
+      toast({ title: "Failed to update like", variant: "destructive" });
+    }
     } catch (error) {
       console.error('Error toggling like:', error);
       toast({ title: "Failed to update like", variant: "destructive" });
