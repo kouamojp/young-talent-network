@@ -157,7 +157,7 @@ const Friends: React.FC = () => {
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => navigate('/messages')}><MessageSquare className="h-4 w-4" /></Button>
-                      <Button size="sm" variant="outline" onClick={() => navigate(`/talent/${friend.id}`)}>{t('common.view')}</Button>
+                      <Button size="sm" variant="outline" onClick={() => goToProfile(friend)}>{t('common.view')}</Button>
                     </div>
                   </CardContent>
                 </Card>
