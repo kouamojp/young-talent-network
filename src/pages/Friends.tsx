@@ -14,6 +14,15 @@ import { toast } from '@/components/ui/use-toast';
 const Friends: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const profileUrl = (u: { id?: string; user_type?: string } | null | undefined) => {
+    if (!u?.id) return '#';
+    if (u.user_type === 'organization') return `/organization/${u.id}`;
+    if (u.user_type === 'agent') return `/agent/${u.id}`;
+    return `/talent/${u.id}`;
+  };
+  const goToProfile = (u: { id?: string; user_type?: string } | null | undefined) => {
+    if (u?.id) navigate(profileUrl(u));
+  };
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
