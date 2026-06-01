@@ -10,7 +10,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
 import ShareMenu from './share/ShareMenu';
+import ShareToFriendsDialog from './share/ShareToFriendsDialog';
 import LinkPreview from './LinkPreview';
+import { Users } from 'lucide-react';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
 const isUrl = (s: string) => /^https?:\/\//i.test(s);
