@@ -756,6 +756,22 @@ export const StoriesBar = () => {
                 )
               )}
 
+              {/* Stickers overlay */}
+              {getStickers(currentStory).map(st => (
+                <span
+                  key={st.id}
+                  className="absolute z-10 pointer-events-none select-none"
+                  style={{
+                    left: `${st.x}%`, top: `${st.y}%`,
+                    transform: `translate(-50%, -50%) rotate(${st.rotation || 0}deg)`,
+                    fontSize: `${st.size}px`, lineHeight: 1,
+                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
+                  }}
+                >
+                  {st.emoji}
+                </span>
+              ))}
+
               {/* Text overlay */}
               {currentStory.text_overlay && (
                 <div className="absolute inset-0 flex items-center justify-center p-8 z-10 pointer-events-none">
