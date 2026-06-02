@@ -548,12 +548,91 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           <TabsContent value="article" className="space-y-3 mt-4">
             <Input placeholder={t('post.articleTitle') || 'Article title'} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} className="text-lg font-semibold" />
             <Input placeholder={t('post.articleCategory') || 'Category'} value={articleCategory} onChange={(e) => setArticleCategory(e.target.value)} />
-            <Textarea placeholder={t('post.articleContent') || 'Write your article...'} value={content} onChange={(e) => setContent(e.target.value)} className="min-h-[250px]" />
+            <Textarea
+              ref={articleTextareaRef}
+              placeholder={t('post.articleContent') || 'Write your article...'}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[250px]"
+            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-8"
+                  placeholder={t('post.articleLink') || 'Insert a link from another source...'}
+                  value={articleLinkUrl}
+                  onChange={(e) => setArticleLinkUrl(e.target.value)}
+                />
+              </div>
+              <Button type="button" variant="outline" onClick={importArticleLink} disabled={!articleLinkUrl.trim()}>
+                <Sparkles className="h-4 w-4" />
+                <span className="ml-1 hidden sm:inline">{t('post.insert') || 'Insert'}</span>
+              </Button>
+            </div>
+            <input ref={articleMediaRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleArticleMediaSelect} />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => articleMediaRef.current?.click()}>
+                <ImageIcon className="h-4 w-4 mr-1 text-green-500" />
+                {t('post.addMedia') || 'Add image / video'}
+              </Button>
+            </div>
+            {articleMediaPreviews.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {articleMediaPreviews.map((src, i) => {
+                  const isVideo = articleMedia[i]?.type.startsWith('video/');
+                  return (
+                    <div key={i} className="relative rounded-lg overflow-hidden bg-muted aspect-video">
+                      {isVideo ? (
+                        <video src={src} className="absolute inset-0 w-full h-full object-cover" controls />
+                      ) : (
+                        <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => insertIntoArticle(isVideo ? `[video](${i + 1})` : `[image ${i + 1}]`)}
+                        className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] rounded px-2 py-0.5 hover:bg-black/80"
+                      >
+                        {t('post.insertInText') || 'Insert in text'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setArticleMedia(prev => prev.filter((_, idx) => idx !== i));
+                          setArticleMediaPreviews(prev => prev.filter((_, idx) => idx !== i));
+                        }}
+                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">{t('post.articleHint') || 'Articles are saved to your pages and shared as a preview in the feed.'}</p>
           </TabsContent>
 
           <TabsContent value="poll" className="space-y-3 mt-4">
             <Input placeholder={t('post.pollQuestion') || 'Ask a question...'} value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="font-medium" />
+            <input ref={pollMediaRef} type="file" accept="image/*,video/*" className="hidden" onChange={handlePollMediaSelect} />
+            {pollMediaPreview ? (
+              <div className="relative rounded-lg overflow-hidden bg-muted aspect-video">
+                {pollMedia?.type.startsWith('video/') ? (
+                  <video src={pollMediaPreview} className="absolute inset-0 w-full h-full object-cover" controls />
+                ) : (
+                  <img src={pollMediaPreview} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                <button type="button" onClick={() => { setPollMedia(null); setPollMediaPreview(''); }} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <Button type="button" variant="outline" size="sm" onClick={() => pollMediaRef.current?.click()}>
+                <ImageIcon className="h-4 w-4 mr-1 text-green-500" />
+                {t('post.addPollMedia') || 'Add image / video'}
+              </Button>
+            )}
             {pollOptions.map((opt, i) => (
               <div key={i} className="flex gap-2">
                 <Input placeholder={`${t('post.pollOption') || 'Option'} ${i + 1}`} value={opt} onChange={(e) => setPollOptions(prev => prev.map((o, idx) => idx === i ? e.target.value : o))} />
