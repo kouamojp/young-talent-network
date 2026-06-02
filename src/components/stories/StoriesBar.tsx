@@ -22,6 +22,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 type MediaKind = 'image' | 'video';
 interface StoryMediaItem { url: string; type: MediaKind }
+interface StorySticker { id: string; emoji: string; x: number; y: number; size: number; rotation?: number }
 
 interface Story {
   id: string;
@@ -33,8 +34,12 @@ interface Story {
   views_count: number;
   created_at: string;
   expires_at: string;
+  stickers?: StorySticker[] | null;
   profile?: { name: string; avatar_url: string | null };
 }
+
+const getStickers = (s: Story | null | undefined): StorySticker[] =>
+  Array.isArray(s?.stickers) ? (s!.stickers as StorySticker[]) : [];
 
 interface GroupedStories {
   user_id: string;
