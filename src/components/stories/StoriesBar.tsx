@@ -257,7 +257,8 @@ export const StoriesBar = () => {
           background_color: bgColor,
           media_items: media_items as any,
           media_url: media_items[0]?.url || null,
-        }).eq('id', editingId);
+          stickers: stickers as any,
+        } as any).eq('id', editingId);
         if (error) throw error;
         toast({ title: 'Story mise à jour' });
       } else {
@@ -267,7 +268,8 @@ export const StoriesBar = () => {
           background_color: bgColor,
           media_url: media_items[0]?.url || null,
           media_items: media_items as any,
-        });
+          stickers: stickers as any,
+        } as any);
         if (error) throw error;
         toast({ title: 'Story publiée !' });
       }
