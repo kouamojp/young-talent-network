@@ -582,50 +582,85 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
               disabled={isSubmitting}
             />
 
-            {previews.length > 0 && (
-              <div className={`grid gap-2 ${previews.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                {previews.map((src, i) => {
-                  const isVideo = files[i]?.type.startsWith('video/');
-                  const rot = rotations[i] || 0;
-                  return (
-                    <div key={i} className="relative rounded-lg overflow-hidden bg-muted aspect-video group">
-                      {isVideo ? (
-                        <video src={src} className="absolute inset-0 w-full h-full object-cover" />
+            {items.length > 0 && (
+              <>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground">{t('post.aspect') || 'Format'}:</span>
+                  {(['16:9', '9:16', '1:1'] as AspectRatio[]).map(a => (
+                    <button
+                      key={a}
+                      type="button"
+                      onClick={() => setAspectRatio(a)}
+                      className={`text-xs px-2 py-1 rounded border ${aspectRatio === a ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}
+                    >{a}</button>
+                  ))}
+                  <span className="ml-auto text-xs text-muted-foreground">{t('post.dragHint') || 'Glisser pour réorganiser'}</span>
+                </div>
+                <div className={`grid gap-2 ${items.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  {items.map((it, i) => (
+                    <div
+                      key={i}
+                      draggable
+                      onDragStart={() => setDragIdx(i)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => { if (dragIdx !== null) { reorderItems(dragIdx, i); setDragIdx(null); } }}
+                      onDragEnd={() => setDragIdx(null)}
+                      className={`relative rounded-lg overflow-hidden bg-muted ${aspectClass} group cursor-move ${dragIdx === i ? 'opacity-50 ring-2 ring-primary' : ''}`}
+                    >
+                      {it.isVideo ? (
+                        <video src={it.preview} className="absolute inset-0 w-full h-full object-cover" />
                       ) : (
                         <img
-                          src={src}
+                          src={it.preview}
                           alt=""
                           className="absolute inset-0 w-full h-full object-cover transition-transform"
-                          style={{ transform: `rotate(${rot}deg) scale(${rot % 180 === 0 ? 1 : 1.4})` }}
+                          style={{
+                            transform: `rotate(${it.rotation}deg)${it.rotation % 180 !== 0 ? ' scale(1.4)' : ''}`,
+                            objectPosition: `${it.offsetX}% ${it.offsetY}%`,
+                          }}
                         />
                       )}
-                      <div className="absolute inset-x-0 bottom-0 p-1 flex justify-between gap-1 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition">
-                        <div className="flex gap-1">
-                          <button type="button" onClick={() => moveFile(i, -1)} disabled={i === 0} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
-                            <ChevronLeft className="h-3 w-3" />
-                          </button>
-                          <button type="button" onClick={() => moveFile(i, 1)} disabled={i === previews.length - 1} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
-                            <ChevronRight className="h-3 w-3" />
-                          </button>
-                        </div>
-                        {!isVideo && (
-                          <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title="Rotate">
-                            <RotateCw className="h-3 w-3" />
-                          </button>
+                      <div className="absolute top-1 left-1 flex items-center gap-1">
+                        <span className="bg-black/60 text-white text-[10px] rounded px-1.5 py-0.5 inline-flex items-center gap-1">
+                          <GripVertical className="h-2.5 w-2.5" />{i + 1}/{items.length}
+                        </span>
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 p-1 flex justify-end gap-1 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition">
+                        {!it.isVideo && (
+                          <>
+                            <button type="button" onClick={() => setCropIdx(cropIdx === i ? null : i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title={t('post.crop') || 'Recadrer'}>
+                              <Crop className="h-3 w-3" />
+                            </button>
+                            <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title="Rotate">
+                              <RotateCw className="h-3 w-3" />
+                            </button>
+                          </>
                         )}
                       </div>
                       <button onClick={() => removeFile(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
                         <X className="h-3 w-3" />
                       </button>
-                      <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] rounded px-1.5 py-0.5">{i + 1}/{previews.length}</span>
+                      {cropIdx === i && !it.isVideo && (
+                        <div className="absolute inset-x-0 bottom-0 bg-black/80 backdrop-blur p-2 space-y-1.5">
+                          <div className="flex items-center gap-2 text-white text-[10px]">
+                            <span className="w-4">X</span>
+                            <Slider value={[it.offsetX]} onValueChange={([v]) => updateItem(i, { offsetX: v })} max={100} step={1} className="flex-1" />
+                            <span className="w-8 text-right">{it.offsetX}%</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-white text-[10px]">
+                            <span className="w-4">Y</span>
+                            <Slider value={[it.offsetY]} onValueChange={([v]) => updateItem(i, { offsetY: v })} max={100} step={1} className="flex-1" />
+                            <span className="w-8 text-right">{it.offsetY}%</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+                <div className="text-xs text-muted-foreground text-right">{items.length}/{MAX_IMAGES}</div>
+              </>
             )}
-            {files.length > 0 && (
-              <div className="text-xs text-muted-foreground text-right">{files.length}/{MAX_IMAGES}</div>
-            )}
+
 
             {showLocation && (
               <div className="bg-muted/50 p-2 rounded-lg space-y-1">
