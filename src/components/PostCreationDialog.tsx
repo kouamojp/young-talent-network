@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles } from 'lucide-react';
+import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles, RotateCw, ChevronLeft, ChevronRight, Video } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 
@@ -38,9 +38,19 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [showDrafts, setShowDrafts] = useState(false);
   const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
   const [linkUrl, setLinkUrl] = useState('');
-  const [linkPreview, setLinkPreview] = useState<{ title?: string; image?: string | null; siteName?: string } | null>(null);
+  const [linkPreview, setLinkPreview] = useState<{ title?: string; description?: string; image?: string | null; siteName?: string; url?: string } | null>(null);
   const [importing, setImporting] = useState(false);
+  const [rotations, setRotations] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const articleMediaRef = useRef<HTMLInputElement>(null);
+  const pollMediaRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGES = 10;
+  const [articleMedia, setArticleMedia] = useState<File[]>([]);
+  const [articleMediaPreviews, setArticleMediaPreviews] = useState<string[]>([]);
+  const [articleLinkUrl, setArticleLinkUrl] = useState('');
+  const [pollMedia, setPollMedia] = useState<File | null>(null);
+  const [pollMediaPreview, setPollMediaPreview] = useState<string>('');
+  const articleTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const importFromLink = async () => {
     if (!linkUrl.trim()) return;
@@ -50,7 +60,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setContent((prev) => (prev ? prev + '\n\n' : '') + (data.content || ''));
-      setLinkPreview({ title: data.title, image: data.image, siteName: data.siteName });
+      setLinkPreview({ title: data.title, description: data.description, image: data.image, siteName: data.siteName, url: linkUrl.trim() });
       toast({ title: t('post.linkImported') || 'Content imported from link' });
     } catch (e: any) {
       toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
@@ -79,9 +89,11 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
   const reset = () => {
     setContent(''); setLocation(null); setShowLocation(false);
-    setFiles([]); setPreviews([]);
+    setFiles([]); setPreviews([]); setRotations([]);
     setArticleTitle(''); setArticleCategory('');
+    setArticleMedia([]); setArticleMediaPreviews([]); setArticleLinkUrl('');
     setPollQuestion(''); setPollOptions(['', '']);
+    setPollMedia(null); setPollMediaPreview('');
     setTab('post'); setVisibility('public');
     setActiveDraftId(null); setShowDrafts(false);
     setScheduledFor('');
@@ -91,17 +103,96 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
     if (selected.length === 0) return;
-    setFiles(prev => [...prev, ...selected]);
-    selected.forEach(file => {
+    const remaining = MAX_IMAGES - files.length;
+    if (remaining <= 0) {
+      toast({ title: t('post.maxImages') || `Maximum ${MAX_IMAGES} files`, variant: 'destructive' });
+      e.target.value = '';
+      return;
+    }
+    const accepted = selected.slice(0, remaining);
+    if (selected.length > remaining) {
+      toast({ title: t('post.maxImages') || `Only ${remaining} more file(s) added (max ${MAX_IMAGES})` });
+    }
+    setFiles(prev => [...prev, ...accepted]);
+    setRotations(prev => [...prev, ...accepted.map(() => 0)]);
+    accepted.forEach(file => {
       const reader = new FileReader();
       reader.onload = (ev) => setPreviews(prev => [...prev, ev.target?.result as string]);
       reader.readAsDataURL(file);
     });
+    e.target.value = '';
   };
 
   const removeFile = (idx: number) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
     setPreviews(prev => prev.filter((_, i) => i !== idx));
+    setRotations(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const rotateFile = (idx: number) => {
+    setRotations(prev => prev.map((r, i) => i === idx ? (r + 90) % 360 : r));
+  };
+
+  const moveFile = (idx: number, dir: -1 | 1) => {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= files.length) return;
+    const swap = <T,>(arr: T[]) => { const a = [...arr]; [a[idx], a[newIdx]] = [a[newIdx], a[idx]]; return a; };
+    setFiles(prev => swap(prev));
+    setPreviews(prev => swap(prev));
+    setRotations(prev => swap(prev));
+  };
+
+  const handleArticleMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    if (!selected.length) return;
+    setArticleMedia(prev => [...prev, ...selected]);
+    selected.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => setArticleMediaPreviews(prev => [...prev, ev.target?.result as string]);
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const insertIntoArticle = (text: string) => {
+    const el = articleTextareaRef.current;
+    const insertion = `\n${text}\n`;
+    if (!el) { setContent(prev => prev + insertion); return; }
+    const start = el.selectionStart ?? content.length;
+    const end = el.selectionEnd ?? content.length;
+    setContent(content.slice(0, start) + insertion + content.slice(end));
+  };
+
+  const importArticleLink = async () => {
+    if (!articleLinkUrl.trim()) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('post-from-link', { body: { url: articleLinkUrl.trim() } });
+      if (error) throw error;
+      const md = `[${data.title || articleLinkUrl}](${articleLinkUrl})${data.description ? `\n${data.description}` : ''}`;
+      insertIntoArticle(md);
+      setArticleLinkUrl('');
+      toast({ title: t('post.linkInserted') || 'Link inserted into article' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+    }
+  };
+
+  const handlePollMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPollMedia(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPollMediaPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const uploadOne = async (userId: string, file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `${userId}/posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage.from('profile-files').upload(path, file);
+    if (error) throw error;
+    return supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
   };
 
   const uploadFiles = async (userId: string): Promise<string[]> => {
@@ -184,7 +275,8 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           toast({ title: t('post.emptyError') || 'Add text or media', variant: 'destructive' });
           return;
         }
-        const mediaUrls = files.length ? await uploadFiles(user.id) : [];
+        const mediaUrls: string[] = [];
+        for (const f of files) mediaUrls.push(await uploadOne(user.id, f));
         const finalContent = showLocation && location?.address ? `${content}\n📍 ${location.address}` : content;
         const isScheduled = !!scheduledFor;
         const { error } = await supabase.from('posts').insert({
@@ -203,9 +295,15 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           toast({ title: t('post.articleError') || 'Title and content required', variant: 'destructive' });
           return;
         }
+        const articleMediaUrls: string[] = [];
+        for (const f of articleMedia) articleMediaUrls.push(await uploadOne(user.id, f));
+        let finalArticle = content.trim();
+        if (articleMediaUrls.length) {
+          finalArticle += '\n\n' + articleMediaUrls.map(u => `![media](${u})`).join('\n');
+        }
         const { error } = await supabase.from('user_pages').insert({
           title: articleTitle.trim(),
-          content: content.trim(),
+          content: finalArticle,
           category: articleCategory || 'other',
           user_id: user.id,
           is_public: visibility === 'public',
@@ -216,6 +314,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
         await supabase.from('posts').insert({
           content: `📄 ${articleTitle}\n\n${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`,
           user_id: user.id,
+          media_urls: articleMediaUrls.length ? articleMediaUrls : null,
           visibility,
           share_token: shareToken,
         });
@@ -226,10 +325,12 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           toast({ title: t('post.pollError') || 'Question and 2+ options required', variant: 'destructive' });
           return;
         }
+        const pollMediaUrl = pollMedia ? await uploadOne(user.id, pollMedia) : null;
         const pollContent = `📊 ${pollQuestion}\n\n${validOptions.map((o, i) => `${i + 1}. ${o}`).join('\n')}`;
         const { error } = await supabase.from('posts').insert({
           content: pollContent,
           user_id: user.id,
+          media_urls: pollMediaUrl ? [pollMediaUrl] : null,
           visibility,
           share_token: shareToken,
         });
@@ -338,15 +439,25 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
               </Button>
             </div>
             {linkPreview && (
-              <div className="flex gap-2 p-2 border rounded-lg bg-muted/30">
-                {linkPreview.image && <img src={linkPreview.image} alt="" className="w-16 h-16 object-cover rounded" />}
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>
-                  <div className="text-sm font-medium truncate">{linkPreview.title}</div>
+              <div className="border rounded-lg overflow-hidden bg-muted/30">
+                {linkPreview.image && (
+                  <div className="relative w-full aspect-video bg-muted">
+                    <img src={linkPreview.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    <button onClick={() => setLinkPreview(null)} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                <div className="p-2 space-y-1">
+                  {linkPreview.siteName && <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>}
+                  {linkPreview.title && <div className="text-sm font-medium line-clamp-2">{linkPreview.title}</div>}
+                  {linkPreview.description && <div className="text-xs text-muted-foreground line-clamp-2">{linkPreview.description}</div>}
+                  {linkPreview.url && (
+                    <a href={linkPreview.url} target="_blank" rel="noreferrer" className="text-xs text-primary truncate block hover:underline">
+                      {linkPreview.url}
+                    </a>
+                  )}
                 </div>
-                <button onClick={() => setLinkPreview(null)} className="p-1 hover:bg-muted rounded">
-                  <X className="h-3 w-3" />
-                </button>
               </div>
             )}
             <Textarea
@@ -359,15 +470,47 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
             {previews.length > 0 && (
               <div className={`grid gap-2 ${previews.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                {previews.map((src, i) => (
-                  <div key={i} className="relative rounded-lg overflow-hidden bg-muted">
-                    <img src={src} alt="" className="w-full h-40 object-cover" />
-                    <button onClick={() => removeFile(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                {previews.map((src, i) => {
+                  const isVideo = files[i]?.type.startsWith('video/');
+                  const rot = rotations[i] || 0;
+                  return (
+                    <div key={i} className="relative rounded-lg overflow-hidden bg-muted aspect-video group">
+                      {isVideo ? (
+                        <video src={src} className="absolute inset-0 w-full h-full object-cover" />
+                      ) : (
+                        <img
+                          src={src}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover transition-transform"
+                          style={{ transform: `rotate(${rot}deg) scale(${rot % 180 === 0 ? 1 : 1.4})` }}
+                        />
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 p-1 flex justify-between gap-1 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition">
+                        <div className="flex gap-1">
+                          <button type="button" onClick={() => moveFile(i, -1)} disabled={i === 0} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
+                            <ChevronLeft className="h-3 w-3" />
+                          </button>
+                          <button type="button" onClick={() => moveFile(i, 1)} disabled={i === previews.length - 1} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
+                            <ChevronRight className="h-3 w-3" />
+                          </button>
+                        </div>
+                        {!isVideo && (
+                          <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title="Rotate">
+                            <RotateCw className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                      <button onClick={() => removeFile(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                        <X className="h-3 w-3" />
+                      </button>
+                      <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] rounded px-1.5 py-0.5">{i + 1}/{previews.length}</span>
+                    </div>
+                  );
+                })}
               </div>
+            )}
+            {files.length > 0 && (
+              <div className="text-xs text-muted-foreground text-right">{files.length}/{MAX_IMAGES}</div>
             )}
 
             {showLocation && (
@@ -405,12 +548,91 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           <TabsContent value="article" className="space-y-3 mt-4">
             <Input placeholder={t('post.articleTitle') || 'Article title'} value={articleTitle} onChange={(e) => setArticleTitle(e.target.value)} className="text-lg font-semibold" />
             <Input placeholder={t('post.articleCategory') || 'Category'} value={articleCategory} onChange={(e) => setArticleCategory(e.target.value)} />
-            <Textarea placeholder={t('post.articleContent') || 'Write your article...'} value={content} onChange={(e) => setContent(e.target.value)} className="min-h-[250px]" />
+            <Textarea
+              ref={articleTextareaRef}
+              placeholder={t('post.articleContent') || 'Write your article...'}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[250px]"
+            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  className="pl-8"
+                  placeholder={t('post.articleLink') || 'Insert a link from another source...'}
+                  value={articleLinkUrl}
+                  onChange={(e) => setArticleLinkUrl(e.target.value)}
+                />
+              </div>
+              <Button type="button" variant="outline" onClick={importArticleLink} disabled={!articleLinkUrl.trim()}>
+                <Sparkles className="h-4 w-4" />
+                <span className="ml-1 hidden sm:inline">{t('post.insert') || 'Insert'}</span>
+              </Button>
+            </div>
+            <input ref={articleMediaRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleArticleMediaSelect} />
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => articleMediaRef.current?.click()}>
+                <ImageIcon className="h-4 w-4 mr-1 text-green-500" />
+                {t('post.addMedia') || 'Add image / video'}
+              </Button>
+            </div>
+            {articleMediaPreviews.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {articleMediaPreviews.map((src, i) => {
+                  const isVideo = articleMedia[i]?.type.startsWith('video/');
+                  return (
+                    <div key={i} className="relative rounded-lg overflow-hidden bg-muted aspect-video">
+                      {isVideo ? (
+                        <video src={src} className="absolute inset-0 w-full h-full object-cover" controls />
+                      ) : (
+                        <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => insertIntoArticle(isVideo ? `[video](${i + 1})` : `[image ${i + 1}]`)}
+                        className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] rounded px-2 py-0.5 hover:bg-black/80"
+                      >
+                        {t('post.insertInText') || 'Insert in text'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setArticleMedia(prev => prev.filter((_, idx) => idx !== i));
+                          setArticleMediaPreviews(prev => prev.filter((_, idx) => idx !== i));
+                        }}
+                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">{t('post.articleHint') || 'Articles are saved to your pages and shared as a preview in the feed.'}</p>
           </TabsContent>
 
           <TabsContent value="poll" className="space-y-3 mt-4">
             <Input placeholder={t('post.pollQuestion') || 'Ask a question...'} value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="font-medium" />
+            <input ref={pollMediaRef} type="file" accept="image/*,video/*" className="hidden" onChange={handlePollMediaSelect} />
+            {pollMediaPreview ? (
+              <div className="relative rounded-lg overflow-hidden bg-muted aspect-video">
+                {pollMedia?.type.startsWith('video/') ? (
+                  <video src={pollMediaPreview} className="absolute inset-0 w-full h-full object-cover" controls />
+                ) : (
+                  <img src={pollMediaPreview} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                )}
+                <button type="button" onClick={() => { setPollMedia(null); setPollMediaPreview(''); }} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <Button type="button" variant="outline" size="sm" onClick={() => pollMediaRef.current?.click()}>
+                <ImageIcon className="h-4 w-4 mr-1 text-green-500" />
+                {t('post.addPollMedia') || 'Add image / video'}
+              </Button>
+            )}
             {pollOptions.map((opt, i) => (
               <div key={i} className="flex gap-2">
                 <Input placeholder={`${t('post.pollOption') || 'Option'} ${i + 1}`} value={opt} onChange={(e) => setPollOptions(prev => prev.map((o, idx) => idx === i ? e.target.value : o))} />
