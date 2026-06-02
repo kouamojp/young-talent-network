@@ -375,26 +375,36 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       const shareToken = visibility === 'link' ? Math.random().toString(36).slice(2, 12) : null;
 
       if (tab === 'post') {
-        if (!content.trim() && files.length === 0) {
+        if (!content.trim() && items.length === 0) {
           toast({ title: t('post.emptyError') || 'Add text or media', variant: 'destructive' });
           return;
         }
-        const mediaUrls: string[] = [];
-        for (const f of files) mediaUrls.push(await uploadOne(user.id, f));
+        const mediaUrls = await uploadItems(user.id);
         const finalContent = showLocation && location?.address ? `${content}\n📍 ${location.address}` : content;
         const isScheduled = !!scheduledFor;
-        const { error } = await supabase.from('posts').insert({
-          content: finalContent.trim() || ' ',
-          user_id: user.id,
-          media_urls: mediaUrls.length ? mediaUrls : null,
-          visibility,
-          share_token: shareToken,
-          scheduled_for: isScheduled ? new Date(scheduledFor).toISOString() : null,
-          is_published: !isScheduled,
-        });
-        if (error) throw error;
-        toast({ title: isScheduled ? (t('post.scheduled') || `Scheduled for ${new Date(scheduledFor).toLocaleString()}`) : (t('post.created') || 'Post published!') });
+        if (isEditing && editPost) {
+          const { error } = await supabase.from('posts').update({
+            content: finalContent.trim() || ' ',
+            media_urls: mediaUrls.length ? mediaUrls : null,
+            visibility,
+          }).eq('id', editPost.id);
+          if (error) throw error;
+          toast({ title: t('post.updated') || 'Publication mise à jour' });
+        } else {
+          const { error } = await supabase.from('posts').insert({
+            content: finalContent.trim() || ' ',
+            user_id: user.id,
+            media_urls: mediaUrls.length ? mediaUrls : null,
+            visibility,
+            share_token: shareToken,
+            scheduled_for: isScheduled ? new Date(scheduledFor).toISOString() : null,
+            is_published: !isScheduled,
+          });
+          if (error) throw error;
+          toast({ title: isScheduled ? (t('post.scheduled') || `Scheduled for ${new Date(scheduledFor).toLocaleString()}`) : (t('post.created') || 'Post published!') });
+        }
       } else if (tab === 'article') {
+
         if (!articleTitle.trim() || !content.trim()) {
           toast({ title: t('post.articleError') || 'Title and content required', variant: 'destructive' });
           return;
