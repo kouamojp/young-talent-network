@@ -60,7 +60,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setContent((prev) => (prev ? prev + '\n\n' : '') + (data.content || ''));
-      setLinkPreview({ title: data.title, image: data.image, siteName: data.siteName });
+      setLinkPreview({ title: data.title, description: data.description, image: data.image, siteName: data.siteName, url: linkUrl.trim() });
       toast({ title: t('post.linkImported') || 'Content imported from link' });
     } catch (e: any) {
       toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
