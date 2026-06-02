@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
-import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown, Copy, Trash2, Flag } from 'lucide-react';
+import { MessageSquare, ThumbsUp, Share, MoreHorizontal, MapPin, Calendar, ChevronDown, Copy, Trash2, Flag, Edit3 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
@@ -12,6 +12,7 @@ import { toast } from './ui/use-toast';
 import ShareMenu from './share/ShareMenu';
 import ShareToFriendsDialog from './share/ShareToFriendsDialog';
 import LinkPreview from './LinkPreview';
+import { PostCreationDialog } from './PostCreationDialog';
 import { Users } from 'lucide-react';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
