@@ -275,7 +275,8 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           toast({ title: t('post.emptyError') || 'Add text or media', variant: 'destructive' });
           return;
         }
-        const mediaUrls = files.length ? await uploadFiles(user.id) : [];
+        const mediaUrls: string[] = [];
+        for (const f of files) mediaUrls.push(await uploadOne(user.id, f));
         const finalContent = showLocation && location?.address ? `${content}\n📍 ${location.address}` : content;
         const isScheduled = !!scheduledFor;
         const { error } = await supabase.from('posts').insert({
