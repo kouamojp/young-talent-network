@@ -1050,6 +1050,42 @@ export const StoriesBar = () => {
                   </PopoverContent>
                 </Popover>
 
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1" title="Ajouter un sticker sur l'image">
+                      <span className="text-base leading-none">🌟</span> Sticker
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-2" align="start">
+                    <p className="text-[10px] text-muted-foreground mb-1 px-1">Cliquez pour ajouter sur l'image, puis glissez-le.</p>
+                    <div className="grid grid-cols-10 gap-1 max-h-60 overflow-y-auto">
+                      {EMOJIS.map(e => (
+                        <button key={e} onClick={() => addSticker(e)} className="text-xl hover:bg-muted rounded p-1 transition-colors" type="button">
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {selectedStickerId && (() => {
+                  const sel = stickers.find(s => s.id === selectedStickerId);
+                  if (!sel) return null;
+                  return (
+                    <div className="flex items-center gap-1 bg-muted rounded-md px-2 py-1">
+                      <span className="text-base">{sel.emoji}</span>
+                      <input
+                        type="range" min={20} max={160} value={sel.size}
+                        onChange={(e) => updateSticker(sel.id, { size: Number(e.target.value) })}
+                        className="w-20 accent-primary"
+                      />
+                      <button type="button" onClick={() => removeSticker(sel.id)} className="text-destructive p-0.5">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  );
+                })()}
+
                 <div className="flex border rounded-md overflow-hidden">
                   {(['top','center','bottom'] as const).map(a => (
                     <button
