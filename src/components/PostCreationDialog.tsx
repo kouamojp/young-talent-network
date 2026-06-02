@@ -295,9 +295,15 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
           toast({ title: t('post.articleError') || 'Title and content required', variant: 'destructive' });
           return;
         }
+        const articleMediaUrls: string[] = [];
+        for (const f of articleMedia) articleMediaUrls.push(await uploadOne(user.id, f));
+        let finalArticle = content.trim();
+        if (articleMediaUrls.length) {
+          finalArticle += '\n\n' + articleMediaUrls.map(u => `![media](${u})`).join('\n');
+        }
         const { error } = await supabase.from('user_pages').insert({
           title: articleTitle.trim(),
-          content: content.trim(),
+          content: finalArticle,
           category: articleCategory || 'other',
           user_id: user.id,
           is_public: visibility === 'public',
@@ -308,11 +314,29 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
         await supabase.from('posts').insert({
           content: `📄 ${articleTitle}\n\n${content.slice(0, 200)}${content.length > 200 ? '...' : ''}`,
           user_id: user.id,
+          media_urls: articleMediaUrls.length ? articleMediaUrls : null,
           visibility,
           share_token: shareToken,
         });
         toast({ title: t('post.articleCreated') || 'Article published!' });
       } else if (tab === 'poll') {
+        const validOptions = pollOptions.filter(o => o.trim());
+        if (!pollQuestion.trim() || validOptions.length < 2) {
+          toast({ title: t('post.pollError') || 'Question and 2+ options required', variant: 'destructive' });
+          return;
+        }
+        const pollMediaUrl = pollMedia ? await uploadOne(user.id, pollMedia) : null;
+        const pollContent = `📊 ${pollQuestion}\n\n${validOptions.map((o, i) => `${i + 1}. ${o}`).join('\n')}`;
+        const { error } = await supabase.from('posts').insert({
+          content: pollContent,
+          user_id: user.id,
+          media_urls: pollMediaUrl ? [pollMediaUrl] : null,
+          visibility,
+          share_token: shareToken,
+        });
+        if (error) throw error;
+        toast({ title: t('post.pollCreated') || 'Poll published!' });
+      }
         const validOptions = pollOptions.filter(o => o.trim());
         if (!pollQuestion.trim() || validOptions.length < 2) {
           toast({ title: t('post.pollError') || 'Question and 2+ options required', variant: 'destructive' });
