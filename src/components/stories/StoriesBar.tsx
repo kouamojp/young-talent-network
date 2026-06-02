@@ -935,19 +935,24 @@ export const StoriesBar = () => {
           <div className="grid md:grid-cols-[1fr_320px] gap-4">
             {/* Big preview */}
             <div
-              className="aspect-[9/16] max-h-[70vh] w-full mx-auto rounded-xl overflow-hidden relative shadow-xl"
+              ref={previewBoxRef}
+              className="aspect-[9/16] max-h-[70vh] w-full mx-auto rounded-xl overflow-hidden relative shadow-xl touch-none"
               style={{ backgroundColor: bgColor }}
+              onPointerMove={onStickerPointerMove}
+              onPointerUp={onStickerPointerUp}
+              onPointerLeave={onStickerPointerUp}
+              onClick={() => setSelectedStickerId(null)}
             >
               {activePreview ? (
                 activePreview.kind === 'image' ? (
-                  <img src={activePreview.url} alt="" className="w-full h-full object-cover" />
+                  <img src={activePreview.url} alt="" className="w-full h-full object-cover pointer-events-none" />
                 ) : (
-                  <video src={activePreview.url} className="w-full h-full object-cover" autoPlay muted loop playsInline preload="metadata" />
+                  <video src={activePreview.url} className="w-full h-full object-cover pointer-events-none" autoPlay muted loop playsInline preload="metadata" />
                 )
               ) : null}
 
               {text && (
-                <div className={`absolute inset-0 flex justify-center p-6 ${alignClass}`}>
+                <div className={`absolute inset-0 flex justify-center p-6 pointer-events-none ${alignClass}`}>
                   <p
                     className="text-white font-bold text-center drop-shadow-lg whitespace-pre-wrap leading-snug"
                     style={{ fontSize: `${fontSize}px` }}
@@ -956,8 +961,41 @@ export const StoriesBar = () => {
                   </p>
                 </div>
               )}
-              {!activePreview && !text && (
-                <div className="absolute inset-0 flex items-center justify-center">
+
+              {/* Draggable stickers in editor */}
+              {stickers.map(st => {
+                const selected = st.id === selectedStickerId;
+                return (
+                  <div
+                    key={st.id}
+                    onPointerDown={(e) => onStickerPointerDown(e, st.id)}
+                    onClick={(e) => { e.stopPropagation(); setSelectedStickerId(st.id); }}
+                    className={`absolute cursor-move select-none ${selected ? 'ring-2 ring-primary ring-offset-1 ring-offset-transparent rounded' : ''}`}
+                    style={{
+                      left: `${st.x}%`, top: `${st.y}%`,
+                      transform: `translate(-50%, -50%) rotate(${st.rotation || 0}deg)`,
+                      fontSize: `${st.size}px`, lineHeight: 1,
+                      filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
+                      touchAction: 'none',
+                    }}
+                  >
+                    {st.emoji}
+                    {selected && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); removeSticker(st.id); }}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow"
+                        style={{ fontSize: 12 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {!activePreview && !text && stickers.length === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <p className="text-white/40 text-sm">{t('stories.preview') || 'Aperçu'}</p>
                 </div>
               )}
@@ -965,13 +1003,13 @@ export const StoriesBar = () => {
               {/* Preview nav */}
               {allPreviewItems.length > 1 && (
                 <>
-                  <button type="button" onClick={() => setPreviewIndex(i => Math.max(0, i - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewIndex(i => Math.max(0, i - 1)); }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white z-20">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
-                  <button type="button" onClick={() => setPreviewIndex(i => Math.min(allPreviewItems.length - 1, i + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewIndex(i => Math.min(allPreviewItems.length - 1, i + 1)); }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white z-20">
                     <ChevronRight className="h-4 w-4" />
                   </button>
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20">
                     {allPreviewItems.map((_, i) => (
                       <span key={i} className={`block h-1.5 w-1.5 rounded-full ${i === previewIndex ? 'bg-white' : 'bg-white/40'}`} />
                     ))}
