@@ -111,6 +111,10 @@ export const StoriesBar = () => {
   const [textAlign, setTextAlign] = useState<'center' | 'top' | 'bottom'>('center');
   const [fontSize, setFontSize] = useState(28);
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [stickers, setStickers] = useState<StorySticker[]>([]);
+  const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
+  const stickerDragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
+  const previewBoxRef = useRef<HTMLDivElement | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
