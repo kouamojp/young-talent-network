@@ -89,9 +89,11 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
   const reset = () => {
     setContent(''); setLocation(null); setShowLocation(false);
-    setFiles([]); setPreviews([]);
+    setFiles([]); setPreviews([]); setRotations([]);
     setArticleTitle(''); setArticleCategory('');
+    setArticleMedia([]); setArticleMediaPreviews([]); setArticleLinkUrl('');
     setPollQuestion(''); setPollOptions(['', '']);
+    setPollMedia(null); setPollMediaPreview('');
     setTab('post'); setVisibility('public');
     setActiveDraftId(null); setShowDrafts(false);
     setScheduledFor('');
@@ -101,17 +103,96 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
     if (selected.length === 0) return;
-    setFiles(prev => [...prev, ...selected]);
-    selected.forEach(file => {
+    const remaining = MAX_IMAGES - files.length;
+    if (remaining <= 0) {
+      toast({ title: t('post.maxImages') || `Maximum ${MAX_IMAGES} files`, variant: 'destructive' });
+      e.target.value = '';
+      return;
+    }
+    const accepted = selected.slice(0, remaining);
+    if (selected.length > remaining) {
+      toast({ title: t('post.maxImages') || `Only ${remaining} more file(s) added (max ${MAX_IMAGES})` });
+    }
+    setFiles(prev => [...prev, ...accepted]);
+    setRotations(prev => [...prev, ...accepted.map(() => 0)]);
+    accepted.forEach(file => {
       const reader = new FileReader();
       reader.onload = (ev) => setPreviews(prev => [...prev, ev.target?.result as string]);
       reader.readAsDataURL(file);
     });
+    e.target.value = '';
   };
 
   const removeFile = (idx: number) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
     setPreviews(prev => prev.filter((_, i) => i !== idx));
+    setRotations(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const rotateFile = (idx: number) => {
+    setRotations(prev => prev.map((r, i) => i === idx ? (r + 90) % 360 : r));
+  };
+
+  const moveFile = (idx: number, dir: -1 | 1) => {
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= files.length) return;
+    const swap = <T,>(arr: T[]) => { const a = [...arr]; [a[idx], a[newIdx]] = [a[newIdx], a[idx]]; return a; };
+    setFiles(prev => swap(prev));
+    setPreviews(prev => swap(prev));
+    setRotations(prev => swap(prev));
+  };
+
+  const handleArticleMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    if (!selected.length) return;
+    setArticleMedia(prev => [...prev, ...selected]);
+    selected.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => setArticleMediaPreviews(prev => [...prev, ev.target?.result as string]);
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const insertIntoArticle = (text: string) => {
+    const el = articleTextareaRef.current;
+    const insertion = `\n${text}\n`;
+    if (!el) { setContent(prev => prev + insertion); return; }
+    const start = el.selectionStart ?? content.length;
+    const end = el.selectionEnd ?? content.length;
+    setContent(content.slice(0, start) + insertion + content.slice(end));
+  };
+
+  const importArticleLink = async () => {
+    if (!articleLinkUrl.trim()) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('post-from-link', { body: { url: articleLinkUrl.trim() } });
+      if (error) throw error;
+      const md = `[${data.title || articleLinkUrl}](${articleLinkUrl})${data.description ? `\n${data.description}` : ''}`;
+      insertIntoArticle(md);
+      setArticleLinkUrl('');
+      toast({ title: t('post.linkInserted') || 'Link inserted into article' });
+    } catch (e: any) {
+      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+    }
+  };
+
+  const handlePollMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPollMedia(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPollMediaPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const uploadOne = async (userId: string, file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `${userId}/posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage.from('profile-files').upload(path, file);
+    if (error) throw error;
+    return supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
   };
 
   const uploadFiles = async (userId: string): Promise<string[]> => {
