@@ -439,15 +439,25 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
               </Button>
             </div>
             {linkPreview && (
-              <div className="flex gap-2 p-2 border rounded-lg bg-muted/30">
-                {linkPreview.image && <img src={linkPreview.image} alt="" className="w-16 h-16 object-cover rounded" />}
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>
-                  <div className="text-sm font-medium truncate">{linkPreview.title}</div>
+              <div className="border rounded-lg overflow-hidden bg-muted/30">
+                {linkPreview.image && (
+                  <div className="relative w-full aspect-video bg-muted">
+                    <img src={linkPreview.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                    <button onClick={() => setLinkPreview(null)} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                <div className="p-2 space-y-1">
+                  {linkPreview.siteName && <div className="text-xs text-muted-foreground truncate">{linkPreview.siteName}</div>}
+                  {linkPreview.title && <div className="text-sm font-medium line-clamp-2">{linkPreview.title}</div>}
+                  {linkPreview.description && <div className="text-xs text-muted-foreground line-clamp-2">{linkPreview.description}</div>}
+                  {linkPreview.url && (
+                    <a href={linkPreview.url} target="_blank" rel="noreferrer" className="text-xs text-primary truncate block hover:underline">
+                      {linkPreview.url}
+                    </a>
+                  )}
                 </div>
-                <button onClick={() => setLinkPreview(null)} className="p-1 hover:bg-muted rounded">
-                  <X className="h-3 w-3" />
-                </button>
               </div>
             )}
             <Textarea
@@ -460,15 +470,47 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
             {previews.length > 0 && (
               <div className={`grid gap-2 ${previews.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                {previews.map((src, i) => (
-                  <div key={i} className="relative rounded-lg overflow-hidden bg-muted">
-                    <img src={src} alt="" className="w-full h-40 object-cover" />
-                    <button onClick={() => removeFile(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                {previews.map((src, i) => {
+                  const isVideo = files[i]?.type.startsWith('video/');
+                  const rot = rotations[i] || 0;
+                  return (
+                    <div key={i} className="relative rounded-lg overflow-hidden bg-muted aspect-video group">
+                      {isVideo ? (
+                        <video src={src} className="absolute inset-0 w-full h-full object-cover" />
+                      ) : (
+                        <img
+                          src={src}
+                          alt=""
+                          className="absolute inset-0 w-full h-full object-cover transition-transform"
+                          style={{ transform: `rotate(${rot}deg) scale(${rot % 180 === 0 ? 1 : 1.4})` }}
+                        />
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 p-1 flex justify-between gap-1 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition">
+                        <div className="flex gap-1">
+                          <button type="button" onClick={() => moveFile(i, -1)} disabled={i === 0} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
+                            <ChevronLeft className="h-3 w-3" />
+                          </button>
+                          <button type="button" onClick={() => moveFile(i, 1)} disabled={i === previews.length - 1} className="bg-black/60 text-white rounded p-1 hover:bg-black/80 disabled:opacity-30">
+                            <ChevronRight className="h-3 w-3" />
+                          </button>
+                        </div>
+                        {!isVideo && (
+                          <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title="Rotate">
+                            <RotateCw className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
+                      <button onClick={() => removeFile(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80">
+                        <X className="h-3 w-3" />
+                      </button>
+                      <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] rounded px-1.5 py-0.5">{i + 1}/{previews.length}</span>
+                    </div>
+                  );
+                })}
               </div>
+            )}
+            {files.length > 0 && (
+              <div className="text-xs text-muted-foreground text-right">{files.length}/{MAX_IMAGES}</div>
             )}
 
             {showLocation && (
