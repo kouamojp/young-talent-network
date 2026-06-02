@@ -136,7 +136,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
   const reset = () => {
     setContent(''); setLocation(null); setShowLocation(false);
-    setFiles([]); setPreviews([]); setRotations([]);
+    setItems([]); setCropIdx(null); setDragIdx(null);
     setArticleTitle(''); setArticleCategory('');
     setArticleMedia([]); setArticleMediaPreviews([]); setArticleLinkUrl('');
     setPollQuestion(''); setPollOptions(['', '']);
@@ -145,48 +145,98 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     setActiveDraftId(null); setShowDrafts(false);
     setScheduledFor('');
     setLinkUrl(''); setLinkPreview(null);
+    setShowArticlePreview(false);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const readFileAsDataURL = (file: File) => new Promise<string>((res, rej) => {
+    const r = new FileReader();
+    r.onload = (e) => res(e.target?.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files || []);
+    e.target.value = '';
     if (selected.length === 0) return;
-    const remaining = MAX_IMAGES - files.length;
+    const remaining = MAX_IMAGES - items.length;
     if (remaining <= 0) {
       toast({ title: t('post.maxImages') || `Maximum ${MAX_IMAGES} files`, variant: 'destructive' });
-      e.target.value = '';
       return;
     }
     const accepted = selected.slice(0, remaining);
     if (selected.length > remaining) {
-      toast({ title: t('post.maxImages') || `Only ${remaining} more file(s) added (max ${MAX_IMAGES})` });
+      toast({ title: `Only ${remaining} more file(s) added (max ${MAX_IMAGES})` });
     }
-    setFiles(prev => [...prev, ...accepted]);
-    setRotations(prev => [...prev, ...accepted.map(() => 0)]);
-    accepted.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => setPreviews(prev => [...prev, ev.target?.result as string]);
-      reader.readAsDataURL(file);
+    const newItems: MediaItem[] = await Promise.all(accepted.map(async (file) => ({
+      file,
+      preview: await readFileAsDataURL(file),
+      isVideo: file.type.startsWith('video/'),
+      rotation: 0,
+      offsetX: 50,
+      offsetY: 50,
+    })));
+    setItems(prev => [...prev, ...newItems]);
+  };
+
+  const removeFile = (idx: number) => setItems(prev => prev.filter((_, i) => i !== idx));
+  const rotateFile = (idx: number) => setItems(prev => prev.map((it, i) => i === idx ? { ...it, rotation: (it.rotation + 90) % 360 } : it));
+  const updateItem = (idx: number, patch: Partial<MediaItem>) => setItems(prev => prev.map((it, i) => i === idx ? { ...it, ...patch } : it));
+
+  const reorderItems = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return;
+    setItems(prev => {
+      const arr = [...prev];
+      const [moved] = arr.splice(from, 1);
+      arr.splice(to, 0, moved);
+      return arr;
     });
-    e.target.value = '';
   };
 
-  const removeFile = (idx: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== idx));
-    setPreviews(prev => prev.filter((_, i) => i !== idx));
-    setRotations(prev => prev.filter((_, i) => i !== idx));
-  };
-
-  const rotateFile = (idx: number) => {
-    setRotations(prev => prev.map((r, i) => i === idx ? (r + 90) % 360 : r));
-  };
-
-  const moveFile = (idx: number, dir: -1 | 1) => {
-    const newIdx = idx + dir;
-    if (newIdx < 0 || newIdx >= files.length) return;
-    const swap = <T,>(arr: T[]) => { const a = [...arr]; [a[idx], a[newIdx]] = [a[newIdx], a[idx]]; return a; };
-    setFiles(prev => swap(prev));
-    setPreviews(prev => swap(prev));
-    setRotations(prev => swap(prev));
+  // Crop an image File to the chosen aspect ratio using a canvas, framing around (offsetX, offsetY)
+  const cropImageFile = (file: File, aspect: number, offX: number, offY: number, rotation: number): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const rot = ((rotation % 360) + 360) % 360;
+          const swap = rot === 90 || rot === 270;
+          const srcW = swap ? img.height : img.width;
+          const srcH = swap ? img.width : img.height;
+          let cw = srcW, ch = Math.round(srcW / aspect);
+          if (ch > srcH) { ch = srcH; cw = Math.round(srcH * aspect); }
+          const maxOffX = srcW - cw;
+          const maxOffY = srcH - ch;
+          const sx = Math.round((offX / 100) * maxOffX);
+          const sy = Math.round((offY / 100) * maxOffY);
+          const canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          const ctx = canvas.getContext('2d')!;
+          // Apply rotation by translating and rotating, then drawing source
+          ctx.save();
+          ctx.translate(cw / 2, ch / 2);
+          ctx.rotate((rot * Math.PI) / 180);
+          // We want to draw the (potentially rotated) image so a crop of (sx, sy, cw, ch) in rotated space is centered
+          // Simplification: draw whole rotated image into an offscreen, then crop
+          const off = document.createElement('canvas');
+          off.width = srcW; off.height = srcH;
+          const octx = off.getContext('2d')!;
+          octx.translate(srcW / 2, srcH / 2);
+          octx.rotate((rot * Math.PI) / 180);
+          octx.drawImage(img, -img.width / 2, -img.height / 2);
+          ctx.restore();
+          ctx.clearRect(0, 0, cw, ch);
+          ctx.drawImage(off, sx, sy, cw, ch, 0, 0, cw, ch);
+          canvas.toBlob((blob) => {
+            if (!blob) return reject(new Error('Canvas blob failed'));
+            const out = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+            resolve(out);
+          }, 'image/jpeg', 0.9);
+        } catch (e) { reject(e); }
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
   };
 
   const handleArticleMediaSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -242,18 +292,25 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     return supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
   };
 
-  const uploadFiles = async (userId: string): Promise<string[]> => {
+  // Upload items in order: existing URLs are kept; new files are cropped (if image) then uploaded
+  const uploadItems = async (userId: string): Promise<string[]> => {
     const urls: string[] = [];
-    for (const file of files) {
-      const ext = file.name.split('.').pop();
-      const path = `${userId}/posts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from('profile-files').upload(path, file);
-      if (error) throw error;
-      const { data } = supabase.storage.from('profile-files').getPublicUrl(path);
-      urls.push(data.publicUrl);
+    for (const it of items) {
+      if (it.existingUrl) { urls.push(it.existingUrl); continue; }
+      if (!it.file) continue;
+      let toUpload = it.file;
+      if (!it.isVideo) {
+        try {
+          toUpload = await cropImageFile(it.file, aspectNum, it.offsetX, it.offsetY, it.rotation);
+        } catch (e) {
+          console.error('Crop failed, uploading original', e);
+        }
+      }
+      urls.push(await uploadOne(userId, toUpload));
     }
     return urls;
   };
+
 
   const saveDraft = async () => {
     const { data: { user } } = await supabase.auth.getUser();
