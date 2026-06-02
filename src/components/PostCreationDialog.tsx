@@ -337,21 +337,6 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
         if (error) throw error;
         toast({ title: t('post.pollCreated') || 'Poll published!' });
       }
-        const validOptions = pollOptions.filter(o => o.trim());
-        if (!pollQuestion.trim() || validOptions.length < 2) {
-          toast({ title: t('post.pollError') || 'Question and 2+ options required', variant: 'destructive' });
-          return;
-        }
-        const pollContent = `📊 ${pollQuestion}\n\n${validOptions.map((o, i) => `${i + 1}. ${o}`).join('\n')}`;
-        const { error } = await supabase.from('posts').insert({
-          content: pollContent,
-          user_id: user.id,
-          visibility,
-          share_token: shareToken,
-        });
-        if (error) throw error;
-        toast({ title: t('post.pollCreated') || 'Poll published!' });
-      }
 
       if (activeDraftId) await supabase.from('post_drafts').delete().eq('id', activeDraftId);
       reset();
