@@ -280,11 +280,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {currentUserId && currentUserId === (post.user_id || post.author.id) && (
+                <DropdownMenuItem onClick={() => setEditOpen(true)}><Edit3 className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={copyLink}><Copy className="h-4 w-4 mr-2" />Copier le lien</DropdownMenuItem>
               <DropdownMenuItem onClick={reportPost}><Flag className="h-4 w-4 mr-2" />Signaler</DropdownMenuItem>
-              <DropdownMenuItem onClick={deletePost} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />Supprimer</DropdownMenuItem>
+              {currentUserId && currentUserId === (post.user_id || post.author.id) && (
+                <DropdownMenuItem onClick={deletePost} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />Supprimer</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
+          <PostCreationDialog
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            editPost={{ id: post.id, content: rawText, media_urls: post.media_urls || undefined }}
+            onPostCreated={() => { setEditOpen(false); onUpdate?.(); }}
+            userName={post.author.name}
+            userAvatar={post.author.avatar}
+          />
+
         </div>
       </div>
 
