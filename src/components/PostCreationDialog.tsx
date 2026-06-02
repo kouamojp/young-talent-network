@@ -469,12 +469,12 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>{t('post.create') || 'Create Post'}</span>
-            {drafts.length > 0 && (
+            <span>{isEditing ? (t('post.edit') || 'Modifier la publication') : (t('post.create') || 'Create Post')}</span>
+            {!isEditing && drafts.length > 0 && (
               <Button variant="ghost" size="sm" onClick={() => setShowDrafts(s => !s)}>
                 <FileClock className="h-4 w-4 mr-1" />
                 {t('post.drafts') || 'Drafts'} ({drafts.length})
@@ -482,6 +482,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             )}
           </DialogTitle>
         </DialogHeader>
+
 
         {showDrafts && (
           <div className="border rounded-lg p-2 space-y-1 max-h-48 overflow-y-auto">
