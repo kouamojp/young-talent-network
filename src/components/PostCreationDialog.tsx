@@ -6,41 +6,69 @@ import { Input } from './ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Slider } from './ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from './ui/use-toast';
-import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles, RotateCw, ChevronLeft, ChevronRight, Video } from 'lucide-react';
+import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link as LinkIcon, Save, FileClock, Clock, Edit3, Sparkles, RotateCw, Video, Eye, Crop, GripVertical } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
+import LinkPreview from './LinkPreview';
+
+interface ExistingPost {
+  id: string;
+  content: string;
+  media_urls?: string[] | null;
+  visibility?: string;
+}
 
 interface PostCreationDialogProps {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   onPostCreated?: () => void;
   userAvatar?: string;
   userName?: string;
+  editPost?: ExistingPost;
+  open?: boolean;
+  onOpenChange?: (o: boolean) => void;
 }
 
 type TabType = 'post' | 'article' | 'poll';
 type Visibility = 'public' | 'friends' | 'link';
+type AspectRatio = '16:9' | '9:16' | '1:1';
 
-export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userName }: PostCreationDialogProps) => {
+interface MediaItem {
+  file?: File;
+  existingUrl?: string;
+  preview: string;
+  isVideo: boolean;
+  rotation: number;
+  offsetX: number; // 0-100
+  offsetY: number; // 0-100
+}
+
+export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userName, editPost, open: openProp, onOpenChange }: PostCreationDialogProps) => {
   const { t } = useLanguage();
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (o: boolean) => { if (onOpenChange) onOpenChange(o); else setOpenState(o); };
+  const isEditing = !!editPost;
   const [tab, setTab] = useState<TabType>('post');
   const [content, setContent] = useState('');
   const [location, setLocation] = useState<LocationValue | null>(null);
   const [showLocation, setShowLocation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [items, setItems] = useState<MediaItem[]>([]);
   const [visibility, setVisibility] = useState<Visibility>('public');
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('16:9');
+  const [cropIdx, setCropIdx] = useState<number | null>(null);
+  const [showArticlePreview, setShowArticlePreview] = useState(false);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [drafts, setDrafts] = useState<any[]>([]);
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
   const [showDrafts, setShowDrafts] = useState(false);
-  const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
+  const [scheduledFor, setScheduledFor] = useState<string>('');
   const [linkUrl, setLinkUrl] = useState('');
   const [linkPreview, setLinkPreview] = useState<{ title?: string; description?: string; image?: string | null; siteName?: string; url?: string } | null>(null);
   const [importing, setImporting] = useState(false);
-  const [rotations, setRotations] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const articleMediaRef = useRef<HTMLInputElement>(null);
   const pollMediaRef = useRef<HTMLInputElement>(null);
@@ -51,6 +79,25 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [pollMedia, setPollMedia] = useState<File | null>(null);
   const [pollMediaPreview, setPollMediaPreview] = useState<string>('');
   const articleTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const aspectClass = aspectRatio === '16:9' ? 'aspect-video' : aspectRatio === '9:16' ? 'aspect-[9/16]' : 'aspect-square';
+  const aspectNum = aspectRatio === '16:9' ? 16 / 9 : aspectRatio === '9:16' ? 9 / 16 : 1;
+
+  // Load existing post when opening in edit mode
+  useEffect(() => {
+    if (open && editPost) {
+      setTab('post');
+      setContent(editPost.content || '');
+      setVisibility((editPost.visibility as Visibility) || 'public');
+      const urls = editPost.media_urls || [];
+      setItems(urls.map((url) => ({
+        existingUrl: url,
+        preview: url,
+        isVideo: /\.(mp4|webm|mov|m4v)(\?|$)/i.test(url),
+        rotation: 0, offsetX: 50, offsetY: 50,
+      })));
+    }
+  }, [open, editPost]);
 
   const importFromLink = async () => {
     if (!linkUrl.trim()) return;
