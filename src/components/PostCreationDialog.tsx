@@ -852,16 +852,103 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
         )}
 
         <div className="flex justify-end gap-2 pt-2">
-          <Button variant="outline" onClick={saveDraft} disabled={isSubmitting}>
-            <Save className="h-4 w-4 mr-1" />
-            {activeDraftId ? (t('post.updateDraft') || 'Update draft') : (t('post.saveDraft') || 'Save draft')}
-          </Button>
+          {!isEditing && (
+            <Button variant="outline" onClick={saveDraft} disabled={isSubmitting}>
+              <Save className="h-4 w-4 mr-1" />
+              {activeDraftId ? (t('post.updateDraft') || 'Update draft') : (t('post.saveDraft') || 'Save draft')}
+            </Button>
+          )}
           <Button onClick={handleSubmit} disabled={isSubmitting} className="flex-1">
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {scheduledFor ? (t('post.schedule') || 'Schedule') : (t('create.post') || 'Publish')}
+            {isEditing ? (t('post.update') || 'Enregistrer') : scheduledFor ? (t('post.schedule') || 'Schedule') : (t('create.post') || 'Publish')}
           </Button>
         </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+// ---------------- Article live preview ----------------
+const URL_REGEX_AP = /(https?:\/\/[^\s<>"')]+)/gi;
+const isUrlAp = (s: string) => /^https?:\/\//i.test(s);
+
+const ArticlePreview: React.FC<{
+  title: string;
+  category: string;
+  content: string;
+  mediaPreviews: string[];
+  mediaFiles: File[];
+  authorName?: string;
+  authorAvatar?: string;
+}> = ({ title, category, content, mediaPreviews, mediaFiles, authorName, authorAvatar }) => {
+  const renderInline = (line: string, key: number) => {
+    const parts = line.split(URL_REGEX_AP);
+    return (
+      <React.Fragment key={key}>
+        {parts.map((p, i) => isUrlAp(p)
+          ? <a key={i} href={p} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all">{p}</a>
+          : <React.Fragment key={i}>{p}</React.Fragment>
+        )}
+      </React.Fragment>
+    );
+  };
+
+  const blocks: React.ReactNode[] = [];
+  const lines = (content || '').split('\n');
+  const urlsSeen = new Set<string>();
+  const referencedImgs = new Set<number>();
+  const referencedVids = new Set<number>();
+
+  lines.forEach((line, idx) => {
+    const imgMatch = line.match(/^\s*\[image\s+(\d+)\]\s*$/i);
+    const vidMatch = line.match(/^\s*\[video\]\(\s*(\d+)\s*\)\s*$/i);
+    if (imgMatch) {
+      const i = parseInt(imgMatch[1], 10) - 1;
+      referencedImgs.add(i);
+      if (mediaPreviews[i] && !mediaFiles[i]?.type.startsWith('video/')) {
+        blocks.push(<img key={`b${idx}`} src={mediaPreviews[i]} alt="" className="w-full rounded-lg my-3 object-cover max-h-[500px]" />);
+        return;
+      }
+    }
+    if (vidMatch) {
+      const i = parseInt(vidMatch[1], 10) - 1;
+      referencedVids.add(i);
+      if (mediaPreviews[i]) {
+        blocks.push(<video key={`b${idx}`} src={mediaPreviews[i]} controls className="w-full rounded-lg my-3" />);
+        return;
+      }
+    }
+    if (line.trim()) {
+      (line.match(URL_REGEX_AP) || []).forEach(u => urlsSeen.add(u));
+      blocks.push(<p key={`p${idx}`} className="text-[15px] leading-relaxed whitespace-pre-wrap">{renderInline(line, idx)}</p>);
+    } else {
+      blocks.push(<div key={`s${idx}`} className="h-2" />);
+    }
+  });
+
+  return (
+    <article className="border rounded-lg p-4 bg-card space-y-3">
+      <div className="flex items-center gap-2">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={authorAvatar} />
+          <AvatarFallback>{authorName?.[0] || 'U'}</AvatarFallback>
+        </Avatar>
+        <div className="text-xs">
+          <div className="font-semibold">{authorName || 'You'}</div>
+          <div className="text-muted-foreground">Aperçu en direct</div>
+        </div>
+      </div>
+      {title && <h1 className="text-2xl font-bold leading-tight">{title}</h1>}
+      {category && <div className="text-xs text-muted-foreground uppercase tracking-wide">{category}</div>}
+      <div className="space-y-1">{blocks.length ? blocks : <p className="text-muted-foreground italic">Commencez à écrire pour voir l'aperçu...</p>}</div>
+      {mediaPreviews.map((src, i) => {
+        const isVid = mediaFiles[i]?.type.startsWith('video/');
+        if (isVid ? referencedVids.has(i) : referencedImgs.has(i)) return null;
+        return isVid
+          ? <video key={`u${i}`} src={src} controls className="w-full rounded-lg" />
+          : <img key={`u${i}`} src={src} alt="" className="w-full rounded-lg object-cover max-h-[500px]" />;
+      })}
+      {[...urlsSeen].slice(0, 3).map(u => <LinkPreview key={u} url={u} />)}
+    </article>
   );
 };
