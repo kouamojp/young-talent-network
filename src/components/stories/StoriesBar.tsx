@@ -169,6 +169,7 @@ export const StoriesBar = () => {
     setText(''); setFiles([]); setPreviews([]); setExistingMedia([]);
     setBgColor('#1a1a2e'); setTextAlign('center'); setFontSize(28);
     setEditingId(null); setPreviewIndex(0);
+    setStickers([]); setSelectedStickerId(null);
   };
 
   const startEdit = (story: Story) => {
@@ -176,10 +177,53 @@ export const StoriesBar = () => {
     setText(story.text_overlay || '');
     setBgColor(story.background_color || '#1a1a2e');
     setExistingMedia(getMediaList(story));
+    setStickers(getStickers(story));
+    setSelectedStickerId(null);
     setFiles([]); setPreviews([]);
     setCreating(true);
     setViewing(null);
   };
+
+  // ===== Sticker helpers =====
+  const addSticker = (emoji: string) => {
+    const s: StorySticker = {
+      id: Math.random().toString(36).slice(2, 9),
+      emoji,
+      x: 50, y: 50, size: 56,
+    };
+    setStickers(prev => [...prev, s]);
+    setSelectedStickerId(s.id);
+  };
+  const updateSticker = (id: string, patch: Partial<StorySticker>) => {
+    setStickers(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+  };
+  const removeSticker = (id: string) => {
+    setStickers(prev => prev.filter(s => s.id !== id));
+    setSelectedStickerId(p => p === id ? null : p);
+  };
+  const onStickerPointerDown = (e: React.PointerEvent, id: string) => {
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setSelectedStickerId(id);
+    const box = previewBoxRef.current?.getBoundingClientRect();
+    const st = stickers.find(s => s.id === id);
+    if (!box || !st) return;
+    const cx = box.left + (st.x / 100) * box.width;
+    const cy = box.top + (st.y / 100) * box.height;
+    stickerDragRef.current = { id, offsetX: e.clientX - cx, offsetY: e.clientY - cy };
+  };
+  const onStickerPointerMove = (e: React.PointerEvent) => {
+    const drag = stickerDragRef.current;
+    const box = previewBoxRef.current?.getBoundingClientRect();
+    if (!drag || !box) return;
+    const nx = ((e.clientX - drag.offsetX - box.left) / box.width) * 100;
+    const ny = ((e.clientY - drag.offsetY - box.top) / box.height) * 100;
+    updateSticker(drag.id, {
+      x: Math.max(2, Math.min(98, nx)),
+      y: Math.max(2, Math.min(98, ny)),
+    });
+  };
+  const onStickerPointerUp = () => { stickerDragRef.current = null; };
 
   const saveStory = async () => {
     const totalMedia = existingMedia.length + previews.length;
