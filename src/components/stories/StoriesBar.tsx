@@ -22,6 +22,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 type MediaKind = 'image' | 'video';
 interface StoryMediaItem { url: string; type: MediaKind }
+interface StorySticker { id: string; emoji: string; x: number; y: number; size: number; rotation?: number }
 
 interface Story {
   id: string;
@@ -33,8 +34,12 @@ interface Story {
   views_count: number;
   created_at: string;
   expires_at: string;
+  stickers?: StorySticker[] | null;
   profile?: { name: string; avatar_url: string | null };
 }
+
+const getStickers = (s: Story | null | undefined): StorySticker[] =>
+  Array.isArray(s?.stickers) ? (s!.stickers as StorySticker[]) : [];
 
 interface GroupedStories {
   user_id: string;
@@ -106,6 +111,10 @@ export const StoriesBar = () => {
   const [textAlign, setTextAlign] = useState<'center' | 'top' | 'bottom'>('center');
   const [fontSize, setFontSize] = useState(28);
   const [previewIndex, setPreviewIndex] = useState(0);
+  const [stickers, setStickers] = useState<StorySticker[]>([]);
+  const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
+  const stickerDragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
+  const previewBoxRef = useRef<HTMLDivElement | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -160,6 +169,7 @@ export const StoriesBar = () => {
     setText(''); setFiles([]); setPreviews([]); setExistingMedia([]);
     setBgColor('#1a1a2e'); setTextAlign('center'); setFontSize(28);
     setEditingId(null); setPreviewIndex(0);
+    setStickers([]); setSelectedStickerId(null);
   };
 
   const startEdit = (story: Story) => {
@@ -167,10 +177,53 @@ export const StoriesBar = () => {
     setText(story.text_overlay || '');
     setBgColor(story.background_color || '#1a1a2e');
     setExistingMedia(getMediaList(story));
+    setStickers(getStickers(story));
+    setSelectedStickerId(null);
     setFiles([]); setPreviews([]);
     setCreating(true);
     setViewing(null);
   };
+
+  // ===== Sticker helpers =====
+  const addSticker = (emoji: string) => {
+    const s: StorySticker = {
+      id: Math.random().toString(36).slice(2, 9),
+      emoji,
+      x: 50, y: 50, size: 56,
+    };
+    setStickers(prev => [...prev, s]);
+    setSelectedStickerId(s.id);
+  };
+  const updateSticker = (id: string, patch: Partial<StorySticker>) => {
+    setStickers(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+  };
+  const removeSticker = (id: string) => {
+    setStickers(prev => prev.filter(s => s.id !== id));
+    setSelectedStickerId(p => p === id ? null : p);
+  };
+  const onStickerPointerDown = (e: React.PointerEvent, id: string) => {
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setSelectedStickerId(id);
+    const box = previewBoxRef.current?.getBoundingClientRect();
+    const st = stickers.find(s => s.id === id);
+    if (!box || !st) return;
+    const cx = box.left + (st.x / 100) * box.width;
+    const cy = box.top + (st.y / 100) * box.height;
+    stickerDragRef.current = { id, offsetX: e.clientX - cx, offsetY: e.clientY - cy };
+  };
+  const onStickerPointerMove = (e: React.PointerEvent) => {
+    const drag = stickerDragRef.current;
+    const box = previewBoxRef.current?.getBoundingClientRect();
+    if (!drag || !box) return;
+    const nx = ((e.clientX - drag.offsetX - box.left) / box.width) * 100;
+    const ny = ((e.clientY - drag.offsetY - box.top) / box.height) * 100;
+    updateSticker(drag.id, {
+      x: Math.max(2, Math.min(98, nx)),
+      y: Math.max(2, Math.min(98, ny)),
+    });
+  };
+  const onStickerPointerUp = () => { stickerDragRef.current = null; };
 
   const saveStory = async () => {
     const totalMedia = existingMedia.length + previews.length;
@@ -204,7 +257,8 @@ export const StoriesBar = () => {
           background_color: bgColor,
           media_items: media_items as any,
           media_url: media_items[0]?.url || null,
-        }).eq('id', editingId);
+          stickers: stickers as any,
+        } as any).eq('id', editingId);
         if (error) throw error;
         toast({ title: 'Story mise à jour' });
       } else {
@@ -214,7 +268,8 @@ export const StoriesBar = () => {
           background_color: bgColor,
           media_url: media_items[0]?.url || null,
           media_items: media_items as any,
-        });
+          stickers: stickers as any,
+        } as any);
         if (error) throw error;
         toast({ title: 'Story publiée !' });
       }
@@ -701,6 +756,22 @@ export const StoriesBar = () => {
                 )
               )}
 
+              {/* Stickers overlay */}
+              {getStickers(currentStory).map(st => (
+                <span
+                  key={st.id}
+                  className="absolute z-10 pointer-events-none select-none"
+                  style={{
+                    left: `${st.x}%`, top: `${st.y}%`,
+                    transform: `translate(-50%, -50%) rotate(${st.rotation || 0}deg)`,
+                    fontSize: `${st.size}px`, lineHeight: 1,
+                    filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
+                  }}
+                >
+                  {st.emoji}
+                </span>
+              ))}
+
               {/* Text overlay */}
               {currentStory.text_overlay && (
                 <div className="absolute inset-0 flex items-center justify-center p-8 z-10 pointer-events-none">
@@ -864,19 +935,24 @@ export const StoriesBar = () => {
           <div className="grid md:grid-cols-[1fr_320px] gap-4">
             {/* Big preview */}
             <div
-              className="aspect-[9/16] max-h-[70vh] w-full mx-auto rounded-xl overflow-hidden relative shadow-xl"
+              ref={previewBoxRef}
+              className="aspect-[9/16] max-h-[70vh] w-full mx-auto rounded-xl overflow-hidden relative shadow-xl touch-none"
               style={{ backgroundColor: bgColor }}
+              onPointerMove={onStickerPointerMove}
+              onPointerUp={onStickerPointerUp}
+              onPointerLeave={onStickerPointerUp}
+              onClick={() => setSelectedStickerId(null)}
             >
               {activePreview ? (
                 activePreview.kind === 'image' ? (
-                  <img src={activePreview.url} alt="" className="w-full h-full object-cover" />
+                  <img src={activePreview.url} alt="" className="w-full h-full object-cover pointer-events-none" />
                 ) : (
-                  <video src={activePreview.url} className="w-full h-full object-cover" autoPlay muted loop playsInline preload="metadata" />
+                  <video src={activePreview.url} className="w-full h-full object-cover pointer-events-none" autoPlay muted loop playsInline preload="metadata" />
                 )
               ) : null}
 
               {text && (
-                <div className={`absolute inset-0 flex justify-center p-6 ${alignClass}`}>
+                <div className={`absolute inset-0 flex justify-center p-6 pointer-events-none ${alignClass}`}>
                   <p
                     className="text-white font-bold text-center drop-shadow-lg whitespace-pre-wrap leading-snug"
                     style={{ fontSize: `${fontSize}px` }}
@@ -885,8 +961,41 @@ export const StoriesBar = () => {
                   </p>
                 </div>
               )}
-              {!activePreview && !text && (
-                <div className="absolute inset-0 flex items-center justify-center">
+
+              {/* Draggable stickers in editor */}
+              {stickers.map(st => {
+                const selected = st.id === selectedStickerId;
+                return (
+                  <div
+                    key={st.id}
+                    onPointerDown={(e) => onStickerPointerDown(e, st.id)}
+                    onClick={(e) => { e.stopPropagation(); setSelectedStickerId(st.id); }}
+                    className={`absolute cursor-move select-none ${selected ? 'ring-2 ring-primary ring-offset-1 ring-offset-transparent rounded' : ''}`}
+                    style={{
+                      left: `${st.x}%`, top: `${st.y}%`,
+                      transform: `translate(-50%, -50%) rotate(${st.rotation || 0}deg)`,
+                      fontSize: `${st.size}px`, lineHeight: 1,
+                      filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))',
+                      touchAction: 'none',
+                    }}
+                  >
+                    {st.emoji}
+                    {selected && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); removeSticker(st.id); }}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow"
+                        style={{ fontSize: 12 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {!activePreview && !text && stickers.length === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <p className="text-white/40 text-sm">{t('stories.preview') || 'Aperçu'}</p>
                 </div>
               )}
@@ -894,13 +1003,13 @@ export const StoriesBar = () => {
               {/* Preview nav */}
               {allPreviewItems.length > 1 && (
                 <>
-                  <button type="button" onClick={() => setPreviewIndex(i => Math.max(0, i - 1))} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewIndex(i => Math.max(0, i - 1)); }} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white z-20">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
-                  <button type="button" onClick={() => setPreviewIndex(i => Math.min(allPreviewItems.length - 1, i + 1))} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white">
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewIndex(i => Math.min(allPreviewItems.length - 1, i + 1)); }} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 rounded-full p-1.5 text-white z-20">
                     <ChevronRight className="h-4 w-4" />
                   </button>
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20">
                     {allPreviewItems.map((_, i) => (
                       <span key={i} className={`block h-1.5 w-1.5 rounded-full ${i === previewIndex ? 'bg-white' : 'bg-white/40'}`} />
                     ))}
@@ -940,6 +1049,42 @@ export const StoriesBar = () => {
                     </div>
                   </PopoverContent>
                 </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-1" title="Ajouter un sticker sur l'image">
+                      <span className="text-base leading-none">🌟</span> Sticker
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-2" align="start">
+                    <p className="text-[10px] text-muted-foreground mb-1 px-1">Cliquez pour ajouter sur l'image, puis glissez-le.</p>
+                    <div className="grid grid-cols-10 gap-1 max-h-60 overflow-y-auto">
+                      {EMOJIS.map(e => (
+                        <button key={e} onClick={() => addSticker(e)} className="text-xl hover:bg-muted rounded p-1 transition-colors" type="button">
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {selectedStickerId && (() => {
+                  const sel = stickers.find(s => s.id === selectedStickerId);
+                  if (!sel) return null;
+                  return (
+                    <div className="flex items-center gap-1 bg-muted rounded-md px-2 py-1">
+                      <span className="text-base">{sel.emoji}</span>
+                      <input
+                        type="range" min={20} max={160} value={sel.size}
+                        onChange={(e) => updateSticker(sel.id, { size: Number(e.target.value) })}
+                        className="w-20 accent-primary"
+                      />
+                      <button type="button" onClick={() => removeSticker(sel.id)} className="text-destructive p-0.5">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  );
+                })()}
 
                 <div className="flex border rounded-md overflow-hidden">
                   {(['top','center','bottom'] as const).map(a => (

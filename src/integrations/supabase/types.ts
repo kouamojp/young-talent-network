@@ -1851,6 +1851,7 @@ export type Database = {
           id: string
           media_items: Json
           media_url: string | null
+          stickers: Json | null
           text_overlay: string | null
           user_id: string
           views_count: number | null
@@ -1862,6 +1863,7 @@ export type Database = {
           id?: string
           media_items?: Json
           media_url?: string | null
+          stickers?: Json | null
           text_overlay?: string | null
           user_id: string
           views_count?: number | null
@@ -1873,6 +1875,7 @@ export type Database = {
           id?: string
           media_items?: Json
           media_url?: string | null
+          stickers?: Json | null
           text_overlay?: string | null
           user_id?: string
           views_count?: number | null
