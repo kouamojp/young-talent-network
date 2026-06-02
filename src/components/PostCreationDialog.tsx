@@ -38,9 +38,19 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const [showDrafts, setShowDrafts] = useState(false);
   const [scheduledFor, setScheduledFor] = useState<string>(''); // datetime-local string
   const [linkUrl, setLinkUrl] = useState('');
-  const [linkPreview, setLinkPreview] = useState<{ title?: string; image?: string | null; siteName?: string } | null>(null);
+  const [linkPreview, setLinkPreview] = useState<{ title?: string; description?: string; image?: string | null; siteName?: string; url?: string } | null>(null);
   const [importing, setImporting] = useState(false);
+  const [rotations, setRotations] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const articleMediaRef = useRef<HTMLInputElement>(null);
+  const pollMediaRef = useRef<HTMLInputElement>(null);
+  const MAX_IMAGES = 10;
+  const [articleMedia, setArticleMedia] = useState<File[]>([]);
+  const [articleMediaPreviews, setArticleMediaPreviews] = useState<string[]>([]);
+  const [articleLinkUrl, setArticleLinkUrl] = useState('');
+  const [pollMedia, setPollMedia] = useState<File | null>(null);
+  const [pollMediaPreview, setPollMediaPreview] = useState<string>('');
+  const articleTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const importFromLink = async () => {
     if (!linkUrl.trim()) return;
