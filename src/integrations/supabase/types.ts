@@ -1744,6 +1744,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          about_me: string | null
+          availability: string | null
           avatar_url: string | null
           bio: string | null
           birthday: string | null
@@ -1754,19 +1756,24 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          languages: string[] | null
           latitude: number | null
           location: string | null
           longitude: number | null
           name: string
           phone: string | null
           platform_rating: number | null
+          professional_title: string | null
           rating_count: number | null
           sport_type: string | null
+          talent_level: string | null
           updated_at: string
           user_type: string
           website: string | null
         }
         Insert: {
+          about_me?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           birthday?: string | null
@@ -1777,19 +1784,24 @@ export type Database = {
           created_at?: string
           email: string
           id: string
+          languages?: string[] | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
           name: string
           phone?: string | null
           platform_rating?: number | null
+          professional_title?: string | null
           rating_count?: number | null
           sport_type?: string | null
+          talent_level?: string | null
           updated_at?: string
           user_type: string
           website?: string | null
         }
         Update: {
+          about_me?: string | null
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           birthday?: string | null
@@ -1800,14 +1812,17 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          languages?: string[] | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
           name?: string
           phone?: string | null
           platform_rating?: number | null
+          professional_title?: string | null
           rating_count?: number | null
           sport_type?: string | null
+          talent_level?: string | null
           updated_at?: string
           user_type?: string
           website?: string | null
@@ -1916,30 +1931,36 @@ export type Database = {
       }
       talent_achievements: {
         Row: {
+          achievement_type: string | null
           category: string | null
           created_at: string
           date: string | null
           description: string | null
+          external_link: string | null
           id: string
           level: string | null
           title: string
           user_id: string
         }
         Insert: {
+          achievement_type?: string | null
           category?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          external_link?: string | null
           id?: string
           level?: string | null
           title: string
           user_id: string
         }
         Update: {
+          achievement_type?: string | null
           category?: string | null
           created_at?: string
           date?: string | null
           description?: string | null
+          external_link?: string | null
           id?: string
           level?: string | null
           title?: string
@@ -1985,6 +2006,51 @@ export type Database = {
           institution?: string
           is_current?: boolean | null
           start_year?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      talent_experiences: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean
+          organization: string | null
+          start_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          organization?: string | null
+          start_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          organization?: string | null
+          start_date?: string | null
+          title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

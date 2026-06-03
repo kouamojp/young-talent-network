@@ -20,6 +20,8 @@ import AutoResumeCard from '@/components/profile/AutoResumeCard';
 import FileUploadButton from '@/components/profile/FileUploadButton';
 import { StoriesBar } from '@/components/stories/StoriesBar';
 import { PostCreationDialog } from '@/components/PostCreationDialog';
+import Talent360Tab from '@/components/profile/Talent360Tab';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -253,6 +255,15 @@ const Profile: React.FC = () => {
           <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={handleSectionChange} />
         </div>
         <div className="lg:col-span-3 space-y-6">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid grid-cols-2 w-full">
+              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+              <TabsTrigger value="talent360">Talent 360°</TabsTrigger>
+            </TabsList>
+            <TabsContent value="talent360" className="mt-4">
+              {userId && <Talent360Tab userId={userId} profile={displayProfile} onProfileUpdate={(u) => setProfile((p: any) => ({ ...p, ...u }))} />}
+            </TabsContent>
+            <TabsContent value="overview" className="mt-4 space-y-6">
           <Card className="overflow-hidden">
             <CardContent className="p-4">
               <div className={cn("transition-all duration-200 ease-out", isTransitioning ? "opacity-0 translate-y-2 scale-[0.98]" : "opacity-100 translate-y-0 scale-100")}>
@@ -427,6 +438,8 @@ const Profile: React.FC = () => {
               <ProfileSettings profile={displayProfile} onUpdate={(updates) => setProfile((prev: any) => ({ ...prev, ...updates }))} />
             </CardContent>
           </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
