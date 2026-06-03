@@ -23,6 +23,8 @@ const AddAchievementDialog: React.FC<AddAchievementDialogProps> = ({ userId, onA
     category: '',
     level: '',
     date: '',
+    achievement_type: '',
+    external_link: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,10 +39,12 @@ const AddAchievementDialog: React.FC<AddAchievementDialogProps> = ({ userId, onA
         category: form.category || null,
         level: form.level || null,
         date: form.date || null,
-      });
+        achievement_type: form.achievement_type || null,
+        external_link: form.external_link.trim() || null,
+      } as any);
       if (error) throw error;
       toast.success('Réalisation ajoutée');
-      setForm({ title: '', description: '', category: '', level: '', date: '' });
+      setForm({ title: '', description: '', category: '', level: '', date: '', achievement_type: '', external_link: '' });
       setOpen(false);
       onAdded();
     } catch (err) {
@@ -98,9 +102,30 @@ const AddAchievementDialog: React.FC<AddAchievementDialogProps> = ({ userId, onA
               </Select>
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Type de réalisation</Label>
+              <Select value={form.achievement_type} onValueChange={v => setForm(f => ({ ...f, achievement_type: v }))}>
+                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="award">Prix / Award</SelectItem>
+                  <SelectItem value="competition">Compétition</SelectItem>
+                  <SelectItem value="publication">Publication</SelectItem>
+                  <SelectItem value="performance">Performance</SelectItem>
+                  <SelectItem value="certification">Certification</SelectItem>
+                  <SelectItem value="record">Record</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Date</Label>
+              <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+            </div>
+          </div>
           <div>
-            <Label>Date</Label>
-            <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+            <Label>Lien externe</Label>
+            <Input type="url" value={form.external_link} onChange={e => setForm(f => ({ ...f, external_link: e.target.value }))} placeholder="https://..." />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Ajout...' : 'Ajouter la réalisation'}
