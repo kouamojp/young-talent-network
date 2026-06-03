@@ -333,6 +333,9 @@ const Profile: React.FC = () => {
 
           {userId && <ProfileSources userId={userId} />}
 
+          {userId && <MySocialLinksCard userId={userId} />}
+
+
           {userId && <SportProfileEditor userId={userId} />}
 
           <Card>
