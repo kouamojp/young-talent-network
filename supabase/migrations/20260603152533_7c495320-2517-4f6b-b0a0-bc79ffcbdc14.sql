@@ -1,0 +1,2 @@
+ALTER TABLE public.talent_presence DROP CONSTRAINT IF EXISTS talent_presence_section_check;
+ALTER TABLE public.talent_presence ADD CONSTRAINT talent_presence_section_check CHECK (section = ANY (ARRAY['events','tv','live','work','learning','yat-coin','karta','marketplace','social']));
