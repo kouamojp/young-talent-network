@@ -12,6 +12,8 @@ import LiveSection from '@/components/talent-dashboard/LiveSection';
 import TVSection from '@/components/talent-dashboard/TVSection';
 import EventsSection from '@/components/talent-dashboard/EventsSection';
 import OrganizationsSection from '@/components/talent-dashboard/OrganizationsSection';
+import OverviewSection from '@/components/talent-dashboard/OverviewSection';
+
 import TalentDashboardMobile from './TalentDashboardMobile';
 import { useLanguage } from '@/i18n/LanguageContext';
 
