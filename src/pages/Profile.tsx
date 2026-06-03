@@ -21,6 +21,8 @@ import FileUploadButton from '@/components/profile/FileUploadButton';
 import { StoriesBar } from '@/components/stories/StoriesBar';
 import { PostCreationDialog } from '@/components/PostCreationDialog';
 import Talent360Tab from '@/components/profile/Talent360Tab';
+import MySocialLinksCard from '@/components/profile/MySocialLinksCard';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
