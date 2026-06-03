@@ -213,12 +213,20 @@ const Profile: React.FC = () => {
               {socialLinks.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {socialLinks.map(link => (
-                    <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer">
-                      <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10">{link.platform}</Badge>
-                    </a>
+                    <button
+                      key={link.id}
+                      type="button"
+                      onClick={() => navigate(`/social?url=${encodeURIComponent(link.url)}&platform=${encodeURIComponent(link.platform)}`)}
+                      title={link.url}
+                    >
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 capitalize">
+                        <Globe className="h-3 w-3 mr-1" />{link.platform}
+                      </Badge>
+                    </button>
                   ))}
                 </div>
               )}
+
             </div>
           </div>
         </CardContent>
