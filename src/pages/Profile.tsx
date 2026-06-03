@@ -255,22 +255,9 @@ const Profile: React.FC = () => {
           <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={handleSectionChange} />
         </div>
         <div className="lg:col-span-3 space-y-6">
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="talent360">Talent 360°</TabsTrigger>
-            </TabsList>
-            <TabsContent value="talent360" className="mt-4">
-              {userId && <Talent360Tab userId={userId} profile={displayProfile} onProfileUpdate={(u) => setProfile((p: any) => ({ ...p, ...u }))} />}
-            </TabsContent>
-            <TabsContent value="overview" className="mt-4 space-y-6">
-          <Card className="overflow-hidden">
-            <CardContent className="p-4">
-              <div className={cn("transition-all duration-200 ease-out", isTransitioning ? "opacity-0 translate-y-2 scale-[0.98]" : "opacity-100 translate-y-0 scale-100")}>
-                {(() => { const tab = sectionTabs.find(t => t.key === activeSection) || sectionTabs[0]; return <SectionContent section={tab.key} icon={tab.icon} color={tab.color} />; })()}
-              </div>
-            </CardContent>
-          </Card>
+          {userId && <Talent360Tab userId={userId} profile={displayProfile} onProfileUpdate={(u) => setProfile((p: any) => ({ ...p, ...u }))} />}
+
+
 
           {levelData && <UserLevelBadge levelData={levelData} />}
 
