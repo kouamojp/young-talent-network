@@ -138,47 +138,7 @@ const Talent360Tab: React.FC<Props> = ({ userId, profile, onProfileUpdate }) => 
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-primary via-purple-500 to-pink-500 relative">
-          {profile?.cover_photo_url && <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />}
-          <div className="absolute top-3 right-3">
-            <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon" variant="secondary"
-              onUploaded={async (url) => {
-                await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId);
-                onProfileUpdate({ cover_photo_url: url });
-              }} />
-          </div>
-        </div>
-        <CardContent className="pt-0 -mt-12 relative">
-          <div className="flex items-end gap-4">
-            <div className="relative">
-              <Avatar className="h-24 w-24 border-4 border-card shadow-lg bg-card">
-                <AvatarImage src={profile?.avatar_url} alt={profile?.name} />
-                <AvatarFallback className="text-2xl">{profile?.name?.[0] || 'T'}</AvatarFallback>
-              </Avatar>
-              <div className="absolute bottom-0 right-0">
-                <FileUploadButton userId={userId} folder="avatar" accept="image/*" label="" size="icon" variant="secondary"
-                  onUploaded={async (url) => {
-                    await supabase.from('profiles').update({ avatar_url: url }).eq('id', userId);
-                    onProfileUpdate({ avatar_url: url });
-                  }} />
-              </div>
-            </div>
-            <div className="flex-1 pb-2">
-              <h2 className="text-xl font-bold">{profile?.name}</h2>
-              {profile?.professional_title && (
-                <p className="text-sm text-primary font-medium">{profile.professional_title}</p>
-              )}
-              <div className="flex flex-wrap gap-2 mt-1">
-                {availabilityBadge && (
-                  <Badge className={`${availabilityBadge.color} border-0`}>{availabilityBadge.l}</Badge>
-                )}
-                {levelLabel && <Badge variant="outline">{levelLabel}</Badge>}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-3">

@@ -12,6 +12,8 @@ import LiveSection from '@/components/talent-dashboard/LiveSection';
 import TVSection from '@/components/talent-dashboard/TVSection';
 import EventsSection from '@/components/talent-dashboard/EventsSection';
 import OrganizationsSection from '@/components/talent-dashboard/OrganizationsSection';
+import OverviewSection from '@/components/talent-dashboard/OverviewSection';
+
 import TalentDashboardMobile from './TalentDashboardMobile';
 import { useLanguage } from '@/i18n/LanguageContext';
 
@@ -44,8 +46,9 @@ const TalentDashboard: React.FC = () => {
 
         <AnalyticsDashboard />
 
-        <Tabs defaultValue="work" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 text-center text-sm">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-7 text-center text-sm">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="work">{t('talent.work')}</TabsTrigger>
             <TabsTrigger value="learning">{t('talent.learning')}</TabsTrigger>
             <TabsTrigger value="live">{t('talent.live')}</TabsTrigger>
@@ -53,6 +56,12 @@ const TalentDashboard: React.FC = () => {
             <TabsTrigger value="events">{t('talent.events')}</TabsTrigger>
             <TabsTrigger value="organizations">{t('talent.organizations')}</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <OverviewSection />
+          </TabsContent>
+
+
 
           <TabsContent value="work">
             <WorkSection />
