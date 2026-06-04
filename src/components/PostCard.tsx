@@ -95,7 +95,24 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
     onUpdate?.();
   };
 
-  const reportPost = () => toast({ title: 'Merci, votre signalement a été enregistré' });
+  const reportPost = async () => {
+    const reason = window.prompt('Pourquoi signalez-vous ce contenu ?');
+    if (!reason || !reason.trim()) return;
+    try {
+      await supabase.functions.invoke('moderate-content', {
+        body: {
+          content: rawText,
+          content_type: 'post',
+          content_id: post.id,
+          reported_user_id: post.user_id || post.author.id,
+          manual_reason: reason.trim(),
+        },
+      });
+      toast({ title: 'Merci, votre signalement a été envoyé aux modérateurs' });
+    } catch (e: any) {
+      toast({ title: 'Échec du signalement', description: e.message, variant: 'destructive' });
+    }
+  };
   const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: 'Lien copié' }); } catch { toast({ title: 'Impossible de copier', variant: 'destructive' }); } };
 
 
