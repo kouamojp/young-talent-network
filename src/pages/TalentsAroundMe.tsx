@@ -114,7 +114,18 @@ const TalentsAroundMe: React.FC = () => {
     else { toast.success('Localisation enregistrée sur votre profil'); setMyProfile(p => ({ ...(p || {}), latitude: coords.lat, longitude: coords.lng } as any)); }
   };
 
-  const fetchTalents = useCallback(async () => {
+  const hideMyLocation = async () => {
+    if (!currentUserId) return;
+    setRemovingLoc(true);
+    const { error } = await supabase.from('profiles')
+      .update({ latitude: null, longitude: null })
+      .eq('id', currentUserId);
+    setRemovingLoc(false);
+    if (error) { toast.error(error.message); return; }
+    setCoords(null);
+    setMyProfile(p => ({ ...(p || {}), latitude: null, longitude: null } as any));
+    toast.success('Géolocalisation désactivée. Seule votre ville/pays sera visible.');
+  };
     setLoading(true);
     try {
       let q = supabase.from('profiles')
