@@ -326,15 +326,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       {rawText && (
         <div className="px-4 pb-3">
           <p className="text-[15px] whitespace-pre-wrap break-words">{renderTextWithLinks(displayText)}</p>
-          {isLong && (
-            <button
-              onClick={() => setExpanded(e => !e)}
-              className="mt-1 text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
-            >
-              {expanded ? 'Voir moins' : 'Voir plus'}
-              <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
-            </button>
-          )}
+          <div className="mt-1 flex items-center gap-2 flex-wrap">
+            {isLong && (
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
+              >
+                {expanded ? 'Voir moins' : 'Voir plus'}
+                <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+              </button>
+            )}
+            <TranslateButton
+              text={rawText}
+              currentLang={translation?.lang || null}
+              onTranslated={(t, lang) => setTranslation(t && lang ? { text: t, lang } : null)}
+            />
+            {translation && (
+              <span className="text-[10px] text-muted-foreground italic">Traduit par IA</span>
+            )}
+          </div>
         </div>
       )}
 
