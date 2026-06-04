@@ -61,6 +61,9 @@ const TalentsAroundMe: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [myProfile, setMyProfile] = useState<{ latitude: number | null; longitude: number | null; city: string | null } | null>(null);
   const [categoryQuery, setCategoryQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'talent' | 'agent' | 'organization'>('all');
+  const [countryFilter, setCountryFilter] = useState('all');
+  const [removingLoc, setRemovingLoc] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
