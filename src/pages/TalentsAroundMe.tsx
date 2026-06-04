@@ -223,9 +223,33 @@ const TalentsAroundMe: React.FC = () => {
 
         {/* Filters */}
         <Card>
-          <CardContent className="p-4 grid md:grid-cols-3 gap-4">
+          <CardContent className="p-4 grid md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Recherche (nom, sport, catégorie)</label>
+              <label className="text-xs font-medium text-muted-foreground">Type de profil</label>
+              <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="talent">Talents</SelectItem>
+                  <SelectItem value="agent">Agents</SelectItem>
+                  <SelectItem value="organization">Organisations</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Pays</label>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger><SelectValue placeholder="Tous" /></SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="all">Tous</SelectItem>
+                  {countries.map((c: any) => (
+                    <SelectItem key={c.code || c.name} value={c.name}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Domaine / mot-clé</label>
               <Input value={categoryQuery} onChange={e => setCategoryQuery(e.target.value)} placeholder="Football, piano, dev..." />
             </div>
             {!coords && (
