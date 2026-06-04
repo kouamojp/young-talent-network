@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import ModerationReportsPanel from '@/components/admin/ModerationReportsPanel';
+import VerificationRequestsPanel from '@/components/admin/VerificationRequestsPanel';
 
 const AdminPanel: React.FC = () => {
   const { t } = useLanguage();
