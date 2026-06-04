@@ -15,6 +15,7 @@ import { ProfileSkills } from './ProfileSkills';
 import AddAchievementDialog from './AddAchievementDialog';
 import AddExperienceDialog from './AddExperienceDialog';
 import { useUserLevel } from '@/hooks/useUserLevel';
+import TranslatableText from '@/components/TranslatableText';
 
 interface Props {
   userId: string;
