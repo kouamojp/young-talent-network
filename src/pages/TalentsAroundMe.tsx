@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Users, Sparkles, Loader2, Locate, Database, Star, MessageCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MapPin, Users, Sparkles, Loader2, Locate, Database, Star, MessageCircle, Shield, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { countries } from '@/data/countries';
 
 interface NearbyTalent {
   id: string;
@@ -59,6 +61,9 @@ const TalentsAroundMe: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [myProfile, setMyProfile] = useState<{ latitude: number | null; longitude: number | null; city: string | null } | null>(null);
   const [categoryQuery, setCategoryQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'talent' | 'agent' | 'organization'>('all');
+  const [countryFilter, setCountryFilter] = useState('all');
+  const [removingLoc, setRemovingLoc] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
@@ -109,12 +114,28 @@ const TalentsAroundMe: React.FC = () => {
     else { toast.success('Localisation enregistrée sur votre profil'); setMyProfile(p => ({ ...(p || {}), latitude: coords.lat, longitude: coords.lng } as any)); }
   };
 
+  const hideMyLocation = async () => {
+    if (!currentUserId) return;
+    setRemovingLoc(true);
+    const { error } = await supabase.from('profiles')
+      .update({ latitude: null, longitude: null })
+      .eq('id', currentUserId);
+    setRemovingLoc(false);
+    if (error) { toast.error(error.message); return; }
+    setCoords(null);
+    setMyProfile(p => ({ ...(p || {}), latitude: null, longitude: null } as any));
+    toast.success('Géolocalisation désactivée. Seule votre ville/pays sera visible.');
+  };
+
   const fetchTalents = useCallback(async () => {
     setLoading(true);
     try {
+      const types = typeFilter === 'all' ? ['talent', 'agent', 'organization'] : [typeFilter];
       let q = supabase.from('profiles')
         .select('id, name, avatar_url, bio, city, country, sport_type, user_type, latitude, longitude, platform_rating')
-        .in('user_type', ['talent', 'agent', 'organization']);
+        .in('user_type', types);
+
+      if (countryFilter !== 'all') q = q.eq('country', countryFilter);
 
       if (currentUserId) q = q.neq('id', currentUserId);
       if (categoryQuery.trim()) {
@@ -148,7 +169,7 @@ const TalentsAroundMe: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [coords, distance, categoryQuery, cityFallback, currentUserId]);
+  }, [coords, distance, categoryQuery, cityFallback, currentUserId, typeFilter, countryFilter]);
 
   useEffect(() => {
     const t = setTimeout(() => fetchTalents(), 300);
@@ -184,6 +205,12 @@ const TalentsAroundMe: React.FC = () => {
                   Enregistrer sur mon profil
                 </Button>
               )}
+              {currentUserId && (myProfile?.latitude || coords) && (
+                <Button size="sm" onClick={hideMyLocation} disabled={removingLoc} variant="secondary" className="gap-1">
+                  {removingLoc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <EyeOff className="h-3.5 w-3.5" />}
+                  Désactiver ma géoloc
+                </Button>
+              )}
               <Button size="sm" variant="secondary" asChild className="gap-1">
                 <Link to="/yat-database"><Database className="h-3.5 w-3.5" /> YAT Database</Link>
               </Button>
@@ -196,9 +223,33 @@ const TalentsAroundMe: React.FC = () => {
 
         {/* Filters */}
         <Card>
-          <CardContent className="p-4 grid md:grid-cols-3 gap-4">
+          <CardContent className="p-4 grid md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Recherche (nom, sport, catégorie)</label>
+              <label className="text-xs font-medium text-muted-foreground">Type de profil</label>
+              <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="talent">Talents</SelectItem>
+                  <SelectItem value="agent">Agents</SelectItem>
+                  <SelectItem value="organization">Organisations</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Pays</label>
+              <Select value={countryFilter} onValueChange={setCountryFilter}>
+                <SelectTrigger><SelectValue placeholder="Tous" /></SelectTrigger>
+                <SelectContent className="max-h-60">
+                  <SelectItem value="all">Tous</SelectItem>
+                  {countries.map((c: any) => (
+                    <SelectItem key={c.code || c.name} value={c.name}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Domaine / mot-clé</label>
               <Input value={categoryQuery} onChange={e => setCategoryQuery(e.target.value)} placeholder="Football, piano, dev..." />
             </div>
             {!coords && (

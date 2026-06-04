@@ -156,6 +156,15 @@ export const yatServicesItems: MenuSectionItem[] = [
     badge: 'New',
     badgeColor: 'bg-amber-500 text-white',
   },
+  {
+    label: 'Recherche avancée',
+    description: 'Filtres détaillés : type, pays, niveau, compétences...',
+    icon: Sparkles,
+    path: '/advanced-search',
+    iconColor: 'text-pink-500',
+    badge: 'New',
+    badgeColor: 'bg-pink-500 text-white',
+  },
 ];
 
 // Communities & Content
