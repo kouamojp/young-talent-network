@@ -251,8 +251,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
   const MAX_DESC = 500;
   const [expanded, setExpanded] = useState(false);
-  const isLong = rawText.length > MAX_DESC;
-  const displayText = !expanded && isLong ? rawText.slice(0, MAX_DESC).trimEnd() + '…' : rawText;
+  const [translation, setTranslation] = useState<{ text: string; lang: string } | null>(null);
+  const shownText = translation?.text ?? rawText;
+  const isLong = shownText.length > MAX_DESC;
+  const displayText = !expanded && isLong ? shownText.slice(0, MAX_DESC).trimEnd() + '…' : shownText;
 
   const postDate = new Date(post.timestamp);
 
