@@ -169,7 +169,7 @@ const TalentsAroundMe: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [coords, distance, categoryQuery, cityFallback, currentUserId]);
+  }, [coords, distance, categoryQuery, cityFallback, currentUserId, typeFilter, countryFilter]);
 
   useEffect(() => {
     const t = setTimeout(() => fetchTalents(), 300);
