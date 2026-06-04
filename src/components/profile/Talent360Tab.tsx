@@ -15,6 +15,7 @@ import { ProfileSkills } from './ProfileSkills';
 import AddAchievementDialog from './AddAchievementDialog';
 import AddExperienceDialog from './AddExperienceDialog';
 import { useUserLevel } from '@/hooks/useUserLevel';
+import TranslatableText from '@/components/TranslatableText';
 
 interface Props {
   userId: string;
@@ -227,7 +228,7 @@ const Talent360Tab: React.FC<Props> = ({ userId, profile, onProfileUpdate }) => 
             </div>
           ) : (
             profile?.about_me
-              ? <p className="text-sm whitespace-pre-wrap leading-relaxed">{profile.about_me}</p>
+              ? <TranslatableText text={profile.about_me} className="text-sm whitespace-pre-wrap leading-relaxed" />
               : <p className="text-sm text-muted-foreground italic">Ajoute une biographie pour présenter ton parcours et tes ambitions.</p>
           )}
         </CardContent>

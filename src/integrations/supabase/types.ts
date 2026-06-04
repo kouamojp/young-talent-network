@@ -1354,6 +1354,66 @@ export type Database = {
           },
         ]
       }
+      moderation_reports: {
+        Row: {
+          categories: string[] | null
+          content_excerpt: string | null
+          content_id: string | null
+          content_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          reported_user_id: string | null
+          reporter_user_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          risk_level: string
+          risk_score: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          categories?: string[] | null
+          content_excerpt?: string | null
+          content_id?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          reported_user_id?: string | null
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_level?: string
+          risk_score?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          categories?: string[] | null
+          content_excerpt?: string | null
+          content_id?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          reported_user_id?: string | null
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          risk_level?: string
+          risk_score?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string

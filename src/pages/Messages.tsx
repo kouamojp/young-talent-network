@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/use-toast';
+import TranslatableText from '@/components/TranslatableText';
 
 const Messages: React.FC = () => {
   const { t } = useLanguage();
@@ -286,7 +287,9 @@ const Messages: React.FC = () => {
                   <div key={message.id} className={`flex group ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${bubbleColor} ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'}`}>
                       {message.forwarded_from_id && <p className="text-[10px] italic opacity-70 mb-1">↪ Transféré</p>}
-                      {message.content && <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
+                      {message.content && (
+                        <TranslatableText text={message.content} className="text-sm whitespace-pre-wrap break-words" />
+                      )}
                       {renderMedia(message)}
                       <div className="flex items-center justify-between gap-2 mt-1">
                         <span className="text-[10px] opacity-70">{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

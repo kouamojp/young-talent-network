@@ -16,6 +16,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import ModerationReportsPanel from '@/components/admin/ModerationReportsPanel';
 
 const AdminPanel: React.FC = () => {
   const { t } = useLanguage();
@@ -571,8 +572,9 @@ const AdminPanel: React.FC = () => {
 
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-4">
+          <ModerationReportsPanel />
           <Card>
-            <CardHeader><CardTitle>{t('admin.contentModeration') || 'Content Moderation'}</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Recent Posts</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {posts.slice(0, 5).map((post, i) => (

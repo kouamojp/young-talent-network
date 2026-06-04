@@ -14,6 +14,7 @@ import ShareToFriendsDialog from './share/ShareToFriendsDialog';
 import LinkPreview from './LinkPreview';
 import { PostCreationDialog } from './PostCreationDialog';
 import { Users } from 'lucide-react';
+import TranslateButton from './TranslateButton';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
 const isUrl = (s: string) => /^https?:\/\//i.test(s);
@@ -94,7 +95,24 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
     onUpdate?.();
   };
 
-  const reportPost = () => toast({ title: 'Merci, votre signalement a été enregistré' });
+  const reportPost = async () => {
+    const reason = window.prompt('Pourquoi signalez-vous ce contenu ?');
+    if (!reason || !reason.trim()) return;
+    try {
+      await supabase.functions.invoke('moderate-content', {
+        body: {
+          content: post.content,
+          content_type: 'post',
+          content_id: post.id,
+          reported_user_id: post.user_id || post.author.id,
+          manual_reason: reason.trim(),
+        },
+      });
+      toast({ title: 'Merci, votre signalement a été envoyé aux modérateurs' });
+    } catch (e: any) {
+      toast({ title: 'Échec du signalement', description: e.message, variant: 'destructive' });
+    }
+  };
   const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: 'Lien copié' }); } catch { toast({ title: 'Impossible de copier', variant: 'destructive' }); } };
 
 
@@ -233,8 +251,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
   const MAX_DESC = 500;
   const [expanded, setExpanded] = useState(false);
-  const isLong = rawText.length > MAX_DESC;
-  const displayText = !expanded && isLong ? rawText.slice(0, MAX_DESC).trimEnd() + '…' : rawText;
+  const [translation, setTranslation] = useState<{ text: string; lang: string } | null>(null);
+  const shownText = translation?.text ?? rawText;
+  const isLong = shownText.length > MAX_DESC;
+  const displayText = !expanded && isLong ? shownText.slice(0, MAX_DESC).trimEnd() + '…' : shownText;
 
   const postDate = new Date(post.timestamp);
 
@@ -306,15 +326,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       {rawText && (
         <div className="px-4 pb-3">
           <p className="text-[15px] whitespace-pre-wrap break-words">{renderTextWithLinks(displayText)}</p>
-          {isLong && (
-            <button
-              onClick={() => setExpanded(e => !e)}
-              className="mt-1 text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
-            >
-              {expanded ? 'Voir moins' : 'Voir plus'}
-              <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
-            </button>
-          )}
+          <div className="mt-1 flex items-center gap-2 flex-wrap">
+            {isLong && (
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
+              >
+                {expanded ? 'Voir moins' : 'Voir plus'}
+                <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+              </button>
+            )}
+            <TranslateButton
+              text={rawText}
+              currentLang={translation?.lang || null}
+              onTranslated={(t, lang) => setTranslation(t && lang ? { text: t, lang } : null)}
+            />
+            {translation && (
+              <span className="text-[10px] text-muted-foreground italic">Traduit par IA</span>
+            )}
+          </div>
         </div>
       )}
 
