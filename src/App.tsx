@@ -44,6 +44,7 @@ import Article from "./pages/Article";
 import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
 import Shorts from "./pages/Shorts";
+import AdvancedSearch from "./pages/AdvancedSearch";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
