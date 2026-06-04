@@ -404,7 +404,12 @@ const AdminPanel: React.FC = () => {
           <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />Communities</TabsTrigger>
           <TabsTrigger value="marketplace"><ShoppingBag className="h-4 w-4 mr-1" />Маркетплейс</TabsTrigger>
           <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />Реклама</TabsTrigger>
+          <TabsTrigger value="verification"><Shield className="h-4 w-4 mr-1" />Vérification</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="verification" className="space-y-4">
+          <VerificationRequestsPanel />
+        </TabsContent>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
