@@ -101,7 +101,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
     try {
       await supabase.functions.invoke('moderate-content', {
         body: {
-          content: rawText,
+          content: post.content,
           content_type: 'post',
           content_id: post.id,
           reported_user_id: post.user_id || post.author.id,
