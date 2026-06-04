@@ -116,6 +116,7 @@ const App = () => {
                 <Route path="/articles" element={<Articles />} />
                <Route path="/assistant" element={<Assistant />} />
                <Route path="/shorts" element={<Shorts />} />
+               <Route path="/advanced-search" element={<AdvancedSearch />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
