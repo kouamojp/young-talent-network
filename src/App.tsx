@@ -45,6 +45,8 @@ import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
 import Shorts from "./pages/Shorts";
 import AdvancedSearch from "./pages/AdvancedSearch";
+import Verification from "./pages/Verification";
+import TalentMarketplace from "./pages/TalentMarketplace";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
