@@ -45,6 +45,8 @@ import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
 import Shorts from "./pages/Shorts";
 import AdvancedSearch from "./pages/AdvancedSearch";
+import Verification from "./pages/Verification";
+import TalentMarketplace from "./pages/TalentMarketplace";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
@@ -116,7 +118,9 @@ const App = () => {
                 <Route path="/articles" element={<Articles />} />
                <Route path="/assistant" element={<Assistant />} />
                <Route path="/shorts" element={<Shorts />} />
-               <Route path="/advanced-search" element={<AdvancedSearch />} />
+              <Route path="/advanced-search" element={<AdvancedSearch />} />
+              <Route path="/verification" element={<Verification />} />
+              <Route path="/talent-marketplace" element={<TalentMarketplace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

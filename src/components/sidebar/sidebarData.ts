@@ -165,6 +165,22 @@ export const yatServicesItems: MenuSectionItem[] = [
     badge: 'New',
     badgeColor: 'bg-pink-500 text-white',
   },
+  {
+    label: 'Marketplace Talents',
+    description: 'Annonces : recrutement, casting, freelance, sponsoring',
+    icon: Briefcase,
+    path: '/talent-marketplace',
+    iconColor: 'text-orange-500',
+    badge: 'New',
+    badgeColor: 'bg-orange-500 text-white',
+  },
+  {
+    label: 'Vérification',
+    description: 'Obtiens un badge vérifié',
+    icon: Shield,
+    path: '/verification',
+    iconColor: 'text-emerald-600',
+  },
 ];
 
 // Communities & Content

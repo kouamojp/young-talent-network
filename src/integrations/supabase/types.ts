@@ -1757,6 +1757,41 @@ export type Database = {
           },
         ]
       }
+      profile_badges: {
+        Row: {
+          badge_type: string
+          created_at: string
+          granted_by: string | null
+          id: string
+          request_id: string | null
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          request_id?: string | null
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          request_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_badges_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "verification_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_sources: {
         Row: {
           auto_sync: boolean
@@ -1896,6 +1931,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saved_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          saved_user_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          saved_user_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          saved_user_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       skills: {
         Row: {
@@ -2303,6 +2362,101 @@ export type Database = {
           },
         ]
       }
+      talent_request_applications: {
+        Row: {
+          applicant_id: string
+          created_at: string
+          id: string
+          message: string | null
+          request_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          request_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          request_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_request_applications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "talent_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_requests: {
+        Row: {
+          budget: string | null
+          city: string | null
+          conditions: string | null
+          contact: string | null
+          country: string | null
+          created_at: string
+          deadline: string | null
+          description: string
+          domain: string | null
+          id: string
+          request_type: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          views_count: number
+        }
+        Insert: {
+          budget?: string | null
+          city?: string | null
+          conditions?: string | null
+          contact?: string | null
+          country?: string | null
+          created_at?: string
+          deadline?: string | null
+          description: string
+          domain?: string | null
+          id?: string
+          request_type: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          views_count?: number
+        }
+        Update: {
+          budget?: string | null
+          city?: string | null
+          conditions?: string | null
+          contact?: string | null
+          country?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          domain?: string | null
+          id?: string
+          request_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
       talent_resumes: {
         Row: {
           achievements: string[] | null
@@ -2651,6 +2805,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      verification_requests: {
+        Row: {
+          admin_notes: string | null
+          badge_type: string
+          created_at: string
+          documents: Json
+          id: string
+          notes: string | null
+          official_links: string[] | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          badge_type: string
+          created_at?: string
+          documents?: Json
+          id?: string
+          notes?: string | null
+          official_links?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          badge_type?: string
+          created_at?: string
+          documents?: Json
+          id?: string
+          notes?: string | null
+          official_links?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       yat_categories: {
         Row: {
