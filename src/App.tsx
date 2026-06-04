@@ -43,6 +43,7 @@ import Friends from "./pages/Friends";
 import Article from "./pages/Article";
 import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
+import Shorts from "./pages/Shorts";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
@@ -112,7 +113,8 @@ const App = () => {
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/article/:id" element={<Article />} />
                 <Route path="/articles" element={<Articles />} />
-                <Route path="/assistant" element={<Assistant />} />
+               <Route path="/assistant" element={<Assistant />} />
+               <Route path="/shorts" element={<Shorts />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

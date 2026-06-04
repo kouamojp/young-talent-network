@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Search, Newspaper, MessageSquare, User } from 'lucide-react';
+import { Home, Search, Play, MessageSquare, User } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 const MobileBottomNav: React.FC = () => {
@@ -10,7 +10,7 @@ const MobileBottomNav: React.FC = () => {
   const navItems = [
     { path: '/', icon: Home, label: t('bottomNav.home') },
     { path: '/search', icon: Search, label: t('bottomNav.search') },
-    { path: '/news', icon: Newspaper, label: t('bottomNav.news') },
+    { path: '/shorts', icon: Play, label: 'Shorts' },
     { path: '/messages', icon: MessageSquare, label: t('bottomNav.messages') },
     { path: '/profile', icon: User, label: t('bottomNav.profile') },
   ];
