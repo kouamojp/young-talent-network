@@ -205,6 +205,12 @@ const TalentsAroundMe: React.FC = () => {
                   Enregistrer sur mon profil
                 </Button>
               )}
+              {currentUserId && (myProfile?.latitude || coords) && (
+                <Button size="sm" onClick={hideMyLocation} disabled={removingLoc} variant="secondary" className="gap-1">
+                  {removingLoc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <EyeOff className="h-3.5 w-3.5" />}
+                  Désactiver ma géoloc
+                </Button>
+              )}
               <Button size="sm" variant="secondary" asChild className="gap-1">
                 <Link to="/yat-database"><Database className="h-3.5 w-3.5" /> YAT Database</Link>
               </Button>
