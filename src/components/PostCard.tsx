@@ -14,6 +14,7 @@ import ShareToFriendsDialog from './share/ShareToFriendsDialog';
 import LinkPreview from './LinkPreview';
 import { PostCreationDialog } from './PostCreationDialog';
 import { Users } from 'lucide-react';
+import TranslateButton from './TranslateButton';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
 const isUrl = (s: string) => /^https?:\/\//i.test(s);
