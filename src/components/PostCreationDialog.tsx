@@ -453,6 +453,17 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       }
 
       if (activeDraftId) await supabase.from('post_drafts').delete().eq('id', activeDraftId);
+
+      // Fire-and-forget AI anti-spam / anti-fraud moderation
+      try {
+        const textForScan = (tab === 'article' ? `${articleTitle}\n${content}` : content).trim();
+        if (textForScan.length > 5) {
+          supabase.functions.invoke('moderate-content', {
+            body: { content: textForScan, content_type: 'post', reported_user_id: user.id },
+          }).catch(() => {});
+        }
+      } catch {}
+
       reset();
       setOpen(false);
       onPostCreated?.();
