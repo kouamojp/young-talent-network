@@ -126,11 +126,16 @@ const TalentsAroundMe: React.FC = () => {
     setMyProfile(p => ({ ...(p || {}), latitude: null, longitude: null } as any));
     toast.success('Géolocalisation désactivée. Seule votre ville/pays sera visible.');
   };
+
+  const fetchTalents = useCallback(async () => {
     setLoading(true);
     try {
+      const types = typeFilter === 'all' ? ['talent', 'agent', 'organization'] : [typeFilter];
       let q = supabase.from('profiles')
         .select('id, name, avatar_url, bio, city, country, sport_type, user_type, latitude, longitude, platform_rating')
-        .in('user_type', ['talent', 'agent', 'organization']);
+        .in('user_type', types);
+
+      if (countryFilter !== 'all') q = q.eq('country', countryFilter);
 
       if (currentUserId) q = q.neq('id', currentUserId);
       if (categoryQuery.trim()) {
