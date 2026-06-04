@@ -7,9 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Users, Sparkles, Loader2, Locate, Database, Star, MessageCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MapPin, Users, Sparkles, Loader2, Locate, Database, Star, MessageCircle, Shield, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { countries } from '@/data/countries';
 
 interface NearbyTalent {
   id: string;
