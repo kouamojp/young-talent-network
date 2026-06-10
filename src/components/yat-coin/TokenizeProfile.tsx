@@ -8,12 +8,22 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Coins, Plus, X, Upload, TrendingUp } from 'lucide-react';
+import { Coins, Plus, X, Upload, TrendingUp, Trophy, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useYatScore } from '@/hooks/useYatScore';
 
 const TokenizeProfile: React.FC = () => {
   const { t } = useLanguage();
+  const { data: yat, loading: yatLoading } = useYatScore();
   const [profileData, setProfileData] = useState({ name: '', title: '', description: '', category: '', initialTokenPrice: 10, totalSupply: 10000, royaltyPercentage: 5 });
+
+  // Apply suggested price once when YAT Score arrives
+  React.useEffect(() => {
+    if (yat?.suggested_token_price) {
+      setProfileData(prev => ({ ...prev, initialTokenPrice: Math.round(yat.suggested_token_price) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yat?.suggested_token_price]);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [achievements, setAchievements] = useState<string[]>([]);
