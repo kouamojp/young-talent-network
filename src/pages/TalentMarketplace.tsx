@@ -253,6 +253,29 @@ const TalentMarketplace: React.FC = () => {
     setCurrentPage(1);
   }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy]);
 
+  // Sync filters → URL (shareable state)
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (search.trim()) params.q = search.trim();
+    if (filterType !== 'all') params.type = filterType;
+    if (filterCountry !== 'all') params.country = filterCountry;
+    if (filterCity.trim()) params.city = filterCity.trim();
+    if (filterDomain.trim()) params.domain = filterDomain.trim();
+    if (filterBudgetMin.trim()) params.bmin = filterBudgetMin.trim();
+    if (filterBudgetMax.trim()) params.bmax = filterBudgetMax.trim();
+    if (filterDeadlineAfter) params.da = filterDeadlineAfter;
+    if (filterDeadlineBefore) params.db = filterDeadlineBefore;
+    if (sortBy !== 'newest') params.sort = sortBy;
+    setSearchParams(params, { replace: true });
+  }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy, setSearchParams]);
+
+  const shareFilters = async () => {
+    const url = window.location.href;
+    if (navigator.share) { try { await navigator.share({ url, title: 'YAT Marketplace — Filtres' }); return; } catch {} }
+    await navigator.clipboard.writeText(url);
+    toast.success('Lien des filtres copié');
+  };
+
   const clearFilters = () => {
     setSearch('');
     setFilterType('all');
