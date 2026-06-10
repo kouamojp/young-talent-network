@@ -45,6 +45,9 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
   const [newEntry, setNewEntry] = useState('');
   const [saving, setSaving] = useState(false);
   const [editBio, setEditBio] = useState('');
+  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [slug, setSlug] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(false);
 
   const buildResume = async () => {
     setLoading(true);
@@ -56,8 +59,13 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
         (supabase.from('talent_education') as any).select('*').eq('user_id', userId).order('start_year', { ascending: false }),
       ]);
 
-      const { data: existingResume } = await supabase
-        .from('talent_resumes').select('*').eq('user_id', userId).eq('is_primary', true).single();
+      const { data: existingResume } = await (supabase
+        .from('talent_resumes') as any).select('*').eq('user_id', userId).eq('is_primary', true).maybeSingle();
+      if (existingResume) {
+        setResumeId(existingResume.id);
+        setSlug(existingResume.slug || null);
+        setIsPublic(!!existingResume.is_public);
+      }
 
       const activeSections = talentPresence.filter(p => p.is_active).map(p => p.section);
 
