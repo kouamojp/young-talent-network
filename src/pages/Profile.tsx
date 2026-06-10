@@ -15,6 +15,7 @@ import SportProfileEditor from '@/components/profile/SportProfileEditor';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
 import AddMediaDialog from '@/components/profile/AddMediaDialog';
+import PortfolioGallery from '@/components/profile/PortfolioGallery';
 import AddEducationDialog from '@/components/profile/AddEducationDialog';
 import AutoResumeCard from '@/components/profile/AutoResumeCard';
 import FileUploadButton from '@/components/profile/FileUploadButton';
@@ -366,30 +367,7 @@ const Profile: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium flex items-center gap-2"><Image className="h-4 w-4" />{t('profile.media')}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary">{media.length}</Badge>
-                  {userId && <AddMediaDialog userId={userId} onAdded={fetchProfile} />}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {media.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {media.map(m => (
-                    <div key={m.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                      {m.media_type === 'image' && m.url && <img src={m.url} alt={m.title || ''} className="w-full h-24 object-cover rounded mb-2" />}
-                      <p className="font-medium text-xs truncate">{m.title || m.media_type}</p>
-                      {m.description && <p className="text-[10px] text-muted-foreground truncate">{m.description}</p>}
-                    </div>
-                  ))}
-                </div>
-              ) : (<p className="text-sm text-muted-foreground">{t('profile.addMedia')}</p>)}
-            </CardContent>
-          </Card>
+          {userId && <PortfolioGallery userId={userId} ownerId={userId} items={media} onChanged={fetchProfile} />}
 
           <Card>
             <CardHeader className="pb-3">

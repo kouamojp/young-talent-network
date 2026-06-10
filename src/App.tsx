@@ -47,6 +47,7 @@ import Shorts from "./pages/Shorts";
 import AdvancedSearch from "./pages/AdvancedSearch";
 import Verification from "./pages/Verification";
 import TalentMarketplace from "./pages/TalentMarketplace";
+import PublicCV from "./pages/PublicCV";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 
 import Navbar from "./components/Navbar";
@@ -121,6 +122,7 @@ const App = () => {
               <Route path="/advanced-search" element={<AdvancedSearch />} />
               <Route path="/verification" element={<Verification />} />
               <Route path="/talent-marketplace" element={<TalentMarketplace />} />
+              <Route path="/cv/:slug" element={<PublicCV />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
