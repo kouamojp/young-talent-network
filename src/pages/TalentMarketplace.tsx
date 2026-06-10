@@ -12,11 +12,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   Briefcase, MapPin, Calendar, DollarSign, Plus, Send, Bookmark, BookmarkCheck,
   Loader2, Inbox, Users, Search, SlidersHorizontal, ChevronLeft, ChevronRight,
-  ArrowUpDown, X
+  ArrowUpDown, X, Share2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { countries } from '@/data/countries';
 
 const REQUEST_TYPES = [
