@@ -74,6 +74,26 @@ const TokenizeProfile: React.FC = () => {
         </div>
 
         <div className="space-y-6">
+          {yat && (
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-amber-500" />
+                  <h4 className="font-semibold text-sm">Valorisation basée sur votre YAT Score</h4>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-2xl font-bold text-primary">{yat.yat_score}/100</span>
+                  <span className="text-sm text-muted-foreground">Prix suggéré: <span className="font-bold text-foreground">${yat.suggested_token_price}</span></span>
+                </div>
+                <Progress value={yat.yat_score} className="h-1.5" />
+                <p className="text-[11px] text-muted-foreground">
+                  <Sparkles className="h-3 w-3 inline mr-1" />
+                  {yat.tips[0]?.tip ? `Pour augmenter votre valeur : ${yat.tips[0].tip}` : 'Excellent score — votre token a une bonne valorisation.'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader><CardTitle>{t('tokenize.profilePreview')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
