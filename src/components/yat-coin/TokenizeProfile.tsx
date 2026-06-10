@@ -8,12 +8,22 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Coins, Plus, X, Upload, TrendingUp } from 'lucide-react';
+import { Coins, Plus, X, Upload, TrendingUp, Trophy, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useYatScore } from '@/hooks/useYatScore';
 
 const TokenizeProfile: React.FC = () => {
   const { t } = useLanguage();
+  const { data: yat, loading: yatLoading } = useYatScore();
   const [profileData, setProfileData] = useState({ name: '', title: '', description: '', category: '', initialTokenPrice: 10, totalSupply: 10000, royaltyPercentage: 5 });
+
+  // Apply suggested price once when YAT Score arrives
+  React.useEffect(() => {
+    if (yat?.suggested_token_price) {
+      setProfileData(prev => ({ ...prev, initialTokenPrice: Math.round(yat.suggested_token_price) }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [yat?.suggested_token_price]);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
   const [achievements, setAchievements] = useState<string[]>([]);
@@ -64,6 +74,26 @@ const TokenizeProfile: React.FC = () => {
         </div>
 
         <div className="space-y-6">
+          {yat && (
+            <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+              <CardContent className="p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-amber-500" />
+                  <h4 className="font-semibold text-sm">Valorisation basée sur votre YAT Score</h4>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-2xl font-bold text-primary">{yat.yat_score}/100</span>
+                  <span className="text-sm text-muted-foreground">Prix suggéré: <span className="font-bold text-foreground">${yat.suggested_token_price}</span></span>
+                </div>
+                <Progress value={yat.yat_score} className="h-1.5" />
+                <p className="text-[11px] text-muted-foreground">
+                  <Sparkles className="h-3 w-3 inline mr-1" />
+                  {yat.tips[0]?.tip ? `Pour augmenter votre valeur : ${yat.tips[0].tip}` : 'Excellent score — votre token a une bonne valorisation.'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader><CardTitle>{t('tokenize.profilePreview')}</CardTitle></CardHeader>
             <CardContent className="space-y-4">
