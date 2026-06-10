@@ -2176,27 +2176,33 @@ export type Database = {
       }
       talent_media: {
         Row: {
+          category: string | null
           created_at: string
           description: string | null
           id: string
+          item_date: string | null
           media_type: string
           title: string | null
           url: string
           user_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          item_date?: string | null
           media_type: string
           title?: string | null
           url: string
           user_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          item_date?: string | null
           media_type?: string
           title?: string | null
           url?: string
@@ -2466,6 +2472,8 @@ export type Database = {
           experience: string | null
           id: string
           is_primary: boolean | null
+          is_public: boolean
+          slug: string | null
           title: string
           updated_at: string
           user_id: string
@@ -2478,6 +2486,8 @@ export type Database = {
           experience?: string | null
           id?: string
           is_primary?: boolean | null
+          is_public?: boolean
+          slug?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -2490,6 +2500,8 @@ export type Database = {
           experience?: string | null
           id?: string
           is_primary?: boolean | null
+          is_public?: boolean
+          slug?: string | null
           title?: string
           updated_at?: string
           user_id?: string
