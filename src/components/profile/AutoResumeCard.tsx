@@ -117,7 +117,7 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
     setSaving(true);
     try {
       const { data: existing } = await supabase
-        .from('talent_resumes').select('id').eq('user_id', userId).eq('is_primary', true).single();
+        .from('talent_resumes').select('id').eq('user_id', userId).eq('is_primary', true).maybeSingle();
 
       const resumePayload = {
         user_id: userId,
@@ -136,9 +136,11 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
       if (existing) {
         const { error } = await supabase.from('talent_resumes').update(resumePayload).eq('id', existing.id);
         if (error) throw error;
+        setResumeId(existing.id);
       } else {
-        const { error } = await supabase.from('talent_resumes').insert(resumePayload);
+        const { data: inserted, error } = await supabase.from('talent_resumes').insert(resumePayload).select('id').single();
         if (error) throw error;
+        if (inserted) setResumeId(inserted.id);
       }
       toast.success('CV sauvegardé');
     } catch (err) {
