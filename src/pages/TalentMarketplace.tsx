@@ -272,7 +272,8 @@ const TalentMarketplace: React.FC = () => {
       if (next !== curr) setSearchParams(params, { replace: true });
     }, 400);
     return () => clearTimeout(handle);
-  }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy, setSearchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy]);
 
   const shareFilters = async () => {
     const url = window.location.href;
