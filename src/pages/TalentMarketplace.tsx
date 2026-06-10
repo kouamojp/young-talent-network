@@ -12,11 +12,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   Briefcase, MapPin, Calendar, DollarSign, Plus, Send, Bookmark, BookmarkCheck,
   Loader2, Inbox, Users, Search, SlidersHorizontal, ChevronLeft, ChevronRight,
-  ArrowUpDown, X
+  ArrowUpDown, X, Share2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { countries } from '@/data/countries';
 
 const REQUEST_TYPES = [
@@ -52,6 +52,7 @@ const ITEMS_PER_PAGE = 9;
 
 const TalentMarketplace: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [userId, setUserId] = useState<string | null>(null);
   const [tab, setTab] = useState('browse');
   const [requests, setRequests] = useState<any[]>([]);
@@ -60,17 +61,17 @@ const TalentMarketplace: React.FC = () => {
   const [saved, setSaved] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
-  const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterCountry, setFilterCountry] = useState('all');
-  const [filterCity, setFilterCity] = useState('');
-  const [filterDomain, setFilterDomain] = useState('');
-  const [filterBudgetMin, setFilterBudgetMin] = useState('');
-  const [filterBudgetMax, setFilterBudgetMax] = useState('');
-  const [filterDeadlineAfter, setFilterDeadlineAfter] = useState('');
-  const [filterDeadlineBefore, setFilterDeadlineBefore] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
+  // Filters (init from URL)
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [filterType, setFilterType] = useState(searchParams.get('type') || 'all');
+  const [filterCountry, setFilterCountry] = useState(searchParams.get('country') || 'all');
+  const [filterCity, setFilterCity] = useState(searchParams.get('city') || '');
+  const [filterDomain, setFilterDomain] = useState(searchParams.get('domain') || '');
+  const [filterBudgetMin, setFilterBudgetMin] = useState(searchParams.get('bmin') || '');
+  const [filterBudgetMax, setFilterBudgetMax] = useState(searchParams.get('bmax') || '');
+  const [filterDeadlineAfter, setFilterDeadlineAfter] = useState(searchParams.get('da') || '');
+  const [filterDeadlineBefore, setFilterDeadlineBefore] = useState(searchParams.get('db') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [showFilters, setShowFilters] = useState(false);
 
   // Pagination
@@ -251,6 +252,29 @@ const TalentMarketplace: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy]);
+
+  // Sync filters → URL (shareable state)
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (search.trim()) params.q = search.trim();
+    if (filterType !== 'all') params.type = filterType;
+    if (filterCountry !== 'all') params.country = filterCountry;
+    if (filterCity.trim()) params.city = filterCity.trim();
+    if (filterDomain.trim()) params.domain = filterDomain.trim();
+    if (filterBudgetMin.trim()) params.bmin = filterBudgetMin.trim();
+    if (filterBudgetMax.trim()) params.bmax = filterBudgetMax.trim();
+    if (filterDeadlineAfter) params.da = filterDeadlineAfter;
+    if (filterDeadlineBefore) params.db = filterDeadlineBefore;
+    if (sortBy !== 'newest') params.sort = sortBy;
+    setSearchParams(params, { replace: true });
+  }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy, setSearchParams]);
+
+  const shareFilters = async () => {
+    const url = window.location.href;
+    if (navigator.share) { try { await navigator.share({ url, title: 'YAT Marketplace — Filtres' }); return; } catch {} }
+    await navigator.clipboard.writeText(url);
+    toast.success('Lien des filtres copié');
+  };
 
   const clearFilters = () => {
     setSearch('');
@@ -434,6 +458,9 @@ const TalentMarketplace: React.FC = () => {
                   {activeFilterCount > 0 && (
                     <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">{activeFilterCount}</Badge>
                   )}
+                </Button>
+                <Button variant="outline" onClick={shareFilters} className="gap-2" title="Partager le lien des filtres">
+                  <Share2 className="h-4 w-4" /> Partager
                 </Button>
               </div>
 

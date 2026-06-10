@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { FileText, Briefcase, GraduationCap, Calendar, Trophy, MapPin, Plus, X, RefreshCw, Download, Star } from 'lucide-react';
+import { FileText, Briefcase, GraduationCap, Calendar, Trophy, MapPin, Plus, X, RefreshCw, Download, Star, Share2, Link2, Globe } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -44,6 +45,9 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
   const [newEntry, setNewEntry] = useState('');
   const [saving, setSaving] = useState(false);
   const [editBio, setEditBio] = useState('');
+  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [slug, setSlug] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(false);
 
   const buildResume = async () => {
     setLoading(true);
@@ -55,8 +59,13 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
         (supabase.from('talent_education') as any).select('*').eq('user_id', userId).order('start_year', { ascending: false }),
       ]);
 
-      const { data: existingResume } = await supabase
-        .from('talent_resumes').select('*').eq('user_id', userId).eq('is_primary', true).single();
+      const { data: existingResume } = await (supabase
+        .from('talent_resumes') as any).select('*').eq('user_id', userId).eq('is_primary', true).maybeSingle();
+      if (existingResume) {
+        setResumeId(existingResume.id);
+        setSlug(existingResume.slug || null);
+        setIsPublic(!!existingResume.is_public);
+      }
 
       const activeSections = talentPresence.filter(p => p.is_active).map(p => p.section);
 
@@ -108,7 +117,7 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
     setSaving(true);
     try {
       const { data: existing } = await supabase
-        .from('talent_resumes').select('id').eq('user_id', userId).eq('is_primary', true).single();
+        .from('talent_resumes').select('id').eq('user_id', userId).eq('is_primary', true).maybeSingle();
 
       const resumePayload = {
         user_id: userId,
@@ -127,9 +136,11 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
       if (existing) {
         const { error } = await supabase.from('talent_resumes').update(resumePayload).eq('id', existing.id);
         if (error) throw error;
+        setResumeId(existing.id);
       } else {
-        const { error } = await supabase.from('talent_resumes').insert(resumePayload);
+        const { data: inserted, error } = await supabase.from('talent_resumes').insert(resumePayload).select('id').single();
         if (error) throw error;
+        if (inserted) setResumeId(inserted.id);
       }
       toast.success('CV sauvegardé');
     } catch (err) {
@@ -207,19 +218,54 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
     tv: 'YAT TV', events: 'YAT Events', karta: 'YAT Karta', 'yat-coin': 'YAT Coin',
   };
 
+  const togglePublic = async (next: boolean) => {
+    if (!resumeId) { toast.error('Sauvegarde le CV d\'abord'); return; }
+    let _slug = slug;
+    if (next && !_slug) {
+      _slug = (resumeData?.personalInfo.name || 'cv').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) + '-' + Math.random().toString(36).slice(2, 8);
+    }
+    const { error } = await (supabase.from('talent_resumes') as any).update({ is_public: next, slug: _slug }).eq('id', resumeId);
+    if (error) { toast.error(error.message); return; }
+    setIsPublic(next); setSlug(_slug);
+    toast.success(next ? 'CV public activé' : 'CV rendu privé');
+  };
+
+  const sharePublicCV = async () => {
+    if (!isPublic || !slug) { toast.error('Active d\'abord le partage public'); return; }
+    const url = `${window.location.origin}/cv/${slug}`;
+    if (navigator.share) { try { await navigator.share({ url, title: 'Mon CV YAT' }); return; } catch {} }
+    await navigator.clipboard.writeText(url);
+    toast.success('Lien copié : ' + url);
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <FileText className="h-4 w-4" /> CV Auto-Généré
+            <FileText className="h-4 w-4" /> CV Intelligent
           </CardTitle>
-          <div className="flex gap-2">
-            <Button size="sm" variant="ghost" onClick={buildResume} className="gap-1"><RefreshCw className="h-3.5 w-3.5" /> Actualiser</Button>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="ghost" onClick={buildResume} className="gap-1"><RefreshCw className="h-3.5 w-3.5" /> Générer</Button>
             <Button size="sm" variant="outline" onClick={exportPDF} className="gap-1"><Download className="h-3.5 w-3.5" /> PDF</Button>
-            <Button size="sm" onClick={saveResume} disabled={saving}>{saving ? 'Sauvegarde...' : 'Sauvegarder'}</Button>
+            <Button size="sm" variant="outline" onClick={sharePublicCV} disabled={!isPublic} className="gap-1"><Share2 className="h-3.5 w-3.5" /> Partager</Button>
+            <Button size="sm" onClick={saveResume} disabled={saving}>{saving ? '...' : 'Sauvegarder'}</Button>
           </div>
         </div>
+        {resumeId && (
+          <div className="flex items-center justify-between mt-3 p-2 rounded-lg bg-muted/40">
+            <div className="flex items-center gap-2 text-xs">
+              <Globe className="h-3.5 w-3.5" />
+              <span>CV public</span>
+              <Switch checked={isPublic} onCheckedChange={togglePublic} />
+            </div>
+            {isPublic && slug && (
+              <a href={`/cv/${slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-primary hover:underline truncate">
+                <Link2 className="h-3 w-3" /> /cv/{slug}
+              </a>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Personal Info */}
