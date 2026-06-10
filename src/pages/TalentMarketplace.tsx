@@ -253,20 +253,25 @@ const TalentMarketplace: React.FC = () => {
     setCurrentPage(1);
   }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy]);
 
-  // Sync filters → URL (shareable state)
+  // Sync filters → URL (shareable state) — debounced to avoid replaceState throttling
   useEffect(() => {
-    const params: Record<string, string> = {};
-    if (search.trim()) params.q = search.trim();
-    if (filterType !== 'all') params.type = filterType;
-    if (filterCountry !== 'all') params.country = filterCountry;
-    if (filterCity.trim()) params.city = filterCity.trim();
-    if (filterDomain.trim()) params.domain = filterDomain.trim();
-    if (filterBudgetMin.trim()) params.bmin = filterBudgetMin.trim();
-    if (filterBudgetMax.trim()) params.bmax = filterBudgetMax.trim();
-    if (filterDeadlineAfter) params.da = filterDeadlineAfter;
-    if (filterDeadlineBefore) params.db = filterDeadlineBefore;
-    if (sortBy !== 'newest') params.sort = sortBy;
-    setSearchParams(params, { replace: true });
+    const handle = setTimeout(() => {
+      const params: Record<string, string> = {};
+      if (search.trim()) params.q = search.trim();
+      if (filterType !== 'all') params.type = filterType;
+      if (filterCountry !== 'all') params.country = filterCountry;
+      if (filterCity.trim()) params.city = filterCity.trim();
+      if (filterDomain.trim()) params.domain = filterDomain.trim();
+      if (filterBudgetMin.trim()) params.bmin = filterBudgetMin.trim();
+      if (filterBudgetMax.trim()) params.bmax = filterBudgetMax.trim();
+      if (filterDeadlineAfter) params.da = filterDeadlineAfter;
+      if (filterDeadlineBefore) params.db = filterDeadlineBefore;
+      if (sortBy !== 'newest') params.sort = sortBy;
+      const next = new URLSearchParams(params).toString();
+      const curr = new URLSearchParams(window.location.search).toString();
+      if (next !== curr) setSearchParams(params, { replace: true });
+    }, 400);
+    return () => clearTimeout(handle);
   }, [search, filterType, filterCountry, filterCity, filterDomain, filterBudgetMin, filterBudgetMax, filterDeadlineAfter, filterDeadlineBefore, sortBy, setSearchParams]);
 
   const shareFilters = async () => {
