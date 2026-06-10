@@ -52,6 +52,7 @@ const ITEMS_PER_PAGE = 9;
 
 const TalentMarketplace: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [userId, setUserId] = useState<string | null>(null);
   const [tab, setTab] = useState('browse');
   const [requests, setRequests] = useState<any[]>([]);
@@ -60,17 +61,17 @@ const TalentMarketplace: React.FC = () => {
   const [saved, setSaved] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filters
-  const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterCountry, setFilterCountry] = useState('all');
-  const [filterCity, setFilterCity] = useState('');
-  const [filterDomain, setFilterDomain] = useState('');
-  const [filterBudgetMin, setFilterBudgetMin] = useState('');
-  const [filterBudgetMax, setFilterBudgetMax] = useState('');
-  const [filterDeadlineAfter, setFilterDeadlineAfter] = useState('');
-  const [filterDeadlineBefore, setFilterDeadlineBefore] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
+  // Filters (init from URL)
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [filterType, setFilterType] = useState(searchParams.get('type') || 'all');
+  const [filterCountry, setFilterCountry] = useState(searchParams.get('country') || 'all');
+  const [filterCity, setFilterCity] = useState(searchParams.get('city') || '');
+  const [filterDomain, setFilterDomain] = useState(searchParams.get('domain') || '');
+  const [filterBudgetMin, setFilterBudgetMin] = useState(searchParams.get('bmin') || '');
+  const [filterBudgetMax, setFilterBudgetMax] = useState(searchParams.get('bmax') || '');
+  const [filterDeadlineAfter, setFilterDeadlineAfter] = useState(searchParams.get('da') || '');
+  const [filterDeadlineBefore, setFilterDeadlineBefore] = useState(searchParams.get('db') || '');
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [showFilters, setShowFilters] = useState(false);
 
   // Pagination
