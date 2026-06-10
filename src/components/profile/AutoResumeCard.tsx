@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { FileText, Briefcase, GraduationCap, Calendar, Trophy, MapPin, Plus, X, RefreshCw, Download, Star } from 'lucide-react';
+import { FileText, Briefcase, GraduationCap, Calendar, Trophy, MapPin, Plus, X, RefreshCw, Download, Star, Share2, Link2, Globe } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
