@@ -459,6 +459,9 @@ const TalentMarketplace: React.FC = () => {
                     <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">{activeFilterCount}</Badge>
                   )}
                 </Button>
+                <Button variant="outline" onClick={shareFilters} className="gap-2" title="Partager le lien des filtres">
+                  <Share2 className="h-4 w-4" /> Partager
+                </Button>
               </div>
 
               {/* Advanced Filters Panel */}
