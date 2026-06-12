@@ -23,6 +23,8 @@ function detectPlatform(url: string): string {
   if (u.includes("twitter.com") || u.includes("x.com")) return "x";
   if (u.includes("facebook.com")) return "facebook";
   if (u.includes("linkedin.com")) return "linkedin";
+  if (u.includes("t.me") || u.includes("telegram.me") || u.includes("telegram.org")) return "telegram";
+  if (u.includes("vk.com") || u.includes("vk.ru")) return "vk";
   if (u.endsWith(".xml") || u.includes("/rss") || u.includes("/feed")) return "rss";
   return "web";
 }
