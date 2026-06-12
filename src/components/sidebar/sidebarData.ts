@@ -24,6 +24,7 @@ import {
   Download,
   Shield,
   Sparkles,
+  Music,
   LucideIcon
 } from 'lucide-react';
 
@@ -200,6 +201,15 @@ export const servicesItems: MenuSectionItem[] = [
     icon: Tv,
     path: '/tv',
     iconColor: 'text-fuchsia-500',
+  },
+  {
+    label: 'YAT Musique',
+    description: 'Streaming des créations IA et humaines',
+    icon: Music,
+    path: '/music',
+    iconColor: 'text-purple-500',
+    badge: 'New',
+    badgeColor: 'bg-purple-500 text-white',
   },
   {
     label: 'sidebar.games',
