@@ -1453,6 +1453,231 @@ export type Database = {
         }
         Relationships: []
       }
+      music_albums: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      music_likes: {
+        Row: {
+          created_at: string
+          id: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_likes_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_playlist_tracks: {
+        Row: {
+          added_by: string
+          created_at: string
+          id: string
+          playlist_id: string
+          position: number
+          track_id: string
+        }
+        Insert: {
+          added_by: string
+          created_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+          track_id: string
+        }
+        Update: {
+          added_by?: string
+          created_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_playlist_tracks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "music_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "music_playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_playlists: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      music_plays: {
+        Row: {
+          created_at: string
+          id: string
+          listened_seconds: number
+          track_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listened_seconds?: number
+          track_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listened_seconds?: number
+          track_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_plays_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_tracks: {
+        Row: {
+          album_id: string | null
+          audio_url: string
+          cover_url: string | null
+          created_at: string
+          duration_seconds: number | null
+          genre: string | null
+          id: string
+          likes_count: number
+          origin: string
+          plays_count: number
+          style: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          album_id?: string | null
+          audio_url: string
+          cover_url?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          genre?: string | null
+          id?: string
+          likes_count?: number
+          origin?: string
+          plays_count?: number
+          style?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          album_id?: string | null
+          audio_url?: string
+          cover_url?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          genre?: string | null
+          id?: string
+          likes_count?: number
+          origin?: string
+          plays_count?: number
+          style?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_tracks_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "music_albums"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string
