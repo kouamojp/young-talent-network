@@ -53,6 +53,8 @@ interface Post {
   shares: number;
   media_urls?: string[] | null;
   user_id?: string;
+  external_source_url?: string | null;
+  external_source_platform?: string | null;
 }
 
 interface PostCardProps {
@@ -365,8 +367,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           ))}
         </div>
       )}
-      
-      {/* Like/Comment/Share Count */}
+
+      {/* External source attribution */}
+      {post.external_source_url && (
+        <div className="px-4 pb-2">
+          <a
+            href={post.external_source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-primary bg-muted/50 hover:bg-muted px-2 py-1 rounded-full transition-colors"
+          >
+            <span className="capitalize font-medium">
+              {post.external_source_platform || 'source'}
+            </span>
+            <span>• Importé depuis l'extérieur</span>
+          </a>
+        </div>
+      )}
+
+
       <div className="px-4 py-2 flex justify-between border-t border-b text-xs text-muted-foreground">
         <div className="flex items-center">
           <div className="bg-primary rounded-full p-1">
