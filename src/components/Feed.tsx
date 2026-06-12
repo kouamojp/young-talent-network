@@ -127,6 +127,8 @@ const Feed: React.FC = () => {
                 shares: 0,
                 media_urls: post.media_urls,
                 user_id: post.user_id,
+                external_source_url: (post as any).external_source_url,
+                external_source_platform: (post as any).external_source_platform,
               }}
               onUpdate={fetchPosts}
             />
