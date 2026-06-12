@@ -38,6 +38,8 @@ const PLATFORMS = [
   { value: 'x',         label: 'X (Twitter)', icon: <Globe className="h-4 w-4" /> },
   { value: 'facebook',  label: 'Facebook',  icon: <Facebook className="h-4 w-4 text-blue-600" /> },
   { value: 'linkedin',  label: 'LinkedIn',  icon: <Linkedin className="h-4 w-4 text-blue-700" /> },
+  { value: 'telegram',  label: 'Telegram',  icon: <Send className="h-4 w-4 text-sky-500" /> },
+  { value: 'vk',        label: 'VK',        icon: <Globe className="h-4 w-4 text-blue-500" /> },
   { value: 'rss',       label: 'RSS / Atom', icon: <Rss className="h-4 w-4 text-orange-500" /> },
   { value: 'web',       label: 'Autre site web', icon: <Globe className="h-4 w-4" /> },
 ];
