@@ -54,6 +54,12 @@ const ShortsPage: React.FC = () => {
   const [newComment, setNewComment] = useState('');
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const tapTimers = useRef<Record<string, any>>({});
+  // Recommendation tracking: per-author and per-category engagement scores
+  const authorScore = useRef<Map<string, number>>(new Map());
+  const categoryScore = useRef<Map<string, number>>(new Map());
+  const seenIds = useRef<Set<string>>(new Set());
+  const watchAccum = useRef<Map<string, number>>(new Map()); // shortKey -> seconds watched
+  const lastTickRef = useRef<{ key: string; t: number } | null>(null);
 
   useEffect(() => { load(); }, []);
 
