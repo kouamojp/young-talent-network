@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import {
   Youtube, Instagram, Facebook, Linkedin, Globe, Plus, Trash2, ExternalLink,
-  RefreshCw, Loader2, Rss,
+  RefreshCw, Loader2, Rss, Send,
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
