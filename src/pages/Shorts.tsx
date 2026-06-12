@@ -412,14 +412,14 @@ const ShortsPage: React.FC = () => {
     const list = (data as any[]) || [];
     const ids = [...new Set(list.map(x => x.user_id))];
     const cIds = list.map(x => x.id);
-    const [{ data: profiles }, likesAgg, mineLikes] = await Promise.all([
+    const [profilesRes, likesAgg, mineLikes] = await Promise.all([
       ids.length ? supabase.from('profiles').select('id,name,avatar_url').in('id', ids) : Promise.resolve({ data: [] as any[] }),
       cIds.length ? supabase.from('media_comment_likes').select('comment_id').in('comment_id', cIds) : Promise.resolve({ data: [] as any[] }),
       currentUser && cIds.length
         ? supabase.from('media_comment_likes').select('comment_id').in('comment_id', cIds).eq('user_id', currentUser)
         : Promise.resolve({ data: [] as any[] }),
     ]);
-    const pmap = new Map((profiles.data as any[] || []).map(p => [p.id, p]));
+    const pmap = new Map(((profilesRes as any).data as any[] || []).map(p => [p.id, p]));
     const likeCount = new Map<string, number>();
     (likesAgg.data as any[] || []).forEach(l => likeCount.set(l.comment_id, (likeCount.get(l.comment_id) || 0) + 1));
     const mineSet = new Set((mineLikes.data as any[] || []).map(l => l.comment_id));
