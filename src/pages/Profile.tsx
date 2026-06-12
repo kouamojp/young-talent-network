@@ -11,6 +11,7 @@ import { ProfileSettings } from '@/components/profile/ProfileSettings';
 import { useUserLevel } from '@/hooks/useUserLevel';
 import { UserLevelBadge } from '@/components/profile/UserLevelBadge';
 import ProfileSources from '@/components/profile/ProfileSources';
+import MyNetworksManager from '@/components/profile/MyNetworksManager';
 import SportProfileEditor from '@/components/profile/SportProfileEditor';
 import ProfileSidebar from '@/components/profile/ProfileSidebar';
 import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
