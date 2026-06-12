@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { MessageCircle, X, Send, Loader2, Sparkles, Briefcase, UserPlus, Edit3, TrendingUp, Calendar } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, Briefcase, UserPlus, Edit3, TrendingUp, Calendar, Languages, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
