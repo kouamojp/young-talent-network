@@ -348,10 +348,21 @@ const ShortsPage: React.FC = () => {
                     loop
                     muted={muted}
                     playsInline
-                    preload="metadata"
+                    // Preload current and next 2 videos for instant swipe; far ones stay light
+                    preload={Math.abs(idx - activeIdx) <= 2 ? 'auto' : 'metadata'}
                     onClick={() => handleTap(short, idx)}
                     onTimeUpdate={(e) => {
                       const v = e.currentTarget;
+                      // Accumulate real watch time (delta since last tick)
+                      const now = v.currentTime;
+                      const last = lastTickRef.current;
+                      if (last && last.key === short.id) {
+                        const delta = now - last.t;
+                        if (delta > 0 && delta < 1.5) {
+                          watchAccum.current.set(short.id, (watchAccum.current.get(short.id) || 0) + delta);
+                        }
+                      }
+                      lastTickRef.current = { key: short.id, t: now };
                       if (v.duration) setProgress(p => ({ ...p, [short.id]: (v.currentTime / v.duration) * 100 }));
                     }}
                     onError={() => setVideoErrors(p => ({ ...p, [short.id]: true }))}
