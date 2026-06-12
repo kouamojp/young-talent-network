@@ -166,8 +166,26 @@ const ShortsPage: React.FC = () => {
     return () => observer.disconnect();
   }, [shorts]);
 
-  // Recommendation: when reaching the end, append more shuffled items
+  // When the active short changes, score the one we just left (watch vs pass)
+  const prevActiveRef = useRef<number>(-1);
   useEffect(() => {
+    const prev = prevActiveRef.current;
+    if (prev >= 0 && prev !== activeIdx && shorts[prev]) {
+      const prevShort = shorts[prev];
+      const v = videoRefs.current[prev];
+      const watched = watchAccum.current.get(prevShort.id) || 0;
+      const dur = v?.duration || 0;
+      if (dur > 0) {
+        const ratio = watched / dur;
+        if (ratio < 0.25 && watched < 4) recordEngagement(prevShort, 'pass', 1);
+        else if (ratio > 0.7 || watched > 15) recordEngagement(prevShort, 'watch', 2);
+        else recordEngagement(prevShort, 'watch', 0.5);
+      } else if (watched > 5) {
+        recordEngagement(prevShort, 'watch', 1);
+      }
+    }
+    prevActiveRef.current = activeIdx;
+    // Append more shorts before reaching the end
     if (shorts.length > 0 && activeIdx >= shorts.length - 2) {
       appendMore();
     }
