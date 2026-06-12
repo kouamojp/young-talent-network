@@ -227,12 +227,49 @@ const CreatorView: React.FC = () => {
   );
 };
 
-const uploadFile = async (file: File, folder: string) => {
+const AUDIO_EXT_MIME: Record<string, string> = {
+  mp3: 'audio/mpeg', wav: 'audio/wav', flac: 'audio/flac', aac: 'audio/aac',
+  ogg: 'audio/ogg', oga: 'audio/ogg', m4a: 'audio/mp4', mp4: 'audio/mp4', webm: 'audio/webm',
+};
+const LOSSLESS_EXTS = new Set(['wav', 'flac']);
+const MAX_DURATION_SEC = 15 * 60;
+
+const getAudioDuration = (file: File): Promise<number> => new Promise((resolve) => {
+  try {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('audio');
+    a.preload = 'metadata';
+    a.onloadedmetadata = () => { const d = a.duration; URL.revokeObjectURL(url); resolve(isFinite(d) ? d : 0); };
+    a.onerror = () => { URL.revokeObjectURL(url); resolve(0); };
+    a.src = url;
+  } catch { resolve(0); }
+});
+
+export const validateAudioFile = async (file: File): Promise<{ ok: true; ext: string; mime: string } | { ok: false; error: string }> => {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!AUDIO_EXT_MIME[ext]) {
+    return { ok: false, error: `Format "${ext || 'inconnu'}" non supporté. Formats acceptés : MP3, WAV, FLAC, AAC, OGG, M4A, WEBM` };
+  }
+  const maxBytes = (LOSSLESS_EXTS.has(ext) ? 200 : 50) * 1024 * 1024;
+  if (file.size > maxBytes) {
+    return { ok: false, error: `Fichier trop volumineux (max ${LOSSLESS_EXTS.has(ext) ? '200 Mo' : '50 Mo'} pour .${ext})` };
+  }
+  const duration = await getAudioDuration(file);
+  if (duration && duration > MAX_DURATION_SEC) {
+    return { ok: false, error: `Durée trop longue (${Math.round(duration/60)} min, max 15 min)` };
+  }
+  return { ok: true, ext, mime: AUDIO_EXT_MIME[ext] };
+};
+
+const uploadFile = async (file: File, folder: string, contentType?: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('not auth');
-  const ext = file.name.split('.').pop();
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
   const path = `${user.id}/${folder}/${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from('profile-files').upload(path, file);
+  const { error } = await supabase.storage.from('profile-files').upload(path, file, {
+    contentType: contentType || file.type || 'application/octet-stream',
+    upsert: false,
+  });
   if (error) throw error;
   return supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
 };
