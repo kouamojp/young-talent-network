@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
+  <script>
+    (function() {
+      if (!window.history || window.history.__yatHistoryThrottled) return;
+      var origPush = window.history.pushState.bind(window.history);
+      var origReplace = window.history.replaceState.bind(window.history);
+      var times = [];
+      var lastReplace = null;
+      function throttle(fn, type) {
+        return function(state, title, url) {
+          var urlStr = url == null ? window.location.href : String(url);
+          var now = Date.now();
+          while (times.length && now - times[0] > 10000) times.shift();
+          if (times.length >= 50) {
+            console.warn('[HistoryThrottle] Dropped ' + type + ' burst');
+            return;
+          }
+          if (type === 'replace' && urlStr === lastReplace) return;
+          times.push(now);
+          if (type === 'replace') lastReplace = urlStr;
+          try { return fn.call(window.history, state, title, url); }
+          catch (e) { if (e && e.name === 'SecurityError') return; throw e; }
+        };
+      }
+      window.history.pushState = throttle(origPush, 'push');
+      window.history.replaceState = throttle(origReplace, 'replace');
+      window.history.__yatHistoryThrottled = true;
+    })();
+  </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
