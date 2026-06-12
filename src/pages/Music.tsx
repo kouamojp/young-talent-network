@@ -288,7 +288,7 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
   const submit = async () => {
     if (!file || !title) { toast.error('Titre + fichier audio requis'); return; }
     const v = await validateAudioFile(file);
-    if (!v.ok) { toast.error(v.error); return; }
+    if (!v.ok) { toast.error((v as { error: string }).error); return; }
     setBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
