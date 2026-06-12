@@ -181,6 +181,7 @@ const ShortsPage: React.FC = () => {
       .from('talent_media')
       .select('*')
       .in('media_type', ['short', 'video'])
+      .order('created_at', { ascending: false })
       .limit(100);
 
     if (followedIds.length > 0) {
@@ -193,11 +194,16 @@ const ShortsPage: React.FC = () => {
         .from('talent_media')
         .select('*')
         .in('media_type', ['short', 'video'])
+        .order('created_at', { ascending: false })
         .limit(50);
       data = fallback.data || [];
     }
 
-    const items = shuffle(data || []);
+    // Keep newest first; only lightly shuffle the tail to add variety
+    const head = (data || []).slice(0, 5);
+    const tail = shuffle((data || []).slice(5));
+    const items = [...head, ...tail];
+    if (items[0]?.created_at) latestCreatedAt.current = items[0].created_at;
     items.forEach((i: any) => seenRealIds.current.add(i.id));
     const enriched = await enrich(items, user?.id);
     setShorts(enriched);
