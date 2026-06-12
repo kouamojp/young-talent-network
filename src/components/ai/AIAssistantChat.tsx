@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { MessageCircle, X, Send, Loader2, Sparkles, Briefcase, UserPlus, Edit3, TrendingUp, Calendar } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, Briefcase, UserPlus, Edit3, TrendingUp, Calendar, Languages, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,15 +13,17 @@ interface Message {
   content: string;
 }
 
-type Mode = 'chat' | 'compose-post' | 'compose-message' | 'profile-tips';
+type Mode = 'chat' | 'compose-post' | 'compose-message' | 'profile-tips' | 'translate' | 'admin';
 
 const QUICK_ACTIONS: { icon: any; label: string; prompt: string; mode: Mode }[] = [
-  { icon: Briefcase, label: "Trouver des opportunités", prompt: "Quelles sont les meilleures opportunités (emplois, événements, formations) qui matchent mon profil ?", mode: 'chat' },
-  { icon: UserPlus, label: "Suggestions de réseau", prompt: "Recommande-moi des personnes, organisations, agents et mentors à contacter avec un score de compatibilité.", mode: 'chat' },
+  { icon: Briefcase, label: "Trouver des opportunités", prompt: "Quelles sont les meilleures opportunités (emplois, événements, formations, bourses, sponsorships) qui matchent mon profil ? Donne le score de compatibilité.", mode: 'chat' },
+  { icon: UserPlus, label: "Suggestions de réseau", prompt: "Recommande-moi des talents, organisations, agents, mentors, sponsors et recruteurs à contacter avec un score de compatibilité (%).", mode: 'chat' },
   { icon: TrendingUp, label: "Améliorer mon YAT Score", prompt: "Analyse mon profil et donne-moi un plan d'action pour augmenter mon YAT Score et ma visibilité.", mode: 'profile-tips' },
   { icon: Edit3, label: "Rédiger un post", prompt: "Aide-moi à rédiger un post engageant. Voici l'idée : ", mode: 'compose-post' },
   { icon: MessageCircle, label: "Message networking", prompt: "Rédige-moi un message professionnel d'approche pour : ", mode: 'compose-message' },
   { icon: Calendar, label: "Événements à venir", prompt: "Quels événements correspondent à mon talent et ma localisation ?", mode: 'chat' },
+  { icon: Search, label: "Découvrir des talents", prompt: "Recommande-moi les talents les plus prometteurs à suivre ou à recruter selon mon profil et mes objectifs.", mode: 'chat' },
+  { icon: Languages, label: "Traduire un texte", prompt: "Traduis ce texte (précise la langue cible : EN, FR, RU, ES, AR, PT, ZH) : ", mode: 'translate' },
 ];
 
 export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) => {
@@ -193,7 +195,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
       {mode !== 'chat' && messages.length > 0 && (
         <div className="px-3 py-1 border-t bg-primary/5 flex items-center justify-between">
           <span className="text-[10px] text-primary font-medium">
-            Mode : {mode === 'compose-post' ? '✏️ Rédaction post' : mode === 'compose-message' ? '💬 Message pro' : '📊 Conseils profil'}
+            Mode : {mode === 'compose-post' ? '✏️ Rédaction post' : mode === 'compose-message' ? '💬 Message pro' : mode === 'profile-tips' ? '📊 Conseils profil' : mode === 'translate' ? '🌐 Traduction' : '🛡️ Admin'}
           </span>
           <button onClick={() => setMode('chat')} className="text-[10px] text-muted-foreground hover:text-foreground">Retour chat</button>
         </div>
