@@ -163,15 +163,45 @@ const ShortsPage: React.FC = () => {
   }, [activeIdx]);
 
   const appendMore = async () => {
-    const { data } = await supabase
+    // Pick top-engaged authors & categories to bias recommendations
+    const topAuthors = Array.from(authorScore.current.entries())
+      .sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k]) => k);
+    const topCategories = Array.from(categoryScore.current.entries())
+      .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => k);
+
+    const exclude = Array.from(seenIds.current);
+    let query = supabase
       .from('talent_media')
       .select('*')
       .in('media_type', ['short', 'video'])
-      .limit(30);
-    if (!data) return;
-    const more = await enrich(shuffle(data), currentUser || undefined);
-    // append with new keys to avoid duplicate observer issues
-    setShorts(prev => [...prev, ...more.map(m => ({ ...m, id: `${m.id}-${prev.length}` }))]);
+      .limit(50);
+    if (exclude.length > 0 && exclude.length < 200) {
+      query = query.not('id', 'in', `(${exclude.join(',')})`);
+    }
+    const { data } = await query;
+    let pool = data || [];
+
+    // If we have engagement signal, prefer items by top authors / categories
+    if (pool.length > 0 && (topAuthors.length > 0 || topCategories.length > 0)) {
+      const score = (m: any) =>
+        (topAuthors.includes(m.user_id) ? (authorScore.current.get(m.user_id) || 0) : 0) +
+        (m.category && topCategories.includes(m.category) ? (categoryScore.current.get(m.category) || 0) * 0.5 : 0) +
+        Math.random() * 0.3; // small jitter to keep variety
+      pool = [...pool].sort((a, b) => score(b) - score(a));
+    } else {
+      pool = shuffle(pool);
+    }
+
+    if (pool.length === 0) return;
+    const more = await enrich(pool.slice(0, 20), currentUser || undefined);
+    setShorts(prev => {
+      const offset = prev.length;
+      return [...prev, ...more.map((m, i) => {
+        const key = `${m.id}-${offset + i}`;
+        seenIds.current.add(m.id);
+        return { ...m, id: key };
+      })];
+    });
   };
 
   const toggleLike = async (s: Short, idx: number, animate = false) => {
