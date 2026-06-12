@@ -227,12 +227,49 @@ const CreatorView: React.FC = () => {
   );
 };
 
-const uploadFile = async (file: File, folder: string) => {
+const AUDIO_EXT_MIME: Record<string, string> = {
+  mp3: 'audio/mpeg', wav: 'audio/wav', flac: 'audio/flac', aac: 'audio/aac',
+  ogg: 'audio/ogg', oga: 'audio/ogg', m4a: 'audio/mp4', mp4: 'audio/mp4', webm: 'audio/webm',
+};
+const LOSSLESS_EXTS = new Set(['wav', 'flac']);
+const MAX_DURATION_SEC = 15 * 60;
+
+const getAudioDuration = (file: File): Promise<number> => new Promise((resolve) => {
+  try {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('audio');
+    a.preload = 'metadata';
+    a.onloadedmetadata = () => { const d = a.duration; URL.revokeObjectURL(url); resolve(isFinite(d) ? d : 0); };
+    a.onerror = () => { URL.revokeObjectURL(url); resolve(0); };
+    a.src = url;
+  } catch { resolve(0); }
+});
+
+export const validateAudioFile = async (file: File): Promise<{ ok: true; ext: string; mime: string } | { ok: false; error: string }> => {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!AUDIO_EXT_MIME[ext]) {
+    return { ok: false, error: `Format "${ext || 'inconnu'}" non supporté. Formats acceptés : MP3, WAV, FLAC, AAC, OGG, M4A, WEBM` };
+  }
+  const maxBytes = (LOSSLESS_EXTS.has(ext) ? 200 : 50) * 1024 * 1024;
+  if (file.size > maxBytes) {
+    return { ok: false, error: `Fichier trop volumineux (max ${LOSSLESS_EXTS.has(ext) ? '200 Mo' : '50 Mo'} pour .${ext})` };
+  }
+  const duration = await getAudioDuration(file);
+  if (duration && duration > MAX_DURATION_SEC) {
+    return { ok: false, error: `Durée trop longue (${Math.round(duration/60)} min, max 15 min)` };
+  }
+  return { ok: true, ext, mime: AUDIO_EXT_MIME[ext] };
+};
+
+const uploadFile = async (file: File, folder: string, contentType?: string) => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('not auth');
-  const ext = file.name.split('.').pop();
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
   const path = `${user.id}/${folder}/${Date.now()}.${ext}`;
-  const { error } = await supabase.storage.from('profile-files').upload(path, file);
+  const { error } = await supabase.storage.from('profile-files').upload(path, file, {
+    contentType: contentType || file.type || 'application/octet-stream',
+    upsert: false,
+  });
   if (error) throw error;
   return supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
 };
@@ -250,12 +287,14 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
 
   const submit = async () => {
     if (!file || !title) { toast.error('Titre + fichier audio requis'); return; }
+    const v = await validateAudioFile(file);
+    if (!v.ok) { toast.error((v as { error: string }).error); return; }
     setBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Connectez-vous');
-      const audio_url = await uploadFile(file, 'music');
-      const cover_url = cover ? await uploadFile(cover, 'music-cover') : null;
+      const audio_url = await uploadFile(file, 'music', v.mime);
+      const cover_url = cover ? await uploadFile(cover, 'music-cover', cover.type) : null;
       const { error } = await supabase.from('music_tracks').insert({
         user_id: user.id, title, audio_url, cover_url,
         genre: genre || null, style: style || null, origin,
@@ -265,7 +304,7 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
       toast.success('Morceau publié !');
       setOpen(false); setTitle(''); setFile(null); setCover(null); setGenre(''); setStyle(''); setAlbumId('none');
       onDone();
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) { toast.error(e.message || 'Upload échoué'); }
     finally { setBusy(false); }
   };
 
@@ -278,7 +317,8 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
           <Input placeholder="Titre" value={title} onChange={e => setTitle(e.target.value)} />
           <div>
             <label className="text-xs text-muted-foreground">Fichier audio</label>
-            <Input type="file" accept="audio/*" onChange={e => setFile(e.target.files?.[0] || null)} />
+            <Input type="file" accept=".mp3,.wav,.flac,.aac,.ogg,.oga,.m4a,.mp4,.webm,audio/*" onChange={e => setFile(e.target.files?.[0] || null)} />
+            <p className="text-[10px] text-muted-foreground mt-1">MP3, WAV, FLAC, AAC, OGG, M4A, WEBM — max 15 min, 50 Mo (200 Mo pour WAV/FLAC)</p>
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Pochette (optionnel)</label>
