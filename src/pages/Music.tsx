@@ -317,7 +317,8 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
           <Input placeholder="Titre" value={title} onChange={e => setTitle(e.target.value)} />
           <div>
             <label className="text-xs text-muted-foreground">Fichier audio</label>
-            <Input type="file" accept="audio/*" onChange={e => setFile(e.target.files?.[0] || null)} />
+            <Input type="file" accept=".mp3,.wav,.flac,.aac,.ogg,.oga,.m4a,.mp4,.webm,audio/*" onChange={e => setFile(e.target.files?.[0] || null)} />
+            <p className="text-[10px] text-muted-foreground mt-1">MP3, WAV, FLAC, AAC, OGG, M4A, WEBM — max 15 min, 50 Mo (200 Mo pour WAV/FLAC)</p>
           </div>
           <div>
             <label className="text-xs text-muted-foreground">Pochette (optionnel)</label>
