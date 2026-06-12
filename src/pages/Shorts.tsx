@@ -70,8 +70,57 @@ const ShortsPage: React.FC = () => {
   const sessionDelta = useRef<Map<string, number>>(new Map()); // realId -> unsaved delta
   const lastTickRef = useRef<{ key: string; t: number } | null>(null);
   const flushTimer = useRef<any>(null);
+  const [newCount, setNewCount] = useState(0);
+  const latestCreatedAt = useRef<string | null>(null);
 
   useEffect(() => { load(); }, []);
+
+  // Realtime: detect new shorts inserted by anyone
+  useEffect(() => {
+    const channel = supabase
+      .channel('shorts-feed')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'talent_media' },
+        (payload) => {
+          const row: any = payload.new;
+          if (!row || !['short', 'video'].includes(row.media_type)) return;
+          if (seenRealIds.current.has(row.id)) return;
+          // Own upload → refresh silently and bring to top
+          if (currentUser && row.user_id === currentUser) {
+            refreshTop();
+          } else {
+            setNewCount((n) => n + 1);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUser]);
+
+  // Fetch newest shorts and prepend them to the feed
+  const refreshTop = async () => {
+    let q = supabase
+      .from('talent_media')
+      .select('*')
+      .in('media_type', ['short', 'video'])
+      .order('created_at', { ascending: false })
+      .limit(30);
+    if (latestCreatedAt.current) q = q.gt('created_at', latestCreatedAt.current);
+    const { data } = await q;
+    const fresh = (data || []).filter((r: any) => !seenRealIds.current.has(r.id));
+    if (fresh.length === 0) { setNewCount(0); return; }
+    fresh.forEach((r: any) => seenRealIds.current.add(r.id));
+    latestCreatedAt.current = fresh[0].created_at;
+    const enriched = await enrich(fresh, currentUser || undefined);
+    setShorts(prev => [...enriched, ...prev]);
+    setNewCount(0);
+    setActiveIdx(0);
+    requestAnimationFrame(() => {
+      const container = document.querySelector('[data-shorts-scroll]') as HTMLElement | null;
+      container?.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  };
 
   // Periodic + unmount flush of watch deltas
   useEffect(() => {
