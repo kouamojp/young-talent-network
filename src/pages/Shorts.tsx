@@ -535,6 +535,16 @@ const ShortsPage: React.FC = () => {
         </Button>
       </div>
 
+      {newCount > 0 && (
+        <button
+          onClick={refreshTop}
+          className="absolute top-14 left-1/2 -translate-x-1/2 z-30 bg-primary text-primary-foreground rounded-full shadow-lg px-4 py-2 text-xs font-semibold flex items-center gap-2 animate-fade-in hover:scale-105 transition"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          {newCount} nouvelle{newCount > 1 ? 's' : ''} vidéo{newCount > 1 ? 's' : ''} — Rafraîchir
+        </button>
+      )}
+
       {loading ? (
         <div className="h-full flex items-center justify-center text-white/70 text-sm">Chargement...</div>
       ) : shorts.length === 0 ? (
