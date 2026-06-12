@@ -48,7 +48,10 @@ import AdvancedSearch from "./pages/AdvancedSearch";
 import Verification from "./pages/Verification";
 import TalentMarketplace from "./pages/TalentMarketplace";
 import PublicCV from "./pages/PublicCV";
+import Music from "./pages/Music";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
+import { MusicPlayerProvider } from "./contexts/MusicPlayerContext";
+import FloatingPlayer from "./components/music/FloatingPlayer";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -62,9 +65,11 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
+      <MusicPlayerProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        
         
         {/* Fixed Navbar */}
         <Navbar />
@@ -123,6 +128,7 @@ const App = () => {
               <Route path="/verification" element={<Verification />} />
               <Route path="/talent-marketplace" element={<TalentMarketplace />} />
               <Route path="/cv/:slug" element={<PublicCV />} />
+              <Route path="/music" element={<Music />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
@@ -135,12 +141,16 @@ const App = () => {
         {/* AI Assistant Chat Bubble */}
         <AIAssistantChat />
         
+        {/* Floating music player */}
+        <FloatingPlayer />
+        
         {/* Facebook-style Footer - desktop only */}
         <Footer />
         
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />
       </TooltipProvider>
+      </MusicPlayerProvider>
       </LanguageProvider>
     </QueryClientProvider>
   );
