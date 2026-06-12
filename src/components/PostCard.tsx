@@ -53,6 +53,8 @@ interface Post {
   shares: number;
   media_urls?: string[] | null;
   user_id?: string;
+  external_source_url?: string | null;
+  external_source_platform?: string | null;
 }
 
 interface PostCardProps {
