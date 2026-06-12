@@ -1696,6 +1696,8 @@ export type Database = {
           comments_count: number | null
           content: string
           created_at: string
+          external_source_platform: string | null
+          external_source_url: string | null
           id: string
           is_published: boolean
           likes_count: number | null
@@ -1712,6 +1714,8 @@ export type Database = {
           comments_count?: number | null
           content: string
           created_at?: string
+          external_source_platform?: string | null
+          external_source_url?: string | null
           id?: string
           is_published?: boolean
           likes_count?: number | null
@@ -1728,6 +1732,8 @@ export type Database = {
           comments_count?: number | null
           content?: string
           created_at?: string
+          external_source_platform?: string | null
+          external_source_url?: string | null
           id?: string
           is_published?: boolean
           likes_count?: number | null
@@ -1794,13 +1800,16 @@ export type Database = {
       }
       profile_sources: {
         Row: {
+          auto_import_posts: boolean
           auto_sync: boolean
           created_at: string
           error_message: string | null
           extracted_data: Json | null
           id: string
           label: string | null
+          last_import_at: string | null
           last_synced_at: string | null
+          platform: string | null
           source_type: string
           status: string
           updated_at: string
@@ -1808,13 +1817,16 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_import_posts?: boolean
           auto_sync?: boolean
           created_at?: string
           error_message?: string | null
           extracted_data?: Json | null
           id?: string
           label?: string | null
+          last_import_at?: string | null
           last_synced_at?: string | null
+          platform?: string | null
           source_type?: string
           status?: string
           updated_at?: string
@@ -1822,13 +1834,16 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_import_posts?: boolean
           auto_sync?: boolean
           created_at?: string
           error_message?: string | null
           extracted_data?: Json | null
           id?: string
           label?: string | null
+          last_import_at?: string | null
           last_synced_at?: string | null
+          platform?: string | null
           source_type?: string
           status?: string
           updated_at?: string
