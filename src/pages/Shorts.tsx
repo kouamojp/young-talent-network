@@ -70,8 +70,57 @@ const ShortsPage: React.FC = () => {
   const sessionDelta = useRef<Map<string, number>>(new Map()); // realId -> unsaved delta
   const lastTickRef = useRef<{ key: string; t: number } | null>(null);
   const flushTimer = useRef<any>(null);
+  const [newCount, setNewCount] = useState(0);
+  const latestCreatedAt = useRef<string | null>(null);
 
   useEffect(() => { load(); }, []);
+
+  // Realtime: detect new shorts inserted by anyone
+  useEffect(() => {
+    const channel = supabase
+      .channel('shorts-feed')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'talent_media' },
+        (payload) => {
+          const row: any = payload.new;
+          if (!row || !['short', 'video'].includes(row.media_type)) return;
+          if (seenRealIds.current.has(row.id)) return;
+          // Own upload → refresh silently and bring to top
+          if (currentUser && row.user_id === currentUser) {
+            refreshTop();
+          } else {
+            setNewCount((n) => n + 1);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUser]);
+
+  // Fetch newest shorts and prepend them to the feed
+  const refreshTop = async () => {
+    let q = supabase
+      .from('talent_media')
+      .select('*')
+      .in('media_type', ['short', 'video'])
+      .order('created_at', { ascending: false })
+      .limit(30);
+    if (latestCreatedAt.current) q = q.gt('created_at', latestCreatedAt.current);
+    const { data } = await q;
+    const fresh = (data || []).filter((r: any) => !seenRealIds.current.has(r.id));
+    if (fresh.length === 0) { setNewCount(0); return; }
+    fresh.forEach((r: any) => seenRealIds.current.add(r.id));
+    latestCreatedAt.current = fresh[0].created_at;
+    const enriched = await enrich(fresh, currentUser || undefined);
+    setShorts(prev => [...enriched, ...prev]);
+    setNewCount(0);
+    setActiveIdx(0);
+    requestAnimationFrame(() => {
+      const container = document.querySelector('[data-shorts-scroll]') as HTMLElement | null;
+      container?.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  };
 
   // Periodic + unmount flush of watch deltas
   useEffect(() => {
@@ -132,6 +181,7 @@ const ShortsPage: React.FC = () => {
       .from('talent_media')
       .select('*')
       .in('media_type', ['short', 'video'])
+      .order('created_at', { ascending: false })
       .limit(100);
 
     if (followedIds.length > 0) {
@@ -144,11 +194,16 @@ const ShortsPage: React.FC = () => {
         .from('talent_media')
         .select('*')
         .in('media_type', ['short', 'video'])
+        .order('created_at', { ascending: false })
         .limit(50);
       data = fallback.data || [];
     }
 
-    const items = shuffle(data || []);
+    // Keep newest first; only lightly shuffle the tail to add variety
+    const head = (data || []).slice(0, 5);
+    const tail = shuffle((data || []).slice(5));
+    const items = [...head, ...tail];
+    if (items[0]?.created_at) latestCreatedAt.current = items[0].created_at;
     items.forEach((i: any) => seenRealIds.current.add(i.id));
     const enriched = await enrich(items, user?.id);
     setShorts(enriched);
@@ -480,6 +535,16 @@ const ShortsPage: React.FC = () => {
         </Button>
       </div>
 
+      {newCount > 0 && (
+        <button
+          onClick={refreshTop}
+          className="absolute top-14 left-1/2 -translate-x-1/2 z-30 bg-primary text-primary-foreground rounded-full shadow-lg px-4 py-2 text-xs font-semibold flex items-center gap-2 animate-fade-in hover:scale-105 transition"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          {newCount} nouvelle{newCount > 1 ? 's' : ''} vidéo{newCount > 1 ? 's' : ''} — Rafraîchir
+        </button>
+      )}
+
       {loading ? (
         <div className="h-full flex items-center justify-center text-white/70 text-sm">Chargement...</div>
       ) : shorts.length === 0 ? (
@@ -488,7 +553,7 @@ const ShortsPage: React.FC = () => {
           <p>Aucun Short pour l'instant.</p>
         </div>
       ) : (
-        <div className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+        <div data-shorts-scroll className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
           {shorts.map((short, idx) => {
             const isFollowing = following.has(short.user_id);
             const isSelf = currentUser === short.user_id;
