@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import LandingPage from '@/components/landing/LandingPage';
 
 const Index: React.FC = () => {
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -18,7 +17,8 @@ const Index: React.FC = () => {
 
   if (authed === null) return null;
   if (authed) return <Navigate to="/feed" replace />;
-  return <LandingPage />;
+  // Non-authenticated/non-subscribed visitors land directly on the AI Assistant
+  return <Navigate to="/assistant" replace />;
 };
 
 export default Index;
