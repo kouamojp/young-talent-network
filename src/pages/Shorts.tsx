@@ -54,6 +54,12 @@ const ShortsPage: React.FC = () => {
   const [newComment, setNewComment] = useState('');
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const tapTimers = useRef<Record<string, any>>({});
+  // Recommendation tracking: per-author and per-category engagement scores
+  const authorScore = useRef<Map<string, number>>(new Map());
+  const categoryScore = useRef<Map<string, number>>(new Map());
+  const seenIds = useRef<Set<string>>(new Set());
+  const watchAccum = useRef<Map<string, number>>(new Map()); // shortKey -> seconds watched
+  const lastTickRef = useRef<{ key: string; t: number } | null>(null);
 
   useEffect(() => { load(); }, []);
 
@@ -99,9 +105,21 @@ const ShortsPage: React.FC = () => {
     }
 
     const items = shuffle(data || []);
+    items.forEach((i: any) => seenIds.current.add(i.id));
     const enriched = await enrich(items, user?.id);
     setShorts(enriched);
     setLoading(false);
+  };
+
+  // Record engagement signals for the recommendation
+  const recordEngagement = (s: Short, kind: 'watch' | 'like' | 'pass', weight = 1) => {
+    const a = authorScore.current.get(s.user_id) || 0;
+    authorScore.current.set(s.user_id, a + (kind === 'pass' ? -weight : weight));
+    const cat = (s as any).category;
+    if (cat) {
+      const c = categoryScore.current.get(cat) || 0;
+      categoryScore.current.set(cat, c + (kind === 'pass' ? -weight : weight));
+    }
   };
 
   const enrich = async (items: any[], uid?: string): Promise<Short[]> => {
@@ -148,8 +166,26 @@ const ShortsPage: React.FC = () => {
     return () => observer.disconnect();
   }, [shorts]);
 
-  // Recommendation: when reaching the end, append more shuffled items
+  // When the active short changes, score the one we just left (watch vs pass)
+  const prevActiveRef = useRef<number>(-1);
   useEffect(() => {
+    const prev = prevActiveRef.current;
+    if (prev >= 0 && prev !== activeIdx && shorts[prev]) {
+      const prevShort = shorts[prev];
+      const v = videoRefs.current[prev];
+      const watched = watchAccum.current.get(prevShort.id) || 0;
+      const dur = v?.duration || 0;
+      if (dur > 0) {
+        const ratio = watched / dur;
+        if (ratio < 0.25 && watched < 4) recordEngagement(prevShort, 'pass', 1);
+        else if (ratio > 0.7 || watched > 15) recordEngagement(prevShort, 'watch', 2);
+        else recordEngagement(prevShort, 'watch', 0.5);
+      } else if (watched > 5) {
+        recordEngagement(prevShort, 'watch', 1);
+      }
+    }
+    prevActiveRef.current = activeIdx;
+    // Append more shorts before reaching the end
     if (shorts.length > 0 && activeIdx >= shorts.length - 2) {
       appendMore();
     }
@@ -157,15 +193,45 @@ const ShortsPage: React.FC = () => {
   }, [activeIdx]);
 
   const appendMore = async () => {
-    const { data } = await supabase
+    // Pick top-engaged authors & categories to bias recommendations
+    const topAuthors = Array.from(authorScore.current.entries())
+      .sort((a, b) => b[1] - a[1]).slice(0, 10).map(([k]) => k);
+    const topCategories = Array.from(categoryScore.current.entries())
+      .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([k]) => k);
+
+    const exclude = Array.from(seenIds.current);
+    let query = supabase
       .from('talent_media')
       .select('*')
       .in('media_type', ['short', 'video'])
-      .limit(30);
-    if (!data) return;
-    const more = await enrich(shuffle(data), currentUser || undefined);
-    // append with new keys to avoid duplicate observer issues
-    setShorts(prev => [...prev, ...more.map(m => ({ ...m, id: `${m.id}-${prev.length}` }))]);
+      .limit(50);
+    if (exclude.length > 0 && exclude.length < 200) {
+      query = query.not('id', 'in', `(${exclude.join(',')})`);
+    }
+    const { data } = await query;
+    let pool = data || [];
+
+    // If we have engagement signal, prefer items by top authors / categories
+    if (pool.length > 0 && (topAuthors.length > 0 || topCategories.length > 0)) {
+      const score = (m: any) =>
+        (topAuthors.includes(m.user_id) ? (authorScore.current.get(m.user_id) || 0) : 0) +
+        (m.category && topCategories.includes(m.category) ? (categoryScore.current.get(m.category) || 0) * 0.5 : 0) +
+        Math.random() * 0.3; // small jitter to keep variety
+      pool = [...pool].sort((a, b) => score(b) - score(a));
+    } else {
+      pool = shuffle(pool);
+    }
+
+    if (pool.length === 0) return;
+    const more = await enrich(pool.slice(0, 20), currentUser || undefined);
+    setShorts(prev => {
+      const offset = prev.length;
+      return [...prev, ...more.map((m, i) => {
+        const key = `${m.id}-${offset + i}`;
+        seenIds.current.add(m.id);
+        return { ...m, id: key };
+      })];
+    });
   };
 
   const toggleLike = async (s: Short, idx: number, animate = false) => {
@@ -175,6 +241,8 @@ const ShortsPage: React.FC = () => {
     setShorts(prev => prev.map((x, i) => i === idx ? { ...x, liked: animate ? true : !was, likes: (x.likes || 0) + ((animate ? !was : !was) ? 1 : -1) } : x));
     if (animate) setHeartBurst(p => ({ ...p, [s.id]: Date.now() }));
     if (animate && was) return; // double-tap on already-liked: just animate
+    // Strong signal: like → boost author/category
+    if (!was) recordEngagement(s, 'like', 5);
     if (was) await supabase.from('media_likes' as any).delete().eq('media_id', realId).eq('user_id', currentUser);
     else await supabase.from('media_likes' as any).insert({ media_id: realId, user_id: currentUser });
   };
@@ -280,10 +348,21 @@ const ShortsPage: React.FC = () => {
                     loop
                     muted={muted}
                     playsInline
-                    preload="metadata"
+                    // Preload current and next 2 videos for instant swipe; far ones stay light
+                    preload={Math.abs(idx - activeIdx) <= 2 ? 'auto' : 'metadata'}
                     onClick={() => handleTap(short, idx)}
                     onTimeUpdate={(e) => {
                       const v = e.currentTarget;
+                      // Accumulate real watch time (delta since last tick)
+                      const now = v.currentTime;
+                      const last = lastTickRef.current;
+                      if (last && last.key === short.id) {
+                        const delta = now - last.t;
+                        if (delta > 0 && delta < 1.5) {
+                          watchAccum.current.set(short.id, (watchAccum.current.get(short.id) || 0) + delta);
+                        }
+                      }
+                      lastTickRef.current = { key: short.id, t: now };
                       if (v.duration) setProgress(p => ({ ...p, [short.id]: (v.currentTime / v.duration) * 100 }));
                     }}
                     onError={() => setVideoErrors(p => ({ ...p, [short.id]: true }))}
