@@ -195,7 +195,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
       {mode !== 'chat' && messages.length > 0 && (
         <div className="px-3 py-1 border-t bg-primary/5 flex items-center justify-between">
           <span className="text-[10px] text-primary font-medium">
-            Mode : {mode === 'compose-post' ? '✏️ Rédaction post' : mode === 'compose-message' ? '💬 Message pro' : '📊 Conseils profil'}
+            Mode : {mode === 'compose-post' ? '✏️ Rédaction post' : mode === 'compose-message' ? '💬 Message pro' : mode === 'profile-tips' ? '📊 Conseils profil' : mode === 'translate' ? '🌐 Traduction' : '🛡️ Admin'}
           </span>
           <button onClick={() => setMode('chat')} className="text-[10px] text-muted-foreground hover:text-foreground">Retour chat</button>
         </div>
