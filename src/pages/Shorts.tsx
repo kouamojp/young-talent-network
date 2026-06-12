@@ -241,6 +241,8 @@ const ShortsPage: React.FC = () => {
     setShorts(prev => prev.map((x, i) => i === idx ? { ...x, liked: animate ? true : !was, likes: (x.likes || 0) + ((animate ? !was : !was) ? 1 : -1) } : x));
     if (animate) setHeartBurst(p => ({ ...p, [s.id]: Date.now() }));
     if (animate && was) return; // double-tap on already-liked: just animate
+    // Strong signal: like → boost author/category
+    if (!was) recordEngagement(s, 'like', 5);
     if (was) await supabase.from('media_likes' as any).delete().eq('media_id', realId).eq('user_id', currentUser);
     else await supabase.from('media_likes' as any).insert({ media_id: realId, user_id: currentUser });
   };
