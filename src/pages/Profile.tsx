@@ -333,7 +333,20 @@ const Profile: React.FC = () => {
 
           {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
 
-          {userId && <ProfileSources userId={userId} />}
+          {userId && (
+            <Tabs defaultValue="sources" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="sources">Sources externes</TabsTrigger>
+                <TabsTrigger value="networks">Mes réseaux</TabsTrigger>
+              </TabsList>
+              <TabsContent value="sources" className="mt-2">
+                <ProfileSources userId={userId} />
+              </TabsContent>
+              <TabsContent value="networks" className="mt-2">
+                <MyNetworksManager userId={userId} />
+              </TabsContent>
+            </Tabs>
+          )}
 
           {userId && <MySocialLinksCard userId={userId} />}
 
