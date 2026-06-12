@@ -37,6 +37,28 @@ const ShortsFeed: React.FC = () => {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user?.id || null));
     fetchShorts();
+
+    const channel = supabase
+      .channel('shorts-feed-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'talent_media' },
+        (payload) => {
+          const row: any = payload.new;
+          if (!row || (row.media_type !== 'short' && row.media_type !== 'video')) return;
+          fetchShorts();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'talent_media' },
+        () => fetchShorts()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchShorts = async () => {
