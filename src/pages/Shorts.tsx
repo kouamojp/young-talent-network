@@ -543,7 +543,7 @@ const ShortsPage: React.FC = () => {
           <p>Aucun Short pour l'instant.</p>
         </div>
       ) : (
-        <div className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+        <div data-shorts-scroll className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
           {shorts.map((short, idx) => {
             const isFollowing = following.has(short.user_id);
             const isSelf = currentUser === short.user_id;
