@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import {
   Youtube, Instagram, Facebook, Linkedin, Globe, Plus, Trash2, ExternalLink,
-  RefreshCw, Loader2, Rss,
+  RefreshCw, Loader2, Rss, Send,
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -38,6 +38,8 @@ const PLATFORMS = [
   { value: 'x',         label: 'X (Twitter)', icon: <Globe className="h-4 w-4" /> },
   { value: 'facebook',  label: 'Facebook',  icon: <Facebook className="h-4 w-4 text-blue-600" /> },
   { value: 'linkedin',  label: 'LinkedIn',  icon: <Linkedin className="h-4 w-4 text-blue-700" /> },
+  { value: 'telegram',  label: 'Telegram',  icon: <Send className="h-4 w-4 text-sky-500" /> },
+  { value: 'vk',        label: 'VK',        icon: <Globe className="h-4 w-4 text-blue-500" /> },
   { value: 'rss',       label: 'RSS / Atom', icon: <Rss className="h-4 w-4 text-orange-500" /> },
   { value: 'web',       label: 'Autre site web', icon: <Globe className="h-4 w-4" /> },
 ];
@@ -50,6 +52,8 @@ function detectPlatform(url: string): string {
   if (u.includes('twitter.com') || u.includes('x.com')) return 'x';
   if (u.includes('facebook.com')) return 'facebook';
   if (u.includes('linkedin.com')) return 'linkedin';
+  if (u.includes('t.me') || u.includes('telegram.me') || u.includes('telegram.org')) return 'telegram';
+  if (u.includes('vk.com') || u.includes('vk.ru')) return 'vk';
   if (u.endsWith('.xml') || u.includes('/rss') || u.includes('/feed')) return 'rss';
   return 'web';
 }
