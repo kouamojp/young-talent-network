@@ -287,12 +287,14 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
 
   const submit = async () => {
     if (!file || !title) { toast.error('Titre + fichier audio requis'); return; }
+    const v = await validateAudioFile(file);
+    if (!v.ok) { toast.error(v.error); return; }
     setBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Connectez-vous');
-      const audio_url = await uploadFile(file, 'music');
-      const cover_url = cover ? await uploadFile(cover, 'music-cover') : null;
+      const audio_url = await uploadFile(file, 'music', v.mime);
+      const cover_url = cover ? await uploadFile(cover, 'music-cover', cover.type) : null;
       const { error } = await supabase.from('music_tracks').insert({
         user_id: user.id, title, audio_url, cover_url,
         genre: genre || null, style: style || null, origin,
@@ -302,7 +304,7 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
       toast.success('Morceau publié !');
       setOpen(false); setTitle(''); setFile(null); setCover(null); setGenre(''); setStyle(''); setAlbumId('none');
       onDone();
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e: any) { toast.error(e.message || 'Upload échoué'); }
     finally { setBusy(false); }
   };
 
