@@ -105,9 +105,21 @@ const ShortsPage: React.FC = () => {
     }
 
     const items = shuffle(data || []);
+    items.forEach((i: any) => seenIds.current.add(i.id));
     const enriched = await enrich(items, user?.id);
     setShorts(enriched);
     setLoading(false);
+  };
+
+  // Record engagement signals for the recommendation
+  const recordEngagement = (s: Short, kind: 'watch' | 'like' | 'pass', weight = 1) => {
+    const a = authorScore.current.get(s.user_id) || 0;
+    authorScore.current.set(s.user_id, a + (kind === 'pass' ? -weight : weight));
+    const cat = (s as any).category;
+    if (cat) {
+      const c = categoryScore.current.get(cat) || 0;
+      categoryScore.current.set(cat, c + (kind === 'pass' ? -weight : weight));
+    }
   };
 
   const enrich = async (items: any[], uid?: string): Promise<Short[]> => {
