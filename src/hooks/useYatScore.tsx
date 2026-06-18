@@ -33,8 +33,23 @@ export function useYatScore(userId?: string) {
   const fetchScore = useCallback(async () => {
     setLoading(true); setError(null);
     try {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        setData(null);
+        return;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        setData(null);
+        return;
+      }
+
       const path = userId ? `yat-score?user_id=${userId}` : 'yat-score';
-      const { data: res, error: err } = await supabase.functions.invoke(path);
+      const { data: res, error: err } = await supabase.functions.invoke(path, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       if (err) throw err;
       setData(res as YatScoreData);
     } catch (e: any) {
