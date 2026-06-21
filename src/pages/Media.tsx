@@ -22,6 +22,7 @@ interface MediaItem {
 
 const Media: React.FC = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const initialTab = (() => {
     if (typeof window === 'undefined') return 'photo';
     const tab = new URLSearchParams(window.location.search).get('tab');
@@ -34,7 +35,15 @@ const Media: React.FC = () => {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchMedia(); }, [activeTab]);
+  // Shorts has its own full-screen experience at /shorts
+  useEffect(() => {
+    if (activeTab === 'shorts') {
+      navigate('/shorts', { replace: true });
+    }
+  }, [activeTab, navigate]);
+
+  useEffect(() => { if (activeTab !== 'shorts') fetchMedia(); }, [activeTab]);
+
 
   const fetchMedia = async () => {
     setLoading(true);
