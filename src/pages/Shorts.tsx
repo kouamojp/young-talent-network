@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ShareMenu from '@/components/share/ShareMenu';
 
