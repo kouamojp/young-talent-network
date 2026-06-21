@@ -2,9 +2,8 @@ name: Sync depuis repo de Pascal
 
 on:
   schedule:
-    # Toutes les nuits à 2h00 (heure UTC = 22h00 heure Montréal)
     - cron: '0 2 * * *'
-  workflow_dispatch: # Permet aussi de lancer manuellement depuis GitHub
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -13,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout ton repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
