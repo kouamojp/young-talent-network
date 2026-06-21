@@ -10,7 +10,6 @@ import GlassMorphism from '@/components/GlassMorphism';
 import AnimatedText from '@/components/AnimatedText';
 import { Apple, Users, Building, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import CategoryPicker from '@/components/categories/CategoryPicker';
@@ -137,12 +136,13 @@ const Authentication: React.FC = () => {
   const handleOAuth = async (provider: 'google' | 'apple') => {
     setIsLoading(true);
     try {
-      const result: any = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/profile`,
+        },
       });
-      if (result?.error) throw new Error(typeof result.error === 'string' ? result.error : (result.error.message || 'OAuth error'));
-      if (result?.redirected) return;
-      navigate('/profile');
+      if (error) throw error;
     } catch (error: any) {
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } finally {
