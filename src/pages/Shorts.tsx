@@ -71,7 +71,10 @@ const ShortsPage: React.FC = () => {
   const lastTickRef = useRef<{ key: string; t: number } | null>(null);
   const flushTimer = useRef<any>(null);
   const [newCount, setNewCount] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const latestCreatedAt = useRef<string | null>(null);
+
 
   useEffect(() => { load(); }, []);
 
