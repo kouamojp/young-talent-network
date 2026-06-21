@@ -1,0 +1,39 @@
+name: Sync depuis repo de Pascal
+
+on:
+  schedule:
+    # Toutes les nuits à 2h00 (heure UTC = 22h00 heure Montréal)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permet aussi de lancer manuellement depuis GitHub
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: Synchronisation upstream → origin
+
+    steps:
+      - name: Checkout ton repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurer Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Ajouter upstream (repo de Pascal)
+        run: |
+          git remote add upstream https://github.com/passypascal/young-talent-network.git || true
+
+      - name: Fetch upstream
+        run: git fetch upstream
+
+      - name: Merger les changements de Pascal
+        run: |
+          git checkout main
+          git merge upstream/main --allow-unrelated-histories -m "chore: sync depuis upstream passypascal/young-talent-network"
+
+      - name: Push vers ton repo
+        run: git push origin main
