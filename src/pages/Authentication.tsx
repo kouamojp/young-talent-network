@@ -155,9 +155,9 @@ const Authentication: React.FC = () => {
       <Button variant="outline" className="w-full" onClick={() => handleOAuth('google')} disabled={isLoading}>
         <GoogleIcon /> Google
       </Button>
-      <Button variant="outline" className="w-full" onClick={() => handleOAuth('apple')} disabled={isLoading}>
+      {/* <Button variant="outline" className="w-full" onClick={() => handleOAuth('apple')} disabled={isLoading}>
         <Apple className="mr-2 h-4 w-4" /> Apple
-      </Button>
+      </Button> */}
       <VKLoginButton />
       <TelegramLoginButton />
     </div>
