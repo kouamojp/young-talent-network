@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { user } from '@/components/profile/ProfileData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,7 +82,10 @@ const Profile: React.FC = () => {
     finally { setLoading(false); }
   };
 
-  const displayProfile = profile || user;
+  // Show the real authenticated profile only. Never fall back to demo data
+  // (ProfileData `user`) — that made OAuth users see "Alex Johnson" instead
+  // of their own account.
+  const displayProfile = profile || {};
   const [isTransitioning, setIsTransitioning] = useState(false);
   const prevSectionRef = useRef(activeSection);
 
