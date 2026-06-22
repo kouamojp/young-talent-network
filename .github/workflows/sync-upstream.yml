@@ -22,9 +22,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Ajouter upstream (repo de Pascal)
+      - name: Ajouter upstream (repo de Pascal)  # 👈 C'est ici
         run: |
-          git remote add upstream https://github.com/passypascal/young-talent-network.git || true
+          git remote add upstream https://x-access-token:${{ secrets.UPSTREAM_TOKEN }}@github.com/passypascal/young-talent-network.git || true
 
       - name: Fetch upstream
         run: git fetch upstream
