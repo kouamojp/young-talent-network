@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Send, Loader2, Plus, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft, MessageSquare, Check, CheckCheck, Forward, Users } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useConversations, type Message } from '@/hooks/useConversations';
+import { useCall } from '@/contexts/CallContext';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +34,18 @@ const Messages: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { conversations, loading, currentUserId, sendMessage, createConversation, createGroupConversation, markMessageRead } = useConversations();
+  const { startCall } = useCall();
   const activeConversation = conversations.find(c => c.id === activeConversationId);
+
+  const handleCall = (video: boolean) => {
+    if (!activeConversation || activeConversation.is_group) {
+      toast({ title: 'Les appels de groupe ne sont pas encore disponibles', variant: 'destructive' });
+      return;
+    }
+    const p = activeConversation.participants[0];
+    if (!p) return;
+    startCall({ id: p.user_id, name: p.profiles?.name || 'Contact', avatar_url: p.profiles?.avatar_url }, video);
+  };
 
   useEffect(() => {
     if (conversations.length > 0 && !activeConversationId) setActiveConversationId(conversations[0].id);
@@ -271,8 +283,8 @@ const Messages: React.FC = () => {
               </div>
             </div>
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon"><Phone className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon"><Video className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleCall(false)} disabled={activeConversation.is_group}><Phone className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleCall(true)} disabled={activeConversation.is_group}><Video className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
             </div>
           </div>

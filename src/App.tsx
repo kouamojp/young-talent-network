@@ -52,6 +52,8 @@ import Music from "./pages/Music";
 import { AIAssistantChat } from "./components/ai/AIAssistantChat";
 import { MusicPlayerProvider } from "./contexts/MusicPlayerContext";
 import FloatingPlayer from "./components/music/FloatingPlayer";
+import { CallProvider } from "./contexts/CallContext";
+import CallOverlay from "./components/calls/CallOverlay";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -66,6 +68,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
       <MusicPlayerProvider>
+      <CallProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -149,7 +152,11 @@ const App = () => {
         
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />
+
+        {/* Global incoming/active call UI */}
+        <CallOverlay />
       </TooltipProvider>
+      </CallProvider>
       </MusicPlayerProvider>
       </LanguageProvider>
     </QueryClientProvider>
