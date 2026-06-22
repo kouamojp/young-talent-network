@@ -3430,6 +3430,7 @@ export type Database = {
         Args: { _name: string; _user_ids: string[] }
         Returns: string
       }
+      delete_current_user: { Args: Record<PropertyKey, never>; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

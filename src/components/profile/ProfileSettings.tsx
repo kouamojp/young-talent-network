@@ -95,6 +95,29 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
     navigate("/auth");
   };
 
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.rpc("delete_current_user");
+      if (error) throw error;
+
+      toast({
+        title: "Compte supprimé",
+        description: "Votre compte et vos données ont été supprimés.",
+      });
+
+      await supabase.auth.signOut();
+      navigate("/auth");
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message ?? "Impossible de supprimer le compte.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
   const handleSaveLocation = async () => {
     setSavingLocation(true);
     try {
@@ -296,8 +319,12 @@ export const ProfileSettings = ({ profile, onUpdate }: ProfileSettingsProps) => 
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                    Supprimer
+                  <AlertDialogAction
+                    onClick={handleDeleteAccount}
+                    disabled={loading}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {loading ? "Suppression…" : "Supprimer"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
