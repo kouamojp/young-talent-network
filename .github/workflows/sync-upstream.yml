@@ -24,7 +24,7 @@ jobs:
 
       - name: Ajouter upstream (repo de Pascal)
         run: |
-          git remote add upstream https://x-access-token:${{ secrets.UPSTREAM_TOKEN }}@github.com/passypascal/young-talent-network.git || true
+          git remote add upstream https://github.com/passypascal/young-talent-network.git || true
 
       - name: Fetch upstream
         run: git fetch upstream
