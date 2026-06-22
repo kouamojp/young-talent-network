@@ -7,40 +7,87 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Phone, PhoneCall, PhoneIncoming, PhoneOutgoing, PhoneMissed, 
-  Video, Search, Clock, Loader2, Plus, Star
+import {
+  Phone, PhoneCall, PhoneIncoming, PhoneOutgoing, PhoneMissed,
+  Video, Search, Clock, Loader2, Star
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useCall } from '@/contexts/CallContext';
 
 interface Contact { id: string; name: string; avatar_url: string | null; user_type: string; country: string | null; }
+
+interface CallRecord {
+  id: string;
+  type: 'incoming' | 'outgoing' | 'missed';
+  isVideo: boolean;
+  time: string;
+  duration: string;
+  peer: { id: string; name: string; avatar_url: string | null };
+}
+
+const fmtDuration = (s: number) => s > 0 ? `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` : '';
 
 const Calls: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { startCall } = useCall();
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [history, setHistory] = useState<CallRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const mockCallHistory = [
-    { id: '1', type: 'outgoing' as const, duration: '5:32', time: `${t('calls.today')}, 14:30`, isVideo: false },
-    { id: '2', type: 'incoming' as const, duration: '12:15', time: `${t('calls.today')}, 11:00`, isVideo: true },
-    { id: '3', type: 'missed' as const, duration: '', time: `${t('calls.yesterday')}, 18:45`, isVideo: false },
-    { id: '4', type: 'outgoing' as const, duration: '3:10', time: `${t('calls.yesterday')}, 09:20`, isVideo: true },
-  ];
 
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/auth'); return; }
-      const { data } = await supabase.from('profiles').select('id, name, avatar_url, user_type, country').neq('id', user.id).limit(20);
-      setContacts(data || []);
+
+      const { data: contactsData } = await supabase
+        .from('profiles').select('id, name, avatar_url, user_type, country').neq('id', user.id).limit(20);
+      const contactList = contactsData || [];
+      setContacts(contactList);
+
+      const { data: callsData } = await supabase
+        .from('calls')
+        .select('*')
+        .or(`caller_id.eq.${user.id},callee_id.eq.${user.id}`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      const calls = callsData || [];
+      const peerIds = Array.from(new Set(calls.map(c => c.caller_id === user.id ? c.callee_id : c.caller_id)));
+      const { data: peersData } = peerIds.length
+        ? await supabase.from('profiles').select('id, name, avatar_url').in('id', peerIds)
+        : { data: [] as any[] };
+      const peers = new Map((peersData || []).map((p: any) => [p.id, p]));
+
+      const records: CallRecord[] = calls.map((c) => {
+        const outgoing = c.caller_id === user.id;
+        const peerId = outgoing ? c.callee_id : c.caller_id;
+        const missed = !outgoing && (c.status === 'missed' || c.status === 'cancelled' || c.status === 'rejected');
+        return {
+          id: c.id,
+          type: missed ? 'missed' : outgoing ? 'outgoing' : 'incoming',
+          isVideo: c.is_video,
+          time: new Date(c.created_at).toLocaleString(),
+          duration: fmtDuration(c.duration_seconds || 0),
+          peer: peers.get(peerId) || { id: peerId, name: 'Utilisateur', avatar_url: null },
+        };
+      });
+      setHistory(records);
       setLoading(false);
     };
     init();
   }, [navigate]);
 
   const filteredContacts = contacts.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const call = (peer: { id: string; name: string; avatar_url: string | null }, video: boolean) => startCall(peer, video);
+
+  const stats = {
+    total: history.length,
+    received: history.filter(c => c.type === 'incoming').length,
+    made: history.filter(c => c.type === 'outgoing').length,
+    missed: history.filter(c => c.type === 'missed').length,
+  };
 
   const getCallIcon = (type: string) => {
     switch (type) {
@@ -63,10 +110,10 @@ const Calls: React.FC = () => {
           </div>
           <div className="grid grid-cols-4 gap-3 mt-6">
             {[
-              { icon: Phone, label: t('calls.totalCalls'), value: mockCallHistory.length },
-              { icon: PhoneIncoming, label: t('calls.received'), value: 1 },
-              { icon: PhoneOutgoing, label: t('calls.made'), value: 2 },
-              { icon: PhoneMissed, label: t('calls.missed'), value: 1 },
+              { icon: Phone, label: t('calls.totalCalls'), value: stats.total },
+              { icon: PhoneIncoming, label: t('calls.received'), value: stats.received },
+              { icon: PhoneOutgoing, label: t('calls.made'), value: stats.made },
+              { icon: PhoneMissed, label: t('calls.missed'), value: stats.missed },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
                 <stat.icon className="h-5 w-5 mx-auto mb-1 text-white/80" /><div className="text-lg font-bold">{stat.value}</div><div className="text-xs text-white/70">{stat.label}</div>
@@ -87,38 +134,37 @@ const Calls: React.FC = () => {
           <TabsContent value="history">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-3">
-                <div className="flex items-center gap-2 mb-4">
-                  <Button className="gap-2"><Plus className="h-4 w-4" /> {t('calls.newCall')}</Button>
-                  <Button variant="outline" className="gap-2"><Video className="h-4 w-4" /> {t('calls.videoCall')}</Button>
-                </div>
-                {mockCallHistory.map((call, idx) => {
-                  const contact = contacts[idx % contacts.length];
-                  return (
-                    <Card key={call.id} className="hover:shadow-sm transition-shadow">
-                      <CardContent className="p-4 flex items-center gap-4">
-                        <Avatar className="h-12 w-12"><AvatarImage src={contact?.avatar_url || ''} /><AvatarFallback>{contact?.name?.[0] || '?'}</AvatarFallback></Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-sm truncate">{contact?.name || 'User'}</p>
-                            {call.isVideo && <Badge variant="secondary" className="text-[10px]">{t('calls.video')}</Badge>}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">{getCallIcon(call.type)}<span>{call.time}</span>{call.duration && <span>• {call.duration}</span>}</div>
+                {history.length === 0 && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <PhoneCall className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                    <p>{t('calls.noFavoritesDesc')}</p>
+                  </div>
+                )}
+                {history.map((call) => (
+                  <Card key={call.id} className="hover:shadow-sm transition-shadow">
+                    <CardContent className="p-4 flex items-center gap-4">
+                      <Avatar className="h-12 w-12"><AvatarImage src={call.peer.avatar_url || ''} /><AvatarFallback>{call.peer.name?.[0] || '?'}</AvatarFallback></Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-sm truncate">{call.peer.name}</p>
+                          {call.isVideo && <Badge variant="secondary" className="text-[10px]">{t('calls.video')}</Badge>}
                         </div>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-9 w-9 text-green-600 hover:bg-green-50"><Phone className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 text-blue-600 hover:bg-blue-50"><Video className="h-4 w-4" /></Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">{getCallIcon(call.type)}<span>{call.time}</span>{call.duration && <span>• {call.duration}</span>}</div>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-green-600 hover:bg-green-50" onClick={() => call.peer && startCall(call.peer, false)}><Phone className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-blue-600 hover:bg-blue-50" onClick={() => call.peer && startCall(call.peer, true)}><Video className="h-4 w-4" /></Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
               <div>
                 <Card>
                   <CardHeader className="pb-3"><h3 className="font-semibold text-sm flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> {t('calls.quickDial')}</h3></CardHeader>
                   <CardContent className="space-y-2">
                     {contacts.slice(0, 5).map((c) => (
-                      <div key={c.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+                      <div key={c.id} onClick={() => call(c, false)} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
                         <Avatar className="h-8 w-8"><AvatarImage src={c.avatar_url || ''} /><AvatarFallback className="text-xs">{c.name[0]}</AvatarFallback></Avatar>
                         <span className="text-sm font-medium flex-1 truncate">{c.name}</span><Phone className="h-3.5 w-3.5 text-muted-foreground" />
                       </div>
@@ -144,8 +190,8 @@ const Calls: React.FC = () => {
                       <div className="flex items-center gap-1"><Badge variant="secondary" className="text-[10px]">{contact.user_type}</Badge>{contact.country && <span className="text-[10px] text-muted-foreground">{contact.country}</span>}</div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-9 w-9"><Phone className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9"><Video className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => call(contact, false)}><Phone className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => call(contact, true)}><Video className="h-4 w-4" /></Button>
                     </div>
                   </CardContent>
                 </Card>

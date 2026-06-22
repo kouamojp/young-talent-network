@@ -10,7 +10,32 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -423,6 +448,71 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "assistant_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calls: {
+        Row: {
+          callee_id: string
+          caller_id: string
+          created_at: string
+          duration_seconds: number
+          ended_at: string | null
+          id: string
+          is_video: boolean
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          callee_id: string
+          caller_id: string
+          created_at?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          is_video?: boolean
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          callee_id?: string
+          caller_id?: string
+          created_at?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          is_video?: boolean
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_callee_id_fkey"
+            columns: ["callee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calls_callee_id_fkey"
+            columns: ["callee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calls_caller_id_fkey"
+            columns: ["caller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calls_caller_id_fkey"
+            columns: ["caller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3430,7 +3520,7 @@ export type Database = {
         Args: { _name: string; _user_ids: string[] }
         Returns: string
       }
-      delete_current_user: { Args: Record<PropertyKey, never>; Returns: undefined }
+      delete_current_user: { Args: never; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3573,6 +3663,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
