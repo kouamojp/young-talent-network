@@ -7,6 +7,11 @@ const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const { t } = useLanguage();
 
+  // Hide bottom nav on the fullscreen Shorts experience
+  if (location.pathname.startsWith('/shorts')) return null;
+
+
+
   const navItems = [
     { path: '/', icon: Home, label: t('bottomNav.home') },
     { path: '/search', icon: Search, label: t('bottomNav.search') },

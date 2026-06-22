@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ShareMenu from '@/components/share/ShareMenu';
 
@@ -71,7 +71,10 @@ const ShortsPage: React.FC = () => {
   const lastTickRef = useRef<{ key: string; t: number } | null>(null);
   const flushTimer = useRef<any>(null);
   const [newCount, setNewCount] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const latestCreatedAt = useRef<string | null>(null);
+
 
   useEffect(() => { load(); }, []);
 
@@ -523,17 +526,70 @@ const ShortsPage: React.FC = () => {
     setReplyTo(null);
   };
 
+  const handleUploadShort = async (file: File) => {
+    if (!file) return;
+    if (!currentUser) { toast.error('Connectez-vous pour publier'); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop() || 'mp4';
+      const path = `${currentUser}/shorts/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('profile-files')
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabase.storage.from('profile-files').getPublicUrl(path);
+      const { error } = await supabase.from('talent_media').insert({
+        user_id: currentUser,
+        media_type: 'short',
+        url: urlData.publicUrl,
+        title: file.name.replace(/\.[^.]+$/, '').slice(0, 80) || null,
+      });
+      if (error) throw error;
+      toast.success('Short publié !');
+      // Realtime listener will prepend, but also refresh to be safe
+      refreshTop();
+    } catch (e: any) {
+      toast.error(e?.message || 'Erreur lors de la publication');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-40 bg-black">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleUploadShort(f);
+        }}
+      />
       <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
         <Button size="icon" variant="secondary" className="rounded-full h-9 w-9 pointer-events-auto" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <span className="text-white font-semibold text-sm bg-black/30 px-3 py-1 rounded-full pointer-events-auto">Shorts</span>
-        <Button size="icon" variant="secondary" className="rounded-full h-9 w-9 pointer-events-auto" onClick={() => setMuted(m => !m)}>
-          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        </Button>
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <Button
+            size="icon" variant="secondary" className="rounded-full h-9 w-9"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            title="Publier un short"
+          >
+            {uploading
+              ? <div className="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+              : <Upload className="h-4 w-4" />}
+          </Button>
+          <Button size="icon" variant="secondary" className="rounded-full h-9 w-9" onClick={() => setMuted(m => !m)}>
+            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
+        </div>
       </div>
+
 
       {newCount > 0 && (
         <button
