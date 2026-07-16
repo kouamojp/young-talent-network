@@ -1,12 +1,13 @@
 import React from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import type { TranslationKey } from '@/i18n/types';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const Footer: React.FC = () => {
   const { t } = useLanguage();
   const year = new Date().getFullYear().toString();
 
-  const links = [
+  const links: TranslationKey[] = [
     'footer.about',
     'footer.privacy',
     'footer.terms',

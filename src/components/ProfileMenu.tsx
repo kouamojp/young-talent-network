@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import type { TranslationKey } from '@/i18n/types';
 
 const ProfileMenu: React.FC = () => {
   const location = useLocation();
@@ -47,7 +48,7 @@ const ProfileMenu: React.FC = () => {
           }`}
         >
           <item.icon className="h-4 w-4" />
-          <span className="hidden lg:inline">{t(item.labelKey)}</span>
+          <span className="hidden lg:inline">{t(item.labelKey as TranslationKey)}</span>
         </Link>
       ))}
     </nav>
