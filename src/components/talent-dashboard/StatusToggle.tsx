@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Briefcase, Edit3 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StatusToggleProps {
   isOpenToWork: boolean;
@@ -15,14 +15,53 @@ interface StatusToggleProps {
   onStatusChange: (status: string) => void;
 }
 
+const CLOSED = 'Closed to work';
+const KNOWN_STATUSES = ['Actively Looking', 'Open to Offers', 'Not Searching'];
+
 const StatusToggle: React.FC<StatusToggleProps> = ({
   isOpenToWork,
   workStatus,
   onToggle,
   onStatusChange
 }) => {
-  const [tagline, setTagline] = React.useState('Seeking freelance design projects');
-  const [isEditingTagline, setIsEditingTagline] = React.useState(false);
+  const [tagline, setTagline] = useState('Seeking freelance design projects');
+  const [isEditingTagline, setIsEditingTagline] = useState(false);
+  const userIdRef = useRef<string | null>(null);
+  const loadedRef = useRef(false);
+
+  // Load persisted availability from the profile.
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      userIdRef.current = user.id;
+      const { data } = await supabase.from('profiles').select('availability').eq('id', user.id).single();
+      const availability = data?.availability || null;
+      if (availability && availability !== CLOSED) {
+        onToggle(true);
+        onStatusChange(KNOWN_STATUSES.includes(availability) ? availability : 'Actively Looking');
+      } else if (availability === CLOSED) {
+        onToggle(false);
+      }
+      loadedRef.current = true;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const persist = async (open: boolean, status: string) => {
+    if (!userIdRef.current) return;
+    await supabase.from('profiles').update({ availability: open ? status : CLOSED }).eq('id', userIdRef.current);
+  };
+
+  const handleToggle = (value: boolean) => {
+    onToggle(value);
+    if (loadedRef.current) persist(value, workStatus);
+  };
+
+  const handleStatusChange = (status: string) => {
+    onStatusChange(status);
+    if (loadedRef.current) persist(isOpenToWork, status);
+  };
 
   const getStatusColor = () => {
     switch (workStatus) {
@@ -48,14 +87,14 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
                 <span className="font-medium text-sm">Open to Work</span>
                 <Switch
                   checked={isOpenToWork}
-                  onCheckedChange={onToggle}
+                  onCheckedChange={handleToggle}
                 />
               </div>
             </div>
 
             {isOpenToWork && (
               <div className="flex flex-wrap items-center gap-2">
-                <Select value={workStatus} onValueChange={onStatusChange}>
+                <Select value={workStatus} onValueChange={handleStatusChange}>
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>

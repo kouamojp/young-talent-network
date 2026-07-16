@@ -1,186 +1,114 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, BookOpen, Headphones, FileText, Video } from 'lucide-react';
+import { Plus, BookOpen, Clock, Users, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface CourseRow {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  level: string | null;
+  price: number | null;
+  duration_hours: number | null;
+  students: number;
+}
 
 const LearningsSection: React.FC = () => {
-  const [learnings] = useState([
-    {
-      id: 1,
-      title: 'Complete Python Masterclass',
-      type: 'Course',
-      description: 'From beginner to advanced Python programming',
-      price: '$49.99',
-      students: 2847,
-      rating: 4.8,
-      icon: BookOpen,
-      color: 'bg-blue-100 text-blue-600'
-    },
-    {
-      id: 2,
-      title: 'Design Thinking Podcast',
-      type: 'Podcast',
-      description: 'Weekly discussions on UX design principles',
-      episodes: 24,
-      subscribers: 1534,
-      icon: Headphones,
-      color: 'bg-purple-100 text-purple-600'
-    },
-    {
-      id: 3,
-      title: 'React Development Guide',
-      type: 'E-book',
-      description: 'Complete guide to modern React development',
-      price: '$19.99',
-      downloads: 456,
-      rating: 4.6,
-      icon: FileText,
-      color: 'bg-green-100 text-green-600'
-    },
-    {
-      id: 4,
-      title: 'Live UI/UX Workshop',
-      type: 'Workshop',
-      description: 'Interactive design session every Friday',
-      nextDate: 'Dec 15, 2024',
-      registered: 89,
-      icon: Video,
-      color: 'bg-orange-100 text-orange-600'
-    }
-  ]);
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState<CourseRow[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'Course':
-        return BookOpen;
-      case 'Podcast':
-        return Headphones;
-      case 'E-book':
-        return FileText;
-      case 'Workshop':
-        return Video;
-      default:
-        return BookOpen;
-    }
-  };
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Course':
-        return 'bg-blue-100 text-blue-800';
-      case 'Podcast':
-        return 'bg-purple-100 text-purple-800';
-      case 'E-book':
-        return 'bg-green-100 text-green-800';
-      case 'Workshop':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+      const { data: coursesData } = await supabase
+        .from('courses')
+        .select('id, title, description, category, level, price, duration_hours')
+        .eq('instructor_id', user.id)
+        .order('created_at', { ascending: false });
+
+      const list = coursesData || [];
+      const counts = await Promise.all(
+        list.map(c =>
+          supabase.from('course_enrollments').select('id', { count: 'exact', head: true }).eq('course_id', c.id)
+        )
+      );
+
+      setCourses(list.map((c, i) => ({ ...c, students: counts[i].count || 0 })) as CourseRow[]);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) {
+    return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Learning Content</h3>
-        <Button>
+        <h3 className="text-lg font-semibold">Contenus pédagogiques</h3>
+        <Button onClick={() => navigate('/learning')}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Content
+          Ajouter un contenu
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {learnings.map((item) => {
-          const IconComponent = getTypeIcon(item.type);
-          
-          return (
+      {courses.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="p-6 text-center">
+            <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-600 mb-4">Partagez votre savoir en créant un cours</p>
+            <Button variant="outline" onClick={() => navigate('/learning')}>
+              <BookOpen className="h-4 w-4 mr-2" />
+              Créer un cours
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {courses.map((item) => (
             <Card key={item.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${item.color}`}>
-                      <IconComponent className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">{item.title}</h4>
-                      <Badge className={getTypeColor(item.type)}>
-                        {item.type}
-                      </Badge>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                    <BookOpen className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">{item.title}</h4>
+                    <div className="flex gap-2 mt-1">
+                      {item.category && <Badge className="bg-blue-100 text-blue-800 text-xs">{item.category}</Badge>}
+                      {item.level && <Badge variant="outline" className="text-xs">{item.level}</Badge>}
                     </div>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="space-y-3">
-                <p className="text-sm text-gray-600">{item.description}</p>
+                {item.description && <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>}
 
-                <div className="flex justify-between text-sm">
-                  {item.type === 'Course' && (
-                    <>
-                      <span>{item.students} students</span>
-                      <span className="font-semibold">{item.price}</span>
-                    </>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span className="flex items-center gap-1"><Users className="h-3 w-3" />{item.students} inscrits</span>
+                  {item.duration_hours != null && (
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{item.duration_hours}h</span>
                   )}
-                  {item.type === 'Podcast' && (
-                    <>
-                      <span>{item.episodes} episodes</span>
-                      <span>{item.subscribers} subscribers</span>
-                    </>
-                  )}
-                  {item.type === 'E-book' && (
-                    <>
-                      <span>{item.downloads} downloads</span>
-                      <span className="font-semibold">{item.price}</span>
-                    </>
-                  )}
-                  {item.type === 'Workshop' && (
-                    <>
-                      <span>Next: {item.nextDate}</span>
-                      <span>{item.registered} registered</span>
-                    </>
-                  )}
+                  <span className="font-semibold">{item.price != null && item.price > 0 ? `${item.price} €` : 'Gratuit'}</span>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1">
-                    Edit
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                    View Stats
-                  </Button>
+                  <Button size="sm" variant="outline" className="flex-1" onClick={() => navigate('/learning')}>Modifier</Button>
+                  <Button size="sm" className="flex-1" onClick={() => navigate('/learning')}>Voir</Button>
                 </div>
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
-
-      <Card className="border-dashed">
-        <CardContent className="p-6 text-center">
-          <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-600 mb-4">Share your knowledge and create learning content</p>
-          <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Course
-            </Button>
-            <Button variant="outline" size="sm">
-              <Headphones className="h-4 w-4 mr-2" />
-              Podcast
-            </Button>
-            <Button variant="outline" size="sm">
-              <FileText className="h-4 w-4 mr-2" />
-              E-book
-            </Button>
-            <Button variant="outline" size="sm">
-              <Video className="h-4 w-4 mr-2" />
-              Workshop
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
