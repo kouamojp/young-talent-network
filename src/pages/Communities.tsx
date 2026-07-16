@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import CommunityFeed from '@/components/communities/CommunityFeed';
 
 interface Community {
   id: string;
@@ -68,12 +69,11 @@ const Communities: React.FC = () => {
       if (joining) {
         const { error } = await supabase.from('community_members').insert({ community_id: community.id, user_id: currentUserId });
         if (error) throw error;
-        await supabase.from('communities').update({ members_count: (community.members_count || 0) + 1 }).eq('id', community.id);
       } else {
         const { error } = await supabase.from('community_members').delete().eq('community_id', community.id).eq('user_id', currentUserId);
         if (error) throw error;
-        await supabase.from('communities').update({ members_count: Math.max(0, (community.members_count || 1) - 1) }).eq('id', community.id);
       }
+      // members_count is maintained by a DB trigger (update_community_members_count).
       setCommunities((prev) => prev.map((c) =>
         c.id === community.id
           ? { ...c, isJoined: joining, members_count: Math.max(0, (c.members_count || 0) + (joining ? 1 : -1)) }
@@ -100,12 +100,13 @@ const Communities: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('communities')
-        .insert({ name: newName.trim(), description: newDesc.trim() || null, creator_id: currentUserId, members_count: 1 })
+        .insert({ name: newName.trim(), description: newDesc.trim() || null, creator_id: currentUserId })
         .select('*')
         .single();
       if (error) throw error;
+      // Adding the creator as a member bumps members_count to 1 via trigger.
       await supabase.from('community_members').insert({ community_id: data.id, user_id: currentUserId, role: 'admin' });
-      setCommunities((prev) => [{ ...(data as Omit<Community, 'isJoined'>), isJoined: true }, ...prev]);
+      setCommunities((prev) => [{ ...(data as Omit<Community, 'isJoined'>), members_count: 1, isJoined: true }, ...prev]);
       toast({ title: 'Communauté créée', description: `${data.name} est en ligne.` });
       setCreateOpen(false);
       setNewName('');
@@ -230,6 +231,11 @@ const Communities: React.FC = () => {
             </Tabs>
           )}
         </GlassMorphism>
+
+        <CommunityFeed
+          joinedCommunities={joined.map((c) => ({ id: c.id, name: c.name }))}
+          currentUserId={currentUserId}
+        />
       </main>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
