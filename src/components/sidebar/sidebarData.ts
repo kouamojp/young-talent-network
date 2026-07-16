@@ -111,7 +111,7 @@ export const mainNavigationItems: MenuSectionItem[] = [
 
 // Services YAT
 export const yatServicesItems: MenuSectionItem[] = [
-  {
+  /*{
     label: 'sidebar.yatWork',
     description: 'sidebar.yatWork.desc',
     icon: Briefcase,
@@ -120,7 +120,7 @@ export const yatServicesItems: MenuSectionItem[] = [
     badge: 'New',
     badgeColor: 'bg-emerald-500 text-white',
   },
-  /* {
+   {
     label: 'sidebar.yatEvents',
     description: 'sidebar.yatEvents.desc',
     icon: CalendarDays,
@@ -133,7 +133,7 @@ export const yatServicesItems: MenuSectionItem[] = [
     icon: GraduationCap,
     path: '/learning',
     iconColor: 'text-violet-500',
-  }, */
+  }, 
   {
     label: 'sidebar.organizations',
     description: 'sidebar.organizations.desc',
@@ -147,7 +147,7 @@ export const yatServicesItems: MenuSectionItem[] = [
     icon: Map,
     path: '/karta',
     iconColor: 'text-cyan-500',
-  },
+  },*/
   {
     label: 'sidebar.yatDatabase',
     description: 'sidebar.yatDatabase.desc',
