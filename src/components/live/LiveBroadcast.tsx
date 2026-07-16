@@ -1,21 +1,38 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { streamCategories } from './data/liveData';
-import { VideoIcon, MapPin, Sparkles, LightbulbIcon } from 'lucide-react';
+import { VideoIcon, MapPin, Sparkles, LightbulbIcon, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
-const LiveBroadcast: React.FC = () => {
+interface LiveBroadcastProps {
+  onWentLive?: (streamId: string) => void;
+}
+
+const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
+  const [detectedLocation, setDetectedLocation] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const loadCountry = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase.from('profiles').select('country').eq('id', user.id).single();
+      if (data?.country) setDetectedLocation(data.country);
+    };
+    loadCountry();
+  }, []);
 
   const titleSuggestions = [
     "My First Guitar Composition 🎸",
@@ -37,13 +54,46 @@ const LiveBroadcast: React.FC = () => {
     setStep(prev => Math.max(1, prev - 1));
   };
   
-  const handleGoLive = () => {
+  const handleGoLive = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Connexion requise", description: "Connectez-vous pour lancer un direct.", variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
+
+    const categoryName = streamCategories.find(c => c.id === category)?.name || category;
+
+    const { data, error } = await supabase
+      .from('live_streams')
+      .insert({
+        streamer_id: user.id,
+        title: title.trim(),
+        description: description.trim() || null,
+        category: categoryName,
+        is_live: true,
+        started_at: new Date().toISOString(),
+        viewer_count: 0,
+      })
+      .select('id')
+      .single();
+
+    setSubmitting(false);
+
+    if (error || !data) {
+      toast({ title: "Échec du lancement", description: error?.message, variant: "destructive" });
+      return;
+    }
+
     toast({
       title: "You're live!",
       description: "Your stream has started. Share it with your followers!",
       variant: "default",
     });
-    // In a real app, we would start the streaming process here
+    onWentLive?.(data.id);
   };
   
   return (
@@ -134,7 +184,7 @@ const LiveBroadcast: React.FC = () => {
               <div className="flex items-center gap-2 bg-blue-50 p-3 rounded-md">
                 <MapPin className="h-5 w-5 text-blue-500" />
                 <div>
-                  <span className="font-medium">Auto-detected:</span> <span className="text-gray-600">New York, USA</span>
+                  <span className="font-medium">Auto-detected:</span> <span className="text-gray-600">{detectedLocation || 'Non défini'}</span>
                 </div>
               </div>
               
@@ -208,12 +258,12 @@ const LiveBroadcast: React.FC = () => {
             
             <div className="flex justify-between">
               <Button variant="outline" onClick={goToPrevStep}>Back: Location</Button>
-              <Button 
-                onClick={handleGoLive} 
-                disabled={!title.trim()}
+              <Button
+                onClick={handleGoLive}
+                disabled={!title.trim() || submitting}
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
-                <VideoIcon className="mr-2 h-4 w-4" />
+                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <VideoIcon className="mr-2 h-4 w-4" />}
                 Go LIVE Now!
               </Button>
             </div>

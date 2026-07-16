@@ -1,46 +1,139 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Globe, Zap, Heart, Search, Video, Eye, MapPin, Radio, Filter, ChevronDown, ArrowLeft, Loader2 } from 'lucide-react';
 import { countries } from '@/data/countries';
-import { liveStreams, trendingStreams, followingStreams, streamCategories } from '@/components/live/data/liveData';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { streamCategories } from '@/components/live/data/liveData';
+import { supabase } from '@/integrations/supabase/client';
 import LiveBroadcast from '@/components/live/LiveBroadcast';
 
+interface StreamCard {
+  id: string;
+  title: string;
+  streamerName: string;
+  streamerId: string;
+  thumbnail: string;
+  viewers: number;
+  category: string;
+  location: string;
+  description?: string;
+}
+
+interface ConnectionRow {
+  user_id: string;
+  connected_user_id: string;
+  status: string | null;
+}
+
+interface StreamRow {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  thumbnail_url: string | null;
+  viewer_count: number | null;
+  started_at: string | null;
+  streamer_id: string;
+  streamer?: { id: string; name: string | null; avatar_url: string | null; country: string | null } | null;
+}
+
+const FALLBACK_THUMB = '/placeholder.svg';
+
 const Live: React.FC = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('live');
   const [regionFilter, setRegionFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [showBroadcast, setShowBroadcast] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [streams, setStreams] = useState<StreamCard[]>([]);
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+
+  const fetchStreams = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const [streamsRes, connectionsRes] = await Promise.all([
+      supabase
+        .from('live_streams')
+        .select('id, title, description, category, thumbnail_url, viewer_count, started_at, streamer_id, streamer:profiles!live_streams_streamer_id_fkey(id, name, avatar_url, country)')
+        .eq('is_live', true)
+        .order('started_at', { ascending: false }),
+      user
+        ? supabase.from('connections').select('user_id, connected_user_id, status').or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`).eq('status', 'accepted')
+        : Promise.resolve({ data: [] as ConnectionRow[] }),
+    ]);
+
+    const mapped: StreamCard[] = ((streamsRes.data || []) as unknown as StreamRow[]).map((s) => ({
+      id: s.id,
+      title: s.title,
+      streamerName: s.streamer?.name || 'Streamer',
+      streamerId: s.streamer_id,
+      thumbnail: s.thumbnail_url || FALLBACK_THUMB,
+      viewers: s.viewer_count || 0,
+      category: s.category || '',
+      location: s.streamer?.country || '',
+      description: s.description || undefined,
+    }));
+    setStreams(mapped);
+
+    if (user) {
+      const ids = new Set<string>();
+      ((connectionsRes.data || []) as ConnectionRow[]).forEach((c) => {
+        ids.add(c.user_id === user.id ? c.connected_user_id : c.user_id);
+      });
+      setFollowingIds(ids);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchStreams();
+    const channel = supabase
+      .channel('live-streams-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'live_streams' }, () => {
+        fetchStreams(true);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchStreams]);
 
   const getFilteredStreams = () => {
-    let streams = activeTab === 'popular' ? trendingStreams :
-                  activeTab === 'following' ? followingStreams :
-                  liveStreams;
+    let list = [...streams];
+
+    if (activeTab === 'popular') {
+      list = list.sort((a, b) => b.viewers - a.viewers);
+    } else if (activeTab === 'following') {
+      list = list.filter(s => followingIds.has(s.streamerId));
+    }
 
     if (searchQuery.trim()) {
-      streams = streams.filter(s =>
-        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.streamerName && s.streamerName.toLowerCase().includes(searchQuery.toLowerCase()))
+      const q = searchQuery.toLowerCase();
+      list = list.filter(s =>
+        s.title.toLowerCase().includes(q) ||
+        s.streamerName.toLowerCase().includes(q)
       );
     }
     if (categoryFilter !== 'all') {
-      streams = streams.filter(s => s.category.toLowerCase() === categoryFilter.toLowerCase());
+      list = list.filter(s => s.category.toLowerCase() === categoryFilter.toLowerCase());
     }
     if (regionFilter !== 'all') {
-      streams = streams.filter(s => s.location.toLowerCase().includes(regionFilter.toLowerCase()));
+      list = list.filter(s => s.location.toLowerCase().includes(regionFilter.toLowerCase()));
     }
-    return streams;
+    return list;
   };
 
-  const streams = getFilteredStreams();
+  const filteredStreams = getFilteredStreams();
+
+  const handleWentLive = () => {
+    setShowBroadcast(false);
+    setActiveTab('live');
+    fetchStreams(true);
+  };
 
   if (showBroadcast) {
     return (
@@ -60,7 +153,7 @@ const Live: React.FC = () => {
           </div>
         </div>
         <div className="container mx-auto px-4 py-4 max-w-2xl">
-          <LiveBroadcast />
+          <LiveBroadcast onWentLive={handleWentLive} />
         </div>
       </div>
     );
@@ -101,7 +194,6 @@ const Live: React.FC = () => {
                 <SelectTrigger className="text-xs h-8"><SelectValue placeholder="Регион / Région" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все / Tous</SelectItem>
-                  <SelectItem value="current">Текущий / Actuel</SelectItem>
                   {countries.slice(0, 20).map(c => (
                     <SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>
                   ))}
@@ -141,14 +233,18 @@ const Live: React.FC = () => {
 
           {['live', 'popular', 'following', 'search'].map(tab => (
             <TabsContent key={tab} value={tab}>
-              {streams.length === 0 ? (
+              {loading ? (
+                <div className="flex justify-center py-16">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredStreams.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   <Video className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">Нет трансляций / Aucun stream</p>
+                  <p className="text-sm">Нет трансляций / Aucun stream en direct</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {streams.map((stream: any) => (
+                  {filteredStreams.map((stream) => (
                     <div key={stream.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
                       <div className="relative h-40 bg-muted overflow-hidden">
                         <img src={stream.thumbnail} alt={stream.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -156,9 +252,6 @@ const Live: React.FC = () => {
                           <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5">
                             <Radio className="h-2.5 w-2.5 mr-0.5" /> LIVE
                           </Badge>
-                          {stream.badges?.includes('rising') && (
-                            <Badge className="bg-orange-500 text-white text-[10px] px-1.5 py-0.5">🔥 Rising</Badge>
-                          )}
                         </div>
                         <div className="absolute bottom-2 right-2">
                           <Badge variant="secondary" className="text-[10px] bg-black/60 text-white border-0">
@@ -168,12 +261,14 @@ const Live: React.FC = () => {
                       </div>
                       <div className="p-3">
                         <h3 className="font-semibold text-sm text-foreground line-clamp-1">{stream.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-0.5">{stream.streamerName || stream.communityName}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{stream.streamerName}</p>
                         <div className="flex items-center gap-2 mt-1.5">
-                          <Badge variant="outline" className="text-[10px]">{stream.category}</Badge>
-                          <span className="flex items-center text-[10px] text-muted-foreground">
-                            <MapPin className="h-2.5 w-2.5 mr-0.5" /> {stream.location}
-                          </span>
+                          {stream.category && <Badge variant="outline" className="text-[10px]">{stream.category}</Badge>}
+                          {stream.location && (
+                            <span className="flex items-center text-[10px] text-muted-foreground">
+                              <MapPin className="h-2.5 w-2.5 mr-0.5" /> {stream.location}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
