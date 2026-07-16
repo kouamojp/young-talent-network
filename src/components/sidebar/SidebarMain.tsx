@@ -5,6 +5,7 @@ import { MenuSectionItem } from './types';
 import { Separator } from '@/components/ui/separator';
 import SidebarCategories from './SidebarCategories';
 import { useLanguage } from '@/i18n/LanguageContext';
+import type { TranslationKey } from '@/i18n/types';
 import AdBanner from '@/components/AdBanner';
 
 interface SidebarMainProps {
@@ -34,7 +35,7 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
         <div className="flex flex-col min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <span className={`text-[13px] font-medium truncate ${active ? 'text-primary' : 'text-foreground'}`}>
-              {t(item.label)}
+              {t(item.label as TranslationKey)}
             </span>
             {item.badge && (
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold leading-none ${item.badgeColor || 'bg-primary text-white'}`}>
@@ -43,7 +44,7 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
             )}
           </div>
           <span className="text-[11px] text-muted-foreground truncate">
-            {t(item.description)}
+            {t(item.description as TranslationKey)}
           </span>
         </div>
       </div>
@@ -82,7 +83,7 @@ const SidebarMain: React.FC<SidebarMainProps> = ({ onNavigate }) => {
           <div key={section.titleKey}>
             {idx > 0 && <Separator className="mb-2.5" />}
             <p className="px-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
-              {t(section.titleKey)}
+              {t(section.titleKey as TranslationKey)}
             </p>
             <div className="space-y-0.5">
               {section.items.map((item) => (

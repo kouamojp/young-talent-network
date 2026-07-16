@@ -161,7 +161,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     if (selected.length === 0) return;
     const remaining = MAX_IMAGES - items.length;
     if (remaining <= 0) {
-      toast({ title: t('post.maxImages') || `Maximum ${MAX_IMAGES} files`, variant: 'destructive' });
+      toast({ title: t('post.maxImages', { max: String(MAX_IMAGES) }), variant: 'destructive' });
       return;
     }
     const accepted = selected.slice(0, remaining);
@@ -401,7 +401,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             is_published: !isScheduled,
           });
           if (error) throw error;
-          toast({ title: isScheduled ? (t('post.scheduled') || `Scheduled for ${new Date(scheduledFor).toLocaleString()}`) : (t('post.created') || 'Post published!') });
+          toast({ title: isScheduled ? t('post.scheduled', { date: new Date(scheduledFor).toLocaleString() }) : (t('post.created') || 'Post published!') });
         }
       } else if (tab === 'article') {
 
