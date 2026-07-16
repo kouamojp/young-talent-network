@@ -7,7 +7,7 @@ import { Edit, Trash2, Eye } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface ResumeProps {
-  id: number;
+  id: string;
   title: string;
   category: string;
   skills: string[];
@@ -19,9 +19,9 @@ export interface ResumeProps {
 
 interface ResumeCardProps {
   resume: ResumeProps;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onView: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onView: (id: string) => void;
 }
 
 const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onView }) => {

@@ -11,6 +11,7 @@ export interface Message {
   media_url?: string | null;
   media_type?: string | null;
   forwarded_from_id?: string | null;
+  pending?: boolean;
 }
 
 export interface Conversation {
@@ -49,10 +50,10 @@ export const useConversations = () => {
     setCurrentUserId(user?.id || null);
   };
 
-  const fetchConversations = async () => {
+  const fetchConversations = async (silent = false) => {
     if (!currentUserId) return;
 
-    setLoading(true);
+    if (!silent) setLoading(true);
     try {
       const { data: participantsData, error: participantsError } = await supabase
         .from('conversation_participants')
@@ -107,7 +108,7 @@ export const useConversations = () => {
     const channel = supabase
       .channel('messages-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
-        fetchConversations();
+        fetchConversations(true);
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -118,7 +119,7 @@ export const useConversations = () => {
     try {
       const { data, error } = await supabase.rpc('create_conversation_with_participant', { _other_user_id: participantId });
       if (error) throw error;
-      await fetchConversations();
+      await fetchConversations(true);
       return data as string;
     } catch (error: any) {
       toast({ title: "Failed to create conversation", description: error?.message, variant: "destructive" });
@@ -131,7 +132,7 @@ export const useConversations = () => {
     try {
       const { data, error } = await (supabase.rpc as any)('create_group_conversation', { _name: name, _user_ids: userIds });
       if (error) throw error;
-      await fetchConversations();
+      await fetchConversations(true);
       return data as string;
     } catch (error: any) {
       toast({ title: "Failed to create group", description: error?.message, variant: "destructive" });
@@ -146,6 +147,24 @@ export const useConversations = () => {
   ) => {
     if (!currentUserId) return;
     if (!content.trim() && !extras?.media_url) return;
+
+    // Optimistic message: shows instantly, replaced by server data on the next refetch.
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimistic: Message = {
+      id: tempId,
+      content: content.trim() || '',
+      sender_id: currentUserId,
+      created_at: new Date().toISOString(),
+      read: false,
+      media_url: extras?.media_url ?? null,
+      media_type: extras?.media_type ?? null,
+      forwarded_from_id: extras?.forwarded_from_id ?? null,
+      pending: true,
+    };
+    setConversations(prev => prev.map(c =>
+      c.id === conversationId ? { ...c, messages: [optimistic, ...c.messages] } : c
+    ));
+
     try {
       const { error } = await supabase.from('messages').insert({
         conversation_id: conversationId,
@@ -154,7 +173,15 @@ export const useConversations = () => {
         ...(extras || {}),
       } as any);
       if (error) throw error;
+      // The realtime subscription triggers a silent refetch that swaps the
+      // optimistic message for the persisted one.
     } catch (error) {
+      // Roll back the optimistic message on failure.
+      setConversations(prev => prev.map(c =>
+        c.id === conversationId
+          ? { ...c, messages: c.messages.filter(m => m.id !== tempId) }
+          : c
+      ));
       toast({ title: "Failed to send message", variant: "destructive" });
     }
   };
@@ -162,7 +189,7 @@ export const useConversations = () => {
   const markMessageRead = async (messageId: string, read: boolean) => {
     try {
       await supabase.from('messages').update({ read } as any).eq('id', messageId);
-      await fetchConversations();
+      await fetchConversations(true);
     } catch (e) {
       console.error(e);
     }
