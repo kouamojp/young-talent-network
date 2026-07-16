@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Send, Loader2, Plus, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft, MessageSquare, Check, CheckCheck, Forward, Users } from 'lucide-react';
+import { Search, Send, Loader2, Plus, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft, MessageSquare, Check, CheckCheck, Clock, Forward, Users } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useConversations, type Message } from '@/hooks/useConversations';
 import { useCall } from '@/contexts/CallContext';
@@ -297,7 +297,7 @@ const Messages: React.FC = () => {
                   : (message.read ? 'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-100' : 'bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100');
                 return (
                   <div key={message.id} className={`flex group ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${bubbleColor} ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'}`}>
+                    <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${bubbleColor} ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} ${message.pending ? 'opacity-70' : ''}`}>
                       {message.forwarded_from_id && <p className="text-[10px] italic opacity-70 mb-1">↪ Transféré</p>}
                       {message.content && (
                         <TranslatableText text={message.content} className="text-sm whitespace-pre-wrap break-words" />
@@ -322,7 +322,7 @@ const Messages: React.FC = () => {
                               )}
                             </DropdownMenuContent>
                           </DropdownMenu>
-                          {isOwn && (message.read ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
+                          {isOwn && (message.pending ? <Clock className="h-3 w-3" /> : message.read ? <CheckCheck className="h-3 w-3" /> : <Check className="h-3 w-3" />)}
                         </div>
                       </div>
                     </div>
