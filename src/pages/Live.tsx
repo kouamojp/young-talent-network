@@ -9,12 +9,14 @@ import { countries } from '@/data/countries';
 import { streamCategories } from '@/components/live/data/liveData';
 import { supabase } from '@/integrations/supabase/client';
 import LiveBroadcast from '@/components/live/LiveBroadcast';
+import LiveWatch from '@/components/live/LiveWatch';
 
 interface StreamCard {
   id: string;
   title: string;
   streamerName: string;
   streamerId: string;
+  streamerAvatar?: string;
   thumbnail: string;
   viewers: number;
   category: string;
@@ -52,10 +54,13 @@ const Live: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [streams, setStreams] = useState<StreamCard[]>([]);
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [watchStream, setWatchStream] = useState<StreamCard | null>(null);
 
   const fetchStreams = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUserId(user?.id || null);
 
     const [streamsRes, connectionsRes] = await Promise.all([
       supabase
@@ -73,6 +78,7 @@ const Live: React.FC = () => {
       title: s.title,
       streamerName: s.streamer?.name || 'Streamer',
       streamerId: s.streamer_id,
+      streamerAvatar: s.streamer?.avatar_url || undefined,
       thumbnail: s.thumbnail_url || FALLBACK_THUMB,
       viewers: s.viewer_count || 0,
       category: s.category || '',
@@ -80,6 +86,10 @@ const Live: React.FC = () => {
       description: s.description || undefined,
     }));
     setStreams(mapped);
+    // Keep an open watch view in sync (e.g. live viewer count). If the stream is no
+    // longer live it drops from the list; we keep the last data so LiveWatch can show
+    // its own "ended" state from its dedicated subscription.
+    setWatchStream(prev => (prev ? mapped.find(m => m.id === prev.id) || prev : null));
 
     if (user) {
       const ids = new Set<string>();
@@ -134,6 +144,21 @@ const Live: React.FC = () => {
     setActiveTab('live');
     fetchStreams(true);
   };
+
+  if (watchStream) {
+    return (
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
+        <div className="container mx-auto px-4 py-4 max-w-3xl">
+          <LiveWatch
+            stream={watchStream}
+            currentUserId={currentUserId}
+            onBack={() => setWatchStream(null)}
+            onEnded={() => { setWatchStream(null); fetchStreams(true); }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (showBroadcast) {
     return (
@@ -245,7 +270,7 @@ const Live: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {filteredStreams.map((stream) => (
-                    <div key={stream.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+                    <div key={stream.id} onClick={() => setWatchStream(stream)} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
                       <div className="relative h-40 bg-muted overflow-hidden">
                         <img src={stream.thumbnail} alt={stream.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         <div className="absolute top-2 left-2 flex gap-1">
