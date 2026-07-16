@@ -248,7 +248,7 @@ const Profile: React.FC = () => {
           <PostCreationDialog
             trigger={
               <Button variant="outline" className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted">
-                {t('feed.whatsNew') || "Quoi de neuf ?"}
+                {t('feed.whatsNew', { name: (displayProfile.name || '').split(' ')[0] }) || "Quoi de neuf ?"}
               </Button>
             }
             userAvatar={displayProfile.avatar_url || displayProfile.avatar}
