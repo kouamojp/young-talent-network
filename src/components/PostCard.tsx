@@ -404,22 +404,22 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       <div className="px-4 py-1 flex justify-between">
         <Button variant="ghost" size="sm" className="flex-1 text-sm" onClick={handleLike}>
           <ThumbsUp className={`h-5 w-5 mr-2 ${isLiked ? 'fill-primary text-primary' : ''}`} />
-          Like
+          {/* Like */}
         </Button>
         <Button variant="ghost" size="sm" className="flex-1 text-sm" onClick={() => setShowComments(!showComments)}>
           <MessageSquare className="h-5 w-5 mr-2" />
-          Comment
+         {/*  Comment */}
         </Button>
         <ShareToFriendsDialog url={postUrl} title={post.author.name + ' sur YAT'} description={rawText.slice(0, 200)} onShared={() => recordShare('messaging')}>
           <Button variant="ghost" size="sm" className="flex-1 text-sm">
             <Users className="h-5 w-5 mr-2" />
-            Amis
+            {/* Amis */}
           </Button>
         </ShareToFriendsDialog>
         <ShareMenu url={postUrl} title={post.author.name + ' sur YAT'}>
           <Button variant="ghost" size="sm" className="flex-1 text-sm" onClick={() => recordShare('external')}>
             <Share className="h-5 w-5 mr-2" />
-            Share
+            {/* Share */}
           </Button>
         </ShareMenu>
       </div>
