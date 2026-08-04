@@ -1,0 +1,82 @@
+# Young Talent Network - configuration Apache (cPanel)
+# Copié tel quel dans dist/ par Vite au build.
+
+# ---------------------------------------------------------------
+# Routage SPA : toute URL qui ne correspond pas a un fichier reel
+# est servie par index.html (React Router prend le relais).
+# ---------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Ne jamais rediriger les fichiers et dossiers existants
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ---------------------------------------------------------------
+# Cache
+# ---------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Assets Vite : nom de fichier hashe (index-CfXc-Ucs.js) donc
+  # immuable. Un nouveau build = un nouveau nom.
+  <FilesMatch "\.(js|css|woff2?|ttf|eot|otf|svg|png|jpe?g|gif|webp|avif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # index.html doit toujours etre revalide, sinon les navigateurs
+  # continuent de pointer vers les anciens assets apres un deploiement.
+  <FilesMatch "^index\.html$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # Service workers kill-switch : jamais en cache, sinon un
+  # navigateur avec un ancien SW ne recupere jamais la version
+  # qui le desinstalle et reste bloque sur un build perime.
+  <FilesMatch "^(sw|service-worker)\.js$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Service-Worker-Allowed "/"
+  </FilesMatch>
+
+  <FilesMatch "^manifest\.json$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+</IfModule>
+
+# ---------------------------------------------------------------
+# Compression
+# ---------------------------------------------------------------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/manifest+json
+</IfModule>
+
+# ---------------------------------------------------------------
+# Types MIME (certains cPanel ne les servent pas correctement)
+# ---------------------------------------------------------------
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+</IfModule>
+
+# ---------------------------------------------------------------
+# En-tetes de securite
+# ---------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Empecher l'acces aux fichiers sensibles eventuellement uploades
+<FilesMatch "^(\.env.*|package(-lock)?\.json|.*\.map)$">
+  Require all denied
+</FilesMatch>
