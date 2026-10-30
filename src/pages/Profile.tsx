@@ -1,37 +1,61 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Camera, MapPin, Briefcase, Globe, LayoutDashboard, Radio, Tv, Calendar, GraduationCap, Map, Coins, FileText, Users, Trophy, Plus, Image, ShoppingBag, Award, History } from 'lucide-react';
-import { ProfileSkills } from '@/components/profile/ProfileSkills';
-import { ProfileInterests } from '@/components/profile/ProfileInterests';
-import { ProfileSettings } from '@/components/profile/ProfileSettings';
-import { useUserLevel } from '@/hooks/useUserLevel';
-import { UserLevelBadge } from '@/components/profile/UserLevelBadge';
-import ProfileSources from '@/components/profile/ProfileSources';
-import MyNetworksManager from '@/components/profile/MyNetworksManager';
-import SportProfileEditor from '@/components/profile/SportProfileEditor';
-import ProfileSidebar from '@/components/profile/ProfileSidebar';
-import AddAchievementDialog from '@/components/profile/AddAchievementDialog';
-import AddMediaDialog from '@/components/profile/AddMediaDialog';
-import PortfolioGallery from '@/components/profile/PortfolioGallery';
-import AddEducationDialog from '@/components/profile/AddEducationDialog';
-import AutoResumeCard from '@/components/profile/AutoResumeCard';
-import FileUploadButton from '@/components/profile/FileUploadButton';
-import { StoriesBar } from '@/components/stories/StoriesBar';
-import { PostCreationDialog } from '@/components/PostCreationDialog';
-import Talent360Tab from '@/components/profile/Talent360Tab';
-import MySocialLinksCard from '@/components/profile/MySocialLinksCard';
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ArrowLeft,
+  Camera,
+  MapPin,
+  Briefcase,
+  Globe,
+  LayoutDashboard,
+  Radio,
+  Tv,
+  Calendar,
+  GraduationCap,
+  Map,
+  Coins,
+  FileText,
+  Users,
+  Trophy,
+  Plus,
+  Image,
+  ShoppingBag,
+  Award,
+  History,
+} from "lucide-react";
+import { ProfileSkills } from "@/components/profile/ProfileSkills";
+import { ProfileInterests } from "@/components/profile/ProfileInterests";
+import { ProfileSettings } from "@/components/profile/ProfileSettings";
+import { useUserLevel } from "@/hooks/useUserLevel";
+import { UserLevelBadge } from "@/components/profile/UserLevelBadge";
+import ProfileSources from "@/components/profile/ProfileSources";
+import MyNetworksManager from "@/components/profile/MyNetworksManager";
+import SportProfileEditor from "@/components/profile/SportProfileEditor";
+import ProfileSidebar from "@/components/profile/ProfileSidebar";
+import AddAchievementDialog from "@/components/profile/AddAchievementDialog";
+import AddMediaDialog from "@/components/profile/AddMediaDialog";
+import PortfolioGallery from "@/components/profile/PortfolioGallery";
+import AddEducationDialog from "@/components/profile/AddEducationDialog";
+import AutoResumeCard from "@/components/profile/AutoResumeCard";
+import FileUploadButton from "@/components/profile/FileUploadButton";
+import { StoriesBar } from "@/components/stories/StoriesBar";
+import { PostCreationDialog } from "@/components/PostCreationDialog";
+import Talent360Tab from "@/components/profile/Talent360Tab";
+import MySocialLinksCard from "@/components/profile/MySocialLinksCard";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { supabase } from '@/integrations/supabase/client';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { useLanguage } from '@/i18n/LanguageContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface TalentPresence {
-  id: string; section: string; is_active: boolean; visibility: string;
+  id: string;
+  section: string;
+  is_active: boolean;
+  visibility: string;
 }
 
 const Profile: React.FC = () => {
@@ -41,7 +65,7 @@ const Profile: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [talentPresence, setTalentPresence] = useState<TalentPresence[]>([]);
-  const [activeSection, setActiveSection] = useState('work');
+  const [activeSection, setActiveSection] = useState("work");
   const [resumes, setResumes] = useState<any[]>([]);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [media, setMedia] = useState<any[]>([]);
@@ -51,23 +75,66 @@ const Profile: React.FC = () => {
   const [coinHistory, setCoinHistory] = useState<any[]>([]);
   const { levelData } = useUserLevel(userId);
 
-  useEffect(() => { fetchProfile(); }, []);
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   const fetchProfile = async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) { navigate('/auth'); return; }
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+      if (!authUser) {
+        navigate("/auth");
+        return;
+      }
       setUserId(authUser.id);
-      const [profileRes, presenceRes, resumesRes, achievementsRes, mediaRes, linksRes, eduRes, badgesRes, coinsRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', authUser.id).single(),
-        supabase.from('talent_presence').select('*').eq('user_id', authUser.id),
-        supabase.from('talent_resumes').select('*, categories(name, name_fr)').eq('user_id', authUser.id),
-        supabase.from('talent_achievements').select('*').eq('user_id', authUser.id).order('date', { ascending: false }),
-        supabase.from('talent_media').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }),
-        supabase.from('talent_social_links').select('*').eq('user_id', authUser.id),
-        (supabase.from('talent_education') as any).select('*').eq('user_id', authUser.id).order('start_year', { ascending: false }),
-        supabase.from('user_badges').select('*').eq('user_id', authUser.id).order('earned_at', { ascending: false }),
-        supabase.from('coin_transactions').select('*').eq('user_id', authUser.id).order('created_at', { ascending: false }).limit(50),
+      const [
+        profileRes,
+        presenceRes,
+        resumesRes,
+        achievementsRes,
+        mediaRes,
+        linksRes,
+        eduRes,
+        badgesRes,
+        coinsRes,
+      ] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", authUser.id).single(),
+        supabase.from("talent_presence").select("*").eq("user_id", authUser.id),
+        supabase
+          .from("talent_resumes")
+          .select("*, categories(name, name_fr)")
+          .eq("user_id", authUser.id),
+        supabase
+          .from("talent_achievements")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .order("date", { ascending: false }),
+        supabase
+          .from("talent_media")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("talent_social_links")
+          .select("*")
+          .eq("user_id", authUser.id),
+        (supabase.from("talent_education") as any)
+          .select("*")
+          .eq("user_id", authUser.id)
+          .order("start_year", { ascending: false }),
+        supabase
+          .from("user_badges")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .order("earned_at", { ascending: false }),
+        supabase
+          .from("coin_transactions")
+          .select("*")
+          .eq("user_id", authUser.id)
+          .order("created_at", { ascending: false })
+          .limit(50),
       ]);
       if (profileRes.data) setProfile(profileRes.data);
       if (presenceRes.data) setTalentPresence(presenceRes.data);
@@ -78,8 +145,11 @@ const Profile: React.FC = () => {
       if (eduRes.data) setEducation(eduRes.data);
       if (badgesRes.data) setUserBadges(badgesRes.data);
       if (coinsRes.data) setCoinHistory(coinsRes.data);
-    } catch (error) { console.error('Error fetching profile:', error); }
-    finally { setLoading(false); }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Show the real authenticated profile only. Never fall back to demo data
@@ -100,89 +170,195 @@ const Profile: React.FC = () => {
   };
 
   const sectionTabs = [
-    { key: 'work', label: 'YAT Work', icon: Briefcase, color: 'bg-blue-500/20 text-blue-500' },
-    { key: 'learning', label: 'YAT Learning', icon: GraduationCap, color: 'bg-green-500/20 text-green-500' },
-    { key: 'live', label: 'YAT Live', icon: Radio, color: 'bg-red-500/20 text-red-500' },
-    { key: 'tv', label: 'YAT TV', icon: Tv, color: 'bg-purple-500/20 text-purple-500' },
-    { key: 'events', label: 'YAT Events', icon: Calendar, color: 'bg-orange-500/20 text-orange-500' },
-    { key: 'karta', label: 'YAT Karta', icon: Map, color: 'bg-teal-500/20 text-teal-500' },
-    { key: 'yat-coin', label: 'YAT Coin', icon: Coins, color: 'bg-yellow-500/20 text-yellow-500' },
-    { key: 'marketplace', label: 'YAT Marketplace', icon: ShoppingBag, color: 'bg-orange-600/20 text-orange-600' },
-    { key: 'social', label: 'YAT Social', icon: Globe, color: 'bg-indigo-500/20 text-indigo-500' },
+    {
+      key: "work",
+      label: "YAT Work",
+      icon: Briefcase,
+      color: "bg-blue-500/20 text-blue-500",
+    },
+    {
+      key: "learning",
+      label: "YAT Learning",
+      icon: GraduationCap,
+      color: "bg-green-500/20 text-green-500",
+    },
+    {
+      key: "live",
+      label: "YAT Live",
+      icon: Radio,
+      color: "bg-red-500/20 text-red-500",
+    },
+    {
+      key: "tv",
+      label: "YAT TV",
+      icon: Tv,
+      color: "bg-purple-500/20 text-purple-500",
+    },
+    {
+      key: "events",
+      label: "YAT Events",
+      icon: Calendar,
+      color: "bg-orange-500/20 text-orange-500",
+    },
+    {
+      key: "karta",
+      label: "YAT Karta",
+      icon: Map,
+      color: "bg-teal-500/20 text-teal-500",
+    },
+    {
+      key: "yat-coin",
+      label: "YAT Coin",
+      icon: Coins,
+      color: "bg-yellow-500/20 text-yellow-500",
+    },
+    {
+      key: "marketplace",
+      label: "YAT Marketplace",
+      icon: ShoppingBag,
+      color: "bg-orange-600/20 text-orange-600",
+    },
+    {
+      key: "social",
+      label: "YAT Social",
+      icon: Globe,
+      color: "bg-indigo-500/20 text-indigo-500",
+    },
   ];
 
   const educationTypeLabel = (type: string) => {
     const map: Record<string, string> = {
-      school: t('profile.school'), university: t('profile.university'),
-      training: t('profile.training'), certification: t('profile.certification'),
-      diploma: t('profile.diploma'),
+      school: t("profile.school"),
+      university: t("profile.university"),
+      training: t("profile.training"),
+      certification: t("profile.certification"),
+      diploma: t("profile.diploma"),
     };
-    return map[type] || t('profile.other');
+    return map[type] || t("profile.other");
   };
 
   const userTypeLabel = (type: string) => {
-    if (type === 'agent') return t('profile.agent');
-    if (type === 'organization') return t('profile.organization');
-    return t('profile.talent');
+    if (type === "agent") return t("profile.agent");
+    if (type === "organization") return t("profile.organization");
+    return t("profile.talent");
   };
 
-  const SectionContent = ({ section, icon: Icon, color }: { section: string; icon: any; color: string }) => {
-    const presence = talentPresence.find(p => p.section === section);
+  const SectionContent = ({
+    section,
+    icon: Icon,
+    color,
+  }: {
+    section: string;
+    icon: any;
+    color: string;
+  }) => {
+    const presence = talentPresence.find((p) => p.section === section);
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className={`p-2 rounded-lg ${color}`}><Icon className="h-5 w-5" /></div>
-            <h3 className="font-semibold">{t('profile.myProfile')} {sectionTabs.find(t => t.key === section)?.label}</h3>
+            <div className={`p-2 rounded-lg ${color}`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <h3 className="font-semibold">
+              {t("profile.myProfile")}{" "}
+              {sectionTabs.find((t) => t.key === section)?.label}
+            </h3>
           </div>
           {presence && (
             <Badge variant={presence.is_active ? "default" : "secondary"}>
-              {presence.is_active ? t('profile.active') : t('profile.inactive')}
+              {presence.is_active ? t("profile.active") : t("profile.inactive")}
             </Badge>
           )}
         </div>
         {presence ? (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {presence.is_active ? t('profile.profileActive') : t('profile.profileInactive')}{' '}
-              {t('profile.visibility')}: {presence.visibility === 'public' ? t('profile.public') : t('profile.private')}.
+              {presence.is_active
+                ? t("profile.profileActive")
+                : t("profile.profileInactive")}{" "}
+              {t("profile.visibility")}:{" "}
+              {presence.visibility === "public"
+                ? t("profile.public")
+                : t("profile.private")}
+              .
             </p>
-            <Button variant="outline" size="sm" onClick={() => navigate(`/${section === 'yat-coin' ? 'yat-coin' : section === 'karta' ? 'karta' : section}`)}>
-              {t('profile.goTo')} {sectionTabs.find(t => t.key === section)?.label}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                navigate(
+                  `/${section === "yat-coin" ? "yat-coin" : section === "karta" ? "karta" : section}`,
+                )
+              }
+            >
+              {t("profile.goTo")}{" "}
+              {sectionTabs.find((t) => t.key === section)?.label}
             </Button>
           </div>
         ) : (
-          <p className="text-muted-foreground text-sm">{t('profile.notCreated')}</p>
+          <p className="text-muted-foreground text-sm">
+            {t("profile.notCreated")}
+          </p>
         )}
       </div>
     );
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
   }
 
   return (
     <div className="w-full max-w-5xl mx-auto py-6 px-4">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
-        <ArrowLeft className="h-4 w-4" /> {t('profile.back')}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate(-1)}
+        className="mb-4 gap-2"
+      >
+        <ArrowLeft className="h-4 w-4" /> {t("profile.back")}
       </Button>
 
       <Card className="overflow-hidden mb-6">
         <div className="h-44 sm:h-56 md:h-64 bg-stage relative overflow-hidden">
           {displayProfile.cover_photo_url ? (
-            <img src={displayProfile.cover_photo_url} alt="" className="w-full h-full object-cover" />
+            <img
+              src={displayProfile.cover_photo_url}
+              alt=""
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div
               aria-hidden
               className="absolute -top-40 -left-24 h-[420px] w-[620px] rounded-full opacity-60"
-              style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+              style={{
+                background:
+                  "radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)",
+              }}
             />
           )}
           {userId && (
             <div className="absolute top-3 right-3 z-10 rounded-full bg-card/80 backdrop-blur-sm">
-              <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon" variant="secondary"
-                onUploaded={async (url) => { await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId); setProfile((p: any) => ({ ...p, cover_photo_url: url })); }} />
+              <FileUploadButton
+                userId={userId}
+                folder="cover"
+                accept="image/*"
+                label=""
+                size="icon"
+                variant="secondary"
+                onUploaded={async (url) => {
+                  await supabase
+                    .from("profiles")
+                    .update({ cover_photo_url: url })
+                    .eq("id", userId);
+                  setProfile((p: any) => ({ ...p, cover_photo_url: url }));
+                }}
+              />
             </div>
           )}
         </div>
@@ -190,57 +366,123 @@ const Profile: React.FC = () => {
           <div className="flex flex-col md:flex-row gap-5 md:gap-6 md:items-end -mt-14 md:-mt-16">
             <div className="relative flex-shrink-0 z-20">
               <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-card bg-card">
-                <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
-                <AvatarFallback className="text-3xl font-display">{displayProfile.name?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarImage
+                  src={displayProfile.avatar_url || displayProfile.avatar}
+                  alt={displayProfile.name}
+                />
+                <AvatarFallback className="text-3xl font-display">
+                  {displayProfile.name?.charAt(0) || "U"}
+                </AvatarFallback>
               </Avatar>
               {userId && (
                 <div className="absolute bottom-0 right-0">
-                  <FileUploadButton userId={userId} folder="avatar" accept="image/*" label="" size="icon" variant="secondary"
-                    onUploaded={async (url) => { await supabase.from('profiles').update({ avatar_url: url }).eq('id', userId); setProfile((p: any) => ({ ...p, avatar_url: url })); }} />
+                  <FileUploadButton
+                    userId={userId}
+                    folder="avatar"
+                    accept="image/*"
+                    label=""
+                    size="icon"
+                    variant="secondary"
+                    onUploaded={async (url) => {
+                      await supabase
+                        .from("profiles")
+                        .update({ avatar_url: url })
+                        .eq("id", userId);
+                      setProfile((p: any) => ({ ...p, avatar_url: url }));
+                    }}
+                  />
                 </div>
               )}
             </div>
             <div className="flex-1 md:pb-1 min-w-0">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-2xl md:text-3xl font-semibold">{displayProfile.name}</h1>
-                    {levelData && <UserLevelBadge levelData={levelData} compact />}
+                  <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-sm">
+                    <h1 className="text-2xl md:text-3xl font-semibold">
+                      {displayProfile.name}
+                    </h1>
+                    {levelData && (
+                      <UserLevelBadge levelData={levelData} compact />
+                    )}
                   </div>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline">{userTypeLabel(displayProfile.user_type)}</Badge>
-                    <span className="text-muted-foreground text-sm">{displayProfile.email}</span>
+                    <Badge variant="outline">
+                      {userTypeLabel(displayProfile.user_type)}
+                    </Badge>
+                    <span className="text-muted-foreground text-sm">
+                      {displayProfile.email}
+                    </span>
                   </div>
                 </div>
-                <Button onClick={() => navigate('/talent-dashboard')} className="w-fit">
-                  <LayoutDashboard className="h-4 w-4 mr-2" /> {t('profile.talentDashboard')}
+                <Button
+                  onClick={() => navigate("/talent-dashboard")}
+                  className="w-fit"
+                >
+                  <LayoutDashboard className="h-4 w-4 mr-2" />{" "}
+                  {t("profile.talentDashboard")}
                 </Button>
               </div>
               <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
                 {(displayProfile.location || displayProfile.city) && (
-                  <div className="flex items-center gap-1"><MapPin className="h-4 w-4" /><span>{displayProfile.city}{displayProfile.country ? `, ${displayProfile.country}` : displayProfile.location ? `, ${displayProfile.location}` : ''}</span></div>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-4 w-4" />
+                    <span>
+                      {displayProfile.city}
+                      {displayProfile.country
+                        ? `, ${displayProfile.country}`
+                        : displayProfile.location
+                          ? `, ${displayProfile.location}`
+                          : ""}
+                    </span>
+                  </div>
                 )}
-                {displayProfile.work && (<div className="flex items-center gap-1"><Briefcase className="h-4 w-4" /><span>{displayProfile.work}</span></div>)}
-                {displayProfile.website && (<div className="flex items-center gap-1"><Globe className="h-4 w-4" /><a href={displayProfile.website} className="text-primary hover:underline">{displayProfile.website}</a></div>)}
+                {displayProfile.work && (
+                  <div className="flex items-center gap-1">
+                    <Briefcase className="h-4 w-4" />
+                    <span>{displayProfile.work}</span>
+                  </div>
+                )}
+                {displayProfile.website && (
+                  <div className="flex items-center gap-1">
+                    <Globe className="h-4 w-4" />
+                    <a
+                      href={displayProfile.website}
+                      className="text-primary hover:underline"
+                    >
+                      {displayProfile.website}
+                    </a>
+                  </div>
+                )}
               </div>
-              {displayProfile.bio && <p className="mt-4 text-[15px] leading-relaxed max-w-prose">{displayProfile.bio}</p>}
+              {displayProfile.bio && (
+                <p className="mt-4 text-[15px] leading-relaxed max-w-prose">
+                  {displayProfile.bio}
+                </p>
+              )}
               {socialLinks.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
-                  {socialLinks.map(link => (
+                  {socialLinks.map((link) => (
                     <button
                       key={link.id}
                       type="button"
-                      onClick={() => navigate(`/social?url=${encodeURIComponent(link.url)}&platform=${encodeURIComponent(link.platform)}`)}
+                      onClick={() =>
+                        navigate(
+                          `/social?url=${encodeURIComponent(link.url)}&platform=${encodeURIComponent(link.platform)}`,
+                        )
+                      }
                       title={link.url}
                     >
-                      <Badge variant="secondary" className="cursor-pointer hover:bg-accent hover:text-accent-foreground capitalize">
-                        <Globe className="h-3 w-3 mr-1" />{link.platform}
+                      <Badge
+                        variant="secondary"
+                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground capitalize"
+                      >
+                        <Globe className="h-3 w-3 mr-1" />
+                        {link.platform}
                       </Badge>
                     </button>
                   ))}
                 </div>
               )}
-
             </div>
           </div>
         </CardContent>
@@ -250,13 +492,21 @@ const Profile: React.FC = () => {
       <div className="mb-4 bg-card rounded-xl p-3 border border-border">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
-            <AvatarFallback>{displayProfile.name?.[0] || 'U'}</AvatarFallback>
+            <AvatarImage
+              src={displayProfile.avatar_url || displayProfile.avatar}
+              alt={displayProfile.name}
+            />
+            <AvatarFallback>{displayProfile.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
           <PostCreationDialog
             trigger={
-              <Button variant="outline" className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted">
-                {t('feed.whatsNew', { name: (displayProfile.name || '').split(' ')[0] }) || "Quoi de neuf ?"}
+              <Button
+                variant="outline"
+                className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted"
+              >
+                {t("feed.whatsNew", {
+                  name: (displayProfile.name || "").split(" ")[0],
+                }) || "Quoi de neuf ?"}
               </Button>
             }
             userAvatar={displayProfile.avatar_url || displayProfile.avatar}
@@ -270,16 +520,24 @@ const Profile: React.FC = () => {
         <StoriesBar />
       </div>
 
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
         <div className="lg:col-span-1">
-          <ProfileSidebar talentPresence={talentPresence} userName={displayProfile.name} userAvatar={displayProfile.avatar_url || displayProfile.avatar} activeSection={activeSection} onSectionChange={handleSectionChange} />
+          <ProfileSidebar
+            talentPresence={talentPresence}
+            userName={displayProfile.name}
+            userAvatar={displayProfile.avatar_url || displayProfile.avatar}
+            activeSection={activeSection}
+            onSectionChange={handleSectionChange}
+          />
         </div>
         <div className="lg:col-span-3 space-y-6">
-          {userId && <Talent360Tab userId={userId} profile={displayProfile} onProfileUpdate={(u) => setProfile((p: any) => ({ ...p, ...u }))} />}
-
-
+          {userId && (
+            <Talent360Tab
+              userId={userId}
+              profile={displayProfile}
+              onProfileUpdate={(u) => setProfile((p: any) => ({ ...p, ...u }))}
+            />
+          )}
 
           {levelData && <UserLevelBadge levelData={levelData} />}
 
@@ -295,11 +553,20 @@ const Profile: React.FC = () => {
               <CardContent>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {userBadges.map((b: any) => (
-                    <div key={b.id} className="flex flex-col items-center p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-center">
-                      <span className="text-2xl mb-1">{b.icon || '🏅'}</span>
+                    <div
+                      key={b.id}
+                      className="flex flex-col items-center p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors text-center"
+                    >
+                      <span className="text-2xl mb-1">{b.icon || "🏅"}</span>
                       <p className="font-semibold text-xs">{b.badge_name}</p>
-                      {b.description && <p className="text-[10px] text-muted-foreground">{b.description}</p>}
-                      <p className="text-[10px] text-muted-foreground mt-1">{new Date(b.earned_at).toLocaleDateString('fr-FR')}</p>
+                      {b.description && (
+                        <p className="text-[10px] text-muted-foreground">
+                          {b.description}
+                        </p>
+                      )}
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        {new Date(b.earned_at).toLocaleDateString("fr-FR")}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -318,30 +585,55 @@ const Profile: React.FC = () => {
               {coinHistory.length > 0 ? (
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {coinHistory.map((tx: any) => (
-                    <div key={tx.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm">
+                    <div
+                      key={tx.id}
+                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-sm"
+                    >
                       <div className="flex items-center gap-2">
-                        <span className={tx.reason === 'post' ? 'text-blue-500' : 'text-pink-500'}>
-                          {tx.reason === 'post' ? '📝' : '❤️'}
+                        <span
+                          className={
+                            tx.reason === "post"
+                              ? "text-blue-500"
+                              : "text-pink-500"
+                          }
+                        >
+                          {tx.reason === "post" ? "📝" : "❤️"}
                         </span>
-                        <span className="capitalize">{tx.reason === 'post' ? 'Публикация' : 'Лайк'}</span>
+                        <span className="capitalize">
+                          {tx.reason === "post" ? "Публикация" : "Лайк"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-muted-foreground">+{tx.xp_earned} XP</span>
-                        <span className="font-semibold text-gold flex items-center gap-1 tabular-nums">
-                          <Coins className="h-3 w-3" /> +{Number(tx.amount).toFixed(4)}
+                        <span className="text-xs text-muted-foreground">
+                          +{tx.xp_earned} XP
                         </span>
-                        <span className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleDateString('fr-FR')}</span>
+                        <span className="font-semibold text-gold flex items-center gap-1 tabular-nums">
+                          <Coins className="h-3 w-3" /> +
+                          {Number(tx.amount).toFixed(4)}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {new Date(tx.created_at).toLocaleDateString("fr-FR")}
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">Ещё нет начислений. Создавайте посты и получайте лайки!</p>
+                <p className="text-sm text-muted-foreground">
+                  Ещё нет начислений. Создавайте посты и получайте лайки!
+                </p>
               )}
             </CardContent>
           </Card>
 
-          {userId && <AutoResumeCard userId={userId} profile={displayProfile} achievements={achievements} talentPresence={talentPresence} />}
+          {userId && (
+            <AutoResumeCard
+              userId={userId}
+              profile={displayProfile}
+              achievements={achievements}
+              talentPresence={talentPresence}
+            />
+          )}
 
           {userId && (
             <Tabs defaultValue="sources" className="w-full">
@@ -360,46 +652,87 @@ const Profile: React.FC = () => {
 
           {userId && <MySocialLinksCard userId={userId} />}
 
-
           {userId && <SportProfileEditor userId={userId} />}
 
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium flex items-center gap-2"><Trophy className="h-4 w-4" />{t('profile.achievements')}</CardTitle>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Trophy className="h-4 w-4" />
+                  {t("profile.achievements")}
+                </CardTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">{achievements.length}</Badge>
-                  {userId && <AddAchievementDialog userId={userId} onAdded={fetchProfile} />}
+                  {userId && (
+                    <AddAchievementDialog
+                      userId={userId}
+                      onAdded={fetchProfile}
+                    />
+                  )}
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               {achievements.length > 0 ? (
                 <div className="space-y-3">
-                  {achievements.map(a => (
-                    <div key={a.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                  {achievements.map((a) => (
+                    <div
+                      key={a.id}
+                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
                       <div className="flex items-center justify-between">
                         <p className="font-medium text-sm">{a.title}</p>
-                        {a.level && <Badge variant="outline" className="text-[10px]">{a.level}</Badge>}
+                        {a.level && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {a.level}
+                          </Badge>
+                        )}
                       </div>
-                      {a.description && <p className="text-xs text-muted-foreground mt-1">{a.description}</p>}
-                      {a.date && <p className="text-[10px] text-muted-foreground mt-1">{new Date(a.date).toLocaleDateString('fr-FR')}</p>}
+                      {a.description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {a.description}
+                        </p>
+                      )}
+                      {a.date && (
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          {new Date(a.date).toLocaleDateString("fr-FR")}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
-              ) : (<p className="text-sm text-muted-foreground">{t('profile.addAchievements')}</p>)}
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t("profile.addAchievements")}
+                </p>
+              )}
             </CardContent>
           </Card>
 
-          {userId && <PortfolioGallery userId={userId} ownerId={userId} items={media} onChanged={fetchProfile} />}
+          {userId && (
+            <PortfolioGallery
+              userId={userId}
+              ownerId={userId}
+              items={media}
+              onChanged={fetchProfile}
+            />
+          )}
 
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium flex items-center gap-2"><GraduationCap className="h-4 w-4" />{t('profile.education')}</CardTitle>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  {t("profile.education")}
+                </CardTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">{education.length}</Badge>
-                  {userId && <AddEducationDialog userId={userId} onAdded={fetchProfile} />}
+                  {userId && (
+                    <AddEducationDialog
+                      userId={userId}
+                      onAdded={fetchProfile}
+                    />
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -407,37 +740,80 @@ const Profile: React.FC = () => {
               {education.length > 0 ? (
                 <div className="space-y-3">
                   {education.map((e: any) => (
-                    <div key={e.id} className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                    <div
+                      key={e.id}
+                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px]">{educationTypeLabel(e.education_type)}</Badge>
-                        <p className="font-medium text-sm">{[e.degree, e.field_of_study].filter(Boolean).join(' - ') || e.institution}</p>
+                        <Badge variant="outline" className="text-[10px]">
+                          {educationTypeLabel(e.education_type)}
+                        </Badge>
+                        <p className="font-medium text-sm">
+                          {[e.degree, e.field_of_study]
+                            .filter(Boolean)
+                            .join(" - ") || e.institution}
+                        </p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? ` - ${t('profile.present')}` : e.end_year ? ` - ${e.end_year}` : ''}` : ''}
+                        {e.institution}{" "}
+                        {e.start_year
+                          ? `• ${e.start_year}${e.is_current ? ` - ${t("profile.present")}` : e.end_year ? ` - ${e.end_year}` : ""}`
+                          : ""}
                       </p>
-                      {e.description && <p className="text-[10px] text-muted-foreground mt-1">{e.description}</p>}
+                      {e.description && (
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          {e.description}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
-              ) : (<p className="text-sm text-muted-foreground">{t('profile.addEducation')}</p>)}
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {t("profile.addEducation")}
+                </p>
+              )}
             </CardContent>
           </Card>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
-              <CardHeader className="pb-3"><CardTitle className="text-sm font-medium flex items-center gap-2"><FileText className="h-4 w-4" />{t('profile.skills')}</CardTitle></CardHeader>
-              <CardContent>{userId && <ProfileSkills userId={userId} />}</CardContent>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  {t("profile.skills")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {userId && <ProfileSkills userId={userId} />}
+              </CardContent>
             </Card>
             <Card>
-              <CardHeader className="pb-3"><CardTitle className="text-sm font-medium flex items-center gap-2"><Users className="h-4 w-4" />{t('profile.interests')}</CardTitle></CardHeader>
-              <CardContent>{userId && <ProfileInterests userId={userId} />}</CardContent>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  {t("profile.interests")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {userId && <ProfileInterests userId={userId} />}
+              </CardContent>
             </Card>
           </div>
 
           <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-sm font-medium">{t('settings.profile')}</CardTitle></CardHeader>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">
+                {t("settings.profile")}
+              </CardTitle>
+            </CardHeader>
             <CardContent>
-              <ProfileSettings profile={displayProfile} onUpdate={(updates) => setProfile((prev: any) => ({ ...prev, ...updates }))} />
+              <ProfileSettings
+                profile={displayProfile}
+                onUpdate={(updates) =>
+                  setProfile((prev: any) => ({ ...prev, ...updates }))
+                }
+              />
             </CardContent>
           </Card>
         </div>
