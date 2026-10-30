@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, Calendar, TrendingUp, Eye, Newspaper, Activity } from 'lucide-react';
+import { ArrowLeft, Building, Users, Briefcase, BarChart3, MapPin, Globe, Mail, Award, UserCheck, TrendingUp, Eye, Newspaper, Activity, BadgeCheck } from 'lucide-react';
+import { OrganizationCrest } from '@/components/organizations/OrganizationRow';
 import { useLanguage } from '@/i18n/LanguageContext';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
@@ -203,10 +204,10 @@ const OrganizationHub: React.FC = () => {
   }
 
   const dashboardStats = [
-    { label: 'Agents', value: agents.length, icon: UserCheck, color: 'text-blue-500' },
-    { label: 'Talents', value: talents.length, icon: Users, color: 'text-green-500' },
-    { label: 'Offres', value: jobPostings.length, icon: Briefcase, color: 'text-purple-500' },
-    { label: 'Fondée', value: org.founded_year || '-', icon: Calendar, color: 'text-orange-500' },
+    { label: 'Agents', value: agents.length },
+    { label: 'Talents', value: talents.length },
+    { label: 'Offres', value: jobPostings.length },
+    { label: 'Fondée', value: org.founded_year || '-' },
   ];
 
   return (
@@ -217,41 +218,63 @@ const OrganizationHub: React.FC = () => {
         </Button>
 
         {/* Org Header */}
-        <Card className="overflow-hidden">
-          <div className="h-36 bg-gradient-to-r from-primary/30 via-secondary/20 to-accent/30" />
-          <CardContent className="relative -mt-12 pb-6">
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-              <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-                <AvatarImage src={org.logo_url || ''} />
-                <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                  {org.company_name?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 mt-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl font-bold text-foreground">{org.company_name}</h1>
-                  {org.verified && <Badge className="bg-green-500 text-white">Vérifiée</Badge>}
+        <section className="relative overflow-hidden rounded-xl bg-stage text-stage-foreground">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-40 -left-24 h-[420px] w-[620px] rounded-full opacity-60"
+            style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+          />
+          <div className="relative px-5 pt-6 md:px-8 md:pt-8">
+            <div className="flex flex-col sm:flex-row gap-5 sm:items-center">
+              <OrganizationCrest
+                name={org.company_name || '?'}
+                logo={org.logo_url || undefined}
+                className="h-20 w-20 md:h-24 md:w-24 text-3xl bg-white/10 ring-white/20"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h1 className="min-w-0 break-words text-2xl md:text-[34px] font-semibold text-white">{org.company_name}</h1>
+                  {org.verified && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-white/25 px-2.5 py-0.5 text-xs font-medium text-white/85">
+                      <BadgeCheck className="h-3.5 w-3.5" /> Vérifiée
+                    </span>
+                  )}
                 </div>
-                {org.industry && <Badge variant="secondary" className="mt-1">{org.industry}</Badge>}
-                <div className="flex flex-wrap gap-4 mt-3 text-sm text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-white/65">
+                  {org.industry && <span>{org.industry}</span>}
                   {org.headquarters && (
-                    <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{org.headquarters}</span>
+                    <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="h-4 w-4 shrink-0" /><span className="truncate">{org.headquarters}</span></span>
                   )}
                   {org.company_size && (
-                    <span className="flex items-center gap-1"><Users className="h-4 w-4" />{org.company_size}</span>
+                    <span className="inline-flex items-center gap-1"><Users className="h-4 w-4 shrink-0" />{org.company_size}</span>
                   )}
                   {org.website_url && (
-                    <span className="flex items-center gap-1"><Globe className="h-4 w-4" />{org.website_url}</span>
+                    <a
+                      href={org.website_url.startsWith('http') ? org.website_url : `https://${org.website_url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-w-0 max-w-full items-center gap-1 hover:text-white"
+                    >
+                      <Globe className="h-4 w-4 shrink-0" /><span className="truncate">{org.website_url.replace(/^https?:\/\//, '')}</span>
+                    </a>
                   )}
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <dl className="mt-7 grid grid-cols-2 sm:grid-cols-4 border-t border-white/10">
+              {dashboardStats.map((stat, i) => (
+                <div key={stat.label} className={`py-4 ${i % 2 === 1 ? 'pl-4 border-l border-white/10' : ''} ${i >= 1 ? 'sm:pl-5 sm:border-l sm:border-white/10' : ''} ${i >= 2 ? 'border-t border-white/10 sm:border-t-0' : ''}`}>
+                  <dt className="text-xs text-white/60">{stat.label}</dt>
+                  <dd className="mt-1 font-display text-3xl font-semibold tabular-nums leading-none text-white">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
+          <TabsList className="mb-2">
             <TabsTrigger value="dashboard">{t('org.dashboard')}</TabsTrigger>
             <TabsTrigger value="posts">Publications</TabsTrigger>
             <TabsTrigger value="activity">Activités</TabsTrigger>
@@ -264,22 +287,11 @@ const OrganizationHub: React.FC = () => {
 
           {/* Dashboard */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {dashboardStats.map((stat) => (
-                <Card key={stat.label}>
-                  <CardContent className="p-4 text-center">
-                    <stat.icon className={`h-6 w-6 mx-auto mb-2 ${stat.color}`} />
-                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
             {org.description && (
               <Card>
                 <CardHeader><CardTitle className="text-lg">À propos</CardTitle></CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">{org.description}</p>
+                  <p className="text-muted-foreground leading-relaxed max-w-prose break-words">{org.description}</p>
                 </CardContent>
               </Card>
             )}
@@ -369,28 +381,28 @@ const OrganizationHub: React.FC = () => {
               </Card>
             ) : (
               agents.map((agent) => (
-                <Card key={agent.id} className="cursor-pointer hover:shadow-md transition-shadow"
+                <Card key={agent.id} className="cursor-pointer hover:border-primary/40 transition-colors"
                   onClick={() => navigate(`/agent/${agent.agent_id}`)}>
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <Avatar>
+                  <CardContent className="p-4 flex items-center gap-3 sm:gap-4">
+                    <Avatar className="shrink-0">
                       <AvatarImage src={agent.agent_profile?.avatar_url || ''} />
                       <AvatarFallback>{agent.agent_profile?.name?.charAt(0) || 'A'}</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                       <h4
-                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        className="truncate font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
                         onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}
                       >
                         {agent.agent_detail?.agency_name || agent.agent_profile?.name}
                       </h4>
-                      <p className="text-sm text-muted-foreground">{agent.agent_detail?.category}</p>
+                      <p className="truncate text-sm text-muted-foreground">{agent.agent_detail?.category}</p>
                       <p className="text-xs text-muted-foreground">
                         {agent.agent_detail?.clients_represented || 0} talents représentés
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{agent.role || 'Membre'}</Badge>
-                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Badge variant="outline" className="hidden sm:inline-flex">{agent.role || 'Membre'}</Badge>
+                      <Button variant="ghost" size="icon" aria-label="Voir le profil" onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -413,30 +425,30 @@ const OrganizationHub: React.FC = () => {
               </Card>
             ) : (
               talents.map((talent, i) => (
-                <Card key={i} className="cursor-pointer hover:shadow-md transition-shadow"
+                <Card key={i} className="cursor-pointer hover:border-primary/40 transition-colors"
                   onClick={() => navigate(`/talent/${talent.talent_id}`)}>
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <Avatar>
+                  <CardContent className="p-4 flex items-center gap-3 sm:gap-4">
+                    <Avatar className="shrink-0">
                       <AvatarImage src={talent.talent_profile?.avatar_url || ''} />
                       <AvatarFallback>{talent.talent_profile?.name?.charAt(0) || 'T'}</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                       <h4
-                        className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                        className="truncate font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
                         onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}
                       >
                         {talent.talent_profile?.name}
                       </h4>
-                      <p className="text-sm text-muted-foreground">{talent.talent_profile?.sport_type}</p>
+                      <p className="truncate text-sm text-muted-foreground">{talent.talent_profile?.sport_type}</p>
                       {talent.talent_profile?.location && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-3 w-3" /> {talent.talent_profile.location}
+                        <p className="text-xs text-muted-foreground flex min-w-0 items-center gap-1">
+                          <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{talent.talent_profile.location}</span>
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary">Agent: {talent.agent_name}</Badge>
-                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Badge variant="secondary" className="hidden sm:inline-flex max-w-[12rem] truncate">Agent : {talent.agent_name}</Badge>
+                      <Button variant="ghost" size="icon" aria-label="Voir le profil" onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -472,11 +484,11 @@ const OrganizationHub: React.FC = () => {
               jobPostings.map((job) => (
                 <Card key={job.id}>
                   <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-semibold text-foreground">{job.title}</h4>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{job.description}</p>
-                        <div className="flex gap-2 mt-2">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-foreground break-words">{job.title}</h4>
+                        <p className="text-sm text-muted-foreground line-clamp-2 break-words">{job.description}</p>
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
                           {job.job_type && <Badge variant="outline">{job.job_type}</Badge>}
                           {job.location && (
                             <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -485,7 +497,7 @@ const OrganizationHub: React.FC = () => {
                           )}
                         </div>
                       </div>
-                      <Badge>{job.status || 'open'}</Badge>
+                      <Badge className="shrink-0">{job.status || 'open'}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -501,15 +513,15 @@ const OrganizationHub: React.FC = () => {
                   <TrendingUp className="h-5 w-5 text-primary" /> Résumé
                 </CardTitle></CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Total agents</span>
                     <span className="font-semibold text-foreground">{agents.length}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Total talents</span>
                     <span className="font-semibold text-foreground">{talents.length}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Offres actives</span>
                     <span className="font-semibold text-foreground">
                       {jobPostings.filter(j => j.status === 'open').length}
@@ -522,15 +534,15 @@ const OrganizationHub: React.FC = () => {
                   <BarChart3 className="h-5 w-5 text-primary" /> Infos
                 </CardTitle></CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Secteur</span>
-                    <span className="font-semibold text-foreground">{org.industry || '-'}</span>
+                    <span className="font-semibold text-foreground text-right break-words min-w-0">{org.industry || '-'}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Taille</span>
                     <span className="font-semibold text-foreground">{org.company_size || '-'}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between gap-4">
                     <span className="text-muted-foreground">Statut</span>
                     <Badge variant={org.verified ? 'default' : 'secondary'}>
                       {org.verified ? 'Vérifiée' : 'Non vérifiée'}
