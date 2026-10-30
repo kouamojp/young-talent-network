@@ -138,6 +138,45 @@ Deploy edge functions:
 supabase functions deploy
 ```
 
+### Environment variables
+
+Every variable (front-end `.env`, Edge Function secrets, deployment steps) is documented in
+[ENVIRONMENT.md](ENVIRONMENT.md). Start from `.env.example` and `supabase/functions/.env.example`.
+
+### AI Provider
+
+All AI-powered edge functions go through a single module, `supabase/functions/_shared/ai.ts`.
+The default provider is Moonshot (Kimi), an OpenAI-compatible API.
+
+Set the API key as a Supabase secret (not in `.env` — this key never reaches the browser):
+
+```bash
+supabase secrets set MOONSHOT_API_KEY=sk-...
+```
+
+Get a key at [platform.kimi.ai](https://platform.kimi.ai).
+
+To switch providers, set `AI_PROVIDER` to `moonshot` (default), `lovable`, or `openrouter`
+and provide the matching key (`MOONSHOT_API_KEY`, `LOVABLE_API_KEY`, `OPENROUTER_API_KEY`):
+
+```bash
+supabase secrets set AI_PROVIDER=lovable
+```
+
+If the selected provider's key is missing, the module falls back to the first provider whose
+key is set, so removing a key degrades gracefully instead of breaking every function.
+
+The AI Assistant tab (`ai-assistant`) asks for haimaker (`z-ai/glm-5.2`) on every call, whatever
+`AI_PROVIDER` says. Without `HAIMAKER_API_KEY` it falls back to the provider above:
+
+```bash
+supabase secrets set HAIMAKER_API_KEY=sk-...
+supabase functions deploy ai-assistant
+```
+
+Models are chosen per call through a tier (`fast`, `default`, `reasoning`) rather than by
+hardcoding a model name, so upgrading a model is a one-line change in `_shared/ai.ts`.
+
 ## Supabase Edge Functions
 
 | Function | Purpose |
