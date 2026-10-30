@@ -4,72 +4,98 @@
 @tailwind utilities;
 
 @layer base {
+  /* YAT palette — Ink #13234A, Paper #EEF2F8, YAT blue #2563EB,
+     Podium gold #F5A524 (scores & ranks only), Line #D8DFEA */
   :root {
-    --background: 210 20% 93%;
-    --foreground: 210 12% 16%;
+    --background: 216 45% 95%;
+    --foreground: 222 59% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 12% 16%;
+    --card-foreground: 222 59% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 12% 16%;
+    --popover-foreground: 222 59% 18%;
 
-    --primary: 210 50% 48%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 92%;
-    --secondary-foreground: 210 12% 16%;
+    --secondary: 217 40% 92%;
+    --secondary-foreground: 222 59% 18%;
 
-    --muted: 210 15% 92%;
-    --muted-foreground: 210 10% 50%;
+    --muted: 217 40% 92%;
+    --muted-foreground: 220 18% 40%;
 
-    --accent: 210 15% 92%;
-    --accent-foreground: 210 50% 48%;
+    --accent: 221 90% 95%;
+    --accent-foreground: 221 83% 45%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 356 75% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 85%;
-    --input: 210 15% 85%;
-    --ring: 210 50% 48%;
+    --border: 217 32% 88%;
+    --input: 217 32% 84%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.5rem;
+    --gold: 38 91% 55%;
+    --gold-foreground: 30 80% 14%;
+
+    --stage: 224 64% 14%;
+    --stage-foreground: 216 60% 97%;
+
+    --radius: 0.875rem;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 210 12% 16%;
-    --sidebar-primary: 210 50% 48%;
-    --sidebar-accent: 210 10% 96%;
-    --sidebar-accent-foreground: 210 50% 48%;
-    --sidebar-border: 210 15% 90%;
-    --sidebar-ring: 210 50% 48%;
+    --sidebar-foreground: 222 59% 18%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 221 90% 95%;
+    --sidebar-accent-foreground: 221 83% 45%;
+    --sidebar-border: 217 32% 90%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   .dark {
-    --background: 210 20% 12%;
-    --foreground: 0 0% 98%;
+    --background: 223 45% 9%;
+    --foreground: 216 50% 96%;
 
-    --card: 210 15% 15%;
-    --card-foreground: 0 0% 98%;
+    --card: 223 40% 13%;
+    --card-foreground: 216 50% 96%;
 
-    --popover: 210 15% 15%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 223 40% 13%;
+    --popover-foreground: 216 50% 96%;
 
-    --primary: 210 50% 55%;
+    --primary: 217 91% 62%;
+    --primary-foreground: 224 64% 10%;
 
-    --secondary: 210 15% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 223 32% 19%;
+    --secondary-foreground: 216 50% 96%;
 
-    --muted: 210 15% 20%;
-    --muted-foreground: 210 10% 70%;
+    --muted: 223 32% 19%;
+    --muted-foreground: 218 22% 70%;
 
-    --accent: 210 15% 20%;
-    --accent-foreground: 210 50% 55%;
+    --accent: 221 45% 22%;
+    --accent-foreground: 217 91% 75%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 356 70% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 25%;
-    --input: 210 15% 25%;
-    --ring: 210 50% 55%;
+    --border: 223 30% 22%;
+    --input: 223 30% 26%;
+    --ring: 217 91% 62%;
+
+    --gold: 40 95% 60%;
+    --gold-foreground: 30 80% 12%;
+
+    --stage: 224 60% 6%;
+    --stage-foreground: 216 60% 97%;
+
+    --sidebar-background: 223 40% 13%;
+    --sidebar-foreground: 216 50% 96%;
+    --sidebar-primary: 217 91% 62%;
+    --sidebar-primary-foreground: 224 64% 10%;
+    --sidebar-accent: 221 45% 22%;
+    --sidebar-accent-foreground: 217 91% 75%;
+    --sidebar-border: 223 30% 20%;
+    --sidebar-ring: 217 91% 62%;
   }
 }
 
@@ -89,6 +115,26 @@
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight;
   }
+
+  /* Unbounded carries the headlines and the numbers; Onest does the rest */
+  h1, h2 {
+    @apply font-display;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Safe area for bottom nav */
@@ -107,11 +153,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-black/10 rounded-full;
+  @apply bg-foreground/10 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-black/20;
+  @apply bg-foreground/20;
 }
 
 /* Fade in animations for sections */
@@ -168,11 +214,7 @@
 
 /* Glass morphism styling */
 .glass {
-  @apply backdrop-blur-xl bg-white/70 border border-white/20 shadow-glass;
-}
-
-.dark .glass {
-  @apply bg-black/70 border-black/20;
+  @apply bg-card border border-border;
 }
 
 /* Image reveal effect */

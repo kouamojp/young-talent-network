@@ -18,18 +18,18 @@ const GlassMorphism: React.FC<GlassMorphismProps> = ({
   hover = false
 }) => {
   const intensityMap = {
-    light: 'backdrop-blur-sm bg-white/30',
-    medium: 'backdrop-blur-md bg-white/50',
-    heavy: 'backdrop-blur-xl bg-white/70'
+    light: 'bg-card/60',
+    medium: 'bg-card/85',
+    heavy: 'bg-card'
   };
 
   return (
     <div
       className={cn(
         intensityMap[intensity],
-        border && 'border border-white/20',
+        border && 'border border-border',
         hover && 'transition-all duration-300 hover:shadow-hover',
-        'rounded-xl shadow-glass',
+        'rounded-xl text-card-foreground',
         className
       )}
     >

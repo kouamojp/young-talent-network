@@ -22,7 +22,7 @@ const SuccessStories = () => {
           </div>
           <div className="p-4">
             <h3 className="font-bold">From Y&T to Broadway</h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               How I landed my dream role after connecting with a casting director on the platform.
             </p>
             <Button variant="link" className="px-0 mt-2">

@@ -16,7 +16,7 @@ const StarRating = ({ value, onChange, readonly = false }: { value: number; onCh
     {[1, 2, 3, 4, 5].map(i => (
       <Star
         key={i}
-        className={`h-5 w-5 ${i <= value ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'} ${!readonly ? 'cursor-pointer hover:text-yellow-400' : ''}`}
+        className={`h-5 w-5 ${i <= value ? 'fill-gold text-gold' : 'text-muted-foreground/30'} ${!readonly ? 'cursor-pointer hover:text-gold' : ''}`}
         onClick={() => !readonly && onChange?.(i)}
       />
     ))}
@@ -26,17 +26,17 @@ const StarRating = ({ value, onChange, readonly = false }: { value: number; onCh
 const InfoRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
   if (!value) return null;
   return (
-    <div className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
-      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-      <span className="text-xs font-semibold text-foreground text-right max-w-[60%]">{value}</span>
+    <div className="flex justify-between gap-4 py-2 border-b border-border/60 last:border-0">
+      <span className="text-sm text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium text-foreground text-right max-w-[60%] break-words">{value}</span>
     </div>
   );
 };
 
 const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: string }) => (
-  <div className="flex items-center gap-2 py-2 px-3 bg-primary/10 rounded-t-lg border border-primary/20">
-    <Icon className="h-4 w-4 text-primary" />
-    <h3 className="text-sm font-bold text-primary">{title}</h3>
+  <div className="flex items-center gap-2 px-4 pt-4 pb-1">
+    <Icon className="h-4 w-4 text-muted-foreground" />
+    <h3 className="text-[15px] font-semibold text-foreground">{title}</h3>
   </div>
 );
 
@@ -160,7 +160,7 @@ const TalentPublicProfile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <main className="container max-w-5xl py-[10px] pr-[5px] pl-[5px] mx-0 px-0">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" /> Retour
         </Button>
@@ -168,32 +168,42 @@ const TalentPublicProfile: React.FC = () => {
         {/* CV Header - inspired by sports profile template */}
         <div className="bg-card border border-border rounded-xl overflow-hidden mb-6 print:shadow-none">
           {/* Cover & Name */}
-          <div className="relative h-28 md:h-36 bg-gradient-to-r from-primary to-primary/70">
-            {profile.cover_photo_url && <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />}
+          <div className="relative h-32 md:h-44 bg-stage overflow-hidden">
+            {profile.cover_photo_url ? (
+              <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div
+                aria-hidden
+                className="absolute -top-40 -left-24 h-[420px] w-[620px] rounded-full opacity-60"
+                style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+              />
+            )}
           </div>
 
-          <div className="px-4 md:px-6 pb-6">
-            <div className="flex flex-col md:flex-row gap-4 -mt-12">
+          <div className="px-5 md:px-7 pb-6">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 -mt-12 md:-mt-14">
               {/* Photo */}
-              <Avatar className="h-24 w-24 border-4 border-card shadow-lg shrink-0">
+              <Avatar className="h-24 w-24 md:h-28 md:w-28 border-4 border-card bg-card shrink-0">
                 <AvatarImage src={profile.avatar_url || ''} />
-                <AvatarFallback className="text-2xl bg-muted">{profile.name?.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-2xl font-display bg-muted">{profile.name?.charAt(0)}</AvatarFallback>
               </Avatar>
 
               {/* Title Info */}
-              <div className="flex-1 pt-12 md:pt-0">
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <h1 className="text-2xl font-bold text-foreground">{profile.name}</h1>
+              <div className="flex-1 min-w-0 md:pt-16">
+                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                  <h1 className="text-2xl md:text-3xl font-semibold text-foreground">{profile.name}</h1>
                   {Number(profile.platform_rating) > 0 && (
-                    <div className="flex items-center gap-1.5">
-                      <StarRating value={Math.round(Number(profile.platform_rating))} readonly />
-                      <span className="text-sm font-medium text-yellow-600">{Number(profile.platform_rating).toFixed(1)}</span>
-                      <span className="text-xs text-muted-foreground">({profile.rating_count || 0})</span>
+                    <div className="flex items-end gap-2.5 shrink-0">
+                      <span className="font-display text-4xl font-semibold leading-none tabular-nums text-gold">{Number(profile.platform_rating).toFixed(1)}</span>
+                      <div className="pb-0.5">
+                        <StarRating value={Math.round(Number(profile.platform_rating))} readonly />
+                        <span className="text-xs text-muted-foreground">{profile.rating_count || 0} avis</span>
+                      </div>
                     </div>
                   )}
                 </div>
-                {profile.bio && <p className="text-sm text-muted-foreground mt-2 max-w-2xl">{profile.bio}</p>}
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                {profile.bio && <p className="text-[15px] text-muted-foreground mt-3 max-w-prose leading-relaxed">{profile.bio}</p>}
+                <div className="flex flex-wrap gap-1.5 mt-3">
                   <Badge variant="outline">{profile.user_type === 'organization' ? 'Organisation' : profile.user_type === 'agent' ? 'Agent' : 'Talent'}</Badge>
                   {profile.sport_type && <Badge variant="secondary">{profile.sport_type}</Badge>}
                 </div>
@@ -209,7 +219,7 @@ const TalentPublicProfile: React.FC = () => {
             {/* About */}
             <div className="bg-card border border-border rounded-xl overflow-hidden">
               <SectionHeader icon={User} title="Informations Personnelles" />
-              <div className="p-3 space-y-0">
+              <div className="px-4 pb-3 space-y-0">
                 <InfoRow label="Nom" value={profile.name} />
                 <InfoRow label="Date de naissance" value={formatDate(profile.birthday)} />
                 <InfoRow label="Âge" value={calculateAge(profile.birthday)} />
@@ -226,7 +236,7 @@ const TalentPublicProfile: React.FC = () => {
             {skills.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <SectionHeader icon={Briefcase} title="Compétences" />
-                <div className="p-3">
+                <div className="px-4 pb-4 pt-1">
                   <div className="flex flex-wrap gap-1.5">
                     {skills.map((s, i) => <Badge key={i} variant="outline" className="text-xs">{s}</Badge>)}
                   </div>
@@ -238,7 +248,7 @@ const TalentPublicProfile: React.FC = () => {
             {socialLinks.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <SectionHeader icon={Globe} title="Réseaux Sociaux" />
-                <div className="p-3 space-y-0">
+                <div className="px-4 pb-3 space-y-0">
                   {socialLinks.map(l => (
                     <div key={l.id} className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
                       <span className="text-xs font-medium text-muted-foreground">{l.platform}</span>
@@ -256,9 +266,9 @@ const TalentPublicProfile: React.FC = () => {
             {education.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <SectionHeader icon={GraduationCap} title="Formation & Diplômes" />
-                <div className="p-3 space-y-2">
+                <div className="px-4 pb-4 pt-1 space-y-2">
                   {education.map((e: any) => (
-                    <div key={e.id} className="p-2.5 rounded-lg bg-muted/40 border border-border/30">
+                    <div key={e.id} className="p-3 rounded-lg bg-background">
                       <div className="flex items-start gap-2">
                         <Badge variant="outline" className="text-[10px] shrink-0 mt-0.5">
                           {e.education_type === 'school' ? 'École' : e.education_type === 'university' ? 'Université' : e.education_type === 'training' ? 'Formation' : e.education_type === 'certification' ? 'Certif.' : e.education_type}
@@ -285,7 +295,7 @@ const TalentPublicProfile: React.FC = () => {
             {achievements.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <SectionHeader icon={Trophy} title="Réalisations & Prix" />
-                <div className="p-3">
+                <div className="px-4 pb-4 pt-1">
                   <table className="w-full text-xs">
                     <tbody>
                       {achievements.map(a => (
@@ -312,7 +322,7 @@ const TalentPublicProfile: React.FC = () => {
         {categories.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
             <SectionHeader icon={Tag} title="Catégories" />
-            <div className="p-3 flex flex-wrap gap-1.5">
+            <div className="px-4 pb-4 pt-1 flex flex-wrap gap-1.5">
               {categories.map((uc: any) => (
                 <Badge
                   key={uc.id}
@@ -333,7 +343,7 @@ const TalentPublicProfile: React.FC = () => {
         {presence.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
             <SectionHeader icon={Layers} title="Présent dans les sections" />
-            <div className="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            <div className="px-4 pb-4 pt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {presence.map((p: any) => {
                 const meta = SECTION_LABELS[p.section] || { label: p.section, icon: '•' };
                 return (
@@ -357,7 +367,7 @@ const TalentPublicProfile: React.FC = () => {
         {/* Posts feed */}
         <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
           <SectionHeader icon={Newspaper} title={`Publications (${posts.length})`} />
-          <div className="p-3 space-y-3">
+          <div className="px-4 pb-4 pt-1 space-y-3">
             {posts.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">Aucune publication publique pour le moment.</p>
             ) : (
@@ -433,7 +443,7 @@ const TalentPublicProfile: React.FC = () => {
         {media.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
             <SectionHeader icon={Image} title="Médias & Portfolio" />
-            <div className="p-3">
+            <div className="px-4 pb-4 pt-1">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {media.map(m => (
                   <div key={m.id} className="rounded-lg overflow-hidden bg-muted/40 border border-border/30">

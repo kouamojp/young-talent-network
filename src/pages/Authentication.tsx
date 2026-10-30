@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import GlassMorphism from '@/components/GlassMorphism';
-import AnimatedText from '@/components/AnimatedText';
-import { Apple, Users, Building, UserCheck } from 'lucide-react';
+import { Users, Building, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -150,7 +146,7 @@ const Authentication: React.FC = () => {
     }
   };
 
-  const SocialButtons = () => (
+  const renderSocialButtons = () => (
     <div className="grid grid-cols-1 gap-2">
       <Button variant="outline" className="w-full" onClick={() => handleOAuth('google')} disabled={isLoading}>
         <GoogleIcon /> Google
@@ -164,24 +160,34 @@ const Authentication: React.FC = () => {
   );
 
 
-  const UserTypeSelector = () => (
-    <div className="space-y-2">
-      <Label>{t('auth.iAm')}</Label>
-      <Select value={userType} onValueChange={(v: 'talent' | 'organization' | 'agent') => setUserType(v)}>
-        <SelectTrigger><SelectValue /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value="talent">
-            <div className="flex items-center gap-2"><Users className="h-4 w-4" /><span>{t('auth.talent')}</span></div>
-          </SelectItem>
-          <SelectItem value="agent">
-            <div className="flex items-center gap-2"><UserCheck className="h-4 w-4" /><span>{t('auth.agent')}</span></div>
-          </SelectItem>
-          <SelectItem value="organization">
-            <div className="flex items-center gap-2"><Building className="h-4 w-4" /><span>{t('auth.organization')}</span></div>
-          </SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+  const userTypes = [
+    { value: 'talent' as const, icon: Users, label: t('auth.talent') },
+    { value: 'agent' as const, icon: UserCheck, label: t('auth.agent') },
+    { value: 'organization' as const, icon: Building, label: t('auth.organization') },
+  ];
+
+  const renderUserTypeSelector = () => (
+    <fieldset className="space-y-2">
+      <legend className="text-sm font-medium mb-2">{t('auth.iAm')}</legend>
+      <div className="grid grid-cols-3 gap-2">
+        {userTypes.map(({ value, icon: Icon, label }) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={userType === value}
+            onClick={() => setUserType(value)}
+            className={`flex flex-col items-center gap-1.5 rounded-lg border px-2 py-3 text-xs font-medium leading-tight text-center transition-colors ${
+              userType === value
+                ? 'border-primary bg-accent text-accent-foreground'
+                : 'border-input bg-card text-muted-foreground hover:text-foreground hover:border-primary/40'
+            }`}
+          >
+            <Icon className="h-5 w-5" />
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
   );
 
   const getNameLabel = () => {
@@ -201,25 +207,52 @@ const Authentication: React.FC = () => {
     }
   };
 
+  const roles = [
+    { icon: Users, title: t('auth.talent'), desc: t('landing.talentsDesc') },
+    { icon: UserCheck, title: t('auth.agent'), desc: t('landing.agentsDesc') },
+    { icon: Building, title: t('auth.organization'), desc: t('landing.orgsDesc') },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/5 to-secondary/5 p-4">
-      <GlassMorphism className="w-full max-w-md p-6">
-        <AnimatedText text={t('auth.title')} tag="h1" className="text-2xl font-bold text-center mb-2" />
-        <p className="text-center text-muted-foreground text-sm mb-6">{t('auth.subtitle')}</p>
-        
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+    <div className="min-h-[calc(100vh-3.5rem)] grid lg:grid-cols-[minmax(0,1fr)_minmax(0,480px)]">
+      <section className="relative overflow-hidden bg-stage text-stage-foreground px-6 py-10 md:px-10 lg:py-16 flex flex-col justify-center">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-48 -left-32 h-[520px] w-[720px] rounded-full opacity-60"
+          style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+        />
+        <div className="relative max-w-md">
+          <img src="/lovable-uploads/b56312bb-24e8-4289-a96d-8651af4ddd7f.png" alt="" className="h-11 w-11 mb-6" />
+          <h1 className="text-3xl md:text-[44px] font-semibold text-white">{t('auth.title')}</h1>
+          <p className="mt-3 text-white/70">{t('auth.subtitle')}</p>
+          <ul className="mt-8 hidden sm:block divide-y divide-white/10 border-y border-white/10">
+            {roles.map(({ icon: Icon, title, desc }) => (
+              <li key={title} className="flex gap-4 py-4">
+                <Icon className="h-5 w-5 mt-0.5 shrink-0 text-white/70" />
+                <div>
+                  <p className="font-semibold text-white">{title}</p>
+                  <p className="text-sm text-white/60">{desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <div className="bg-card px-6 py-8 md:px-10 lg:py-14 flex flex-col justify-center">
+        <Tabs defaultValue="login" className="w-full max-w-sm mx-auto">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
             <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('auth.loginTitle')}</CardTitle>
-                <CardDescription>{t('auth.loginDesc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold">{t('auth.loginTitle')}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t('auth.loginDesc')}</p>
+              </div>
+              <div>
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">{t('auth.email')}</Label>
@@ -243,7 +276,7 @@ const Authentication: React.FC = () => {
                   </Button>
                 </form>
                 {showReset && (
-                  <form onSubmit={handlePasswordReset} className="mt-4 space-y-3 p-3 border rounded-lg bg-muted/40">
+                  <form onSubmit={handlePasswordReset} className="mt-4 space-y-3 p-4 border rounded-lg bg-background">
                     <Label htmlFor="reset-email" className="text-sm font-medium">
                       {t('auth.resetTitle') || 'Réinitialiser le mot de passe'}
                     </Label>
@@ -268,24 +301,23 @@ const Authentication: React.FC = () => {
                     </div>
                   </form>
                 )}
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">{t('common.or')}</span></div>
+                <div className="flex items-center gap-3 my-5 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />{t('common.or')}<span className="h-px flex-1 bg-border" />
                 </div>
-                <SocialButtons />
-              </CardContent>
-            </Card>
+                {renderSocialButtons()}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="register">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('auth.registerTitle')}</CardTitle>
-                <CardDescription>{t('auth.registerDesc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div>
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold">{t('auth.registerTitle')}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{t('auth.registerDesc')}</p>
+              </div>
+              <div>
                 <form onSubmit={handleRegister} className="space-y-4">
-                  <UserTypeSelector />
+                  {renderUserTypeSelector()}
                   <div className="space-y-2">
                     <Label htmlFor="reg-name">{getNameLabel()}</Label>
                     <Input id="reg-name" name="name" placeholder={userType === 'organization' ? t('auth.orgPlaceholder') : t('auth.namePlaceholder')} required />
@@ -306,7 +338,7 @@ const Authentication: React.FC = () => {
                       value={bioText}
                       onChange={(e) => setBioText(e.target.value)}
                       placeholder={t('auth.skillsBioPlaceholder') || 'Describe your skills (e.g. football coach, web developer, jazz singer)'}
-                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className="flex w-full rounded-lg border border-input bg-card px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                   </div>
                   <div className="space-y-2">
@@ -322,16 +354,15 @@ const Authentication: React.FC = () => {
                     {getCreateButtonText()}
                   </Button>
                 </form>
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">{t('common.or')}</span></div>
+                <div className="flex items-center gap-3 my-5 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />{t('common.or')}<span className="h-px flex-1 bg-border" />
                 </div>
-                <SocialButtons />
-              </CardContent>
-            </Card>
+                {renderSocialButtons()}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
-      </GlassMorphism>
+      </div>
     </div>
   );
 };

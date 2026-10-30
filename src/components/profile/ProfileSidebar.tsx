@@ -115,9 +115,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
               <div
                 key={item.key}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 w-full",
+                  "relative flex items-center gap-3 px-2.5 py-2 rounded-lg transition-colors w-full",
                   "hover:bg-muted group",
-                  activeSection === item.key && "bg-primary/10 border-l-2 border-primary shadow-sm"
+                  activeSection === item.key && "bg-accent before:absolute before:-left-2 before:top-2 before:bottom-2 before:w-[3px] before:rounded-r-full before:bg-primary"
                 )}
               >
                 <button
@@ -125,20 +125,14 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                   onClick={() => onSectionChange?.(item.key)}
                   className="flex items-center gap-3 flex-1 min-w-0 text-left"
                 >
-                  <div className={cn(
-                    "p-1.5 rounded-md transition-all duration-200",
-                    item.bgColor,
-                    "group-hover:scale-110"
-                  )}>
-                    <item.icon className={cn("h-4 w-4", item.color)} />
-                  </div>
+                  <item.icon className={cn("h-[18px] w-[18px] shrink-0", activeSection === item.key ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                   <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium block truncate">
+                    <span className={cn("text-sm block truncate", activeSection === item.key ? "font-semibold text-primary" : "font-medium")}>
                       {item.label}
                     </span>
                     <span className={cn(
-                      "text-[10px] font-medium",
-                      isActive ? "text-emerald-600" : "text-muted-foreground"
+                      "text-[11px]",
+                      isActive ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"
                     )}>
                       {isActive ? (t('services.active') || 'active') : (t('services.inactive') || 'inactive')}
                     </span>
@@ -159,16 +153,12 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
           <Link
             to="/talent-dashboard"
             className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all",
-              "bg-gradient-to-r from-primary/10 to-accent/10",
-              "hover:from-primary/20 hover:to-accent/20",
-              "border border-primary/20"
+              "flex items-center gap-3 px-2.5 py-2 rounded-lg transition-colors",
+              "text-primary hover:bg-accent"
             )}
           >
-            <div className="p-1.5 rounded-md bg-primary/20">
-              <LayoutDashboard className="h-4 w-4 text-primary" />
-            </div>
-            <span className="text-sm font-medium text-primary">
+            <LayoutDashboard className="h-[18px] w-[18px]" />
+            <span className="text-sm font-semibold">
               Talent Dashboard
             </span>
           </Link>

@@ -362,12 +362,12 @@ const EventGrid: React.FC<EventGridProps> = ({ events, loading, onJoin, formatDa
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
       {events.map(event => (
-        <div key={event.id} className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-          <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+        <div key={event.id} className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary/40 transition-colors">
+          <div className="h-32 bg-muted flex items-center justify-center">
             {event.image_url ? (
               <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
             ) : (
-              <Calendar className="h-10 w-10 text-primary/30" />
+              <Calendar className="h-10 w-10 text-muted-foreground/40" />
             )}
           </div>
           <div className="p-3">

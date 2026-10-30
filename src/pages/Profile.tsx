@@ -169,21 +169,29 @@ const Profile: React.FC = () => {
       </Button>
 
       <Card className="overflow-hidden mb-6">
-        <div className="h-48 sm:h-60 md:h-72 bg-gradient-to-r from-primary/80 to-primary relative">
-          {displayProfile.cover_photo_url && <img src={displayProfile.cover_photo_url} alt="Cover" className="w-full h-full object-cover" />}
+        <div className="h-44 sm:h-56 md:h-64 bg-stage relative overflow-hidden">
+          {displayProfile.cover_photo_url ? (
+            <img src={displayProfile.cover_photo_url} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div
+              aria-hidden
+              className="absolute -top-40 -left-24 h-[420px] w-[620px] rounded-full opacity-60"
+              style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+            />
+          )}
           {userId && (
-            <div className="absolute top-3 right-3 z-10 rounded-full bg-background/70 backdrop-blur-sm shadow-md">
+            <div className="absolute top-3 right-3 z-10 rounded-full bg-card/80 backdrop-blur-sm">
               <FileUploadButton userId={userId} folder="cover" accept="image/*" label="" size="icon" variant="secondary"
                 onUploaded={async (url) => { await supabase.from('profiles').update({ cover_photo_url: url }).eq('id', userId); setProfile((p: any) => ({ ...p, cover_photo_url: url })); }} />
             </div>
           )}
         </div>
-        <CardContent className="pt-0 relative z-10 bg-sky-50 pb-[5px] pr-[5px] pl-[5px]">
-          <div className="flex flex-col md:flex-row gap-6 md:items-end -mt-16">
+        <CardContent className="relative z-10 px-5 pb-6 pt-0 md:px-7">
+          <div className="flex flex-col md:flex-row gap-5 md:gap-6 md:items-end -mt-14 md:-mt-16">
             <div className="relative flex-shrink-0 z-20">
-              <Avatar className="h-32 w-32 border-4 border-card shadow-lg bg-card">
+              <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-card bg-card">
                 <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
-                <AvatarFallback className="text-3xl">{displayProfile.name?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarFallback className="text-3xl font-display">{displayProfile.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               {userId && (
                 <div className="absolute bottom-0 right-0">
@@ -192,14 +200,14 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="flex-1 pt-4 md:pt-0 md:pb-2 min-w-0">
+            <div className="flex-1 md:pb-1 min-w-0">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <h1 className="text-2xl font-bold">{displayProfile.name}</h1>
+                    <h1 className="text-2xl md:text-3xl font-semibold">{displayProfile.name}</h1>
                     {levelData && <UserLevelBadge levelData={levelData} compact />}
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-2">
                     <Badge variant="outline">{userTypeLabel(displayProfile.user_type)}</Badge>
                     <span className="text-muted-foreground text-sm">{displayProfile.email}</span>
                   </div>
@@ -215,7 +223,7 @@ const Profile: React.FC = () => {
                 {displayProfile.work && (<div className="flex items-center gap-1"><Briefcase className="h-4 w-4" /><span>{displayProfile.work}</span></div>)}
                 {displayProfile.website && (<div className="flex items-center gap-1"><Globe className="h-4 w-4" /><a href={displayProfile.website} className="text-primary hover:underline">{displayProfile.website}</a></div>)}
               </div>
-              {displayProfile.bio && <p className="mt-4 text-sm leading-relaxed">{displayProfile.bio}</p>}
+              {displayProfile.bio && <p className="mt-4 text-[15px] leading-relaxed max-w-prose">{displayProfile.bio}</p>}
               {socialLinks.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {socialLinks.map(link => (
@@ -225,7 +233,7 @@ const Profile: React.FC = () => {
                       onClick={() => navigate(`/social?url=${encodeURIComponent(link.url)}&platform=${encodeURIComponent(link.platform)}`)}
                       title={link.url}
                     >
-                      <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 capitalize">
+                      <Badge variant="secondary" className="cursor-pointer hover:bg-accent hover:text-accent-foreground capitalize">
                         <Globe className="h-3 w-3 mr-1" />{link.platform}
                       </Badge>
                     </button>
@@ -239,7 +247,7 @@ const Profile: React.FC = () => {
       </Card>
 
       {/* What's new — quick post creation */}
-      <div className="mb-4 bg-card rounded-lg shadow-sm p-3 border border-border">
+      <div className="mb-4 bg-card rounded-xl p-3 border border-border">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={displayProfile.avatar_url || displayProfile.avatar} alt={displayProfile.name} />
@@ -319,7 +327,7 @@ const Profile: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-muted-foreground">+{tx.xp_earned} XP</span>
-                        <span className="font-semibold text-yellow-500 flex items-center gap-1">
+                        <span className="font-semibold text-gold flex items-center gap-1 tabular-nums">
                           <Coins className="h-3 w-3" /> +{Number(tx.amount).toFixed(4)}
                         </span>
                         <span className="text-[10px] text-muted-foreground">{new Date(tx.created_at).toLocaleDateString('fr-FR')}</span>

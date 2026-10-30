@@ -51,7 +51,7 @@ const OrganizationView: React.FC<OrganizationViewProps> = ({
                   </div>
                   <div>
                     <h3 className="text-lg font-bold">{talent.name}</h3>
-                    <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <div className="flex items-center text-sm text-muted-foreground mt-1">
                       <MapPin className="h-4 w-4 mr-1" />
                       {talent.location}
                     </div>
@@ -62,22 +62,22 @@ const OrganizationView: React.FC<OrganizationViewProps> = ({
                 </Button>
               </div>
               
-              <p className="mt-3 text-gray-700">{talent.description}</p>
+              <p className="mt-3 text-foreground">{talent.description}</p>
               
               <div className="mt-4 flex flex-wrap gap-2">
                 {talent.skills.map((skill, index) => (
-                  <Badge key={index} variant="outline" className="bg-purple-50">
+                  <Badge key={index} variant="outline" className="bg-accent">
                     {skill}
                   </Badge>
                 ))}
               </div>
               
               <div className="mt-4 flex flex-wrap gap-2">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
                   Experience: {talent.experience}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1" />
                   {talent.availability}
                 </div>
@@ -99,9 +99,9 @@ const OrganizationView: React.FC<OrganizationViewProps> = ({
       
       <TabsContent value="posted" className="space-y-4">
         <div className="text-center py-8">
-          <Building className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+          <Building className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
           <h3 className="text-xl font-bold mb-2">No Opportunities Posted Yet</h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-muted-foreground mb-4">
             Share your first opportunity to connect with talented individuals!
           </p>
           <Button>

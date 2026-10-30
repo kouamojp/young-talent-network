@@ -74,14 +74,6 @@ const FeedPage: React.FC = () => {
 
   const userType = currentUser?.user_type || 'talent';
 
-  const getHeaderGradient = () => {
-    switch (userType) {
-      case 'agent': return 'from-violet-600 via-purple-600 to-indigo-600';
-      case 'organization': return 'from-teal-600 via-emerald-600 to-green-600';
-      default: return 'from-blue-600 via-sky-600 to-cyan-600';
-    }
-  };
-
   const getSubtitle = () => {
     switch (userType) {
       case 'agent': return t('feed.agentSubtitle');
@@ -97,54 +89,57 @@ const FeedPage: React.FC = () => {
           { icon: Users, label: t('landing.talents'), value: suggestedTalents.length },
           { icon: Briefcase, label: t('feed.contracts'), value: 0 },
           { icon: Building2, label: t('landing.organizations'), value: suggestedOrgs.length },
-          { icon: Star, label: t('feed.reputation'), value: currentUser?.platform_rating || 0 },
+          { icon: Star, label: t('feed.reputation'), value: currentUser?.platform_rating || 0, score: true },
         ];
       case 'organization':
         return [
           { icon: Users, label: t('feed.members'), value: suggestedTalents.length },
           { icon: Briefcase, label: t('feed.offers'), value: 0 },
           { icon: TrendingUp, label: t('feed.applications'), value: 0 },
-          { icon: Star, label: t('feed.score'), value: currentUser?.platform_rating || 0 },
+          { icon: Star, label: t('feed.score'), value: currentUser?.platform_rating || 0, score: true },
         ];
       default:
         return [
           { icon: TrendingUp, label: t('feed.posts'), value: posts.length },
           { icon: Users, label: t('feed.connections'), value: suggestedTalents.length },
           { icon: Building2, label: t('landing.organizations'), value: suggestedOrgs.length },
-          { icon: Star, label: t('feed.yatScore'), value: currentUser?.platform_rating || 0 },
+          { icon: Star, label: t('feed.yatScore'), value: currentUser?.platform_rating || 0, score: true },
         ];
     }
   };
 
   return (
     <div className="w-full min-h-screen">
-      <div className={`bg-gradient-to-r ${getHeaderGradient()} text-white`}>
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-white/30"><AvatarImage src={currentUser?.avatar_url} /><AvatarFallback className="bg-white/20 text-white text-xl">{currentUser?.name?.[0] || 'U'}</AvatarFallback></Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">{t('feed.welcome', { name: currentUser?.name || 'User' })}</h1>
-                <Badge className="bg-white/20 text-white border-0 text-xs">{getUserTypeLabel(userType)}</Badge>
-              </div>
-              <p className="text-white/80 text-sm">{getSubtitle()}</p>
+      <section className="relative overflow-hidden bg-stage text-stage-foreground">
+        {/* Spotlight on the talent */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-40 -left-24 h-[420px] w-[620px] rounded-full opacity-60"
+          style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
+        />
+        <div className="relative max-w-5xl mx-auto px-4 pt-8 md:pt-10">
+          <div className="flex items-center gap-4 md:gap-5">
+            <Avatar className="h-14 w-14 md:h-[72px] md:w-[72px] ring-2 ring-white/15 ring-offset-2 ring-offset-stage"><AvatarImage src={currentUser?.avatar_url} /><AvatarFallback className="bg-white/10 text-white text-xl font-display">{currentUser?.name?.[0] || 'U'}</AvatarFallback></Avatar>
+            <div className="min-w-0">
+              <span className="inline-flex items-center rounded-full border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/80">{getUserTypeLabel(userType)}</span>
+              <h1 className="mt-2 text-2xl md:text-[34px] font-semibold text-white truncate">{t('feed.welcome', { name: currentUser?.name || 'User' })}</h1>
+              <p className="mt-1 text-sm text-white/65 max-w-xl">{getSubtitle()}</p>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-3 mt-6">
-            {getStats().map((stat) => (
-              <div key={stat.label} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                <stat.icon className="h-5 w-5 mx-auto mb-1 text-white/80" />
-                <div className="text-lg font-bold">{stat.value}</div>
-                <div className="text-xs text-white/70">{stat.label}</div>
+          <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 border-t border-white/10">
+            {getStats().map((stat, i) => (
+              <div key={stat.label} className={`py-4 sm:py-5 ${i % 2 === 1 ? 'pl-4 border-l border-white/10' : ''} ${i >= 1 ? 'sm:pl-5 sm:border-l sm:border-white/10' : ''} ${i >= 2 ? 'border-t border-white/10 sm:border-t-0' : ''}`}>
+                <dt className="text-xs text-white/60">{stat.label}</dt>
+                <dd className={`mt-1 font-display text-3xl md:text-4xl font-semibold tabular-nums leading-none ${'score' in stat && stat.score ? 'text-gold' : 'text-white'}`}>{stat.value}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
-      </div>
+      </section>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
         <Tabs defaultValue="feed" className="w-full">
-          <TabsList className="w-full justify-start mb-6 bg-muted/50">
+          <TabsList className="justify-start mb-6 bg-card border border-border">
             <TabsTrigger value="feed">{t('feed.myFeed')}</TabsTrigger>
             <TabsTrigger value="discover">{t('feed.discover')}</TabsTrigger>
             <TabsTrigger value="organizations">{t('feed.organizations')}</TabsTrigger>
@@ -153,7 +148,7 @@ const FeedPage: React.FC = () => {
           <TabsContent value="feed">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
-                <Card className="border-border/50">
+                <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10"><AvatarImage src={currentUser?.avatar_url} /><AvatarFallback>{currentUser?.name?.[0] || 'U'}</AvatarFallback></Avatar>
@@ -210,14 +205,14 @@ const FeedPage: React.FC = () => {
                 <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-sm flex items-center gap-2"><Building2 className="h-4 w-4 text-teal-500" />{t('feed.organizations')}</h3>
+                      <h3 className="font-semibold text-sm flex items-center gap-2"><Building2 className="h-4 w-4 text-primary" />{t('feed.organizations')}</h3>
                       <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate('/organizations')}>{t('common.seeAll')}</Button>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {suggestedOrgs.map((org) => (
                       <div key={org.id} className="flex items-center gap-3 cursor-pointer hover:bg-muted/50 rounded-lg p-1.5 -mx-1.5 transition-colors" onClick={() => navigate(`/organization/${org.id}`)}>
-                        <Avatar className="h-9 w-9"><AvatarImage src={org.logo_url || ''} /><AvatarFallback className="text-xs bg-teal-100 text-teal-700">{org.company_name[0]}</AvatarFallback></Avatar>
+                        <Avatar className="h-9 w-9"><AvatarImage src={org.logo_url || ''} /><AvatarFallback className="text-xs bg-accent text-accent-foreground">{org.company_name[0]}</AvatarFallback></Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{org.company_name}</p>
                           <p className="text-[11px] text-muted-foreground truncate">{org.industry || org.headquarters || t('profile.organization')}</p>
@@ -228,7 +223,7 @@ const FeedPage: React.FC = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <Card>
                   <CardContent className="p-4 space-y-2">
                     <h3 className="font-semibold text-sm flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" />{t('feed.quickActions')}</h3>
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/work')}><Briefcase className="h-3.5 w-3.5 mr-2" /> {t('feed.searchOpportunities')}</Button>
@@ -263,7 +258,7 @@ const FeedPage: React.FC = () => {
               {suggestedOrgs.map((org) => (
                 <Card key={org.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/organization/${org.id}`)}>
                   <CardContent className="p-4 flex items-center gap-4">
-                    <Avatar className="h-14 w-14"><AvatarImage src={org.logo_url || ''} /><AvatarFallback className="bg-teal-100 text-teal-700">{org.company_name[0]}</AvatarFallback></Avatar>
+                    <Avatar className="h-14 w-14"><AvatarImage src={org.logo_url || ''} /><AvatarFallback className="bg-accent text-accent-foreground">{org.company_name[0]}</AvatarFallback></Avatar>
                     <div className="flex-1">
                       <h4 className="font-semibold">{org.company_name}</h4>
                       <p className="text-sm text-muted-foreground">{org.industry || t('profile.organization')}</p>

@@ -32,7 +32,7 @@ export const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ levelData, compa
             <p className="text-xs text-muted-foreground">Level {levelData.level}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 text-sm font-semibold text-yellow-500">
+        <div className="flex items-center gap-1 text-sm font-semibold text-gold tabular-nums">
           <Coins className="h-4 w-4" />
           <span>{levelData.yat_coins.toFixed(4)}</span>
         </div>

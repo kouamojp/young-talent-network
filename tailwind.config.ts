@@ -53,6 +53,14 @@ export default {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))'
 				},
+				gold: {
+					DEFAULT: 'hsl(var(--gold))',
+					foreground: 'hsl(var(--gold-foreground))'
+				},
+				stage: {
+					DEFAULT: 'hsl(var(--stage))',
+					foreground: 'hsl(var(--stage-foreground))'
+				},
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
@@ -113,17 +121,18 @@ export default {
 				'blur-in': 'blur-in 0.7s ease-out forwards'
 			},
 			boxShadow: {
-				'soft': '0 4px 15px rgba(0, 0, 0, 0.05)',
-				'glass': '0 8px 32px rgba(0, 0, 0, 0.08)',
-				'hover': '0 10px 40px rgba(0, 0, 0, 0.1)'
+				'soft': '0 1px 0 hsl(var(--border))',
+				'glass': '0 12px 32px -12px hsl(222 60% 18% / 0.25)',
+				'hover': '0 12px 32px -12px hsl(222 60% 18% / 0.25)'
 			},
 			transitionTimingFunction: {
 				'apple': 'cubic-bezier(0.22, 1, 0.36, 1)'
 			},
 			fontFamily: {
-				'sans': ['SF Pro Display', 'system-ui', 'sans-serif'],
-				'serif': ['New York', 'Georgia', 'serif'],
-				'mono': ['SF Mono', 'monospace']
+				'sans': ['Onest', 'system-ui', 'sans-serif'],
+				'display': ['Unbounded', 'Onest', 'system-ui', 'sans-serif'],
+				'serif': ['Georgia', 'serif'],
+				'mono': ['ui-monospace', 'SFMono-Regular', 'monospace']
 			}
 		}
 	},

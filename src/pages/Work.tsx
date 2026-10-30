@@ -47,8 +47,8 @@ const Work: React.FC = () => {
   // Detail views
   if (path === 'talent' || path === 'organization') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50">
-        <main className="container mx-auto px-4 py-12">
+      <div className="min-h-screen">
+        <main className="max-w-5xl mx-auto px-4 py-6">
           <GlassMorphism className="p-6 mb-6">
             <SearchHeader
               path={path}
@@ -104,14 +104,14 @@ const Work: React.FC = () => {
 
   // Hub overview
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50">
-      <main className="container mx-auto px-4 py-12">
+    <div className="min-h-screen">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         <GlassMorphism className="p-6">
           <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <Briefcase className="h-8 w-8 text-blue-600" />
+              <Briefcase className="h-8 w-8 text-primary" />
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-semibold">
                   {t('work.title') || 'YAT Work'}
                 </h1>
                 <p className="text-muted-foreground">{t('work.subtitle')}</p>
@@ -127,23 +127,18 @@ const Work: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <dl className="grid grid-cols-2 md:grid-cols-4 mb-8 border-y border-border">
             {stats.map((s, i) => (
-              <Card key={i} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{s.label}</p>
-                    <p className="text-2xl font-bold">{s.value}</p>
-                    <div className="flex items-center gap-1 text-emerald-600">
-                      <ArrowUpRight className="h-3 w-3" />
-                      <span className="text-xs">{s.change}</span>
-                    </div>
-                  </div>
-                  <s.icon className="h-8 w-8 text-blue-600" />
-                </div>
-              </Card>
+              <div key={i} className={`py-4 ${i % 2 === 1 ? 'pl-4 border-l border-border' : ''} ${i >= 1 ? 'md:pl-5 md:border-l md:border-border' : ''} ${i >= 2 ? 'border-t border-border md:border-t-0' : ''}`}>
+                <dt className="text-sm text-muted-foreground">{s.label}</dt>
+                <dd className="mt-1 font-display text-2xl md:text-3xl font-semibold tabular-nums leading-none">{s.value}</dd>
+                <dd className="mt-1.5 flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                  <ArrowUpRight className="h-3 w-3" />
+                  <span className="text-xs tabular-nums">{s.change}</span>
+                </dd>
+              </div>
             ))}
-          </div>
+          </dl>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3">
@@ -160,12 +155,12 @@ const Work: React.FC = () => {
             <TabsContent value="opportunities" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card
-                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  className="p-6 hover:border-primary/40 transition-colors cursor-pointer"
                   onClick={() => setSearchParams({ path: 'talent' })}
                 >
                   <div className="text-center">
-                    <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
-                      <Target className="h-12 w-12 text-blue-600" />
+                    <div className="inline-flex p-4 bg-accent rounded-full mb-4">
+                      <Target className="h-10 w-10 text-primary" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">{t('work.dreamStage')}</h3>
                     <p className="text-muted-foreground mb-4">{t('work.dreamStageDesc')}</p>
@@ -173,12 +168,12 @@ const Work: React.FC = () => {
                   </div>
                 </Card>
                 <Card
-                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  className="p-6 hover:border-primary/40 transition-colors cursor-pointer"
                   onClick={() => setSearchParams({ path: 'organization' })}
                 >
                   <div className="text-center">
-                    <div className="inline-block p-4 bg-pink-100 rounded-full mb-4">
-                      <Sparkles className="h-12 w-12 text-pink-600" />
+                    <div className="inline-flex p-4 bg-muted rounded-full mb-4">
+                      <Sparkles className="h-10 w-10 text-foreground" />
                     </div>
                     <h3 className="text-xl font-bold mb-2">{t('work.dreamTeam')}</h3>
                     <p className="text-muted-foreground mb-4">{t('work.dreamTeamDesc')}</p>

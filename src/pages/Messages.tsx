@@ -223,14 +223,14 @@ const Messages: React.FC = () => {
             const lastMessage = conversation.messages[0];
             const unreadCount = conversation.messages.filter(m => !m.read && m.sender_id !== currentUserId).length;
             return (
-              <div key={conversation.id} onClick={() => selectConversation(conversation.id)} className={`p-3 cursor-pointer transition-colors flex items-center gap-3 ${activeConversationId === conversation.id ? 'bg-muted' : 'hover:bg-muted/50'}`}>
+              <div key={conversation.id} onClick={() => selectConversation(conversation.id)} className={`p-3 cursor-pointer transition-colors flex items-center gap-3 ${activeConversationId === conversation.id ? 'bg-accent' : 'hover:bg-muted'}`}>
                 <div className="relative">
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={display.avatar || '/placeholder.svg'} />
                     <AvatarFallback>{conversation.is_group ? <Users className="h-5 w-5" /> : display.name[0]}</AvatarFallback>
                   </Avatar>
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold">{unreadCount}</span>
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full min-w-5 h-5 px-1 flex items-center justify-center font-bold tabular-nums ring-2 ring-card">{unreadCount}</span>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -241,7 +241,7 @@ const Messages: React.FC = () => {
                     </h3>
                     <span className="text-[10px] text-muted-foreground">{lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
                   </div>
-                  <p className={`text-xs truncate ${unreadCount > 0 ? 'text-blue-500 font-semibold' : 'text-muted-foreground'}`}>
+                  <p className={`text-xs truncate ${unreadCount > 0 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
                     {lastMessage?.media_url ? '📎 ' : ''}{lastMessage?.content || t('messages.noMessages')}
                   </p>
                 </div>
@@ -293,8 +293,9 @@ const Messages: React.FC = () => {
               {activeConversation.messages.slice().reverse().map((message) => {
                 const isOwn = message.sender_id === currentUserId;
                 const bubbleColor = isOwn
-                  ? (message.read ? 'bg-green-500 text-white' : 'bg-blue-500 text-white')
-                  : (message.read ? 'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-100' : 'bg-blue-100 text-blue-900 dark:bg-blue-900/40 dark:text-blue-100');
+                  ? 'bg-primary text-primary-foreground'
+                  // Reçu non lu : teinte bleutée ; une fois lu, bulle neutre
+                  : (message.read ? 'bg-muted text-foreground' : 'bg-accent text-foreground ring-1 ring-primary/25');
                 return (
                   <div key={message.id} className={`flex group ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${bubbleColor} ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} ${message.pending ? 'opacity-70' : ''}`}>

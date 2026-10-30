@@ -150,7 +150,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                     <FormLabel>Location</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                        <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input className="pl-8" placeholder="e.g. New York, NY" {...field} />
                       </div>
                     </FormControl>
@@ -167,7 +167,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                     <FormLabel>Job Type</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                        <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input className="pl-8" placeholder="e.g. Full-time, Part-time" {...field} />
                       </div>
                     </FormControl>
@@ -236,7 +236,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                     <FormLabel>Application Deadline (Optional)</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                        <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input 
                           className="pl-8" 
                           placeholder="e.g. 2023-12-31" 

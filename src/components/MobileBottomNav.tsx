@@ -29,12 +29,15 @@ const MobileBottomNav: React.FC = () => {
             <Link
               key={path}
               to={path}
-              className={`flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors ${
-                isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+              aria-current={isActive ? 'page' : undefined}
+              className={`relative flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors ${
+                isActive
+                  ? 'text-primary before:absolute before:top-0 before:h-[3px] before:w-8 before:rounded-b-full before:bg-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[10px] font-medium leading-none">{label}</span>
+              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.25 : 1.75} />
+              <span className={`text-[10.5px] leading-none ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
             </Link>
           );
         })}

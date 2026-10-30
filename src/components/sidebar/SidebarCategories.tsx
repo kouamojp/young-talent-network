@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Tag, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useYatCategories } from '@/hooks/useYatCategories';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Separator } from '@/components/ui/separator';
@@ -14,8 +14,8 @@ const SidebarCategories: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }
 
   return (
     <div>
-      <Separator className="mb-2.5" />
-      <p className="px-2.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
+      <Separator className="mb-3" />
+      <p className="px-2 text-xs font-semibold text-muted-foreground mb-1">
         {t('categories.title') || 'Categories'}
       </p>
       <div className="space-y-0.5">
@@ -24,23 +24,23 @@ const SidebarCategories: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }
             key={cat.id}
             to={`/yat-database?category=${cat.slug}`}
             onClick={onNavigate}
-            className="flex items-center gap-3 px-2.5 py-1.5 rounded-lg hover:bg-muted/80 transition-all"
+            className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
           >
-            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-muted">
-              <Tag className="h-4 w-4" style={{ color: cat.color || undefined }} />
+            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+              <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground" style={{ backgroundColor: cat.color || undefined }} />
             </div>
-            <span className="text-[13px] font-medium truncate flex-1">{getCategoryName(cat)}</span>
+            <span className="text-[13.5px] font-medium truncate flex-1">{getCategoryName(cat)}</span>
           </Link>
         ))}
         <Link
           to="/categories"
           onClick={onNavigate}
-          className="flex items-center gap-3 px-2.5 py-1.5 rounded-lg hover:bg-muted/80 transition-all text-primary"
+          className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors text-primary"
         >
-          <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-primary/10">
-            <ChevronRight className="h-4 w-4" />
+          <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+            <ChevronRight className="h-[18px] w-[18px]" />
           </div>
-          <span className="text-[13px] font-medium">{t('categories.viewAll') || 'All categories'}</span>
+          <span className="text-[13.5px] font-semibold">{t('categories.viewAll') || 'All categories'}</span>
         </Link>
       </div>
     </div>

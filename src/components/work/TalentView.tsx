@@ -65,7 +65,7 @@ const TalentView: React.FC<TalentViewProps> = ({
                       </Badge>
                     )}
                   </div>
-                  <p className="text-gray-600">{job.company}</p>
+                  <p className="text-muted-foreground">{job.company}</p>
                 </div>
                 <Button variant="ghost" size="icon">
                   <Bookmark className="h-5 w-5" />
@@ -73,25 +73,25 @@ const TalentView: React.FC<TalentViewProps> = ({
               </div>
               
               <div className="flex flex-wrap gap-2 mt-3">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4 mr-1" />
                   {job.location}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
                   {job.type}
                 </div>
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1" />
                   {job.postedDate}
                 </div>
               </div>
               
-              <p className="mt-3 text-gray-700">{job.description}</p>
+              <p className="mt-3 text-foreground">{job.description}</p>
               
               <div className="mt-4 flex flex-wrap gap-2">
                 {job.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="bg-gray-100">
+                  <Badge key={index} variant="outline" className="bg-muted">
                     {tag}
                   </Badge>
                 ))}
@@ -122,20 +122,20 @@ const TalentView: React.FC<TalentViewProps> = ({
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-bold">{scholarship.title}</h3>
-                  <p className="text-gray-600">{scholarship.organization}</p>
+                  <p className="text-muted-foreground">{scholarship.organization}</p>
                 </div>
                 <div className="text-lg font-bold text-primary">{scholarship.amount}</div>
               </div>
               
-              <p className="mt-3 text-gray-700">{scholarship.description}</p>
+              <p className="mt-3 text-foreground">{scholarship.description}</p>
               
-              <div className="mt-4 bg-blue-50 p-3 rounded-lg">
+              <div className="mt-4 bg-accent p-3 rounded-lg">
                 <div className="font-medium mb-1">Requirements</div>
-                <p className="text-sm text-gray-600">{scholarship.requirements}</p>
+                <p className="text-sm text-muted-foreground">{scholarship.requirements}</p>
               </div>
               
               <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Clock className="h-4 w-4 mr-1" />
                   Deadline: {scholarship.deadline}
                 </div>
@@ -166,19 +166,19 @@ const TalentView: React.FC<TalentViewProps> = ({
                 </Button>
               </div>
               
-              <p className="mt-3 text-gray-700">{mentorship.description}</p>
+              <p className="mt-3 text-foreground">{mentorship.description}</p>
               
               <div className="mt-4 flex flex-wrap gap-4">
-                <div className="bg-gray-100 px-3 py-2 rounded-lg text-sm">
+                <div className="bg-muted px-3 py-2 rounded-lg text-sm">
                   <span className="font-medium">Duration:</span> {mentorship.duration}
                 </div>
-                <div className="bg-gray-100 px-3 py-2 rounded-lg text-sm">
+                <div className="bg-muted px-3 py-2 rounded-lg text-sm">
                   <span className="font-medium">Time Commitment:</span> {mentorship.commitment}
                 </div>
               </div>
               
               <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1" />
                   Apply by: {mentorship.applicationDeadline}
                 </div>
