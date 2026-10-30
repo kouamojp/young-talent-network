@@ -1,161 +1,107 @@
-
-import React, { useState } from 'react';
-import Navbar from '@/components/Navbar';
-import GlassMorphism from '@/components/GlassMorphism';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, MapPin, Search, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Award, Star, Filter, MapPin } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Person {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+  city: string | null;
+  country: string | null;
+  sport_type: string | null;
+  professional_title: string | null;
+  platform_rating: number | null;
+  user_type: string | null;
+}
+
+const PeopleList: React.FC<{ people: Person[]; onOpen: (p: Person) => void }> = ({ people, onOpen }) => {
+  if (people.length === 0) {
+    return <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Personne ne correspond à cette recherche.</p>;
+  }
+  return (
+    <ul className="rounded-xl border border-border bg-card divide-y divide-border">
+      {people.map(p => {
+        const place = [p.city, p.country].filter(Boolean).join(', ');
+        const role = p.professional_title || p.sport_type;
+        return (
+          <li key={p.id}>
+            <button type="button" onClick={() => onOpen(p)} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/60 transition-colors">
+              <Avatar className="h-11 w-11 shrink-0">
+                <AvatarImage src={p.avatar_url || ''} />
+                <AvatarFallback>{p.name?.charAt(0) || '?'}</AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{p.name || 'Sans nom'}</span>
+                <span className="flex flex-wrap gap-x-3 text-sm text-muted-foreground">
+                  {role && <span className="truncate">{role}</span>}
+                  {place && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{place}</span></span>}
+                </span>
+              </span>
+              {!!p.platform_rating && (
+                <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold tabular-nums">
+                  <Star className="h-4 w-4 fill-gold text-gold" />{Number(p.platform_rating).toFixed(1)}
+                </span>
+              )}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 
 const Participants: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const participants = [
-    { id: 1, name: 'Emma Thompson', location: 'New York, USA', type: 'Musician', avatar: '/placeholder.svg', rating: 4.8, featured: true },
-    { id: 2, name: 'Daniel Lee', location: 'Los Angeles, USA', type: 'Actor', avatar: '/placeholder.svg', rating: 4.7, featured: false },
-    { id: 3, name: 'Sofia Garcia', location: 'Miami, USA', type: 'Dancer', avatar: '/placeholder.svg', rating: 4.9, featured: true },
-    { id: 4, name: 'Alex Kim', location: 'Chicago, USA', type: 'Visual Artist', avatar: '/placeholder.svg', rating: 4.6, featured: false },
-    { id: 5, name: 'Jessica Wu', location: 'Boston, USA', type: 'Writer', avatar: '/placeholder.svg', rating: 4.5, featured: false },
-    { id: 6, name: 'Michael Johnson', location: 'Austin, USA', type: 'Filmmaker', avatar: '/placeholder.svg', rating: 4.8, featured: true },
-  ];
-  
-  const mentors = [
-    { id: 1, name: 'Dr. Robert Williams', specialization: 'Music Production', avatar: '/placeholder.svg', rating: 4.9, experience: '15+ years' },
-    { id: 2, name: 'Sarah Chen', specialization: 'Acting Coach', avatar: '/placeholder.svg', rating: 4.8, experience: '12+ years' },
-    { id: 3, name: 'James Taylor', specialization: 'Dance Instructor', avatar: '/placeholder.svg', rating: 4.7, experience: '10+ years' },
-  ];
+  const [people, setPeople] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('id, name, avatar_url, city, country, sport_type, professional_title, platform_rating, user_type')
+      .in('user_type', ['talent', 'agent'])
+      .order('platform_rating', { ascending: false, nullsFirst: false })
+      .limit(200)
+      .then(({ data }) => {
+        setPeople((data as Person[] | null) ?? []);
+        setLoading(false);
+      });
+  }, []);
+
+  const query = searchTerm.toLowerCase();
+  const matches = (p: Person) =>
+    [p.name, p.city, p.country, p.sport_type, p.professional_title].some(v => v?.toLowerCase().includes(query));
+  const talents = people.filter(p => p.user_type === 'talent' && matches(p));
+  const agents = people.filter(p => p.user_type === 'agent' && matches(p));
+  const open = (p: Person) => navigate(p.user_type === 'agent' ? `/agent/${p.id}` : `/talent/${p.id}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-purple-50 to-blue-50">
-      <Navbar />
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Discover Talented People</h1>
-          
-          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1">
-                <Input 
-                  placeholder="Search by name, skill or location..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-white border-gray-200"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" className="bg-white hover:bg-gray-50">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-                </Button>
-                <Button variant="outline" className="bg-white hover:bg-gray-50">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  Location
-                </Button>
-              </div>
-            </div>
-            
-            <Tabs defaultValue="participants" className="w-full">
-              <TabsList className="mb-6 w-full bg-gray-100/50 p-1 rounded-lg">
-                <TabsTrigger value="participants" className="flex-1 data-[state=active]:bg-white rounded-md">
-                  <Users className="h-4 w-4 mr-2" />
-                  Participants
-                </TabsTrigger>
-                <TabsTrigger value="mentors" className="flex-1 data-[state=active]:bg-white rounded-md">
-                  <Award className="h-4 w-4 mr-2" />
-                  Mentors
-                </TabsTrigger>
-                <TabsTrigger value="featured" className="flex-1 data-[state=active]:bg-white rounded-md">
-                  <Star className="h-4 w-4 mr-2" />
-                  Featured
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="participants" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {participants.map(participant => (
-                    <div 
-                      key={participant.id} 
-                      className="bg-white rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow border border-gray-100"
-                    >
-                      <div className="flex items-start gap-4">
-                        <Avatar className="h-16 w-16 border-2 border-white shadow-sm">
-                          <AvatarImage src={participant.avatar} alt={participant.name} />
-                          <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="font-semibold text-lg">{participant.name}</h3>
-                          <p className="text-sm text-primary/80 font-medium">{participant.type}</p>
-                          <div className="flex items-center text-xs mt-1 text-gray-600">
-                            <MapPin className="h-3 w-3 mr-1" />
-                            <span>{participant.location}</span>
-                          </div>
-                          <div className="flex items-center mt-2">
-                            <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                            <span className="text-sm">{participant.rating}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="mentors" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {mentors.map(mentor => (
-                    <div 
-                      key={mentor.id} 
-                      className="bg-white rounded-lg p-6 hover:shadow-md transition-shadow text-center border border-gray-100 shadow-sm"
-                    >
-                      <Avatar className="h-20 w-20 mx-auto mb-4 border-4 border-white shadow">
-                        <AvatarImage src={mentor.avatar} alt={mentor.name} />
-                        <AvatarFallback>{mentor.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <h3 className="font-semibold text-lg">{mentor.name}</h3>
-                      <p className="text-primary font-medium text-sm">{mentor.specialization}</p>
-                      <div className="flex items-center justify-center mt-2 mb-1">
-                        <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                        <span>{mentor.rating}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-4">{mentor.experience}</p>
-                      <Button className="w-full" size="sm">View Profile</Button>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="featured" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {participants
-                    .filter(p => p.featured)
-                    .map(participant => (
-                      <div 
-                        key={participant.id} 
-                        className="bg-gradient-to-br from-white to-blue-50 rounded-lg p-6 hover:shadow-lg transition-shadow text-center relative overflow-hidden border border-blue-100 shadow-sm"
-                      >
-                        <div className="absolute top-3 right-3">
-                          <span className="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full font-medium">Featured</span>
-                        </div>
-                        <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-white shadow">
-                          <AvatarImage src={participant.avatar} alt={participant.name} />
-                          <AvatarFallback>{participant.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <h3 className="font-semibold text-lg">{participant.name}</h3>
-                        <p className="text-primary font-medium">{participant.type}</p>
-                        <div className="flex items-center justify-center mt-2 mb-1">
-                          <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                          <span>{participant.rating}</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-4">{participant.location}</p>
-                        <Button className="w-full bg-primary/90 hover:bg-primary" size="sm">View Profile</Button>
-                      </div>
-                    ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+    <div className="min-h-screen">
+      <main className="max-w-3xl mx-auto px-4 py-6 md:py-8">
+        <h1 className="text-2xl md:text-3xl font-semibold mb-6">Participants</h1>
+
+        <div className="relative mb-6">
+          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input className="pl-10" placeholder="Rechercher par nom, discipline ou ville" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
+
+        {loading ? (
+          <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+        ) : (
+          <Tabs defaultValue="talents">
+            <TabsList className="mb-4">
+              <TabsTrigger value="talents">Talents ({talents.length})</TabsTrigger>
+              <TabsTrigger value="agents">Agents ({agents.length})</TabsTrigger>
+            </TabsList>
+            <TabsContent value="talents"><PeopleList people={talents} onOpen={open} /></TabsContent>
+            <TabsContent value="agents"><PeopleList people={agents} onOpen={open} /></TabsContent>
+          </Tabs>
+        )}
       </main>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Newspaper, TrendingUp, Search, Eye, Heart, MessageSquare, Share2, BookOpen, Star, Clock, User, Flame, Image as ImageIcon, Play } from 'lucide-react';
+import { Newspaper, TrendingUp, Search, Heart, MessageSquare, Share2, BookOpen, Star, Clock, User, Flame, Image as ImageIcon, Play } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,13 +12,6 @@ import { ChevronRight } from 'lucide-react';
 
 const newsCategories = ['All', 'Sports', 'Arts', 'Music', 'Technology', 'Business', 'Entertainment', 'Education', 'Community'];
 
-const trendingTopics = [
-  { tag: '#TalentShowcase', posts: 1240 },
-  { tag: '#YATCommunity', posts: 890 },
-  { tag: '#SportsNews', posts: 756 },
-  { tag: '#NewOpportunities', posts: 623 },
-  { tag: '#SuccessStories', posts: 512 },
-];
 
 const News: React.FC = () => {
   const { t } = useLanguage();
@@ -39,9 +32,19 @@ const News: React.FC = () => {
   const filteredPosts = posts.filter(post => !searchQuery || post.content?.toLowerCase().includes(searchQuery.toLowerCase()));
   const popularPosts = [...filteredPosts].sort((a, b) => (b.likes_count || 0) - (a.likes_count || 0));
 
+  // Hashtags les plus fréquents dans les publications chargées
+  const tagCounts = new Map<string, number>();
+  posts.forEach((post) => {
+    const tags = new Set<string>((post.content?.match(/#[\p{L}\p{N}_]+/gu) ?? []).map((tag: string) => tag.toLowerCase()));
+    tags.forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1));
+  });
+  const trendingTopics = [...tagCounts.entries()]
+    .sort((x, y) => y[1] - x[1])
+    .slice(0, 5)
+    .map(([tag, count]) => ({ tag, posts: count }));
+
   const stats = [
     { icon: Newspaper, label: t('news.articles'), value: posts.length.toString(), color: 'text-blue-500' },
-    { icon: Eye, label: t('news.viewsToday'), value: '12.4K', color: 'text-emerald-500' },
     { icon: TrendingUp, label: t('news.trending'), value: trendingTopics.length.toString(), color: 'text-orange-500' },
     { icon: Star, label: t('news.featured'), value: Math.min(3, posts.length).toString(), color: 'text-amber-500' },
   ];
@@ -173,6 +176,9 @@ const News: React.FC = () => {
               <Card className="p-4">
                 <h3 className="font-semibold flex items-center gap-2 mb-3"><TrendingUp className="h-4 w-4 text-orange-500" /> {t('news.trendingTopics')}</h3>
                 <div className="space-y-3">
+                  {trendingTopics.length === 0 && (
+                    <p className="text-sm text-muted-foreground">Aucun hashtag dans les publications récentes.</p>
+                  )}
                   {trendingTopics.map((topic, i) => (
                     <div key={i} className="flex items-center justify-between group cursor-pointer hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors">
                       <div><p className="text-sm font-medium text-primary">{topic.tag}</p><p className="text-xs text-muted-foreground">{topic.posts.toLocaleString()} {t('news.posts')}</p></div>

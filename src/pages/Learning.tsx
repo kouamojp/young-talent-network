@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { GraduationCap, Brain, Palette, BookOpen, Globe, MapPin, Users, TrendingUp, ArrowUpRight } from 'lucide-react';
+import { GraduationCap, Brain, Palette, BookOpen, Globe, MapPin, Users } from 'lucide-react';
+import { usePlatformCounts, formatCount } from '@/hooks/usePlatformCounts';
 import GlassMorphism from '@/components/GlassMorphism';
 import LearningExplore from '@/components/learning/LearningExplore';
 import LearningCreate from '@/components/learning/LearningCreate';
@@ -18,11 +19,11 @@ const Learning: React.FC = () => {
 
   const handleBack = () => { setSearchParams({}); setActiveTab('overview'); };
 
+  const counts = usePlatformCounts();
   const stats = [
-    { label: t('learning.availableCourses'), value: '340+', icon: BookOpen, change: '+24' },
-    { label: t('learning.activeLearners'), value: '2,150', icon: Users, change: '+180' },
-    { label: t('learning.instructors'), value: '87', icon: GraduationCap, change: '+12' },
-    { label: t('learning.successRate'), value: '94%', icon: TrendingUp, change: '+3.2%' },
+    { label: t('learning.availableCourses'), value: formatCount(counts?.courses), icon: BookOpen },
+    { label: t('learning.activeLearners'), value: formatCount(counts?.learners), icon: Users },
+    { label: t('learning.instructors'), value: formatCount(counts?.instructors), icon: GraduationCap },
   ];
 
   const learningModes = [
@@ -62,16 +63,13 @@ const Learning: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {stats.map((stat, index) => (
               <Card key={index} className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <div className="flex items-center gap-1 text-emerald-600">
-                      <ArrowUpRight className="h-3 w-3" /><span className="text-xs">{stat.change}</span>
-                    </div>
+                    <p className="text-2xl font-bold tabular-nums">{stat.value}</p>
                   </div>
                   <stat.icon className="h-8 w-8 text-violet-600" />
                 </div>

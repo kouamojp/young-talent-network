@@ -50,12 +50,6 @@ const AptitudeTest: React.FC = () => {
     setTestCompleted(false);
   };
 
-  const stats = [
-    { label: 'Catégories', value: testCategories.length.toString() },
-    { label: 'Tests passés', value: '2,847' },
-    { label: 'Talents connectés', value: '1,203' },
-    { label: 'Taux de succès', value: '94%' },
-  ];
 
   return (
     <div className="w-full min-h-screen">
@@ -71,14 +65,7 @@ const AptitudeTest: React.FC = () => {
               <p className="text-white/80 text-sm">Découvrez vos aptitudes, capacités et connectez-vous avec ceux qui les recherchent</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
-            {stats.map((s, i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-3 text-center">
-                <p className="text-xl font-bold">{s.value}</p>
-                <p className="text-xs text-white/70">{s.label}</p>
-              </div>
-            ))}
-          </div>
+          <p className="mt-4 text-sm text-white/80">{testCategories.length} catégories de tests disponibles</p>
         </div>
       </div>
 

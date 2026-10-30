@@ -1,115 +1,86 @@
-
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, MapPin, Users } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Briefcase, Building, MapPin, Clock, Calendar, ChevronRight, Bookmark } from 'lucide-react';
-import { talents } from './data/talents';
+import { supabase } from '@/integrations/supabase/client';
 
-interface OrganizationViewProps {
-  selectedTab: string;
-  onTabChange: (value: string) => void;
-  handleApplyClick: (event: React.MouseEvent) => void;
-  handleCardClick: (id: number) => void;
+interface TalentProfile {
+  id: string;
+  name: string | null;
+  avatar_url: string | null;
+  professional_title: string | null;
+  sport_type: string | null;
+  bio: string | null;
+  city: string | null;
+  country: string | null;
+  availability: string | null;
 }
 
-const OrganizationView: React.FC<OrganizationViewProps> = ({
-  selectedTab,
-  onTabChange,
-  handleApplyClick,
-  handleCardClick
-}) => {
+/** Talents inscrits, pour les organisations qui recrutent. */
+const OrganizationView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }) => {
+  const navigate = useNavigate();
+  const [talents, setTalents] = useState<TalentProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('id, name, avatar_url, professional_title, sport_type, bio, city, country, availability')
+      .eq('user_type', 'talent')
+      .order('platform_rating', { ascending: false, nullsFirst: false })
+      .limit(50)
+      .then(({ data }) => {
+        setTalents((data as TalentProfile[] | null) ?? []);
+        setLoading(false);
+      });
+  }, []);
+
+  const query = searchTerm.toLowerCase();
+  const visible = talents.filter(t => [t.name, t.professional_title, t.sport_type, t.city, t.country].some(v => v?.toLowerCase().includes(query)));
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+
+  if (visible.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border p-10 text-center">
+        <Users className="mx-auto h-8 w-8 text-muted-foreground/50" />
+        <p className="mt-3 text-sm text-muted-foreground">
+          {talents.length === 0 ? 'Aucun talent inscrit pour le moment.' : 'Aucun talent ne correspond à cette recherche.'}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <Tabs value={selectedTab} onValueChange={onTabChange}>
-      <TabsList className="mb-6">
-        <TabsTrigger value="talents" className="flex items-center gap-2">
-          <Heart className="h-4 w-4" />
-          Find Talents
-        </TabsTrigger>
-        <TabsTrigger value="posted" className="flex items-center gap-2">
-          <Briefcase className="h-4 w-4" />
-          My Postings
-        </TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="talents" className="space-y-4">
-        {talents.map((talent) => (
-          <div 
-            key={talent.id}
-            className="bg-white/40 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => handleCardClick(talent.id)}
-          >
-            <div className="p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex gap-3">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
-                    <img 
-                      src={talent.avatar} 
-                      alt={talent.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold">{talent.name}</h3>
-                    <div className="flex items-center text-sm text-muted-foreground mt-1">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {talent.location}
-                    </div>
-                  </div>
-                </div>
-                <Button variant="ghost" size="icon">
-                  <Bookmark className="h-5 w-5" />
-                </Button>
-              </div>
-              
-              <p className="mt-3 text-foreground">{talent.description}</p>
-              
-              <div className="mt-4 flex flex-wrap gap-2">
-                {talent.skills.map((skill, index) => (
-                  <Badge key={index} variant="outline" className="bg-accent">
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
-              
-              <div className="mt-4 flex flex-wrap gap-2">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Experience: {talent.experience}
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {talent.availability}
-                </div>
-              </div>
-              
-              <div className="mt-4 flex justify-between items-center">
-                <Button onClick={(e) => handleApplyClick(e)}>
-                  Contact Talent
-                </Button>
-                <Button variant="ghost" className="text-primary">
-                  {talent.portfolio}
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </TabsContent>
-      
-      <TabsContent value="posted" className="space-y-4">
-        <div className="text-center py-8">
-          <Building className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-          <h3 className="text-xl font-bold mb-2">No Opportunities Posted Yet</h3>
-          <p className="text-muted-foreground mb-4">
-            Share your first opportunity to connect with talented individuals!
-          </p>
-          <Button>
-            Post New Opportunity
-          </Button>
-        </div>
-      </TabsContent>
-    </Tabs>
+    <ul className="rounded-xl border border-border bg-card divide-y divide-border">
+      {visible.map(talent => {
+        const place = [talent.city, talent.country].filter(Boolean).join(', ');
+        return (
+          <li key={talent.id}>
+            <button type="button" onClick={() => navigate(`/talent/${talent.id}`)} className="flex w-full gap-4 p-4 text-left hover:bg-muted/60 transition-colors">
+              <Avatar className="h-12 w-12 shrink-0">
+                <AvatarImage src={talent.avatar_url || ''} />
+                <AvatarFallback>{talent.name?.charAt(0) || '?'}</AvatarFallback>
+              </Avatar>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold break-words">{talent.name || 'Sans nom'}</span>
+                  {talent.availability && <Badge variant="secondary">{talent.availability}</Badge>}
+                </span>
+                {(talent.professional_title || talent.sport_type) && (
+                  <span className="block truncate text-sm text-muted-foreground">{talent.professional_title || talent.sport_type}</span>
+                )}
+                {talent.bio && <span className="mt-1 block text-sm line-clamp-2 break-words">{talent.bio}</span>}
+                {place && (
+                  <span className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{place}</span>
+                )}
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 };
 

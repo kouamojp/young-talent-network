@@ -1,196 +1,85 @@
-
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Briefcase, Calendar, Loader2, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Briefcase, 
-  FileText, 
-  Building, 
-  MapPin, 
-  Clock, 
-  Calendar, 
-  ChevronRight, 
-  Bookmark
-} from 'lucide-react';
-import { opportunities } from './data/opportunities';
-import { scholarships } from './data/scholarships';
-import { mentorships } from './data/mentorships';
+import { supabase } from '@/integrations/supabase/client';
+import { OrganizationCrest } from '@/components/organizations/OrganizationRow';
 
-interface TalentViewProps {
-  selectedTab: string;
-  onTabChange: (value: string) => void;
-  handleApplyClick: (event: React.MouseEvent) => void;
-  handleCardClick: (id: number) => void;
+interface JobPosting {
+  id: string;
+  title: string;
+  description: string | null;
+  job_type: string | null;
+  location: string | null;
+  salary_range: string | null;
+  created_at: string;
+  organization_id: string | null;
+  // organization_id pointe vers le profil du compte organisation
+  organization: { name: string | null; avatar_url: string | null } | null;
 }
 
-const TalentView: React.FC<TalentViewProps> = ({
-  selectedTab,
-  onTabChange,
-  handleApplyClick,
-  handleCardClick
-}) => {
+/** Offres ouvertes publiées par les organisations (table job_postings). */
+const TalentView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }) => {
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<JobPosting[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from('job_postings')
+      .select('id, title, description, job_type, location, salary_range, created_at, organization_id, organization:profiles!job_postings_organization_id_fkey(name, avatar_url)')
+      .eq('status', 'open')
+      .order('created_at', { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        setJobs((data as JobPosting[] | null) ?? []);
+        setLoading(false);
+      });
+  }, []);
+
+  const query = searchTerm.toLowerCase();
+  const visible = jobs.filter(j => [j.title, j.description, j.location, j.organization?.name].some(v => v?.toLowerCase().includes(query)));
+
+  if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+
+  if (visible.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-border p-10 text-center">
+        <Briefcase className="mx-auto h-8 w-8 text-muted-foreground/50" />
+        <p className="mt-3 text-sm text-muted-foreground">
+          {jobs.length === 0 ? 'Aucune offre ouverte pour le moment.' : 'Aucune offre ne correspond à cette recherche.'}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <Tabs value={selectedTab} onValueChange={onTabChange}>
-      <TabsList className="mb-6">
-        <TabsTrigger value="opportunities" className="flex items-center gap-2">
-          <Briefcase className="h-4 w-4" />
-          Jobs & Gigs
-        </TabsTrigger>
-        <TabsTrigger value="scholarships" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Scholarships
-        </TabsTrigger>
-        <TabsTrigger value="mentorships" className="flex items-center gap-2">
-          <Building className="h-4 w-4" />
-          Mentorships
-        </TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="opportunities" className="space-y-4">
-        {opportunities.map((job) => (
-          <div 
-            key={job.id}
-            className={`bg-white/40 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer ${job.isFeatured ? 'border-2 border-primary/30' : ''}`}
-            onClick={() => handleCardClick(job.id)}
+    <ul className="rounded-xl border border-border bg-card divide-y divide-border">
+      {visible.map(job => (
+        <li key={job.id}>
+          <button
+            type="button"
+            onClick={() => job.organization_id && navigate(`/organization/${job.organization_id}`)}
+            className="flex w-full gap-4 p-4 text-left hover:bg-muted/60 transition-colors"
           >
-            <div className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold">{job.title}</h3>
-                    {job.isFeatured && (
-                      <Badge className="bg-primary/20 text-primary border-primary hover:bg-primary/30">
-                        Featured
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground">{job.company}</p>
-                </div>
-                <Button variant="ghost" size="icon">
-                  <Bookmark className="h-5 w-5" />
-                </Button>
-              </div>
-              
-              <div className="flex flex-wrap gap-2 mt-3">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  {job.location}
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {job.type}
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {job.postedDate}
-                </div>
-              </div>
-              
-              <p className="mt-3 text-foreground">{job.description}</p>
-              
-              <div className="mt-4 flex flex-wrap gap-2">
-                {job.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="bg-muted">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-              
-              <div className="mt-4 flex justify-between items-center">
-                <Button onClick={(e) => handleApplyClick(e)}>
-                  Apply Now
-                </Button>
-                <Button variant="ghost" className="text-primary">
-                  View Details
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </TabsContent>
-      
-      <TabsContent value="scholarships" className="space-y-4">
-        {scholarships.map((scholarship) => (
-          <div 
-            key={scholarship.id}
-            className="bg-white/40 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => handleCardClick(scholarship.id)}
-          >
-            <div className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold">{scholarship.title}</h3>
-                  <p className="text-muted-foreground">{scholarship.organization}</p>
-                </div>
-                <div className="text-lg font-bold text-primary">{scholarship.amount}</div>
-              </div>
-              
-              <p className="mt-3 text-foreground">{scholarship.description}</p>
-              
-              <div className="mt-4 bg-accent p-3 rounded-lg">
-                <div className="font-medium mb-1">Requirements</div>
-                <p className="text-sm text-muted-foreground">{scholarship.requirements}</p>
-              </div>
-              
-              <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4 mr-1" />
-                  Deadline: {scholarship.deadline}
-                </div>
-                <Button>
-                  Apply for Scholarship
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </TabsContent>
-      
-      <TabsContent value="mentorships" className="space-y-4">
-        {mentorships.map((mentorship) => (
-          <div 
-            key={mentorship.id}
-            className="bg-white/40 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => handleCardClick(mentorship.id)}
-          >
-            <div className="p-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-bold">{mentorship.title}</h3>
-                  <p className="text-primary font-medium">{mentorship.mentor}</p>
-                </div>
-                <Button variant="ghost" size="icon">
-                  <Bookmark className="h-5 w-5" />
-                </Button>
-              </div>
-              
-              <p className="mt-3 text-foreground">{mentorship.description}</p>
-              
-              <div className="mt-4 flex flex-wrap gap-4">
-                <div className="bg-muted px-3 py-2 rounded-lg text-sm">
-                  <span className="font-medium">Duration:</span> {mentorship.duration}
-                </div>
-                <div className="bg-muted px-3 py-2 rounded-lg text-sm">
-                  <span className="font-medium">Time Commitment:</span> {mentorship.commitment}
-                </div>
-              </div>
-              
-              <div className="mt-4 flex justify-between items-center">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  Apply by: {mentorship.applicationDeadline}
-                </div>
-                <Button>
-                  Apply for Mentorship
-                </Button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </TabsContent>
-    </Tabs>
+            <OrganizationCrest name={job.organization?.name || '?'} logo={job.organization?.avatar_url || undefined} className="h-12 w-12 text-lg" />
+            <span className="min-w-0 flex-1">
+              <span className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold break-words">{job.title}</span>
+                {job.job_type && <Badge variant="secondary">{job.job_type}</Badge>}
+              </span>
+              {job.organization?.name && <span className="block text-sm text-muted-foreground truncate">{job.organization.name}</span>}
+              {job.description && <span className="mt-1 block text-sm line-clamp-2 break-words">{job.description}</span>}
+              <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                {job.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.location}</span>}
+                {job.salary_range && <span>{job.salary_range}</span>}
+                <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(job.created_at).toLocaleDateString()}</span>
+              </span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 };
 

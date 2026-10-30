@@ -12,12 +12,9 @@ const WorkMap = () => {
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedJob, setSelectedJob] = useState<any>(null);
 
-  // Sample job data
-  const jobs = [
-    { id: 1, title: 'Frontend Developer', company: 'Tech Corp', location: [30.5234, 50.4501], salary: '$60k-80k', type: 'Full-time' },
-    { id: 2, title: 'Designer', company: 'Creative Studio', location: [30.5334, 50.4601], salary: '$50k-70k', type: 'Contract' },
-    { id: 3, title: 'Marketing Manager', company: 'Brand Agency', location: [30.5134, 50.4401], salary: '$55k-75k', type: 'Full-time' },
-  ];
+  // Les offres (job_postings) n'ont pas de coordonnées en base : aucun marqueur
+  // tant que ce n'est pas le cas.
+  const jobs: { id: string; title: string; company: string; location: [number, number]; salary: string; type: string }[] = [];
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;

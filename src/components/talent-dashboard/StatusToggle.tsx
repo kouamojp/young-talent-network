@@ -24,7 +24,7 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
   onToggle,
   onStatusChange
 }) => {
-  const [tagline, setTagline] = useState('Seeking freelance design projects');
+  const [tagline, setTagline] = useState('');
   const [isEditingTagline, setIsEditingTagline] = useState(false);
   const userIdRef = useRef<string | null>(null);
   const loadedRef = useRef(false);
@@ -131,7 +131,7 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 italic">"{tagline}"</span>
+                  <span className="text-sm text-muted-foreground italic">{tagline ? `"${tagline}"` : 'Ajoutez une accroche'}</span>
                   <Button
                     size="sm"
                     variant="ghost"

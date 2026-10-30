@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,12 +13,26 @@ const EventsMap = () => {
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
-  // Sample events data
-  const events = [
-    { id: 1, title: 'Basketball Tournament', date: '2025-10-15', time: '14:00', location: [30.5234, 50.4501], attendees: 45 },
-    { id: 2, title: 'Yoga Workshop', date: '2025-10-16', time: '10:00', location: [30.5334, 50.4601], attendees: 20 },
-    { id: 3, title: 'Football Training', date: '2025-10-17', time: '18:00', location: [30.5134, 50.4401], attendees: 30 },
-  ];
+  // Événements géolocalisés de la base
+  const [events, setEvents] = useState<{ id: string; title: string; date: string; time: string; location: [number, number]; attendees: number }[]>([]);
+  useEffect(() => {
+    supabase
+      .from('events')
+      .select('id, title, start_date, latitude, longitude, attendees_count')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .then(({ data }) => setEvents((data ?? []).map((e) => {
+        const start = new Date(e.start_date);
+        return {
+          id: e.id,
+          title: e.title,
+          date: start.toLocaleDateString(),
+          time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          location: [Number(e.longitude), Number(e.latitude)] as [number, number],
+          attendees: e.attendees_count ?? 0,
+        };
+      })));
+  }, []);
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -57,7 +72,7 @@ const EventsMap = () => {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, events]);
 
   if (!mapboxToken) {
     return (

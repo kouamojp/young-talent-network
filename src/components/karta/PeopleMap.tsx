@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,12 +15,24 @@ const PeopleMap = () => {
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedPerson, setSelectedPerson] = useState<any>(null);
 
-  // Sample people data
-  const people = [
-    { id: 1, name: 'Alex Johnson', role: 'Тренер', sport: 'Football', location: [30.5234, 50.4501], avatar: '' },
-    { id: 2, name: 'Maria Garcia', role: 'Агент', sport: 'Basketball', location: [30.5334, 50.4601], avatar: '' },
-    { id: 3, name: 'John Smith', role: 'Athlete', sport: 'Tennis', location: [30.5134, 50.4401], avatar: '' },
-  ];
+  // Profils qui ont renseigné leur position
+  const [people, setPeople] = useState<{ id: string; name: string; role: string; sport: string; location: [number, number]; avatar: string }[]>([]);
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('id, name, user_type, sport_type, latitude, longitude, avatar_url')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .limit(500)
+      .then(({ data }) => setPeople((data ?? []).map((p) => ({
+        id: p.id,
+        name: p.name || '?',
+        role: p.user_type || '',
+        sport: p.sport_type || '',
+        location: [Number(p.longitude), Number(p.latitude)] as [number, number],
+        avatar: p.avatar_url || '',
+      }))));
+  }, []);
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -59,7 +72,7 @@ const PeopleMap = () => {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, people]);
 
   if (!mapboxToken) {
     return (

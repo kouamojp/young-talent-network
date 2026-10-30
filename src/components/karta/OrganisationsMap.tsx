@@ -13,39 +13,9 @@ const OrganisationsMap = () => {
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedOrg, setSelectedOrg] = useState<any>(null);
 
-  // Sample organisations data
-  const organisations = [
-    { 
-      id: 1, 
-      name: 'Sports Academy', 
-      type: 'Школа', 
-      location: [30.5234, 50.4501], 
-      phone: '+380123456789',
-      email: 'info@academy.com',
-      website: 'academy.com',
-      logo: ''
-    },
-    { 
-      id: 2, 
-      name: 'Fitness Club', 
-      type: 'Клуб', 
-      location: [30.5334, 50.4601],
-      phone: '+380987654321',
-      email: 'contact@fitness.com',
-      website: 'fitness.com',
-      logo: ''
-    },
-    { 
-      id: 3, 
-      name: 'Talent Agency', 
-      type: 'Агенство', 
-      location: [30.5134, 50.4401],
-      phone: '+380555555555',
-      email: 'hello@agency.com',
-      website: 'agency.com',
-      logo: ''
-    },
-  ];
+  // Les organisations (organization_profiles) n'ont pas de coordonnées en base :
+  // aucun marqueur tant que ce n'est pas le cas.
+  const organisations: { id: string; name: string; type: string; location: [number, number]; phone: string; email: string; website: string; logo: string }[] = [];
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
