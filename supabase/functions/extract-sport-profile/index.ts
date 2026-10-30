@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiCompleteJson, aiErrorResponse, isAIConfigured } from "../_shared/ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,8 +24,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Invalid payload" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableKey) return new Response(JSON.stringify({ error: "AI not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (!isAIConfigured()) return new Response(JSON.stringify({ error: "AI not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
     const schemaDesc = schema_fields.map((f: any) => {
       let s = `- "${f.key}" (${f.type}) — ${f.label}`;
@@ -34,29 +34,19 @@ Deno.serve(async (req) => {
 
     const ctx = JSON.stringify(sources).slice(0, 12000);
 
-    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: `Extract sport-specific profile fields for "${sport}". Return ONLY JSON {"fields": {"<key>": value}} matching these field definitions. For multiselect, return arrays of allowed values. For select, return one allowed value. Omit fields without evidence.\n\nFields:\n${schemaDesc}` },
-          { role: "user", content: `Synced sources:\n${ctx}` },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
-
-    if (!aiRes.ok) return new Response(JSON.stringify({ error: `AI ${aiRes.status}` }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    const aiData = await aiRes.json();
-    const content = aiData.choices?.[0]?.message?.content || "{}";
-    let parsed: any = {};
-    try { parsed = JSON.parse(content); } catch { parsed = { fields: {} }; }
+    // Extraction factuelle : température nulle, pas de raisonnement.
+    const parsed = await aiCompleteJson<{ fields?: Record<string, unknown> }>({
+      messages: [
+        { role: "system", content: `Extract sport-specific profile fields for "${sport}". Return ONLY JSON {"fields": {"<key>": value}} matching these field definitions. For multiselect, return arrays of allowed values. For select, return one allowed value. Omit fields without evidence.\n\nFields:\n${schemaDesc}` },
+        { role: "user", content: `Synced sources:\n${ctx}` },
+      ],
+      temperature: 0,
+    }, { fields: {} });
 
     return new Response(JSON.stringify({ success: true, fields: parsed.fields || {} }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e?.message || "Unknown" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return aiErrorResponse(e, corsHeaders);
   }
 });

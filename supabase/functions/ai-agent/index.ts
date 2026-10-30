@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiCompleteJson, aiErrorResponse } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -100,9 +101,6 @@ AGENTS: ${JSON.stringify(agentsRes.data || [])}
 COMMUNITIES: ${JSON.stringify(communitiesRes.data?.slice(0, 5) || [])}
 `;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
     const systemPrompt = `You are the **YAT AI Agent** — proactive talent advisor & networking facilitator.
 
 Generate hyper-personalized, actionable suggestions for this user. Each suggestion must reference REAL data from the context.
@@ -142,32 +140,20 @@ Rules:
 - Reference SPECIFIC events/jobs/orgs by name from the data
 - Respond in the user's language (default FR if unclear)`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate personalized suggestions, YAT score breakdown and platform insights now." }
-        ],
-      }),
+    const parsed: any = await aiCompleteJson({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: "Generate personalized suggestions, YAT score breakdown and platform insights now." }
+      ],
+      // 5 à 8 suggestions + insights + breakdown : le défaut de 2048 est trop juste.
+      maxTokens: 3000,
+    }, {
+      suggestions: [],
+      platform_insights: { trending: "", growth: "", tip: "" },
+      yat_score: yatScore,
+      profile_completion: completion,
     });
 
-    if (!response.ok) {
-      if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limited" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Credits exhausted" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI gateway error");
-    }
-
-    const data = await response.json();
-    let result = data.choices?.[0]?.message?.content || "{}";
-    result = result.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-
-    let parsed: any;
-    try { parsed = JSON.parse(result); } catch {
-      parsed = { suggestions: [], platform_insights: { trending: "", growth: "", tip: "" }, yat_score: yatScore, profile_completion: completion };
-    }
     parsed.yat_score = parsed.yat_score ?? yatScore;
     parsed.profile_completion = parsed.profile_completion ?? completion;
 
@@ -187,6 +173,6 @@ Rules:
     return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error: any) {
     console.error("AI agent error:", error);
-    return new Response(JSON.stringify({ error: error.message || "Internal error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return aiErrorResponse(error, corsHeaders);
   }
 });

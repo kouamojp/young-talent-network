@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiErrorResponse, aiStream, type AIMessage } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -173,41 +174,19 @@ Rules:
 - Quote actual data — never invent events, jobs, orgs or people.
 - End every reply with **"💡 Prochaine étape:"** (or equivalent in user's language) suggesting 1-2 actions with links.`;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
-    const aiMessages = [
+    const aiMessages: AIMessage[] = [
       { role: "system", content: systemPrompt },
       ...messages.slice(-20).map((m: any) => ({
-        role: m.role === 'assistant' ? 'assistant' : 'user',
+        role: m.role === 'assistant' ? 'assistant' as const : 'user' as const,
         content: String(m.content).slice(0, 4000)
       }))
     ];
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: aiMessages,
-        stream: true,
-      }),
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limited" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Credits exhausted" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI gateway error");
-    }
-
-    return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
-    });
+    // Conversationnel : un peu plus de liberté que le défaut du module.
+    // L'assistant tourne sur GLM via haimaker ; repli sur AI_PROVIDER si HAIMAKER_API_KEY manque.
+    return await aiStream({ provider: "haimaker", messages: aiMessages, temperature: 0.6, maxTokens: 2048 }, corsHeaders);
   } catch (error: any) {
     console.error("AI assistant error:", error);
-    return new Response(JSON.stringify({ error: error.message || "Internal error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return aiErrorResponse(error, corsHeaders);
   }
 });

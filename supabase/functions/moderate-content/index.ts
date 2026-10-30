@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiCompleteJson, aiErrorResponse, isAIConfigured } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,7 +20,6 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     const userClient = createClient(supabaseUrl, anon, { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authError } = await userClient.auth.getUser();
@@ -54,7 +54,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, report: data }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    if (!LOVABLE_API_KEY) {
+    if (!isAIConfigured()) {
       return new Response(JSON.stringify({ error: "AI not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -65,27 +65,16 @@ Return STRICT JSON: {"risk_score": 0-100, "risk_level": "low|medium|high|critica
 - low: 0-29, medium: 30-59, high: 60-84, critical: 85-100
 - should_flag = true if risk_score >= 60 OR categories include scam/fraud/phishing/impersonation/hate_speech.`;
 
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: content.slice(0, 4000) },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
-
-    if (!aiResp.ok) {
-      const txt = await aiResp.text();
-      console.error('AI moderation failed', aiResp.status, txt);
-      return new Response(JSON.stringify({ error: "AI moderation failed", status: aiResp.status }), { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const aiJson = await aiResp.json();
-    let parsed: any = {};
-    try { parsed = JSON.parse(aiJson.choices?.[0]?.message?.content || '{}'); } catch { parsed = {}; }
+    // Classification : sortie déterministe, verdict court.
+    const parsed: any = await aiCompleteJson({
+      tier: 'fast',
+      messages: [
+        { role: "system", content: sys },
+        { role: "user", content: content.slice(0, 4000) },
+      ],
+      temperature: 0,
+      maxTokens: 500,
+    }, {});
 
     const risk_score = Math.max(0, Math.min(100, Number(parsed.risk_score) || 0));
     const risk_level = parsed.risk_level || (risk_score >= 85 ? 'critical' : risk_score >= 60 ? 'high' : risk_score >= 30 ? 'medium' : 'low');
@@ -117,6 +106,6 @@ Return STRICT JSON: {"risk_score": 0-100, "risk_level": "low|medium|high|critica
     });
   } catch (e: any) {
     console.error('moderate-content error', e);
-    return new Response(JSON.stringify({ error: e.message || "Internal error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return aiErrorResponse(e, corsHeaders);
   }
 });

@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiCompleteJson, aiErrorResponse } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,9 +47,6 @@ serve(async (req) => {
       return new Response(JSON.stringify({ matches: [] }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY missing');
-
     const prompt = `JOB:
 Title: ${job.title || ''}
 Description: ${job.description || ''}
@@ -62,30 +60,14 @@ ${candidates.map((c: any) => `${c.id} | ${c.name} | ${c.sport_type || '-'} | ${[
 Return JSON: {"matches":[{"id":"uuid","score":0-100,"reason":"1 short sentence"}]}
 Rank top 20 by relevance to the job. Higher score = better match.`;
 
-    const aiRes = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: 'You are a recruitment matching expert. Always reply with valid JSON only.' },
-          { role: 'user', content: prompt }
-        ],
-        response_format: { type: 'json_object' },
-      }),
-    });
-
-    if (!aiRes.ok) {
-      if (aiRes.status === 429) return new Response(JSON.stringify({ error: 'Rate limited' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      if (aiRes.status === 402) return new Response(JSON.stringify({ error: 'Credits exhausted' }), { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-      throw new Error('AI gateway error');
-    }
-
-    const data = await aiRes.json();
-    let raw = data.choices?.[0]?.message?.content || '{"matches":[]}';
-    raw = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    let parsed: any = { matches: [] };
-    try { parsed = JSON.parse(raw); } catch { /* keep empty */ }
+    const parsed: any = await aiCompleteJson({
+      messages: [
+        { role: 'system', content: 'You are a recruitment matching expert. Always reply with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      // Jusqu'à 20 candidats classés, chacun avec une justification.
+      maxTokens: 3000,
+    }, { matches: [] });
 
     const byId = new Map(candidates.map((c: any) => [c.id, c]));
     const enriched = (parsed.matches || []).slice(0, 20).map((m: any) => ({
@@ -96,6 +78,6 @@ Rank top 20 by relevance to the job. Higher score = better match.`;
     return new Response(JSON.stringify({ matches: enriched }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e: any) {
     console.error('match-candidates error:', e);
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    return aiErrorResponse(e, corsHeaders);
   }
 });

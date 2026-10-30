@@ -1,6 +1,7 @@
 // Scheduled function: re-syncs profile_sources flagged with auto_sync=true,
 // where last_synced_at is older than 24h (or never synced).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { aiCompleteJson, isAIConfigured } from "../_shared/ai.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,24 +51,20 @@ Deno.serve(async (req) => {
           .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
           .replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 6000);
 
-        const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+        // Enrichissement optionnel : on garde le texte brut si l'IA est absente
+        // ou en panne, le batch continue sur les sources suivantes.
         let extracted: any = { raw_text: text.slice(0, 1500) };
-        if (lovableKey) {
-          const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${lovableKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "google/gemini-2.5-flash",
+        if (isAIConfigured()) {
+          try {
+            extracted = await aiCompleteJson({
+              temperature: 0,
               messages: [
                 { role: "system", content: `Extract profile data. Return JSON: {name, bio, location, sport_or_specialty, achievements:[{title,date}], stats, skills:[], photos:[], social_links:[{platform,url}]}` },
                 { role: "user", content: `URL: ${s.url}\n\n${text}` },
               ],
-              response_format: { type: "json_object" },
-            }),
-          });
-          if (ai.ok) {
-            const j = await ai.json();
-            try { extracted = JSON.parse(j.choices?.[0]?.message?.content || "{}"); } catch {}
+            }, extracted);
+          } catch (aiErr) {
+            console.error("auto-sync-sources AI extraction failed", aiErr);
           }
         }
         await admin.from("profile_sources").update({

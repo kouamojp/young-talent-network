@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { aiCompleteJson, isAIConfigured } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -68,26 +69,17 @@ serve(async (req) => {
     };
 
     // AI fallback / enrichment
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (LOVABLE_API_KEY) {
+    if (isAIConfigured()) {
       try {
         const text = head.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 8000);
-        const aiRes = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
-            messages: [
-              { role: 'system', content: 'Extract event info as STRICT JSON only: {"title":"","description":"","start_date":"ISO8601 or null","end_date":"ISO8601 or null","location":"","price":"","currency":"","is_virtual":false}. Respond in the same language as the source. No markdown.' },
-              { role: 'user', content: `URL: ${url}\nOG title: ${title}\nOG desc: ${description}\nPage text: ${text}` }
-            ],
-          }),
-        });
-        if (aiRes.ok) {
-          const data = await aiRes.json();
-          let raw = data.choices?.[0]?.message?.content?.trim() || '';
-          raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/, '').trim();
-          const ai = JSON.parse(raw);
+        const ai: any = await aiCompleteJson({
+          temperature: 0,
+          messages: [
+            { role: 'system', content: 'Extract event info as STRICT JSON only: {"title":"","description":"","start_date":"ISO8601 or null","end_date":"ISO8601 or null","location":"","price":"","currency":"","is_virtual":false}. Respond in the same language as the source. No markdown.' },
+            { role: 'user', content: `URL: ${url}\nOG title: ${title}\nOG desc: ${description}\nPage text: ${text}` }
+          ],
+        }, null);
+        if (ai) {
           result = {
             title: ai.title || result.title,
             description: ai.description || result.description,

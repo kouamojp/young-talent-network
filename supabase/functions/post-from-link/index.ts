@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { aiComplete, isAIConfigured } from "../_shared/ai.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,24 +38,17 @@ serve(async (req) => {
     if (image && image.startsWith('/')) image = new URL(image, url).toString();
 
     let summary = description;
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (LOVABLE_API_KEY && (title || description)) {
+    if (isAIConfigured() && (title || description)) {
       try {
-        const aiRes = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
-            messages: [
-              { role: 'system', content: 'You write engaging short social posts (max 3 lines, friendly tone, 1-2 relevant emojis, no hashtags spam). Detect the language of the title/description and respond in the same language.' },
-              { role: 'user', content: `Title: ${title}\nDescription: ${description}\nSource: ${siteName}\n\nWrite a catchy post summarizing this link.` }
-            ],
-          }),
-        });
-        if (aiRes.ok) {
-          const data = await aiRes.json();
-          summary = data.choices?.[0]?.message?.content?.trim() || description;
-        }
+        summary = await aiComplete({
+          tier: 'fast',
+          messages: [
+            { role: 'system', content: 'You write engaging short social posts (max 3 lines, friendly tone, 1-2 relevant emojis, no hashtags spam). Detect the language of the title/description and respond in the same language.' },
+            { role: 'user', content: `Title: ${title}\nDescription: ${description}\nSource: ${siteName}\n\nWrite a catchy post summarizing this link.` }
+          ],
+          temperature: 0.7,
+          maxTokens: 300,
+        }) || description;
       } catch (_) { /* fallback to description */ }
     }
 
