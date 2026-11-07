@@ -39,7 +39,15 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   const hideFloating = !fullPage && location.pathname.startsWith('/messages');
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Pas de scrollIntoView : il ferait aussi défiler la page autour du chat.
+    const viewport = scrollRef.current?.closest<HTMLElement>("[data-radix-scroll-area-viewport]");
+    if (!viewport) return;
+
+    // Pendant le streaming, on ne suit la réponse que si l'utilisateur est déjà en bas.
+    const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    if (messages[messages.length - 1]?.role === "user" || distanceFromBottom < 120) {
+      viewport.scrollTop = viewport.scrollHeight;
+    }
   }, [messages]);
 
   const sendMessage = async (overrideText?: string, overrideMode?: Mode) => {
@@ -115,7 +123,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
       toast({ title: "Erreur", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
     }
   };
 
