@@ -12,7 +12,8 @@
  *   MOONSHOT_API_KEY   — https://platform.kimi.ai
  *   LOVABLE_API_KEY    — ancien gateway, conservé comme repli
  *   OPENROUTER_API_KEY — optionnel
- *   HAIMAKER_API_KEY   — https://haimaker.ai (GLM, utilisé par l'assistant IA)
+ *   HAIMAKER_API_KEY   — https://haimaker.ai (GLM)
+ *   KIMI_API_KEY       — https://platform.kimi.ai (Kimi K3, réservé à l'assistant IA)
  */
 
 export type AIMessage = { role: "system" | "user" | "assistant"; content: string };
@@ -24,7 +25,7 @@ export type AIMessage = { role: "system" | "user" | "assistant"; content: string
  */
 export type ModelTier = "fast" | "default" | "reasoning";
 
-export type ProviderName = "moonshot" | "lovable" | "openrouter" | "haimaker";
+export type ProviderName = "moonshot" | "kimi" | "lovable" | "openrouter" | "haimaker";
 
 interface Provider {
   baseUrl: string;
@@ -38,6 +39,13 @@ const PROVIDERS: Record<ProviderName, Provider> = {
     keyEnv: "MOONSHOT_API_KEY",
     // kimi-k2.5 et la série moonshot-v1 ferment le 31/08/2026 : ne pas les utiliser.
     models: { fast: "kimi-k2.6", default: "kimi-k2.6", reasoning: "kimi-k3" },
+  },
+  // Même API que moonshot, avec une clé dédiée. Absent de PROVIDER_ORDER : seul un
+  // appel qui le demande explicitement consomme cette clé.
+  kimi: {
+    baseUrl: "https://api.moonshot.ai/v1",
+    keyEnv: "KIMI_API_KEY",
+    models: { fast: "kimi-k3", default: "kimi-k3", reasoning: "kimi-k3" },
   },
   lovable: {
     baseUrl: "https://ai.gateway.lovable.dev/v1",
@@ -77,7 +85,7 @@ export interface ResolvedProvider {
 
 export function resolveProvider(requested?: ProviderName): ResolvedProvider | null {
   const preferred = (requested || Deno.env.get("AI_PROVIDER") || "moonshot").toLowerCase() as ProviderName;
-  const order = PROVIDER_ORDER.includes(preferred)
+  const order = preferred in PROVIDERS
     ? [preferred, ...PROVIDER_ORDER.filter((p) => p !== preferred)]
     : PROVIDER_ORDER;
 
@@ -152,12 +160,14 @@ function buildBody(req: AIRequest, { name, provider }: ResolvedProvider): Record
   if (req.stream) body.stream = true;
   if (req.json) body.response_format = { type: "json_object" };
 
-  if (name === "moonshot") {
+  if (name === "moonshot" || name === "kimi") {
     // max_tokens est déprécié côté Moonshot et le défaut de K3 monte à 131k :
     // on plafonne toujours explicitement.
     body.max_completion_tokens = maxTokens;
 
     if (model.startsWith("kimi-k3")) {
+      // K3 rejette toute autre température (HTTP 400).
+      body.temperature = 1;
       // K3 raisonne toujours ; on ne peut que doser l'effort (défaut "max").
       body.reasoning_effort = req.reasoning ? "high" : "low";
     } else if (model.startsWith("kimi-k2")) {

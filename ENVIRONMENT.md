@@ -61,7 +61,8 @@ si le fournisseur demandé n'a pas de clé, le module prend le premier qui en a 
 
 | Variable | Rôle |
 |---|---|
-| `HAIMAKER_API_KEY` | Clé [haimaker](https://app.haimaker.ai) (`sk-…`). L'Assistant IA l'utilise en priorité (modèle `z-ai/glm-5.2`). |
+| `KIMI_API_KEY` | Clé [Kimi](https://platform.kimi.ai) réservée à l'Assistant IA (modèle `kimi-k3`). Sans elle, l'assistant passe sur `AI_PROVIDER`. |
+| `HAIMAKER_API_KEY` | Clé [haimaker](https://app.haimaker.ai) (`sk-…`), modèle `z-ai/glm-5.2`. |
 | `MOONSHOT_API_KEY` | Clé [Moonshot / Kimi](https://platform.kimi.ai). Fournisseur par défaut des autres fonctions IA. |
 | `OPENROUTER_API_KEY` | Clé [OpenRouter](https://openrouter.ai), facultative. |
 | `LOVABLE_API_KEY` | Ancienne passerelle Lovable, conservée comme repli. |

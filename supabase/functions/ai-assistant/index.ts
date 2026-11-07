@@ -182,9 +182,9 @@ Rules:
       }))
     ];
 
-    // Conversationnel : un peu plus de liberté que le défaut du module.
-    // L'assistant tourne sur GLM via haimaker ; repli sur AI_PROVIDER si HAIMAKER_API_KEY manque.
-    return await aiStream({ provider: "haimaker", messages: aiMessages, temperature: 0.6, maxTokens: 2048 }, corsHeaders);
+    // L'assistant tourne sur Kimi K3 (température imposée par ai.ts) ;
+    // repli sur AI_PROVIDER si KIMI_API_KEY manque.
+    return await aiStream({ provider: "kimi", messages: aiMessages, temperature: 0.6, maxTokens: 2048 }, corsHeaders);
   } catch (error: any) {
     console.error("AI assistant error:", error);
     return aiErrorResponse(error, corsHeaders);
