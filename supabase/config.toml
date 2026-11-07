@@ -3,9 +3,6 @@ project_id = "vmpbisbfnbmpsxbdgoyc"
 [functions.suggest-categories]
 verify_jwt = false
 
-[functions.seed-test-accounts]
-verify_jwt = false
-
 [functions.telegram-auth]
 verify_jwt = false
 

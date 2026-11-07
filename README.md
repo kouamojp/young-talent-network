@@ -194,7 +194,6 @@ hardcoding a model name, so upgrading a model is a one-line change in `_shared/a
 | `scrape-event` | Scrape event data |
 | `scrape-profile` | Enrich user profiles |
 | `search-self-online` | Find online presence |
-| `seed-test-accounts` | Generate test data |
 | `suggest-categories` | Recommend categories |
 | `suggest-jobs` | AI job recommendations |
 | `telegram-auth` | Telegram OAuth handler |
