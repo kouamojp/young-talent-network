@@ -195,6 +195,18 @@ export const useConversations = () => {
     }
   };
 
+  const markConversationRead = async (conversationId: string) => {
+    if (!currentUserId) return;
+    // Optimistic: clear the unread badge immediately.
+    setConversations(prev => prev.map(c =>
+      c.id === conversationId
+        ? { ...c, messages: c.messages.map(m => (m.sender_id !== currentUserId && !m.read ? { ...m, read: true } : m)) }
+        : c
+    ));
+    const { error } = await (supabase.rpc as any)('mark_conversation_read', { _conversation_id: conversationId });
+    if (error) console.error('Error marking conversation read:', error);
+  };
+
   return {
     conversations,
     loading,
@@ -203,6 +215,7 @@ export const useConversations = () => {
     createGroupConversation,
     sendMessage,
     markMessageRead,
+    markConversationRead,
     refreshConversations: fetchConversations,
   };
 };

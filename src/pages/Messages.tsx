@@ -33,7 +33,7 @@ const Messages: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { conversations, loading, currentUserId, sendMessage, createConversation, createGroupConversation, markMessageRead } = useConversations();
+  const { conversations, loading, currentUserId, sendMessage, createConversation, createGroupConversation, markMessageRead, markConversationRead } = useConversations();
   const { startCall } = useCall();
   const activeConversation = conversations.find(c => c.id === activeConversationId);
 
@@ -50,6 +50,14 @@ const Messages: React.FC = () => {
   useEffect(() => {
     if (conversations.length > 0 && !activeConversationId) setActiveConversationId(conversations[0].id);
   }, [conversations]);
+
+  // Mark received messages as read when a conversation is open on screen,
+  // and again whenever a new incoming message lands in it.
+  const chatVisible = !isMobile || showChat;
+  const latestIncomingUnreadId = activeConversation?.messages.find(m => m.sender_id !== currentUserId && !m.read && !m.pending)?.id;
+  useEffect(() => {
+    if (activeConversationId && chatVisible && latestIncomingUnreadId) markConversationRead(activeConversationId);
+  }, [activeConversationId, chatVisible, latestIncomingUnreadId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

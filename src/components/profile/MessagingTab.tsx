@@ -20,7 +20,7 @@ const formatTime = (iso?: string) => {
 
 const MessagingTab: React.FC = () => {
   const navigate = useNavigate();
-  const { conversations, loading, currentUserId, sendMessage } = useConversations();
+  const { conversations, loading, currentUserId, sendMessage, markConversationRead } = useConversations();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [search, setSearch] = useState('');
@@ -51,6 +51,11 @@ const MessagingTab: React.FC = () => {
   }, [conversations, search]);
 
   const activeConversation = conversations.find(c => c.id === activeId) || null;
+
+  const latestIncomingUnreadId = activeConversation?.messages.find(m => m.sender_id !== currentUserId && !m.read && !m.pending)?.id;
+  useEffect(() => {
+    if (activeId && latestIncomingUnreadId) markConversationRead(activeId);
+  }, [activeId, latestIncomingUnreadId]);
 
   const activeMessages = useMemo(() => {
     if (!activeConversation) return [];
