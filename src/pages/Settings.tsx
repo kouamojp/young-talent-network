@@ -19,6 +19,10 @@ import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { YatServicesManager } from '@/components/profile/YatServicesManager';
 import { LinkedAccountsManager } from '@/components/profile/LinkedAccountsManager';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -65,6 +69,21 @@ const Settings: React.FC = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    navigate('/auth');
+  };
+
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    const { error } = await (supabase.rpc as any)('delete_own_account');
+    if (error) {
+      setDeleting(false);
+      toast({ title: 'Suppression impossible', description: error.message, variant: 'destructive' });
+      return;
+    }
+    await supabase.auth.signOut();
+    toast({ title: 'Compte supprimé', description: 'Votre compte et vos données ont été supprimés.' });
     navigate('/auth');
   };
 
@@ -313,7 +332,31 @@ const Settings: React.FC = () => {
                 <CardContent className="space-y-3">
                   <Button variant="outline" className="gap-2" onClick={handleLogout}><LogOut className="h-4 w-4" /> {t('settings.logout')}</Button>
                   <div>
-                    <Button variant="destructive" size="sm" className="gap-2"><Trash2 className="h-4 w-4" /> {t('settings.deleteAccount')}</Button>
+                    <AlertDialog onOpenChange={(open) => { if (!open) setDeleteConfirm(''); }}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm" className="gap-2"><Trash2 className="h-4 w-4" /> {t('settings.deleteAccount')}</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Supprimer définitivement votre compte ?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Votre profil, vos publications, messages, médias et connexions seront supprimés. Cette action est irréversible.
+                            Tapez <strong>SUPPRIMER</strong> pour confirmer.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <Input id="delete-account-confirm" value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} placeholder="SUPPRIMER" autoComplete="off" />
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={deleting}>Annuler</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            disabled={deleteConfirm !== 'SUPPRIMER' || deleting}
+                            onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
+                          >
+                            {deleting ? 'Suppression…' : 'Supprimer mon compte'}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                     <p className="text-xs text-muted-foreground mt-1">{t('settings.irreversible')}</p>
                   </div>
                 </CardContent>
