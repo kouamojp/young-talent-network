@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, BookOpen, Clock, GraduationCap, Loader2, Search } from 'lucide-react';
+import { ArrowLeft, BookOpen, Check, Clock, GraduationCap, Loader2, Search } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ interface Course {
   duration_hours: number | null;
   price: number | null;
   thumbnail_url: string | null;
+  instructor_id: string;
 }
 
 /** Cours publiés sur YAT (table courses). */
@@ -25,17 +27,44 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [enrolledIds, setEnrolledIds] = useState<Set<string>>(new Set());
+  const [enrollingId, setEnrollingId] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
-      .from('courses')
-      .select('id, title, description, category, level, duration_hours, price, thumbnail_url')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setCourses((data as Course[] | null) ?? []);
-        setLoading(false);
-      });
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id ?? null);
+      const [{ data }, enrollments] = await Promise.all([
+        supabase
+          .from('courses')
+          .select('id, title, description, category, level, duration_hours, price, thumbnail_url, instructor_id')
+          .order('created_at', { ascending: false }),
+        user
+          ? supabase.from('course_enrollments').select('course_id').eq('student_id', user.id)
+          : Promise.resolve({ data: [] as { course_id: string }[] }),
+      ]);
+      setCourses((data as Course[] | null) ?? []);
+      setEnrolledIds(new Set((enrollments.data ?? []).map(e => e.course_id)));
+      setLoading(false);
+    })();
   }, []);
+
+  const enroll = async (courseId: string) => {
+    if (!userId) {
+      toast({ title: 'Connexion requise', description: 'Connectez-vous pour vous inscrire à un cours.', variant: 'destructive' });
+      return;
+    }
+    setEnrollingId(courseId);
+    const { error } = await supabase.from('course_enrollments').insert({ course_id: courseId, student_id: userId });
+    setEnrollingId(null);
+    if (error && error.code !== '23505') {
+      toast({ title: "Échec de l'inscription", description: error.message, variant: 'destructive' });
+      return;
+    }
+    setEnrolledIds(prev => new Set(prev).add(courseId));
+    toast({ title: 'Inscription confirmée', description: 'Retrouvez ce cours dans votre tableau de bord.' });
+  };
 
   const query = searchTerm.toLowerCase();
   const visible = courses.filter(c => [c.title, c.description, c.category].some(v => v?.toLowerCase().includes(query)));
@@ -84,7 +113,19 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" />{course.duration_hours} h</span>
                   )}
                 </div>
-                {course.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words">{course.description}</p>}
+                {course.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words whitespace-pre-line">{course.description}</p>}
+                <div className="mt-3">
+                  {course.instructor_id === userId ? (
+                    <Badge variant="outline">Votre cours</Badge>
+                  ) : enrolledIds.has(course.id) ? (
+                    <Button size="sm" variant="secondary" disabled className="gap-1.5"><Check className="h-4 w-4" />Inscrit</Button>
+                  ) : (
+                    <Button size="sm" onClick={() => enroll(course.id)} disabled={enrollingId === course.id}>
+                      {enrollingId === course.id && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
+                      S'inscrire
+                    </Button>
+                  )}
+                </div>
               </div>
             </li>
           ))}

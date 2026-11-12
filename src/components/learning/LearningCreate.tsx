@@ -1,320 +1,312 @@
-
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, GraduationCap, Upload, Calendar, Clock, Globe, MapPin, DollarSign, Users } from 'lucide-react';
+import { ArrowLeft, GraduationCap, Upload, Calendar, Clock, Globe, MapPin, DollarSign, Users, Loader2, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 import { categories } from './data/categories';
 
 interface LearningCreateProps {
   onBack: () => void;
 }
 
+interface LearningFormValues {
+  title: string;
+  learningType: string;
+  instructor: string;
+  description: string;
+  category: string;
+  subcategory: string;
+  locationType: string;
+  address: string;
+  startDate: string;
+  durationHours: string;
+  price: string;
+  maxParticipants: string;
+  skillLevel: string;
+  requirements: string;
+}
+
+const locationTypes = [
+  { value: 'remote', label: 'À distance' },
+  { value: 'in-person', label: 'En présentiel' },
+  { value: 'hybrid', label: 'Hybride' },
+];
+
+const learningTypes = [
+  { value: 'training', label: 'Formation' },
+  { value: 'seminar', label: 'Séminaire' },
+  { value: 'masterclass', label: 'Masterclass' },
+  { value: 'lecture', label: 'Conférence' },
+];
+
+const skillLevels = [
+  { value: 'beginner', label: 'Débutant' },
+  { value: 'intermediate', label: 'Intermédiaire' },
+  { value: 'advanced', label: 'Avancé' },
+  { value: 'all-levels', label: 'Tous niveaux' },
+];
+
+const labelOf = (list: { value: string; label: string }[], value: string) =>
+  list.find(i => i.value === value)?.label || value;
+
+/**
+ * Formulaire de création de cours. Les champs sans colonne dédiée dans la
+ * table `courses` (type, lieu, date, places, prérequis…) sont ajoutés en fin
+ * de description pour ne pas être perdus.
+ */
 const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
-  const form = useForm();
-  
-  const locationTypes = [
-    { value: 'remote', label: 'Remote (Pajama-friendly learning!)' },
-    { value: 'in-person', label: 'In-Person (High-fives included!)' },
-    { value: 'hybrid', label: 'Hybrid (Best of both worlds!)' }
-  ];
-  
-  const learningTypes = [
-    { value: 'training', label: 'Training', description: 'Transform "I wish" into "I can"!' },
-    { value: 'seminar', label: 'Seminar', description: 'Wisdom nuggets from industry wizards!' },
-    { value: 'masterclass', label: 'Masterclass', description: 'Steal secrets from the masters!' },
-    { value: 'lecture', label: 'Lecture', description: 'Knowledge snacks for curious minds' }
-  ];
-  
-  const handleSubmit = (data: any) => {
-    console.log('Form data:', data);
-    // Submit to API would go here
+  const form = useForm<LearningFormValues>({
+    defaultValues: {
+      title: '', learningType: '', instructor: '', description: '', category: '', subcategory: '',
+      locationType: '', address: '', startDate: '', durationHours: '', price: '', maxParticipants: '',
+      skillLevel: '', requirements: '',
+    },
+  });
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const buildDescription = (v: LearningFormValues) => {
+    const details = [
+      v.learningType && `Type : ${labelOf(learningTypes, v.learningType)}`,
+      v.instructor && `Intervenant : ${v.instructor}`,
+      v.subcategory && `Spécialité : ${v.subcategory}`,
+      v.locationType && `Format : ${labelOf(locationTypes, v.locationType)}`,
+      v.address && `Lieu : ${v.address}`,
+      v.startDate && `Début : ${new Date(v.startDate).toLocaleDateString()}`,
+      v.maxParticipants && `Places : ${v.maxParticipants}`,
+      v.requirements && `Prérequis : ${v.requirements}`,
+    ].filter(Boolean);
+    return [v.description.trim(), details.join('\n')].filter(Boolean).join('\n\n');
   };
-  
+
+  const handleSubmit = async (values: LearningFormValues) => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({ title: 'Connexion requise', description: 'Connectez-vous pour publier un cours.', variant: 'destructive' });
+        return;
+      }
+
+      let thumbnailUrl: string | null = null;
+      if (thumbnail) {
+        const ext = thumbnail.name.split('.').pop();
+        const path = `${user.id}/courses/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from('profile-files').upload(path, thumbnail);
+        if (uploadError) throw uploadError;
+        thumbnailUrl = supabase.storage.from('profile-files').getPublicUrl(path).data.publicUrl;
+      }
+
+      const duration = parseFloat(values.durationHours.replace(',', '.'));
+      const price = parseFloat(values.price.replace(',', '.'));
+
+      const { error } = await supabase.from('courses').insert({
+        instructor_id: user.id,
+        title: values.title.trim(),
+        description: buildDescription(values) || null,
+        category: values.category || null,
+        level: values.skillLevel ? labelOf(skillLevels, values.skillLevel) : null,
+        duration_hours: Number.isFinite(duration) ? Math.round(duration) : null,
+        price: Number.isFinite(price) ? price : 0,
+        thumbnail_url: thumbnailUrl,
+      });
+      if (error) throw error;
+
+      toast({ title: 'Cours publié', description: 'Votre cours est visible dans « Explorer ».' });
+      form.reset();
+      setThumbnail(null);
+      onBack();
+    } catch (error: any) {
+      toast({ title: 'Échec de la publication', description: error?.message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const titleError = form.formState.errors.title;
+
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="icon" onClick={onBack}>
+        <Button variant="ghost" size="icon" onClick={onBack} aria-label="Retour">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <GraduationCap className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">
-          Create Learning Adventure
-        </h1>
+        <GraduationCap className="h-6 w-6 text-primary" />
+        <h1 className="text-2xl font-bold">Créer un cours</h1>
       </div>
-      
-      <Form {...form}>
+
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="bg-white/60 p-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">1. Basic Information</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <FormLabel htmlFor="title">Title</FormLabel>
-              <FormDescription>Make it catchy! What would make YOU click?</FormDescription>
-              <Input 
-                id="title"
-                placeholder="e.g. From Shy to Shining: 3-Day Confidence Bootcamp"
-                {...form.register('title')}
-              />
+        <section className="bg-card border border-border p-6 rounded-lg space-y-4">
+          <h2 className="text-lg font-semibold">1. Informations principales</h2>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="title">Titre *</Label>
+            <Input id="title" placeholder="ex. Prise de parole en public : 3 jours pour gagner en confiance"
+              {...form.register('title', { required: 'Le titre est obligatoire', validate: v => v.trim().length > 0 || 'Le titre est obligatoire' })} />
+            {titleError && <p className="text-xs text-destructive">{titleError.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="learning-type">Type</Label>
+              <Select value={form.watch('learningType')} onValueChange={(v) => form.setValue('learningType', v)}>
+                <SelectTrigger id="learning-type"><SelectValue placeholder="Choisir un type" /></SelectTrigger>
+                <SelectContent>
+                  {learningTypes.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormLabel htmlFor="learning-type">Learning Adventure Type</FormLabel>
-                <Select 
-                  onValueChange={(value) => form.setValue('learningType', value)}
-                  defaultValue=""
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {learningTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <div>
-                          <div>{type.label}</div>
-                          <div className="text-xs text-gray-500 italic">{type.description}</div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <FormLabel htmlFor="instructor">Instructor Name</FormLabel>
-                <Input 
-                  id="instructor"
-                  placeholder="e.g. Dr. Jane Smith"
-                  {...form.register('instructor')}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <FormLabel htmlFor="description">Description</FormLabel>
-              <FormDescription>Tell learners what makes your adventure special!</FormDescription>
-              <Textarea 
-                id="description"
-                placeholder="Describe your learning adventure in detail..."
-                className="min-h-32"
-                {...form.register('description')}
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="instructor">Intervenant</Label>
+              <Input id="instructor" placeholder="ex. Dr Jeanne Martin" {...form.register('instructor')} />
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white/60 p-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">2. Category & Location</h2>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormLabel htmlFor="category">Category</FormLabel>
-                <Select 
-                  onValueChange={(value) => form.setValue('category', value)}
-                  defaultValue=""
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.name.toLowerCase()}>
-                        <div className="flex items-center">
-                          <span className="mr-2">{category.icon}</span>
-                          {category.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <FormLabel htmlFor="subcategory">Subcategory</FormLabel>
-                <Input 
-                  id="subcategory"
-                  placeholder="e.g. Public Speaking, Guitar, Coding"
-                  {...form.register('subcategory')}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <FormLabel htmlFor="location-type">Location Setting</FormLabel>
-              <FormDescription>Where's the magic happening?</FormDescription>
-              <Select 
-                onValueChange={(value) => form.setValue('locationType', value)}
-                defaultValue=""
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select location type" />
-                </SelectTrigger>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" className="min-h-32" placeholder="Ce que les participants vont apprendre…" {...form.register('description')} />
+          </div>
+        </section>
+
+        <section className="bg-card border border-border p-6 rounded-lg space-y-4">
+          <h2 className="text-lg font-semibold">2. Catégorie et lieu</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="category">Catégorie</Label>
+              <Select value={form.watch('category')} onValueChange={(v) => form.setValue('category', v)}>
+                <SelectTrigger id="category"><SelectValue placeholder="Choisir une catégorie" /></SelectTrigger>
                 <SelectContent>
-                  {locationTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      <div className="flex items-center">
-                        {type.value === 'remote' ? (
-                          <Globe className="mr-2 h-4 w-4" />
-                        ) : (
-                          <MapPin className="mr-2 h-4 w-4" />
-                        )}
-                        {type.label}
-                      </div>
+                  {categories.map(c => (
+                    <SelectItem key={c.id} value={c.name}>
+                      <span className="mr-2">{c.icon}</span>{c.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            
-            <div>
-              <FormLabel htmlFor="address">Venue Address</FormLabel>
-              <FormDescription>Only needed for in-person or hybrid events</FormDescription>
-              <Input 
-                id="address"
-                placeholder="e.g. 123 Creativity Lane, New York, NY"
-                {...form.register('address')}
-              />
+            <div className="space-y-1.5">
+              <Label htmlFor="subcategory">Spécialité</Label>
+              <Input id="subcategory" placeholder="ex. Guitare, Code, Prise de parole" {...form.register('subcategory')} />
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white/60 p-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">3. Logistics & Media</h2>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <FormLabel htmlFor="start-date">Start Date</FormLabel>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    id="start-date"
-                    type="date"
-                    className="pl-10"
-                    {...form.register('startDate')}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <FormLabel htmlFor="duration">Duration</FormLabel>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    id="duration"
-                    placeholder="e.g. 2 hours, 3 days"
-                    className="pl-10"
-                    {...form.register('duration')}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <FormLabel htmlFor="price">Price</FormLabel>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    id="price"
-                    placeholder="e.g. 49.99"
-                    className="pl-10"
-                    {...form.register('price')}
-                  />
-                </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="location-type">Format</Label>
+              <Select value={form.watch('locationType')} onValueChange={(v) => form.setValue('locationType', v)}>
+                <SelectTrigger id="location-type"><SelectValue placeholder="Choisir un format" /></SelectTrigger>
+                <SelectContent>
+                  {locationTypes.map(t => (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span className="inline-flex items-center">
+                        {t.value === 'remote' ? <Globe className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
+                        {t.label}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="address">Adresse</Label>
+              <Input id="address" placeholder="Pour le présentiel ou l'hybride" {...form.register('address')} />
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-card border border-border p-6 rounded-lg space-y-4">
+          <h2 className="text-lg font-semibold">3. Organisation</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="start-date">Date de début</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="start-date" type="date" className="pl-10" {...form.register('startDate')} />
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <FormLabel htmlFor="max-participants">Maximum Participants</FormLabel>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input 
-                    id="max-participants"
-                    type="number"
-                    placeholder="e.g. 20"
-                    className="pl-10"
-                    {...form.register('maxParticipants')}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <FormLabel htmlFor="skill-level">Skill Level</FormLabel>
-                <Select 
-                  onValueChange={(value) => form.setValue('skillLevel', value)}
-                  defaultValue=""
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select skill level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">Beginner (No experience needed)</SelectItem>
-                    <SelectItem value="intermediate">Intermediate (Some experience helpful)</SelectItem>
-                    <SelectItem value="advanced">Advanced (Experienced learners)</SelectItem>
-                    <SelectItem value="all-levels">All Levels Welcome</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-1.5">
+              <Label htmlFor="duration">Durée (heures)</Label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="duration" type="number" min="0" step="1" placeholder="ex. 6" className="pl-10" {...form.register('durationHours')} />
               </div>
             </div>
-            
-            <div>
-              <FormLabel htmlFor="media">Upload Media</FormLabel>
-              <FormDescription>Pro tip: Photos with natural light get 2x more signups!</FormDescription>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="mx-auto h-10 w-10 text-gray-400 mb-2" />
-                <p className="text-gray-600 mb-2">Drag and drop your files here, or click to browse</p>
-                <Button type="button" variant="outline" size="sm">
-                  Choose Files
+            <div className="space-y-1.5">
+              <Label htmlFor="price">Prix (0 = gratuit)</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="price" type="number" min="0" step="0.01" placeholder="0" className="pl-10" {...form.register('price')} />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="max-participants">Nombre de places</Label>
+              <div className="relative">
+                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="max-participants" type="number" min="1" placeholder="ex. 20" className="pl-10" {...form.register('maxParticipants')} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="skill-level">Niveau</Label>
+              <Select value={form.watch('skillLevel')} onValueChange={(v) => form.setValue('skillLevel', v)}>
+                <SelectTrigger id="skill-level"><SelectValue placeholder="Choisir un niveau" /></SelectTrigger>
+                <SelectContent>
+                  {skillLevels.map(l => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="thumbnail">Image de couverture</Label>
+            <input id="thumbnail" ref={fileInputRef} type="file" accept="image/*" className="hidden"
+              onChange={(e) => setThumbnail(e.target.files?.[0] ?? null)} />
+            {thumbnail ? (
+              <div className="flex items-center gap-3 rounded-lg border border-border p-3">
+                <img src={URL.createObjectURL(thumbnail)} alt="" className="h-14 w-20 rounded object-cover" />
+                <span className="flex-1 truncate text-sm">{thumbnail.name}</span>
+                <Button type="button" variant="ghost" size="icon" aria-label="Retirer l'image"
+                  onClick={() => { setThumbnail(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
-            </div>
+            ) : (
+              <button type="button" onClick={() => fileInputRef.current?.click()}
+                className="w-full border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-muted/50 transition-colors">
+                <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <span className="text-sm text-muted-foreground">Cliquez pour choisir une image</span>
+              </button>
+            )}
           </div>
-        </div>
-        
-        <div className="bg-white/60 p-6 rounded-lg">
-          <h2 className="text-lg font-semibold mb-4">4. Extra Magic Dust</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <FormLabel htmlFor="requirements">Special Requirements</FormLabel>
-              <FormDescription>Will there be snacks? Do participants need to bring anything?</FormDescription>
-              <Textarea 
-                id="requirements"
-                placeholder="e.g. Please bring a notebook and pen. Snacks will be provided!"
-                {...form.register('requirements')}
-              />
-            </div>
-            
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="flex gap-2">
-                <div className="text-xl">🌈</div>
-                <div>
-                  <h3 className="font-medium">Success Tip</h3>
-                  <p className="text-sm text-gray-600">
-                    Listings with 3+ photos get 50% more clicks! Add some sparkle!
-                  </p>
-                </div>
-              </div>
-            </div>
+        </section>
+
+        <section className="bg-card border border-border p-6 rounded-lg space-y-4">
+          <h2 className="text-lg font-semibold">4. Prérequis</h2>
+          <div className="space-y-1.5">
+            <Label htmlFor="requirements">Matériel ou connaissances nécessaires</Label>
+            <Textarea id="requirements" placeholder="ex. Apporter un carnet et un stylo." {...form.register('requirements')} />
           </div>
-        </div>
-        
+        </section>
+
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onBack}>
-            Save as Draft
-          </Button>
-          <Button type="submit">
-            Publish Learning Adventure
+          <Button type="button" variant="outline" onClick={onBack} disabled={submitting}>Annuler</Button>
+          <Button type="submit" disabled={submitting}>
+            {submitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+            Publier le cours
           </Button>
         </div>
       </form>
-      </Form>
     </div>
   );
 };
