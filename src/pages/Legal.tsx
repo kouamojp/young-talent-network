@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
+import { tr } from '@/i18n';
 
 /**
  * Pages légales : CGU, confidentialité, cookies, mentions légales.
@@ -15,53 +16,50 @@ type Section = { title: string; body: React.ReactNode };
 type LegalDoc = { title: string; intro?: React.ReactNode; sections: Section[] };
 
 const TODO = ({ children }: { children: React.ReactNode }) => (
-  <mark className="bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100 rounded px-1">[À COMPLÉTER : {children}]</mark>
+  <mark className="bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-100 rounded px-1">{tr('legal.toBeCompleted')} {children}]</mark>
 );
 
 const DOCS: Record<string, LegalDoc> = {
   'mentions-legales': {
-    title: 'Mentions légales',
+    title: tr('footer.legal'),
     sections: [
       {
-        title: 'Éditeur du site',
+        title: tr('legal.sitePublisher'),
         body: (
           <ul>
-            <li>Raison sociale : <TODO>nom de la société ou de l'association</TODO></li>
-            <li>Forme juridique et capital : <TODO>SAS, SARL, association…</TODO></li>
-            <li>Siège social : <TODO>adresse complète</TODO></li>
-            <li>Immatriculation : <TODO>RCS / SIREN / numéro d'enregistrement</TODO></li>
-            <li>Numéro de TVA intracommunautaire : <TODO>si applicable</TODO></li>
-            <li>Contact : <TODO>adresse e-mail de contact</TODO></li>
-            <li>Directeur de la publication : <TODO>nom et fonction</TODO></li>
+            <li>{tr('legal.companyName')} <TODO>{tr('legal.nameOfTheCompanyOrAssociation')}</TODO></li>
+            <li>{tr('legal.legalFormAndCapital')} <TODO>{tr('legal.companyTypeAssociation')}</TODO></li>
+            <li>{tr('legal.registeredOffice')} <TODO>{tr('legal.fullAddress')}</TODO></li>
+            <li>{tr('legal.registration')} <TODO>{tr('legal.companyRegistrationNumber')}</TODO></li>
+            <li>{tr('legal.euVatNumber')} <TODO>{tr('legal.ifApplicable')}</TODO></li>
+            <li>{tr('legal.contact')} <TODO>{tr('legal.contactEmailAddress')}</TODO></li>
+            <li>{tr('legal.publicationDirector')} <TODO>{tr('legal.nameAndPosition')}</TODO></li>
           </ul>
         ),
       },
       {
-        title: 'Hébergement',
+        title: tr('legal.hosting'),
         body: (
           <p>
-            Les données et le back-end sont hébergés par Supabase Inc. (970 Toa Payoh North #07-04, Singapour), sur des
-            serveurs situés dans la région <TODO>région Supabase du projet, ex. eu-west</TODO>. Le site web est hébergé par{' '}
-            <TODO>hébergeur du front-end, adresse</TODO>.
+            {tr('legal.dataAndTheBackEndAre')} <TODO>{tr('legal.supabaseRegionOfTheProjectE')}</TODO>{tr('legal.theWebsiteIsHostedBy')}{' '}
+            <TODO>{tr('legal.frontEndHostAddress')}</TODO>.
           </p>
         ),
       },
       {
-        title: 'Propriété intellectuelle',
+        title: tr('legal.intellectualProperty'),
         body: (
           <p>
-            La marque Young &amp; Talented, le logo YAT, la charte graphique et le code de la plateforme sont la propriété de
-            l'éditeur. Les contenus publiés par les membres (photos, vidéos, textes, musique) restent leur propriété : voir les
-            conditions générales d'utilisation.
+            {tr('legal.theYoungTalentedBrandTheYat')}
           </p>
         ),
       },
       {
-        title: 'Signaler un contenu',
+        title: tr('legal.reportContent'),
         body: (
           <p>
-            Chaque publication et chaque profil peut être signalé depuis son menu « Signaler ». Vous pouvez aussi écrire à{' '}
-            <TODO>adresse e-mail de modération</TODO>. Les signalements concernant un mineur sont traités en priorité.
+            {tr('legal.everyPostAndProfileCanBe')}{' '}
+            <TODO>{tr('legal.moderationEmailAddress')}</TODO>{tr('legal.reportsInvolvingAMinorAreHandled')}
           </p>
         ),
       },
@@ -69,110 +67,97 @@ const DOCS: Record<string, LegalDoc> = {
   },
 
   cgu: {
-    title: "Conditions générales d'utilisation",
+    title: tr('legal.termsOfUse'),
     intro: (
       <p>
-        Les présentes conditions encadrent l'utilisation de Young &amp; Talented (« YAT »), plateforme qui permet aux jeunes
-        de présenter leurs talents (sport, arts, musique, métiers…) et d'échanger avec d'autres membres, des agents et des
-        organisations. En créant un compte, vous acceptez ces conditions.
+        {tr('legal.theseTermsGovernTheUseOf')}
       </p>
     ),
     sections: [
       {
-        title: '1. Âge minimum et comptes de mineurs',
+        title: tr('legal.1MinimumAgeAndMinorsAccounts'),
         body: (
           <>
-            <p>YAT est réservé aux personnes de <strong>13 ans et plus</strong>. La date de naissance est demandée à l'inscription et ne peut plus être modifiée ensuite que par le support.</p>
+            <p>{tr('legal.yatIsForPeopleAged')} <strong>{tr('legal.13AndOver')}</strong>{tr('legal.theDateOfBirthIsRequested')}</p>
             <ul>
-              <li><strong>13 et 14 ans</strong> : l'accord d'un parent ou du titulaire de l'autorité parentale est obligatoire. Un e-mail lui est envoyé ; tant qu'il n'a pas donné son accord, la messagerie est désactivée.</li>
-              <li><strong>15 à 17 ans</strong> : l'inscription est libre, mais un adulte ne peut envoyer de message privé à un mineur que si vous êtes connectés (demande d'ami acceptée).</li>
+              <li><strong>{tr('legal.ages13And14')}</strong> {tr('legal.consentFromAParentOrLegal')}</li>
+              <li><strong>{tr('legal.ages15To17')}</strong> {tr('legal.signUpIsOpenButAn')}</li>
             </ul>
-            <p>Un parent peut à tout moment demander la suppression du compte de son enfant en écrivant à <TODO>adresse e-mail de contact</TODO>.</p>
+            <p>{tr('legal.aParentCanAtAnyTime')} <TODO>{tr('legal.contactEmailAddress')}</TODO>.</p>
           </>
         ),
       },
       {
-        title: '2. Votre compte',
+        title: tr('legal.2YourAccount'),
         body: (
           <p>
-            Vous vous engagez à fournir des informations exactes, à garder votre mot de passe confidentiel et à ne pas créer de
-            compte au nom d'une autre personne. Les comptes agent et organisation doivent représenter une activité réelle ; ils
-            peuvent demander un badge de vérification.
+            {tr('legal.youAgreeToProvideAccurateInformation')}
           </p>
         ),
       },
       {
-        title: '3. Contenus publiés',
+        title: tr('legal.3PublishedContent'),
         body: (
           <>
             <p>
-              Vous restez propriétaire de ce que vous publiez. Vous accordez à l'éditeur une licence non exclusive, gratuite et
-              mondiale pour héberger, afficher et diffuser ces contenus sur YAT, pendant la durée de leur publication.
+              {tr('legal.youRemainTheOwnerOfWhat')}
             </p>
-            <p>Sont interdits notamment :</p>
+            <p>{tr('legal.theFollowingAreProhibitedInParticular')}</p>
             <ul>
-              <li>les contenus sexuels, violents, haineux, discriminatoires ou de harcèlement ;</li>
-              <li>toute sollicitation d'un mineur à caractère sexuel ou toute tentative d'obtenir ses coordonnées personnelles ;</li>
-              <li>les contenus qui portent atteinte aux droits d'autrui (droit à l'image, droit d'auteur) ;</li>
-              <li>les arnaques, offres d'emploi fictives et demandes d'argent pour « réserver » une opportunité ;</li>
-              <li>le spam et l'usurpation d'identité.</li>
+              <li>{tr('legal.sexualViolentHatefulDiscriminatoryOrHarassin')}</li>
+              <li>{tr('legal.anySexualSolicitationOfAMinor')}</li>
+              <li>{tr('legal.contentThatInfringesTheRightsOf')}</li>
+              <li>{tr('legal.scamsFakeJobOffersAndRequests')}</li>
+              <li>{tr('legal.spamAndImpersonation')}</li>
             </ul>
           </>
         ),
       },
       {
-        title: '4. Modération, blocage et signalement',
+        title: tr('legal.4ModerationBlockingAndReporting'),
         body: (
           <p>
-            Les contenus peuvent être analysés automatiquement (y compris par un outil d'intelligence artificielle) et examinés
-            par l'équipe de modération. Vous pouvez signaler un contenu ou un profil, et bloquer un membre : il ne pourra plus vous
-            écrire. L'éditeur peut retirer un contenu ou suspendre un compte qui ne respecte pas ces conditions.
+            {tr('legal.contentMayBeAnalysedAutomaticallyIncluding')}
           </p>
         ),
       },
       {
-        title: '5. Opportunités, contrats et transactions',
+        title: tr('legal.5OpportunitiesContractsAndTransactions'),
         body: (
           <p>
-            YAT met en relation talents, agents et organisations, mais n'est pas partie aux contrats conclus entre membres. Aucune
-            somme ne doit être demandée à un talent pour accéder à une opportunité. Les éventuelles fonctionnalités payantes
-            feront l'objet de conditions de vente distinctes.
+            {tr('legal.yatConnectsTalentsAgentsAndOrganizations')}
           </p>
         ),
       },
       {
-        title: '6. YAT Coin',
+        title: tr('legal.6YatCoin'),
         body: (
           <p>
-            Les YAT Coins récompensent l'activité sur la plateforme. Ils n'ont pas de valeur monétaire, ne sont ni remboursables
-            ni échangeables contre de l'argent, et peuvent être retirés en cas d'abus.
+            {tr('legal.yatCoinsRewardActivityOnThe')}
           </p>
         ),
       },
       {
-        title: '7. Suppression du compte',
+        title: tr('legal.7AccountDeletion'),
         body: (
           <p>
-            Vous pouvez supprimer votre compte à tout moment depuis Paramètres → Zone dangereuse. La suppression est définitive.
-            Vous pouvez aussi télécharger une copie de vos données depuis Paramètres → Confidentialité.
+            {tr('legal.youCanDeleteYourAccountAt')}
           </p>
         ),
       },
       {
-        title: '8. Responsabilité',
+        title: tr('legal.8Liability'),
         body: (
           <p>
-            L'éditeur fait ses meilleurs efforts pour assurer la disponibilité du service, sans garantie d'absence
-            d'interruption. Chaque membre est responsable des contenus qu'il publie et des échanges qu'il a avec les autres membres.
+            {tr('legal.thePublisherMakesItsBestEfforts')}
           </p>
         ),
       },
       {
-        title: '9. Droit applicable',
+        title: tr('legal.9GoverningLaw'),
         body: (
           <p>
-            Ces conditions sont soumises au droit <TODO>pays du droit applicable</TODO>. En cas de litige, une solution amiable
-            sera recherchée avant toute action devant les tribunaux compétents de <TODO>ville</TODO>.
+            {tr('legal.theseTermsAreGovernedByThe')} <TODO>{tr('legal.countryOfGoverningLaw')}</TODO>{tr('legal.inTheEventOfADispute')} <TODO>{tr('legal.city')}</TODO>.
           </p>
         ),
       },
@@ -180,92 +165,87 @@ const DOCS: Record<string, LegalDoc> = {
   },
 
   confidentialite: {
-    title: 'Politique de confidentialité',
+    title: tr('legal.privacyPolicy'),
     intro: (
       <p>
-        Cette politique explique quelles données personnelles YAT collecte, pourquoi, avec qui elles sont partagées et comment
-        exercer vos droits. Le responsable du traitement est <TODO>raison sociale et adresse de l'éditeur</TODO>.
-        Délégué à la protection des données : <TODO>nom ou adresse e-mail du DPO</TODO>.
+        {tr('legal.thisPolicyExplainsWhichPersonalData')} <TODO>{tr('legal.publisherSCompanyNameAndAddress')}</TODO>{tr('legal.dataProtectionOfficer')} <TODO>{tr('legal.dpoNameOrEmailAddress')}</TODO>.
       </p>
     ),
     sections: [
       {
-        title: 'Données collectées',
+        title: tr('legal.dataCollected'),
         body: (
           <ul>
-            <li><strong>Compte</strong> : nom, e-mail, mot de passe (chiffré), type de compte, date de naissance et, pour les moins de 15 ans, e-mail d'un parent.</li>
-            <li><strong>Profil</strong> : photo, biographie, ville et pays, compétences, expériences, formations, réalisations, liens vers vos réseaux sociaux, CV.</li>
-            <li><strong>Contenus</strong> : publications, commentaires, stories, shorts, médias, musique, messages privés, appels (date, durée, participants ; le contenu audio et vidéo n'est pas enregistré).</li>
-            <li><strong>Localisation</strong> : la position que vous choisissez de partager (fonction « Talents autour de moi », carte YAT Karta). Votre pays est aussi estimé à partir de votre adresse IP pour choisir la langue.</li>
-            <li><strong>Activité</strong> : likes, abonnements, connexions, niveaux, YAT Coins, résultats du test d'aptitude.</li>
-            <li><strong>Vérification</strong> : documents envoyés pour obtenir un badge, consultés uniquement par l'équipe de vérification.</li>
+            <li><strong>{tr('settings.account')}</strong> {tr('legal.nameEmailPasswordEncryptedAccountType')}</li>
+            <li><strong>{tr('sidebar.profile')}</strong> {tr('legal.photoBiographyCityAndCountrySkills')}</li>
+            <li><strong>{tr('legal.content')}</strong> {tr('legal.postsCommentsStoriesShortsMediaMusic')}</li>
+            <li><strong>{tr('location.label')}</strong> {tr('legal.theLocationYouChooseToShare')}</li>
+            <li><strong>{tr('legal.activity')}</strong> {tr('legal.likesFollowsConnectionsLevelsYatCoins')}</li>
+            <li><strong>{tr('common.verification')}</strong> {tr('legal.documentsSentToObtainABadge')}</li>
           </ul>
         ),
       },
       {
-        title: 'Finalités et bases légales',
+        title: tr('legal.purposesAndLegalBases'),
         body: (
           <ul>
-            <li>Fournir le service (compte, profil, messagerie, mise en relation) : exécution du contrat.</li>
-            <li>Protéger les mineurs, modérer les contenus, prévenir la fraude : intérêt légitime et obligation légale.</li>
-            <li>Recommandations et assistant IA (suggestions d'offres, de talents, traduction) : intérêt légitime, désactivable en n'utilisant pas ces fonctions.</li>
-            <li>Accord parental pour les 13-14 ans : obligation légale (âge du consentement numérique).</li>
+            <li>{tr('legal.providingTheServiceAccountProfileMessaging')}</li>
+            <li>{tr('legal.protectingMinorsModeratingContentPreventingF')}</li>
+            <li>{tr('legal.recommendationsAndAiAssistantJobTalent')}</li>
+            <li>{tr('legal.parentalConsentForAges1314')}</li>
           </ul>
         ),
       },
       {
-        title: 'Destinataires et sous-traitants',
+        title: tr('legal.recipientsAndProcessors'),
         body: (
           <>
-            <p>Votre profil public et vos publications sont visibles par les autres membres. Nous faisons appel aux prestataires suivants :</p>
+            <p>{tr('legal.yourPublicProfileAndYourPosts')}</p>
             <ul>
-              <li><strong>Supabase</strong> : hébergement de la base de données, authentification et fichiers.</li>
-              <li><strong>Moonshot AI (Kimi)</strong> et, selon la configuration, <strong>haimaker</strong> ou <strong>OpenRouter</strong> : traitements d'intelligence artificielle (assistant, traduction, modération, suggestions). Seules les données nécessaires à la demande sont transmises.</li>
-              <li><strong>Mapbox</strong> : affichage des cartes.</li>
-              <li><strong>Resend</strong> : envoi de l'e-mail d'accord parental.</li>
-              <li><strong>ipapi.co</strong> : estimation du pays à partir de l'adresse IP, pour la langue.</li>
-              <li><strong>Telegram</strong> et <strong>VK</strong> : si vous choisissez de vous connecter avec ces services.</li>
-              <li><strong>Serveur relais TURN</strong> : acheminement technique des appels audio et vidéo.</li>
+              <li><strong>Supabase</strong> {tr('legal.hostingOfTheDatabaseAuthenticationAnd')}</li>
+              <li><strong>Moonshot AI (Kimi)</strong> {tr('legal.andDependingOnTheConfiguration')} <strong>haimaker</strong> {tr('legal.or')} <strong>OpenRouter</strong> {tr('legal.artificialIntelligenceProcessingAssistantTra')}</li>
+              <li><strong>Mapbox</strong> {tr('legal.mapDisplay')}</li>
+              <li><strong>Resend</strong> {tr('legal.sendingTheParentalConsentEmail')}</li>
+              <li><strong>ipapi.co</strong> {tr('legal.estimatingTheCountryFromTheIp')}</li>
+              <li><strong>Telegram</strong> {tr('legal.and')} <strong>VK</strong> {tr('legal.ifYouChooseToSignIn')}</li>
+              <li><strong>{tr('legal.turnRelayServer')}</strong> {tr('legal.technicalRoutingOfAudioAndVideo')}</li>
             </ul>
             <p>
-              Certains prestataires sont situés hors de l'Union européenne. Ces transferts sont encadrés par des clauses
-              contractuelles types de la Commission européenne. <TODO>vérifier et lister les garanties de chaque prestataire</TODO>
+              {tr('legal.someProvidersAreLocatedOutsideThe')} <TODO>{tr('legal.checkAndListEachProviderS')}</TODO>
             </p>
           </>
         ),
       },
       {
-        title: 'Durées de conservation',
+        title: tr('legal.retentionPeriods'),
         body: (
           <ul>
-            <li>Compte et contenus : tant que le compte existe ; supprimés lors de la suppression du compte.</li>
-            <li>Documents de vérification : <TODO>durée, ex. jusqu'à la décision puis 1 an</TODO>.</li>
-            <li>Signalements et décisions de modération : <TODO>durée</TODO>.</li>
-            <li>Demande d'accord parental non validée : <TODO>durée, ex. 30 jours avant suppression du compte</TODO>.</li>
+            <li>{tr('legal.accountAndContentForAsLong')}</li>
+            <li>{tr('legal.verificationDocuments')} <TODO>{tr('legal.periodEGUntilTheDecision')}</TODO>.</li>
+            <li>{tr('legal.reportsAndModerationDecisions')} <TODO>{tr('legal.period')}</TODO>.</li>
+            <li>{tr('legal.unvalidatedParentalConsentRequest')} <TODO>{tr('legal.periodEG30DaysBefore')}</TODO>.</li>
           </ul>
         ),
       },
       {
-        title: 'Vos droits',
+        title: tr('legal.yourRights'),
         body: (
           <>
-            <p>Vous disposez des droits d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité.</p>
+            <p>{tr('legal.youHaveTheRightsOfAccess')}</p>
             <ul>
-              <li><strong>Télécharger vos données</strong> : Paramètres → Confidentialité → « Télécharger mes données ».</li>
-              <li><strong>Supprimer votre compte</strong> : Paramètres → Zone dangereuse.</li>
-              <li><strong>Autres demandes</strong> : <TODO>adresse e-mail dédiée</TODO>. Réponse sous un mois.</li>
+              <li><strong>{tr('legal.downloadYourData')}</strong> {tr('legal.settingsPrivacyDownloadMyData')}</li>
+              <li><strong>{tr('legal.deleteYourAccount')}</strong> {tr('legal.settingsDangerZone')}</li>
+              <li><strong>{tr('legal.otherRequests')}</strong> : <TODO>{tr('legal.dedicatedEmailAddress')}</TODO>{tr('legal.replyWithinOneMonth')}</li>
             </ul>
-            <p>Vous pouvez aussi saisir l'autorité de protection des données : <TODO>ex. CNIL, www.cnil.fr</TODO>.</p>
+            <p>{tr('legal.youCanAlsoLodgeAComplaint')} <TODO>{tr('legal.eGCnilWwwCnilFr')}</TODO>.</p>
           </>
         ),
       },
       {
-        title: 'Mineurs',
+        title: tr('legal.minors'),
         body: (
           <p>
-            Les moins de 13 ans ne peuvent pas s'inscrire. Pour les 13-14 ans, un parent doit valider le compte par e-mail.
-            La date de naissance des membres n'est utilisée que pour appliquer ces règles et les protections de la messagerie.
-            Un parent peut demander l'accès aux données de son enfant ou leur suppression à <TODO>adresse e-mail de contact</TODO>.
+            {tr('legal.childrenUnder13CannotSignUp')} <TODO>{tr('legal.contactEmailAddress')}</TODO>.
           </p>
         ),
       },
@@ -273,35 +253,32 @@ const DOCS: Record<string, LegalDoc> = {
   },
 
   cookies: {
-    title: 'Cookies et stockage local',
+    title: tr('legal.cookiesAndLocalStorage'),
     sections: [
       {
-        title: "Ce que YAT enregistre sur votre appareil",
+        title: tr('legal.whatYatStoresOnYourDevice'),
         body: (
           <ul>
-            <li><strong>Session de connexion</strong> (stockage local, clés <code>sb-…</code>) : vous garde connecté. Indispensable.</li>
-            <li><strong>Langue</strong> (<code>yat-language</code>, <code>yat-language-geo-tried</code>) : mémorise votre langue. Indispensable.</li>
-            <li><strong>Thème</strong> (<code>yat-theme</code>) : mémorise le mode clair ou sombre. Indispensable.</li>
-            <li><strong>Application installable</strong> : un service worker met en cache les fichiers du site pour qu'il se charge plus vite.</li>
+            <li><strong>{tr('legal.loginSession')}</strong> {tr('legal.localStorageKeys')} <code>sb-…</code>{tr('legal.keepsYouLoggedInEssential')}</li>
+            <li><strong>{tr('common.language')}</strong> (<code>yat-language</code>, <code>yat-language-geo-tried</code>{tr('legal.remembersYourLanguageEssential')}</li>
+            <li><strong>{tr('settings.theme')}</strong> (<code>yat-theme</code>{tr('legal.remembersLightOrDarkModeEssential')}</li>
+            <li><strong>{tr('legal.installableApp')}</strong> {tr('legal.aServiceWorkerCachesTheSite')}</li>
           </ul>
         ),
       },
       {
-        title: 'Pas de traceurs publicitaires',
+        title: tr('legal.noAdvertisingTrackers'),
         body: (
           <p>
-            YAT n'utilise aucun cookie publicitaire ni outil de mesure d'audience tiers. Les traceurs ci-dessus sont nécessaires
-            au fonctionnement du service et ne demandent donc pas de consentement. Si un outil de mesure est ajouté plus tard,
-            un bandeau de consentement sera affiché.
+            {tr('legal.yatUsesNoAdvertisingCookiesOr')}
           </p>
         ),
       },
       {
-        title: 'Effacer ces données',
+        title: tr('legal.clearingThisData'),
         body: (
           <p>
-            Vous pouvez les effacer depuis les réglages de votre navigateur, ou depuis Paramètres → « Vider le cache » dans YAT.
-            Vous serez alors déconnecté.
+            {tr('legal.youCanClearItFromYour')}
           </p>
         ),
       },
@@ -310,10 +287,10 @@ const DOCS: Record<string, LegalDoc> = {
 };
 
 export const LEGAL_LINKS = [
-  { slug: 'cgu', label: "Conditions d'utilisation" },
-  { slug: 'confidentialite', label: 'Confidentialité' },
-  { slug: 'cookies', label: 'Cookies' },
-  { slug: 'mentions-legales', label: 'Mentions légales' },
+  { slug: 'cgu', label: tr('legal.termsOfUse2') },
+  { slug: 'confidentialite', label: tr('footer.privacy') },
+  { slug: 'cookies', label: tr('footer.cookies') },
+  { slug: 'mentions-legales', label: tr('footer.legal') },
 ] as const;
 
 const Legal: React.FC = () => {
@@ -323,7 +300,7 @@ const Legal: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <nav className="flex flex-wrap gap-2 mb-6" aria-label="Documents légaux">
+      <nav className="flex flex-wrap gap-2 mb-6" aria-label={tr('common.legalDocuments')}>
         {LEGAL_LINKS.map(l => (
           <Link
             key={l.slug}
@@ -339,12 +316,12 @@ const Legal: React.FC = () => {
       <article className="bg-card border border-border rounded-xl p-6 md:p-8 space-y-6">
         <header className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold">{page.title}</h1>
-          <p className="text-sm text-muted-foreground">Dernière mise à jour : {LAST_UPDATE}</p>
+          <p className="text-sm text-muted-foreground">{tr('legal.lastUpdated')} {LAST_UPDATE}</p>
         </header>
 
         <div className="flex gap-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-sm">
           <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
-          <p>Document en cours de finalisation : les mentions surlignées doivent être complétées et le texte relu par un juriste.</p>
+          <p>{tr('legal.documentBeingFinalisedTheHighlightedItems')}</p>
         </div>
 
         {page.intro && <div className="text-[15px] leading-relaxed">{page.intro}</div>}

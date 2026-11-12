@@ -10,6 +10,7 @@ import { streamCategories } from '@/components/live/data/liveData';
 import { supabase } from '@/integrations/supabase/client';
 import LiveBroadcast from '@/components/live/LiveBroadcast';
 import LiveWatch from '@/components/live/LiveWatch';
+import { tr } from '@/i18n';
 
 interface StreamCard {
   id: string;
@@ -168,11 +169,11 @@ const Live: React.FC = () => {
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" onClick={() => setShowBroadcast(false)} className="gap-1.5">
                 <ArrowLeft className="h-4 w-4" />
-                Назад
+                {tr('common.back')}
               </Button>
               <div className="flex items-center gap-2">
                 <Radio className="h-5 w-5 text-destructive animate-pulse" />
-                <h1 className="text-xl font-bold text-foreground">Прямой эфир</h1>
+                <h1 className="text-xl font-bold text-foreground">{tr('sidebar.live')}</h1>
               </div>
             </div>
           </div>
@@ -196,7 +197,7 @@ const Live: React.FC = () => {
             </div>
             <Button size="sm" className="gap-1.5 bg-destructive hover:bg-destructive/90" onClick={() => setShowBroadcast(true)}>
               <Video className="h-4 w-4" />
-              Запустить / Go Live
+              {tr('live.goLive')}
             </Button>
           </div>
 
@@ -204,7 +205,7 @@ const Live: React.FC = () => {
             <Input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Поиск трансляций / Rechercher..."
+              placeholder={tr('live.searchStreams')}
               className="flex-1 h-10 text-sm bg-card"
             />
             <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="gap-1">
@@ -216,18 +217,18 @@ const Live: React.FC = () => {
           {showFilters && (
             <div className="grid grid-cols-2 gap-2 mt-3">
               <Select value={regionFilter} onValueChange={setRegionFilter}>
-                <SelectTrigger className="text-xs h-8"><SelectValue placeholder="Регион / Région" /></SelectTrigger>
+                <SelectTrigger className="text-xs h-8"><SelectValue placeholder={tr('live.region')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все / Tous</SelectItem>
+                  <SelectItem value="all">{tr('live.all')}</SelectItem>
                   {countries.slice(0, 20).map(c => (
                     <SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="text-xs h-8"><SelectValue placeholder="Тематика / Catégorie" /></SelectTrigger>
+                <SelectTrigger className="text-xs h-8"><SelectValue placeholder={tr('live.category')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все / Toutes</SelectItem>
+                  <SelectItem value="all">{tr('live.all2')}</SelectItem>
                   {streamCategories.map(c => (
                     <SelectItem key={c.id} value={c.name}>{c.icon} {c.name}</SelectItem>
                   ))}
@@ -243,16 +244,16 @@ const Live: React.FC = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-4 w-full grid grid-cols-4 text-xs">
             <TabsTrigger value="live" className="gap-1 text-xs">
-              <Globe className="h-3.5 w-3.5" /> LIVE
+              <Globe className="h-3.5 w-3.5" /> {tr('common.live')}
             </TabsTrigger>
             <TabsTrigger value="popular" className="gap-1 text-xs">
-              <Zap className="h-3.5 w-3.5" /> Популярные
+              <Zap className="h-3.5 w-3.5" /> {tr('articles.mostLiked')}
             </TabsTrigger>
             <TabsTrigger value="following" className="gap-1 text-xs">
-              <Heart className="h-3.5 w-3.5" /> Мои
+              <Heart className="h-3.5 w-3.5" /> {tr('events.my')}
             </TabsTrigger>
             <TabsTrigger value="search" className="gap-1 text-xs">
-              <Search className="h-3.5 w-3.5" /> Поиск
+              <Search className="h-3.5 w-3.5" /> {tr('common.search')}
             </TabsTrigger>
           </TabsList>
 
@@ -265,7 +266,7 @@ const Live: React.FC = () => {
               ) : filteredStreams.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   <Video className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">Нет трансляций / Aucun stream en direct</p>
+                  <p className="text-sm">{tr('live.noLiveStreams')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -275,7 +276,7 @@ const Live: React.FC = () => {
                         <img src={stream.thumbnail} alt={stream.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         <div className="absolute top-2 left-2 flex gap-1">
                           <Badge className="bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5">
-                            <Radio className="h-2.5 w-2.5 mr-0.5" /> LIVE
+                            <Radio className="h-2.5 w-2.5 mr-0.5" /> {tr('common.live')}
                           </Badge>
                         </div>
                         <div className="absolute bottom-2 right-2">

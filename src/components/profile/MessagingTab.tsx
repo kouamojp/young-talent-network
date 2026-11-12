@@ -8,14 +8,16 @@ import { MessageSquare, Search, Phone, Video, User, Image, Send, Loader2, Clock 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useConversations, type Conversation } from '@/hooks/useConversations';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const formatTime = (iso?: string) => {
   if (!iso) return '';
   const d = new Date(iso);
   const now = new Date();
   const sameDay = d.toDateString() === now.toDateString();
-  if (sameDay) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+  if (sameDay) return d.toLocaleTimeString(localeTag(), { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString(localeTag(), { day: '2-digit', month: '2-digit' });
 };
 
 const MessagingTab: React.FC = () => {
@@ -93,9 +95,9 @@ const MessagingTab: React.FC = () => {
       <GlassMorphism className="p-0 overflow-hidden">
         <div className="flex h-[600px] flex-col items-center justify-center text-center text-gray-500 p-6">
           <MessageSquare className="h-12 w-12 mb-3 text-gray-300" />
-          <h3 className="text-lg font-medium mb-2">No conversations yet</h3>
-          <p className="mb-4">Start chatting with your connections.</p>
-          <Button onClick={() => navigate('/messages')}>Go to Messages</Button>
+          <h3 className="text-lg font-medium mb-2">{tr('messagingTab.noConversationsYet')}</h3>
+          <p className="mb-4">{tr('messagingTab.startChattingWithYourConnections')}</p>
+          <Button onClick={() => navigate('/messages')}>{tr('messagingTab.goToMessages')}</Button>
         </div>
       </GlassMorphism>
     );
@@ -110,7 +112,7 @@ const MessagingTab: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search conversations"
+                placeholder={tr('messages.searchConversations')}
                 className="pl-10"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -138,12 +140,12 @@ const MessagingTab: React.FC = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between">
-                        <p className="font-medium truncate">{name || 'Conversation'}</p>
+                        <p className="font-medium truncate">{name || tr('messagingTab.conversation')}</p>
                         <p className="text-xs text-gray-500">{formatTime(last?.created_at)}</p>
                       </div>
                       <p className="text-sm text-gray-600 truncate">
                         {last?.sender_id === currentUserId && 'You: '}
-                        {last?.content || (last?.media_url ? '📎 Pièce jointe' : 'Aucun message')}
+                        {last?.content || (last?.media_url ? tr('messagingTab.attachment') : tr('messagingTab.noMessages'))}
                       </p>
                     </div>
 
@@ -180,7 +182,7 @@ const MessagingTab: React.FC = () => {
                     <Phone className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Call</TooltipContent>
+                <TooltipContent>{tr('orgDisc.call')}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -189,7 +191,7 @@ const MessagingTab: React.FC = () => {
                     <Video className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Video call</TooltipContent>
+                <TooltipContent>{tr('calls.videoCall')}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -198,7 +200,7 @@ const MessagingTab: React.FC = () => {
                     <User className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Open in Messages</TooltipContent>
+                <TooltipContent>{tr('messagingTab.openInMessages')}</TooltipContent>
               </Tooltip>
             </div>
           </div>
@@ -244,11 +246,11 @@ const MessagingTab: React.FC = () => {
                     <Image className="h-5 w-5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Send image (in Messages)</TooltipContent>
+                <TooltipContent>{tr('messagingTab.sendImageInMessages')}</TooltipContent>
               </Tooltip>
 
               <Input
-                placeholder="Type a message..."
+                placeholder={tr('messages.typeMessage')}
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyDown={(e) => {

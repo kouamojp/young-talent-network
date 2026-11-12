@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Upload, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface FileUploadButtonProps {
   userId: string;
@@ -25,7 +26,7 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
     if (!file) return;
     
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('Fichier trop volumineux (max 10MB)');
+      toast.error(tr('fileUploadButton.fileTooLargeMax10mb'));
       return;
     }
 
@@ -45,10 +46,10 @@ const FileUploadButton: React.FC<FileUploadButtonProps> = ({
         .getPublicUrl(path);
 
       onUploaded(publicUrl);
-      toast.success('Fichier uploadé');
+      toast.success(tr('fileUploadButton.fileUploaded'));
     } catch (err) {
       console.error(err);
-      toast.error("Erreur lors de l'upload");
+      toast.error(tr('fileUploadButton.errorDuringUpload'));
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';

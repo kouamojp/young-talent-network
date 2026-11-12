@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, Star, FileText, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface TalentResult {
   id: string;
@@ -90,7 +91,7 @@ const TalentSearchDirectory: React.FC = () => {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Search className="h-4 w-4" /> Recherche de Talents
+          <Search className="h-4 w-4" /> {tr('talentSearchDirectory.talentSearch')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -98,23 +99,23 @@ const TalentSearchDirectory: React.FC = () => {
           <Input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Compétence, nom, sport..."
+            placeholder={tr('talentSearchDirectory.skillNameSport')}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
           />
           <Input
             value={location}
             onChange={e => setLocation(e.target.value)}
-            placeholder="Ville, pays..."
+            placeholder={tr('common.cityCountry')}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
           />
           <Button onClick={handleSearch} disabled={loading} className="gap-1.5">
             <Filter className="h-3.5 w-3.5" />
-            {loading ? 'Recherche...' : 'Rechercher'}
+            {loading ? 'Recherche...' : tr('common.search')}
           </Button>
         </div>
 
         {searched && results.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">Aucun talent trouvé pour ces critères.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{tr('common.noTalentFoundForTheseCriteria')}</p>
         )}
 
         <div className="space-y-3">
@@ -143,12 +144,12 @@ const TalentSearchDirectory: React.FC = () => {
                   {t.skills.slice(0, 5).map((s, i) => (
                     <Badge key={i} variant="outline" className="text-[10px]">{s}</Badge>
                   ))}
-                  {t.education_count > 0 && <Badge variant="secondary" className="text-[10px]">{t.education_count} formation(s)</Badge>}
-                  {t.achievements_count > 0 && <Badge variant="secondary" className="text-[10px]">{t.achievements_count} réalisation(s)</Badge>}
+                  {t.education_count > 0 && <Badge variant="secondary" className="text-[10px]">{t.education_count} {tr('talentSearchDirectory.courseS')}</Badge>}
+                  {t.achievements_count > 0 && <Badge variant="secondary" className="text-[10px]">{t.achievements_count} {tr('talentSearchDirectory.achievementS')}</Badge>}
                 </div>
               </div>
               <Button variant="outline" size="sm" className="gap-1 shrink-0" onClick={() => window.location.href = `/talent/${t.id}`}>
-                <FileText className="h-3 w-3" /> Voir CV
+                <FileText className="h-3 w-3" /> {tr('talentSearchDirectory.viewCv')}
               </Button>
             </div>
           ))}

@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 const Article: React.FC = () => {
   const { t } = useLanguage();
@@ -83,7 +84,7 @@ const Article: React.FC = () => {
 
   const toggleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast({ title: 'Please log in', variant: 'destructive' }); return; }
+    if (!user) { toast({ title: tr('events.loginRequired'), variant: 'destructive' }); return; }
 
     // Optimistic update
     const wasLiked = isLiked;
@@ -94,26 +95,26 @@ const Article: React.FC = () => {
 
     if (wasLiked) {
       const { error } = await supabase.from('page_likes').delete().eq('page_id', page.id).eq('user_id', user.id);
-      if (error) { setIsLiked(true); setLikesCount(c => c + 1); toast({ title: 'Failed', variant: 'destructive' }); }
+      if (error) { setIsLiked(true); setLikesCount(c => c + 1); toast({ title: tr('common.failed'), variant: 'destructive' }); }
     } else {
       const { error } = await supabase.from('page_likes').insert({ page_id: page.id, user_id: user.id });
-      if (error) { setIsLiked(false); setLikesCount(c => Math.max(c - 1, 0)); toast({ title: 'Failed', variant: 'destructive' }); }
+      if (error) { setIsLiked(false); setLikesCount(c => Math.max(c - 1, 0)); toast({ title: tr('common.failed'), variant: 'destructive' }); }
     }
   };
 
   const submitComment = async () => {
     if (!newComment.trim()) return;
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast({ title: 'Please log in', variant: 'destructive' }); return; }
+    if (!user) { toast({ title: tr('events.loginRequired'), variant: 'destructive' }); return; }
     setSubmitting(true);
     const { error } = await supabase.from('page_comments').insert({ page_id: page.id, user_id: user.id, content: newComment.trim() });
     if (!error) { setNewComment(''); }
-    else toast({ title: 'Failed to post comment', variant: 'destructive' });
+    else toast({ title: tr('article.failedToPostComment'), variant: 'destructive' });
     setSubmitting(false);
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-  if (!page) return <div className="p-8 text-center">Article not found</div>;
+  if (!page) return <div className="p-8 text-center">{tr('article.articleNotFound')}</div>;
 
   return (
     <article className="max-w-3xl mx-auto py-6 px-4">
@@ -149,7 +150,7 @@ const Article: React.FC = () => {
             <div key={c.id} className="flex gap-2 animate-in fade-in slide-in-from-top-1">
               <Avatar className="h-8 w-8"><AvatarFallback>{c.profile?.name?.[0] || 'U'}</AvatarFallback></Avatar>
               <div className="flex-1 bg-muted rounded-lg p-2">
-                <p className="text-sm font-semibold">{c.profile?.name || 'User'}</p>
+                <p className="text-sm font-semibold">{c.profile?.name || tr('admin.user')}</p>
                 <p className="text-sm">{c.content}</p>
                 <p className="text-xs text-muted-foreground mt-1">{formatDistanceToNow(new Date(c.created_at), { addSuffix: true })}</p>
               </div>

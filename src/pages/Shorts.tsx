@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ShareMenu from '@/components/share/ShareMenu';
+import { tr } from '@/i18n';
 
 interface Short {
   id: string;          // unique key in list (may be suffixed)
@@ -418,7 +419,7 @@ const ShortsPage: React.FC = () => {
     } else {
       await supabase.from('connections').insert({ user_id: currentUser, connected_user_id: targetId, status: 'accepted' });
       setFollowing(prev => new Set(prev).add(targetId));
-      toast.success('Abonné');
+      toast.success(tr('shorts.subscribed'));
     }
   };
 
@@ -539,13 +540,13 @@ const ShortsPage: React.FC = () => {
 
   const handleUploadShort = async (file: File) => {
     if (!file) return;
-    if (!currentUser) { toast.error('Connectez-vous pour publier'); return; }
+    if (!currentUser) { toast.error(tr('post.loginRequired')); return; }
     if (!file.type.startsWith('video/')) {
-      toast.error(`Format non accepté (${file.type || 'inconnu'}). Choisissez une vidéo (MP4, MOV, WEBM…).`);
+      toast.error(tr('shorts.formatNotAcceptedChooseAVideo', { p0: file.type || 'inconnu' }));
       return;
     }
     if (file.size > MAX_SHORT_SIZE) {
-      toast.error(`Fichier trop volumineux (${Math.round(file.size / (1024 * 1024))} Mo). Maximum : 200 Mo.`);
+      toast.error(tr('shorts.fileTooLargeMbMaximum200', { p0: Math.round(file.size / (1024 * 1024)) }));
       return;
     }
     setUploading(true);
@@ -557,7 +558,7 @@ const ShortsPage: React.FC = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-      if (!token) { toast.error('Session expirée. Reconnectez-vous puis réessayez.'); return; }
+      if (!token) { toast.error(tr('shorts.sessionExpiredLogInAgainAnd')); return; }
 
       const ext = file.name.split('.').pop() || 'mp4';
       const path = `${currentUser}/shorts/${Date.now()}.${ext}`;
@@ -585,11 +586,11 @@ const ShortsPage: React.FC = () => {
             const body = JSON.parse(xhr.responseText || '{}');
             const detail = (body.message || body.error || '').toString().toLowerCase();
             if (xhr.status === 413 || xhr.status === 422 || detail.includes('size') || detail.includes('too large')) {
-              msg = `Fichier trop volumineux (max 200 Mo).`;
+              msg = tr('shorts.fileTooLargeMax200Mb');
             } else if (xhr.status === 401 || xhr.status === 403) {
-              msg = 'Session expirée. Reconnectez-vous puis réessayez.';
+              msg = tr('shorts.sessionExpiredLogInAgainAnd');
             } else if (xhr.status === 409) {
-              msg = 'Un fichier identique existe déjà. Réessayez.';
+              msg = tr('shorts.anIdenticalFileAlreadyExistsPlease');
             } else if (detail) {
               msg = `Échec de l'envoi : ${body.message || body.error}`;
             }
@@ -615,17 +616,17 @@ const ShortsPage: React.FC = () => {
         title: file.name.replace(/\.[^.]+$/, '').slice(0, 80) || null,
       });
       if (error) {
-        toast.error(`La vidéo a été envoyée mais la publication a échoué : ${error.message}`);
+        toast.error(tr('shorts.theVideoWasUploadedButPublishing', { p0: error.message }));
         return;
       }
-      toast.success('Short publié !');
+      toast.success(tr('common.shortPublished'));
       // Realtime listener will prepend, but also refresh to be safe
       refreshTop();
     } catch (e: any) {
       if (e?.aborted) {
-        toast.info('Upload annulé');
+        toast.info(tr('shorts.uploadCancelled'));
       } else {
-        toast.error(e?.message || "Erreur lors de la publication. Réessayez.");
+        toast.error(e?.message || tr('shorts.errorWhilePublishingPleaseTryAgain'));
       }
     } finally {
       setUploading(false);
@@ -658,7 +659,7 @@ const ShortsPage: React.FC = () => {
             size="icon" variant="secondary" className="rounded-full h-9 w-9"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            title="Publier un short"
+            title={tr('shorts.publishAShort')}
           >
             {uploading
               ? <div className="h-4 w-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
@@ -675,7 +676,7 @@ const ShortsPage: React.FC = () => {
           <div className="w-72 max-w-[85vw] text-center text-white">
             <div className="mx-auto mb-3 h-10 w-10 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             <p className="text-sm font-semibold mb-1">
-              {uploadPhase === 'saving' ? 'Publication du Short…' : 'Envoi de la vidéo…'}
+              {uploadPhase === 'saving' ? tr('shorts.publishingTheShort') : tr('shorts.uploadingTheVideo')}
             </p>
             <p className="text-xs text-white/70 mb-3 truncate">
               {uploadFileName}
@@ -691,11 +692,11 @@ const ShortsPage: React.FC = () => {
             )}
             {uploadSlow && uploadPhase === 'uploading' && (
               <p className="text-xs text-yellow-300 mb-3">
-                Transfert lent — connexion faible. Vous pouvez patienter ou annuler.
+                {tr('shorts.slowTransferWeakConnectionYouCan')}
               </p>
             )}
             <Button size="sm" variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-black" onClick={cancelUpload}>
-              Annuler
+              {tr('common.cancel')}
             </Button>
           </div>
         </div>
@@ -707,16 +708,16 @@ const ShortsPage: React.FC = () => {
           className="absolute top-14 left-1/2 -translate-x-1/2 z-30 bg-primary text-primary-foreground rounded-full shadow-lg px-4 py-2 text-xs font-semibold flex items-center gap-2 animate-fade-in hover:scale-105 transition"
         >
           <RefreshCw className="h-3.5 w-3.5" />
-          {newCount} nouvelle{newCount > 1 ? 's' : ''} vidéo{newCount > 1 ? 's' : ''} — Rafraîchir
+          {newCount} {tr('shorts.new')}{newCount > 1 ? 's' : ''} {tr('common.video')}{newCount > 1 ? 's' : ''} {tr('shorts.refresh')}
         </button>
       )}
 
       {loading ? (
-        <div className="h-full flex items-center justify-center text-white/70 text-sm">Chargement...</div>
+        <div className="h-full flex items-center justify-center text-white/70 text-sm">{tr('common.loading')}</div>
       ) : shorts.length === 0 ? (
         <div className="h-full flex flex-col items-center justify-center text-white/70 text-sm gap-2 px-6 text-center">
           <Play className="h-10 w-10 opacity-40" />
-          <p>Aucun Short pour l'instant.</p>
+          <p>{tr('shorts.noShortsYet')}</p>
         </div>
       ) : (
         <div data-shorts-scroll className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
@@ -729,7 +730,7 @@ const ShortsPage: React.FC = () => {
                 {videoErrors[short.id] ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80">
                     <AlertTriangle className="h-10 w-10 mb-2 text-yellow-400" />
-                    <p className="text-sm">Vidéo indisponible</p>
+                    <p className="text-sm">{tr('common.videoUnavailable')}</p>
                   </div>
                 ) : (
                   <video
@@ -784,12 +785,12 @@ const ShortsPage: React.FC = () => {
                     </div>
                     <span className="text-xs mt-1 font-semibold">{short.comments_count || 0}</span>
                   </button>
-                  <ShareMenu url={`${window.location.origin}/media?tab=shorts&v=${short.realId}`} title={short.title || 'Short'}>
+                  <ShareMenu url={`${window.location.origin}/media?tab=shorts&v=${short.realId}`} title={short.title || tr('common.short')}>
                     <button className="flex flex-col items-center text-white">
                       <div className="bg-black/40 backdrop-blur-sm rounded-full p-2.5">
                         <Share2 className="h-6 w-6" />
                       </div>
-                      <span className="text-xs mt-1 font-semibold">Partager</span>
+                      <span className="text-xs mt-1 font-semibold">{tr('communities.share')}</span>
                     </button>
                   </ShareMenu>
                   <button onClick={() => setMuted(m => !m)} className="flex flex-col items-center text-white">
@@ -823,7 +824,7 @@ const ShortsPage: React.FC = () => {
                   {short.description && <p className="text-xs opacity-90 line-clamp-2">{short.description}</p>}
                   <div className="flex items-center gap-1.5 mt-2 text-xs opacity-90">
                     <Music className="h-3 w-3 animate-spin" style={{ animationDuration: '4s' }} />
-                    <span className="truncate">Audio original · @{short.profile?.name || 'user'}</span>
+                    <span className="truncate">{tr('shorts.originalAudio')}{short.profile?.name || 'user'}</span>
                   </div>
                 </div>
 
@@ -840,21 +841,21 @@ const ShortsPage: React.FC = () => {
       <Sheet open={!!commentsOpen} onOpenChange={(o) => { if (!o) { setCommentsOpen(null); setReplyTo(null); } }}>
         <SheetContent side="bottom" className="h-[70vh] flex flex-col p-0 rounded-t-2xl">
           <SheetHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
-            <SheetTitle>{comments.length} commentaire{comments.length > 1 ? 's' : ''}</SheetTitle>
+            <SheetTitle>{comments.length} {tr('shorts.comment')}{comments.length > 1 ? 's' : ''}</SheetTitle>
             <Button
               size="icon" variant="ghost" className="h-8 w-8"
               onClick={() => commentsOpen && loadComments(commentsOpen)}
-              title="Recharger"
+              title={tr('shorts.reload')}
             >
               <RefreshCw className={`h-4 w-4 ${commentsLoading ? 'animate-spin' : ''}`} />
             </Button>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             {commentsLoading && comments.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">Chargement...</p>
+              <p className="text-sm text-muted-foreground text-center py-8">{tr('common.loading')}</p>
             )}
             {!commentsLoading && comments.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">Soyez le premier à commenter.</p>
+              <p className="text-sm text-muted-foreground text-center py-8">{tr('shorts.beTheFirstToComment')}</p>
             )}
             {comments.map(c => {
               const replyCount = (c.replies || []).length;
@@ -872,7 +873,7 @@ const ShortsPage: React.FC = () => {
                         <Heart className={`h-3.5 w-3.5 ${c.liked ? 'fill-red-500 text-red-500' : ''}`} />
                         {c.likes || 0}
                       </button>
-                      <button onClick={() => { setReplyTo(c); }} className="hover:text-foreground">Répondre</button>
+                      <button onClick={() => { setReplyTo(c); }} className="hover:text-foreground">{tr('shorts.reply')}</button>
                     </div>
 
                     {replyCount > 0 && !c.repliesLoaded && (
@@ -880,7 +881,7 @@ const ShortsPage: React.FC = () => {
                         onClick={() => loadReplies(c)}
                         className="text-xs text-primary mt-2 flex items-center gap-1 hover:underline"
                       >
-                        <CornerDownRight className="h-3 w-3" /> Voir {replyCount} réponse{replyCount > 1 ? 's' : ''}
+                        <CornerDownRight className="h-3 w-3" /> {tr('common.view')} {replyCount} {tr('shorts.reply2')}{replyCount > 1 ? 's' : ''}
                       </button>
                     )}
 
@@ -900,7 +901,7 @@ const ShortsPage: React.FC = () => {
                                   <Heart className={`h-3.5 w-3.5 ${r.liked ? 'fill-red-500 text-red-500' : ''}`} />
                                   {r.likes || 0}
                                 </button>
-                                <button onClick={() => setReplyTo(c)} className="hover:text-foreground">Répondre</button>
+                                <button onClick={() => setReplyTo(c)} className="hover:text-foreground">{tr('shorts.reply')}</button>
                               </div>
                             </div>
                           </div>
@@ -914,15 +915,15 @@ const ShortsPage: React.FC = () => {
           </div>
           {replyTo && (
             <div className="px-4 py-1.5 text-xs text-muted-foreground bg-muted/50 flex items-center justify-between">
-              <span>Réponse à @{replyTo.profile?.name || 'user'}</span>
-              <button onClick={() => setReplyTo(null)} className="text-primary hover:underline">Annuler</button>
+              <span>{tr('shorts.replyTo')}{replyTo.profile?.name || 'user'}</span>
+              <button onClick={() => setReplyTo(null)} className="text-primary hover:underline">{tr('common.cancel')}</button>
             </div>
           )}
           <div className="border-t p-3 flex gap-2">
             <Input
               value={newComment}
               onChange={e => setNewComment(e.target.value)}
-              placeholder={replyTo ? 'Écrire une réponse...' : 'Ajouter un commentaire...'}
+              placeholder={replyTo ? tr('shorts.writeAReply') : tr('common.addAComment')}
               onKeyDown={e => e.key === 'Enter' && submitComment()}
             />
             <Button size="icon" onClick={submitComment} disabled={!newComment.trim()}>

@@ -4,6 +4,8 @@ import { Briefcase, Calendar, Loader2, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { OrganizationCrest } from '@/components/organizations/OrganizationRow';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface JobPosting {
   id: string;
@@ -47,7 +49,7 @@ const TalentView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }) => {
       <div className="rounded-xl border border-dashed border-border p-10 text-center">
         <Briefcase className="mx-auto h-8 w-8 text-muted-foreground/50" />
         <p className="mt-3 text-sm text-muted-foreground">
-          {jobs.length === 0 ? 'Aucune offre ouverte pour le moment.' : 'Aucune offre ne correspond à cette recherche.'}
+          {jobs.length === 0 ? tr('talentView.noOpenJobOffersYet') : tr('talentView.noJobOfferMatchesThisSearch')}
         </p>
       </div>
     );
@@ -73,7 +75,7 @@ const TalentView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }) => {
               <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 {job.location && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.location}</span>}
                 {job.salary_range && <span>{job.salary_range}</span>}
-                <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(job.created_at).toLocaleDateString()}</span>
+                <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{new Date(job.created_at).toLocaleDateString(localeTag())}</span>
               </span>
             </span>
           </button>

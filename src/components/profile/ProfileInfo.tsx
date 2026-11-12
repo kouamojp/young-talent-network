@@ -4,6 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { MapPin, Link as LinkIcon, Calendar, BookOpen, Briefcase } from 'lucide-react';
 import GlassMorphism from '@/components/GlassMorphism';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface ProfileInfoProps {
   user: {
@@ -28,11 +30,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1">
                 <MapPin size={16} />
-                <span>🌍 Talent discovered near {user.location.split(',')[0]}! Send a wave 👋</span>
+                <span>{tr('profileInfo.talentDiscoveredNear')} {user.location.split(',')[0]}{tr('profileInfo.sendAWave')}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>See where this talent is making waves!</p>
+              <p>{tr('profileInfo.seeWhereThisTalentIsMaking')}</p>
             </TooltipContent>
           </Tooltip>
           
@@ -45,11 +47,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1">
                 <Calendar size={16} />
-                <span>🎉 Born to shine on {user.birthday}!</span>
+                <span>{tr('profileInfo.bornToShineOn')} {user.birthday}!</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Mark your calendar for celebration time!</p>
+              <p>{tr('profileInfo.markYourCalendarForCelebrationTime')}</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -57,7 +59,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
         <Card>
           <CardContent className="p-4">
             <h3 className="font-medium flex items-center gap-2 mb-2">
-              <span>When I'm not performing, I love...</span>
+              <span>{tr('profileInfo.whenIMNotPerformingI')}</span>
             </h3>
             <div className="flex flex-wrap gap-2">
               {user.hobbies.map((hobby, index) => (
@@ -79,11 +81,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
           <CardContent className="p-4">
             <h3 className="font-medium flex items-center gap-2 mb-2">
               <BookOpen size={16} className="text-purple-600" />
-              <span>📚 Learning the art of music at {user.education}</span>
+              <span>{tr('profileInfo.learningTheArtOfMusicAt')} {user.education}</span>
             </h3>
             <h3 className="font-medium flex items-center gap-2 mt-3">
               <Briefcase size={16} className="text-purple-600" />
-              <span>💡 Currently: {user.work}. (Destined for greater stages!)</span>
+              <span>{tr('profileInfo.currently')} {user.work}{tr('profileInfo.destinedForGreaterStages')}</span>
             </h3>
           </CardContent>
         </Card>
@@ -92,12 +94,12 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ user }) => {
           <CardContent className="p-4">
             <div className="flex justify-between">
               <div>
-                <span className="font-bold">{user.followers.toLocaleString()}</span> 
-                <span className="text-gray-600 ml-1">👥 supporters in your fan network</span>
+                <span className="font-bold">{user.followers.toLocaleString(localeTag())}</span> 
+                <span className="text-gray-600 ml-1">{tr('profileInfo.supportersInYourFanNetwork')}</span>
               </div>
               <div>
                 <span className="font-bold">{user.mentors}</span> 
-                <span className="text-gray-600 ml-1">🎓 mentors guiding your journey</span>
+                <span className="text-gray-600 ml-1">{tr('profileInfo.mentorsGuidingYourJourney')}</span>
               </div>
             </div>
           </CardContent>

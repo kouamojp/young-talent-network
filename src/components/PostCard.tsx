@@ -15,6 +15,7 @@ import LinkPreview from './LinkPreview';
 import { PostCreationDialog } from './PostCreationDialog';
 import { Users } from 'lucide-react';
 import TranslateButton from './TranslateButton';
+import { tr } from '@/i18n';
 
 const URL_REGEX = /(https?:\/\/[^\s<>"')]+)/gi;
 const isUrl = (s: string) => /^https?:\/\//i.test(s);
@@ -90,10 +91,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   const postUrl = `${window.location.origin}/feed?post=${post.id}`;
 
   const deletePost = async () => {
-    if (!confirm('Supprimer cette publication ?')) return;
+    if (!confirm(tr('common.deleteThisPost'))) return;
     const { error } = await supabase.from('posts').delete().eq('id', post.id);
     if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Publication supprimée' });
+    toast({ title: tr('admin.postDeleted') });
     onUpdate?.();
   };
 
@@ -110,12 +111,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           manual_reason: reason.trim(),
         },
       });
-      toast({ title: 'Merci, votre signalement a été envoyé aux modérateurs' });
+      toast({ title: tr('postCard.thankYouYourReportHasBeen') });
     } catch (e: any) {
-      toast({ title: 'Échec du signalement', description: e.message, variant: 'destructive' });
+      toast({ title: tr('postCard.reportFailed'), description: e.message, variant: 'destructive' });
     }
   };
-  const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: 'Lien copié' }); } catch { toast({ title: 'Impossible de copier', variant: 'destructive' }); } };
+  const copyLink = async () => { try { await navigator.clipboard.writeText(postUrl); toast({ title: tr('postCard.linkCopied') }); } catch { toast({ title: tr('postCard.couldNotCopy'), variant: 'destructive' }); } };
 
 
   useEffect(() => {
@@ -179,7 +180,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   const handleLike = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: "Please log in to like posts", variant: "destructive" });
+      toast({ title: tr('postCard.pleaseLogInToLikePosts'), variant: "destructive" });
       return;
     }
 
@@ -198,7 +199,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       console.error('Error toggling like:', error);
       setIsLiked(wasLiked);
       setLikesCount(prev => prev + (wasLiked ? 1 : -1));
-      toast({ title: "Failed to update like", variant: "destructive" });
+      toast({ title: tr('postCard.failedToUpdateLike'), variant: "destructive" });
     }
   };
 
@@ -224,7 +225,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: "Please log in to comment", variant: "destructive" });
+      toast({ title: tr('postCard.pleaseLogInToComment'), variant: "destructive" });
       return;
     }
 
@@ -239,10 +240,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       setNewComment('');
       fetchComments();
       onUpdate?.();
-      toast({ title: "Comment added!" });
+      toast({ title: tr('postCard.commentAdded') });
     } catch (error) {
       console.error('Error adding comment:', error);
-      toast({ title: "Failed to add comment", variant: "destructive" });
+      toast({ title: tr('postCard.failedToAddComment'), variant: "destructive" });
     } finally {
       setIsSubmitting(false);
     }
@@ -267,7 +268,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            <button onClick={goToProfile} className="shrink-0" aria-label={`Voir le profil de ${post.author.name}`}>
+            <button onClick={goToProfile} className="shrink-0" aria-label={tr('postCard.viewSProfile', { p0: post.author.name })}>
               <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-primary/40 transition">
                 <AvatarImage src={post.author.avatar} alt={post.author.name} />
                 <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
@@ -304,12 +305,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {currentUserId && currentUserId === (post.user_id || post.author.id) && (
-                <DropdownMenuItem onClick={() => setEditOpen(true)}><Edit3 className="h-4 w-4 mr-2" />Modifier</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setEditOpen(true)}><Edit3 className="h-4 w-4 mr-2" />{tr('common.edit')}</DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={copyLink}><Copy className="h-4 w-4 mr-2" />Copier le lien</DropdownMenuItem>
-              <DropdownMenuItem onClick={reportPost}><Flag className="h-4 w-4 mr-2" />Signaler</DropdownMenuItem>
+              <DropdownMenuItem onClick={copyLink}><Copy className="h-4 w-4 mr-2" />{tr('common.copyLink')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={reportPost}><Flag className="h-4 w-4 mr-2" />{tr('postCard.report')}</DropdownMenuItem>
               {currentUserId && currentUserId === (post.user_id || post.author.id) && (
-                <DropdownMenuItem onClick={deletePost} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />Supprimer</DropdownMenuItem>
+                <DropdownMenuItem onClick={deletePost} className="text-destructive"><Trash2 className="h-4 w-4 mr-2" />{tr('common.delete')}</DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -335,7 +336,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
                 onClick={() => setExpanded(e => !e)}
                 className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
               >
-                {expanded ? 'Voir moins' : 'Voir plus'}
+                {expanded ? tr('postCard.showLess') : tr('postCard.showMore')}
                 <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
               </button>
             )}
@@ -345,7 +346,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
               onTranslated={(t, lang) => setTranslation(t && lang ? { text: t, lang } : null)}
             />
             {translation && (
-              <span className="text-[10px] text-muted-foreground italic">Traduit par IA</span>
+              <span className="text-[10px] text-muted-foreground italic">{tr('common.translatedByAi')}</span>
             )}
           </div>
         </div>
@@ -381,7 +382,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
             <span className="capitalize font-medium">
               {post.external_source_platform || 'source'}
             </span>
-            <span>• Importé depuis l'extérieur</span>
+            <span>{tr('postCard.importedFromOutside')}</span>
           </a>
         </div>
       )}
@@ -396,8 +397,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
         </div>
         
         <div className="flex space-x-3">
-          <span>{commentsCount} comments</span>
-          <span>{sharesCount} shares</span>
+          <span>{commentsCount} {tr('postCard.comments')}</span>
+          <span>{sharesCount} {tr('postCard.shares')}</span>
         </div>
       </div>
       
@@ -430,7 +431,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
         <div className="px-4 pb-4 space-y-3 border-t pt-3">
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-2">
-              <button onClick={() => goToUserProfile(comment.user_id, comment.profiles?.user_type)} className="shrink-0" aria-label={`Voir le profil de ${comment.profiles.name}`}>
+              <button onClick={() => goToUserProfile(comment.user_id, comment.profiles?.user_type)} className="shrink-0" aria-label={tr('postCard.viewSProfile', { p0: comment.profiles.name })}>
                 <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/40 transition">
                   <AvatarImage src={comment.profiles.avatar_url} />
                   <AvatarFallback>{comment.profiles.name[0]}</AvatarFallback>
@@ -444,14 +445,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           ))}
           <div className="flex gap-2 mt-3">
             <Textarea
-              placeholder="Write a comment..."
+              placeholder={tr('articles.writeComment')}
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               className="min-h-[60px]"
               disabled={isSubmitting}
             />
             <Button onClick={handleComment} disabled={isSubmitting || !newComment.trim()}>
-              Post
+              {tr('common.post')}
             </Button>
           </div>
         </div>

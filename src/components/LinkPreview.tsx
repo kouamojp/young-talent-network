@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface LinkPreviewProps {
   url: string;
@@ -94,7 +95,7 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url }) => {
           <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{data.description}</div>
         )}
         <div className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary">
-          Ouvrir <ExternalLink className="h-3 w-3" />
+          {tr('common.open')} <ExternalLink className="h-3 w-3" />
         </div>
       </div>
     </a>

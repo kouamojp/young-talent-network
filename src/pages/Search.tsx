@@ -12,6 +12,7 @@ import { countries } from '@/data/countries';
 import { sportCategories } from '@/data/sportCategories';
 import { useLanguage } from '@/i18n/LanguageContext';
 import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
+import { tr } from '@/i18n';
 
 type SearchType = 'all' | 'talent' | 'agent' | 'organization';
 
@@ -128,8 +129,8 @@ const Search: React.FC = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-2 mb-3">
             <Database className="h-4 w-4 text-primary" />
-            <span className="text-xs text-muted-foreground">{t('search.syncedYatDb') || 'Synchronisé avec YAT Database'}</span>
-            <Link to="/yat-database" className="text-xs text-primary hover:underline ml-auto">{t('search.openDb') || 'Ouvrir YAT Database'} →</Link>
+            <span className="text-xs text-muted-foreground">{t('search.syncedYatDb') || tr('search.syncedYatDb')}</span>
+            <Link to="/yat-database" className="text-xs text-primary hover:underline ml-auto">{t('search.openDb') || tr('search.openDb')} →</Link>
           </div>
           <div className="flex gap-2">
             <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search.searchPlaceholder')}
@@ -140,7 +141,7 @@ const Search: React.FC = () => {
             {([
               { key: 'all' as SearchType, icon: Database, label: t('search.all') || 'Tous' },
               { key: 'talent' as SearchType, icon: Users, label: t('search.talents') },
-              { key: 'agent' as SearchType, icon: UserCheck, label: 'Agents' },
+              { key: 'agent' as SearchType, icon: UserCheck, label: tr('org.agents') },
               { key: 'organization' as SearchType, icon: Building2, label: t('search.organizations') },
             ]).map(tab => (
               <Button key={tab.key} variant={searchType === tab.key ? 'default' : 'outline'} size="sm"

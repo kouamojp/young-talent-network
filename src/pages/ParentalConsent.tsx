@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Loader2, ShieldCheck, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { invokeFunction } from '@/lib/invokeFunction';
+import { tr } from '@/i18n';
 
 type State =
   | { kind: 'loading' }
@@ -18,10 +19,10 @@ const ParentalConsent: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
-    if (!token) { setState({ kind: 'error', message: 'Lien incomplet. Utilisez le lien reçu par e-mail.' }); return; }
+    if (!token) { setState({ kind: 'error', message: tr('parentalConsent.incompleteLinkUseTheLinkYou') }); return; }
     invokeFunction<{ childName: string; status: string }>('parental-consent', { action: 'info', token }).then(({ data, error }) => {
       if (error || !data) {
-        setState({ kind: 'error', message: error || "Ce lien n'est plus valable." });
+        setState({ kind: 'error', message: error || tr('parentalConsent.thisLinkIsNoLongerValid') });
       } else if (data.status === 'granted') {
         setState({ kind: 'granted', childName: data.childName });
       } else {
@@ -35,7 +36,7 @@ const ParentalConsent: React.FC = () => {
     const { data, error } = await invokeFunction<{ childName: string }>('parental-consent', { action: 'confirm', token });
     setConfirming(false);
     if (error || !data) {
-      setState({ kind: 'error', message: error || "L'accord n'a pas pu être enregistré. Réessayez." });
+      setState({ kind: 'error', message: error || tr('parentalConsent.theConsentCouldNotBeSaved') });
       return;
     }
     setState({ kind: 'granted', childName: data.childName });
@@ -46,7 +47,7 @@ const ParentalConsent: React.FC = () => {
       <div className="bg-card border border-border rounded-xl p-6 md:p-8 space-y-5">
         <div className="flex items-center gap-3">
           <ShieldCheck className="h-7 w-7 text-primary" />
-          <h1 className="text-2xl font-bold">Accord parental</h1>
+          <h1 className="text-2xl font-bold">{tr('parentalConsent.parentalConsent')}</h1>
         </div>
 
         {state.kind === 'loading' && (
@@ -63,28 +64,25 @@ const ParentalConsent: React.FC = () => {
         {state.kind === 'ready' && (
           <>
             <p>
-              <strong>{state.childName}</strong> a créé un compte sur Young &amp; Talented (YAT), une plateforme où les jeunes
-              présentent leurs talents et échangent avec d'autres membres, des agents et des organisations.
+              <strong>{state.childName}</strong> {tr('parentalConsent.hasCreatedAnAccountOnYoung')}
             </p>
-            <p>En donnant votre accord, vous permettez à votre enfant d'utiliser toutes les fonctions de YAT, y compris la messagerie. Pour sa sécurité :</p>
+            <p>{tr('parentalConsent.byGivingYourConsentYouAllow')}</p>
             <ul className="list-disc pl-5 space-y-1 text-sm">
-              <li>un adulte ne peut lui écrire que si votre enfant a accepté sa demande d'ami ;</li>
-              <li>votre enfant peut bloquer ou signaler n'importe quel membre ;</li>
-              <li>vous pouvez demander la suppression du compte à tout moment.</li>
+              <li>{tr('parentalConsent.anAdultCanOnlyMessageYour')}</li>
+              <li>{tr('parentalConsent.yourChildCanBlockOrReport')}</li>
+              <li>{tr('parentalConsent.youCanRequestTheDeletionOf')}</li>
             </ul>
             <p className="text-sm text-muted-foreground">
-              Avant de confirmer, consultez les <Link to="/legal/cgu" className="underline">conditions d'utilisation</Link> et
-              la <Link to="/legal/confidentialite" className="underline">politique de confidentialité</Link>.
+              {tr('parentalConsent.beforeConfirmingReadThe')} <Link to="/legal/cgu" className="underline">{tr('auth.termsLink')}</Link> {tr('auth.and')} <Link to="/legal/confidentialite" className="underline">{tr('auth.privacyLink')}</Link>.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button onClick={confirm} disabled={confirming}>
                 {confirming && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Je suis son parent et je donne mon accord
+                {tr('parentalConsent.iAmTheirParentAndI')}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Vous refusez ou ne connaissez pas ce compte ? Ne faites rien : la messagerie restera désactivée.
-              Pour demander sa suppression, écrivez à l'adresse indiquée dans les <Link to="/legal/mentions-legales" className="underline">mentions légales</Link>.
+              {tr('parentalConsent.doYouRefuseOrNotRecognise')} <Link to="/legal/mentions-legales" className="underline">{tr('parentalConsent.legalNotice')}</Link>.
             </p>
           </>
         )}
@@ -93,7 +91,7 @@ const ParentalConsent: React.FC = () => {
           <div className="flex gap-3 rounded-lg bg-green-500/10 p-4">
             <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
             <p className="text-sm">
-              Merci. L'accord est enregistré : le compte de <strong>{state.childName}</strong> est maintenant actif.
+              {tr('parentalConsent.thankYouTheConsentIsRecorded')} <strong>{state.childName}</strong> {tr('parentalConsent.isNowActive')}
             </p>
           </div>
         )}

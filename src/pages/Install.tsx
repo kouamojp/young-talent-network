@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, Smartphone, Share, MoreVertical, Plus, Check, Monitor, ChevronRight } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -43,10 +44,10 @@ const Install: React.FC = () => {
   };
 
   const features = [
-    { icon: '⚡', title: 'Accès instantané', desc: 'Lancez YAT directement depuis votre écran d\'accueil' },
-    { icon: '📱', title: 'Expérience native', desc: 'Interface plein écran sans barre de navigateur' },
-    { icon: '🔔', title: 'Notifications', desc: 'Restez informé des nouvelles opportunités' },
-    { icon: '🌐', title: 'Accès hors ligne', desc: 'Consultez votre profil même sans connexion' },
+    { icon: '⚡', title: tr('install.instant'), desc: tr('install.launchYatStraightFromYourHome') },
+    { icon: '📱', title: tr('install.native'), desc: tr('install.fullScreenInterfaceWithoutABrowser') },
+    { icon: '🔔', title: tr('nav.notifications'), desc: tr('install.stayInformedAboutNewOpportunities') },
+    { icon: '🌐', title: tr('install.offline'), desc: tr('install.viewYourProfileEvenOffline') },
   ];
 
   if (isInstalled) {
@@ -57,9 +58,9 @@ const Install: React.FC = () => {
             <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
               <Check className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Application installée !</h2>
+            <h2 className="text-2xl font-bold text-foreground">{tr('install.installed')}</h2>
             <p className="text-muted-foreground">
-              YAT est maintenant disponible sur votre écran d&apos;accueil. Vous pouvez fermer ce navigateur et utiliser l&apos;application directement.
+              {tr('install.yatIsNowAvailableOnYour')}
             </p>
           </CardContent>
         </Card>
@@ -74,9 +75,9 @@ const Install: React.FC = () => {
         <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
           <Smartphone className="h-10 w-10" />
         </div>
-        <h1 className="text-3xl font-bold mb-2">Installer YAT</h1>
+        <h1 className="text-3xl font-bold mb-2">{tr('sidebar.installYat')}</h1>
         <p className="text-white/80 max-w-sm mx-auto">
-          Ajoutez Young & Talented à votre écran d'accueil pour une expérience optimale
+          {tr('install.subtitle')}
         </p>
       </div>
 
@@ -91,7 +92,7 @@ const Install: React.FC = () => {
                 className="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white font-semibold text-lg h-14 rounded-xl"
               >
                 <Download className="mr-2 h-5 w-5" />
-                Installer l'application
+                {tr('install.button')}
               </Button>
             </CardContent>
           </Card>
@@ -101,27 +102,27 @@ const Install: React.FC = () => {
         <Card className="border-none shadow-lg">
           <CardContent className="p-6">
             <h3 className="font-semibold text-foreground mb-4 text-lg">
-              {platform === 'ios' ? 'Comment installer sur iPhone' : 
-               platform === 'android' ? 'Comment installer sur Android' : 
-               'Comment installer'}
+              {platform === 'ios' ? tr('install.howIos') : 
+               platform === 'android' ? tr('install.howAndroid') : 
+               tr('install.howDesktop')}
             </h3>
             
             {platform === 'ios' ? (
               <div className="space-y-4">
-                <Step number={1} icon={<Share className="h-5 w-5" />} text="Appuyez sur le bouton Partager en bas du navigateur Safari" />
-                <Step number={2} icon={<Plus className="h-5 w-5" />} text={"Faites défiler et appuyez sur \"Sur l'écran d'accueil\""} />
-                <Step number={3} icon={<Check className="h-5 w-5" />} text={"Appuyez sur \"Ajouter\" en haut à droite"} />
+                <Step number={1} icon={<Share className="h-5 w-5" />} text={tr('install.tapTheShareButtonAtThe')} />
+                <Step number={2} icon={<Plus className="h-5 w-5" />} text={tr('install.ios2')} />
+                <Step number={3} icon={<Check className="h-5 w-5" />} text={tr('install.ios3')} />
               </div>
             ) : platform === 'android' ? (
               <div className="space-y-4">
-                <Step number={1} icon={<MoreVertical className="h-5 w-5" />} text="Appuyez sur le menu ⋮ en haut à droite du navigateur" />
-                <Step number={2} icon={<Download className="h-5 w-5" />} text={"Appuyez sur \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\""} />
+                <Step number={1} icon={<MoreVertical className="h-5 w-5" />} text={tr('install.tapTheMenuAtTheTop')} />
+                <Step number={2} icon={<Download className="h-5 w-5" />} text={tr('install.tapInstallAppOrAddTo')} />
                 <Step number={3} icon={<Check className="h-5 w-5" />} text={"Confirmez l'installation"} />
               </div>
             ) : (
               <div className="space-y-4">
-                <Step number={1} icon={<Monitor className="h-5 w-5" />} text="Cliquez sur l'icône d'installation dans la barre d'adresse" />
-                <Step number={2} icon={<Check className="h-5 w-5" />} text='Cliquez sur "Installer" dans la boîte de dialogue' />
+                <Step number={1} icon={<Monitor className="h-5 w-5" />} text={tr('install.desktop1')} />
+                <Step number={2} icon={<Check className="h-5 w-5" />} text={tr('install.desktop2')} />
               </div>
             )}
           </CardContent>
@@ -129,7 +130,7 @@ const Install: React.FC = () => {
 
         {/* Features */}
         <div>
-          <h3 className="font-semibold text-foreground mb-3 text-lg px-1">Pourquoi installer YAT ?</h3>
+          <h3 className="font-semibold text-foreground mb-3 text-lg px-1">{tr('install.why')}</h3>
           <div className="grid grid-cols-2 gap-3">
             {features.map((f) => (
               <Card key={f.title} className="border-none shadow-md">

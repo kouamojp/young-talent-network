@@ -8,6 +8,8 @@ import { Globe, Clock, Heart, MessageSquare, Send, Loader2, X } from 'lucide-rea
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface JoinedCommunity { id: string; name: string; }
 
@@ -40,7 +42,7 @@ interface CommunityFeedProps {
   onClearFocus?: () => void;
 }
 
-const timeAgo = (iso: string) => new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+const timeAgo = (iso: string) => new Date(iso).toLocaleString(localeTag(), { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, currentUserId, focusCommunityId, onClearFocus }) => {
   const { t } = useLanguage();
@@ -114,14 +116,14 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
       content: content.trim(),
     });
     setPosting(false);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setContent('');
     fetchPosts(true);
   };
 
   const toggleLike = async (post: Post) => {
     if (!currentUserId) {
-      toast({ title: 'Connexion requise', variant: 'destructive' });
+      toast({ title: tr('messages.loginRequired'), variant: 'destructive' });
       return;
     }
     const liking = !post.liked;
@@ -156,7 +158,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
       user_id: currentUserId,
       content: commentText.trim(),
     });
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setCommentText('');
     // Refresh comments and the post's comment count.
     const { data } = await supabase
@@ -174,7 +176,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
         <h2 className="text-xl font-semibold mb-2">{t('communities.communityPosts')}</h2>
         <div className="text-center py-8 text-gray-500">
           <MessageSquare className="h-10 w-10 mx-auto mb-2 opacity-40" />
-          <p>Rejoignez une communauté pour voir et publier des messages.</p>
+          <p>{tr('communityFeed.joinACommunityToSeeAnd')}</p>
         </div>
       </GlassMorphism>
     );
@@ -187,7 +189,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
         {focusedName && (
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary text-sm px-3 py-1">
             {focusedName}
-            <button type="button" onClick={onClearFocus} aria-label="Afficher toutes les communautés" className="hover:text-foreground">
+            <button type="button" onClick={onClearFocus} aria-label={tr('communityFeed.showAllCommunities')} className="hover:text-foreground">
               <X className="h-3.5 w-3.5" />
             </button>
           </span>
@@ -199,19 +201,19 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Partagez quelque chose avec votre communauté..."
+          placeholder={tr('communityFeed.shareSomethingWithYourCommunity')}
           rows={2}
         />
         <div className="flex items-center gap-2 justify-between">
           <Select value={targetCommunity} onValueChange={setTargetCommunity}>
-            <SelectTrigger className="w-56"><SelectValue placeholder="Choisir une communauté" /></SelectTrigger>
+            <SelectTrigger className="w-56"><SelectValue placeholder={tr('communityFeed.chooseACommunity')} /></SelectTrigger>
             <SelectContent>
               {joinedCommunities.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Button onClick={submitPost} disabled={!content.trim() || !targetCommunity || posting}>
             {posting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
-            Publier
+            {tr('common.post')}
           </Button>
         </div>
       </div>
@@ -221,7 +223,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
       ) : visiblePosts.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <MessageSquare className="h-10 w-10 mx-auto mb-2 opacity-40" />
-          <p>Aucune publication pour le moment. Soyez le premier à publier !</p>
+          <p>{tr('communityFeed.noPostsYetBeTheFirst')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -233,7 +235,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
                   <AvatarFallback>{post.author?.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h4 className="font-medium">{post.author?.name || 'Utilisateur'}</h4>
+                  <h4 className="font-medium">{post.author?.name || tr('admin.user')}</h4>
                   <div className="flex items-center text-xs text-gray-500">
                     <Globe className="h-3 w-3 mr-1" /><span>{post.community?.name}</span>
                     <span className="mx-1">•</span>
@@ -269,12 +271,12 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
                             <AvatarFallback>{c.author?.name?.charAt(0) || 'U'}</AvatarFallback>
                           </Avatar>
                           <div className="bg-muted rounded-lg px-3 py-1.5 flex-1">
-                            <p className="text-xs font-medium">{c.author?.name || 'Utilisateur'}</p>
+                            <p className="text-xs font-medium">{c.author?.name || tr('admin.user')}</p>
                             <p className="text-sm">{c.content}</p>
                           </div>
                         </div>
                       ))}
-                      {comments.length === 0 && <p className="text-xs text-gray-500">Aucun commentaire.</p>}
+                      {comments.length === 0 && <p className="text-xs text-gray-500">{tr('communityFeed.noComments')}</p>}
                     </>
                   )}
                   {currentUserId && (
@@ -282,7 +284,7 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
                       <Textarea
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Écrire un commentaire..."
+                        placeholder={tr('articles.writeComment')}
                         rows={1}
                         className="flex-1 min-h-0"
                       />

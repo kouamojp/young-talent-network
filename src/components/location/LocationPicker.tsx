@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, Loader2, Crosshair, X } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { tr } from '@/i18n';
 
 export interface LocationValue {
   address: string;
@@ -136,7 +137,7 @@ export const LocationPicker = ({ value, onChange, placeholder, showLabel = true,
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
                 onFocus={() => results.length > 0 && setOpen(true)}
-                placeholder={placeholder || t('location.placeholder') || 'Search a city or address…'}
+                placeholder={placeholder || t('location.placeholder') || tr('location.placeholder')}
                 className="pl-8 pr-8"
               />
               {loading && <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />}
@@ -171,7 +172,7 @@ export const LocationPicker = ({ value, onChange, placeholder, showLabel = true,
           size="icon"
           onClick={useCurrentLocation}
           disabled={geoLoading}
-          title={t('location.useCurrent') || 'Use my current location'}
+          title={t('location.useCurrent') || tr('location.useCurrent')}
         >
           {geoLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crosshair className="h-4 w-4" />}
         </Button>

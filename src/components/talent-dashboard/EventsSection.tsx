@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Plus, Calendar as CalendarIcon, Users, MapPin, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface EventRow {
   id: string;
@@ -56,17 +58,17 @@ const EventsSection: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">🗓️ Mes événements</h3>
+        <h3 className="text-lg font-semibold">{tr('eventsSection.myEvents')}</h3>
         <Button onClick={() => navigate('/events')}>
           <Plus className="h-4 w-4 mr-2" />
-          Créer un événement
+          {tr('events.createEvent')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Calendrier</CardTitle>
+            <CardTitle className="text-base">{tr('eventsSection.calendar')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Calendar
@@ -85,10 +87,10 @@ const EventsSection: React.FC = () => {
             <Card className="border-dashed">
               <CardContent className="p-6 text-center">
                 <CalendarIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 mb-4">Vous n'avez pas encore créé d'événement</p>
+                <p className="text-gray-600 mb-4">{tr('eventsSection.youHavenTCreatedAnyEvents')}</p>
                 <Button variant="outline" onClick={() => navigate('/events')}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Créer un événement
+                  {tr('events.createEvent')}
                 </Button>
               </CardContent>
             </Card>
@@ -104,29 +106,29 @@ const EventsSection: React.FC = () => {
                       <div>
                         <h4 className="font-semibold mb-1">{event.title}</h4>
                         <div className="flex items-center gap-2 mb-2">
-                          {event.is_virtual && <Badge className="bg-blue-100 text-blue-800">En ligne</Badge>}
+                          {event.is_virtual && <Badge className="bg-blue-100 text-blue-800">{tr('messages.activeNow')}</Badge>}
                           <Badge className={statusColor(event.status)}>{event.status}</Badge>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => navigate('/events')}>Gérer</Button>
+                      <Button variant="ghost" size="sm" onClick={() => navigate('/events')}>{tr('eventsSection.manage')}</Button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-gray-600">
                           <CalendarIcon className="h-3 w-3" />
-                          {new Date(event.start_date).toLocaleDateString('fr-FR')}
+                          {new Date(event.start_date).toLocaleDateString(localeTag())}
                         </div>
                         <div className="flex items-center gap-2 text-gray-600">
                           <MapPin className="h-3 w-3" />
-                          {event.location || (event.is_virtual ? 'En ligne' : '—')}
+                          {event.location || (event.is_virtual ? tr('messages.activeNow') : '—')}
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <Users className="h-3 w-3 text-gray-600" />
-                          <span>{registered}{capacity > 0 ? ` / ${capacity}` : ''} inscrits</span>
+                          <span>{registered}{capacity > 0 ? ` / ${capacity}` : ''} {tr('common.enrolled')}</span>
                         </div>
                       </div>
                     </div>
@@ -134,7 +136,7 @@ const EventsSection: React.FC = () => {
                     {capacity > 0 && (
                       <div className="mt-4 bg-gray-100 rounded-lg p-2">
                         <div className="flex justify-between text-xs text-gray-600 mb-1">
-                          <span>Progression des inscriptions</span>
+                          <span>{tr('eventsSection.registrationProgress')}</span>
                           <span>{pct}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">

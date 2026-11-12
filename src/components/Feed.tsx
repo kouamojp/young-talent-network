@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import FeedLevelBar from './FeedLevelBar';
 import AdBanner from './AdBanner';
+import { tr } from '@/i18n';
 
   interface Post {
     id: string;
@@ -89,13 +90,13 @@ const Feed: React.FC = () => {
       <div className="bg-card rounded-lg shadow-sm p-3 border border-border">
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={currentUser?.avatar_url} alt="User avatar" />
+            <AvatarImage src={currentUser?.avatar_url} alt={tr('feed.userAvatar')} />
             <AvatarFallback>{currentUser?.name?.[0] || 'U'}</AvatarFallback>
           </Avatar>
           <PostCreationDialog
             trigger={
               <Button variant="outline" className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted">
-                What's on your mind?
+                {tr('common.whatSOnYourMind')}
               </Button>
             }
             onPostCreated={fetchPosts}

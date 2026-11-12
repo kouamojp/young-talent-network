@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface AddAchievementDialogProps {
   userId: string;
@@ -43,12 +44,12 @@ const AddAchievementDialog: React.FC<AddAchievementDialogProps> = ({ userId, onA
         external_link: form.external_link.trim() || null,
       } as any);
       if (error) throw error;
-      toast.success('Réalisation ajoutée');
+      toast.success(tr('addAchievementDialog.achievementAdded'));
       setForm({ title: '', description: '', category: '', level: '', date: '', achievement_type: '', external_link: '' });
       setOpen(false);
       onAdded();
     } catch (err) {
-      toast.error("Erreur lors de l'ajout");
+      toast.error(tr('common.errorWhileAdding'));
     } finally {
       setLoading(false);
     }
@@ -58,77 +59,77 @@ const AddAchievementDialog: React.FC<AddAchievementDialogProps> = ({ userId, onA
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <Plus className="h-3.5 w-3.5" /> Ajouter
+          <Plus className="h-3.5 w-3.5" /> {tr('tv.addLink')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nouvelle réalisation</DialogTitle>
+          <DialogTitle>{tr('addAchievementDialog.newAchievement')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Titre *</Label>
-            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Ex: Champion national 2025" required />
+            <Label>{tr('events.eventName')}</Label>
+            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={tr('addAchievementDialog.eGNationalChampion2025')} required />
           </div>
           <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Détails de la réalisation..." rows={3} />
+            <Label>{tr('events.description')}</Label>
+            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder={tr('addAchievementDialog.achievementDetails')} rows={3} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Catégorie</Label>
+              <Label>{tr('categories.selectCategory')}</Label>
               <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
-                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr('marketplace.select')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sport">Sport</SelectItem>
-                  <SelectItem value="education">Éducation</SelectItem>
-                  <SelectItem value="art">Art & Culture</SelectItem>
-                  <SelectItem value="tech">Technologie</SelectItem>
-                  <SelectItem value="business">Business</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
+                  <SelectItem value="sport">{tr('landing.sport')}</SelectItem>
+                  <SelectItem value="education">{tr('addAchievementDialog.education')}</SelectItem>
+                  <SelectItem value="art">{tr('addAchievementDialog.artCulture')}</SelectItem>
+                  <SelectItem value="tech">{tr('common.technology')}</SelectItem>
+                  <SelectItem value="business">{tr('addAchievementDialog.business')}</SelectItem>
+                  <SelectItem value="other">{tr('profile.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Niveau</Label>
+              <Label>{tr('common.level')}</Label>
               <Select value={form.level} onValueChange={v => setForm(f => ({ ...f, level: v }))}>
-                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr('marketplace.select')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="local">Local</SelectItem>
-                  <SelectItem value="regional">Régional</SelectItem>
-                  <SelectItem value="national">National</SelectItem>
-                  <SelectItem value="international">International</SelectItem>
+                  <SelectItem value="local">{tr('addAchievementDialog.local')}</SelectItem>
+                  <SelectItem value="regional">{tr('addAchievementDialog.regional')}</SelectItem>
+                  <SelectItem value="national">{tr('addAchievementDialog.national')}</SelectItem>
+                  <SelectItem value="international">{tr('addAchievementDialog.international')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Type de réalisation</Label>
+              <Label>{tr('addAchievementDialog.achievementType')}</Label>
               <Select value={form.achievement_type} onValueChange={v => setForm(f => ({ ...f, achievement_type: v }))}>
-                <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr('marketplace.select')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="award">Prix / Award</SelectItem>
-                  <SelectItem value="competition">Compétition</SelectItem>
-                  <SelectItem value="publication">Publication</SelectItem>
-                  <SelectItem value="performance">Performance</SelectItem>
-                  <SelectItem value="certification">Certification</SelectItem>
-                  <SelectItem value="record">Record</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
+                  <SelectItem value="award">{tr('addAchievementDialog.award')}</SelectItem>
+                  <SelectItem value="competition">{tr('addAchievementDialog.competition')}</SelectItem>
+                  <SelectItem value="publication">{tr('post.tab.post')}</SelectItem>
+                  <SelectItem value="performance">{tr('investDialog.performance')}</SelectItem>
+                  <SelectItem value="certification">{tr('profile.certification')}</SelectItem>
+                  <SelectItem value="record">{tr('addAchievementDialog.record')}</SelectItem>
+                  <SelectItem value="other">{tr('profile.other')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Date</Label>
+              <Label>{tr('common.date')}</Label>
               <Input type="date" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
             </div>
           </div>
           <div>
-            <Label>Lien externe</Label>
+            <Label>{tr('addAchievementDialog.externalLink')}</Label>
             <Input type="url" value={form.external_link} onChange={e => setForm(f => ({ ...f, external_link: e.target.value }))} placeholder="https://..." />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Ajout...' : 'Ajouter la réalisation'}
+            {loading ? 'Ajout...' : tr('addAchievementDialog.addAchievement')}
           </Button>
         </form>
       </DialogContent>

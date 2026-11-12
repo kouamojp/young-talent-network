@@ -13,6 +13,8 @@ import { Loader2, Image as ImageIcon, MapPin, Smile, X, Plus, Globe, Users, Link
 import { useLanguage } from '@/i18n/LanguageContext';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
 import LinkPreview from './LinkPreview';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface ExistingPost {
   id: string;
@@ -108,9 +110,9 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       if (data?.error) throw new Error(data.error);
       setContent((prev) => (prev ? prev + '\n\n' : '') + (data.content || ''));
       setLinkPreview({ title: data.title, description: data.description, image: data.image, siteName: data.siteName, url: linkUrl.trim() });
-      toast({ title: t('post.linkImported') || 'Content imported from link' });
+      toast({ title: t('post.linkImported') || tr('post.linkImported') });
     } catch (e: any) {
-      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+      toast({ title: e.message || tr('postCreationDialog.failedToImportLink'), variant: 'destructive' });
     } finally {
       setImporting(false);
     }
@@ -166,7 +168,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     }
     const accepted = selected.slice(0, remaining);
     if (selected.length > remaining) {
-      toast({ title: `Only ${remaining} more file(s) added (max ${MAX_IMAGES})` });
+      toast({ title: tr('postCreationDialog.onlyMoreFileSAddedMax', { p0: remaining, p1: MAX_IMAGES }) });
     }
     const newItems: MediaItem[] = await Promise.all(accepted.map(async (file) => ({
       file,
@@ -268,9 +270,9 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       const md = `[${data.title || articleLinkUrl}](${articleLinkUrl})${data.description ? `\n${data.description}` : ''}`;
       insertIntoArticle(md);
       setArticleLinkUrl('');
-      toast({ title: t('post.linkInserted') || 'Link inserted into article' });
+      toast({ title: t('post.linkInserted') || tr('post.linkInserted') });
     } catch (e: any) {
-      toast({ title: e.message || 'Failed to import link', variant: 'destructive' });
+      toast({ title: e.message || tr('postCreationDialog.failedToImportLink'), variant: 'destructive' });
     }
   };
 
@@ -315,7 +317,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
   const saveDraft = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: t('post.loginRequired') || 'Please log in', variant: 'destructive' });
+      toast({ title: t('post.loginRequired') || tr('events.loginRequired'), variant: 'destructive' });
       return;
     }
     const payload: any = {
@@ -340,7 +342,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       toast({ title: t('post.draftSaved') || 'Draft saved' });
       loadDrafts();
     } catch (e: any) {
-      toast({ title: e.message || 'Failed to save draft', variant: 'destructive' });
+      toast({ title: e.message || tr('postCreationDialog.failedToSaveDraft'), variant: 'destructive' });
     }
   };
 
@@ -369,14 +371,14 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        toast({ title: t('post.loginRequired') || 'Please log in', variant: 'destructive' });
+        toast({ title: t('post.loginRequired') || tr('events.loginRequired'), variant: 'destructive' });
         return;
       }
       const shareToken = visibility === 'link' ? Math.random().toString(36).slice(2, 12) : null;
 
       if (tab === 'post') {
         if (!content.trim() && items.length === 0) {
-          toast({ title: t('post.emptyError') || 'Add text or media', variant: 'destructive' });
+          toast({ title: t('post.emptyError') || tr('postCreationDialog.addTextOrMedia'), variant: 'destructive' });
           return;
         }
         const mediaUrls = await uploadItems(user.id);
@@ -389,7 +391,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             visibility,
           }).eq('id', editPost.id);
           if (error) throw error;
-          toast({ title: t('post.updated') || 'Publication mise à jour' });
+          toast({ title: t('post.updated') || tr('post.updated') });
         } else {
           const { error } = await supabase.from('posts').insert({
             content: finalContent.trim() || ' ',
@@ -401,12 +403,12 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             is_published: !isScheduled,
           });
           if (error) throw error;
-          toast({ title: isScheduled ? t('post.scheduled', { date: new Date(scheduledFor).toLocaleString() }) : (t('post.created') || 'Post published!') });
+          toast({ title: isScheduled ? t('post.scheduled', { date: new Date(scheduledFor).toLocaleString(localeTag()) }) : (t('post.created') || 'Post published!') });
         }
       } else if (tab === 'article') {
 
         if (!articleTitle.trim() || !content.trim()) {
-          toast({ title: t('post.articleError') || 'Title and content required', variant: 'destructive' });
+          toast({ title: t('post.articleError') || tr('postCreationDialog.titleAndContentRequired'), variant: 'destructive' });
           return;
         }
         const articleMediaUrls: string[] = [];
@@ -469,7 +471,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       onPostCreated?.();
     } catch (error: any) {
       console.error('Error creating post:', error);
-      toast({ title: error.message || 'Failed to publish', variant: 'destructive' });
+      toast({ title: error.message || tr('common.failedToPublish'), variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -484,7 +486,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>{isEditing ? (t('post.edit') || 'Modifier la publication') : (t('post.create') || 'Create Post')}</span>
+            <span>{isEditing ? (t('post.edit') || tr('post.edit')) : (t('post.create') || 'Create Post')}</span>
             {!isEditing && drafts.length > 0 && (
               <Button variant="ghost" size="sm" onClick={() => setShowDrafts(s => !s)}>
                 <FileClock className="h-4 w-4 mr-1" />
@@ -500,13 +502,13 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             {drafts.map(d => (
               <div key={d.id} className="flex items-center justify-between gap-2 p-2 hover:bg-muted rounded">
                 <button onClick={() => loadDraft(d)} className="flex-1 text-left text-sm">
-                  <div className="font-medium truncate">{d.title || d.content?.slice(0, 50) || d.poll_question || '(empty)'}</div>
+                  <div className="font-medium truncate">{d.title || d.content?.slice(0, 50) || d.poll_question || tr('postCreationDialog.empty')}</div>
                   <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    {d.draft_type} · {new Date(d.updated_at).toLocaleString()}
+                    {d.draft_type} · {new Date(d.updated_at).toLocaleString(localeTag())}
                     {d.scheduled_for && (
                       <span className="inline-flex items-center gap-0.5 text-primary ml-1">
                         <Clock className="h-3 w-3" />
-                        {new Date(d.scheduled_for).toLocaleString()}
+                        {new Date(d.scheduled_for).toLocaleString(localeTag())}
                       </span>
                     )}
                   </div>
@@ -525,7 +527,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             <AvatarFallback>{userName?.[0] || 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <div className="font-semibold text-sm">{userName || 'You'}</div>
+            <div className="font-semibold text-sm">{userName || tr('postCreationDialog.you')}</div>
             <Select value={visibility} onValueChange={(v) => setVisibility(v as Visibility)}>
               <SelectTrigger className="h-7 w-auto text-xs gap-1 mt-0.5">
                 <VIcon className="h-3 w-3" />
@@ -553,7 +555,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                 <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   className="pl-8"
-                  placeholder={t('post.linkPlaceholder') || 'Paste a link to auto-generate a post...'}
+                  placeholder={t('post.linkPlaceholder') || tr('post.linkPlaceholder')}
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   disabled={importing}
@@ -606,7 +608,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                       className={`text-xs px-2 py-1 rounded border ${aspectRatio === a ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}
                     >{a}</button>
                   ))}
-                  <span className="ml-auto text-xs text-muted-foreground">{t('post.dragHint') || 'Glisser pour réorganiser'}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{t('post.dragHint') || tr('post.dragHint')}</span>
                 </div>
                 <div className={`grid gap-2 ${items.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                   {items.map((it, i) => (
@@ -643,7 +645,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                             <button type="button" onClick={() => setCropIdx(cropIdx === i ? null : i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title={t('post.crop') || 'Recadrer'}>
                               <Crop className="h-3 w-3" />
                             </button>
-                            <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title="Rotate">
+                            <button type="button" onClick={() => rotateFile(i)} className="bg-black/60 text-white rounded p-1 hover:bg-black/80" title={tr('postCreationDialog.rotate')}>
                               <RotateCw className="h-3 w-3" />
                             </button>
                           </>
@@ -691,7 +693,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleFileSelect} />
 
             <div className="flex items-center justify-between border rounded-lg p-2">
-              <span className="text-sm text-muted-foreground ml-2">{t('post.addToPost') || 'Add to post'}</span>
+              <span className="text-sm text-muted-foreground ml-2">{t('post.addToPost') || tr('postCreationDialog.addToPost')}</span>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" type="button" onClick={() => fileInputRef.current?.click()} title={t('post.addPhoto') || 'Photo/Video'}>
                   <ImageIcon className="h-5 w-5 text-green-500" />
@@ -699,7 +701,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                 <Button variant="ghost" size="icon" type="button" onClick={() => setShowLocation(true)} title={t('post.addLocation') || 'Location'}>
                   <MapPin className="h-5 w-5 text-red-500" />
                 </Button>
-                <Button variant="ghost" size="icon" type="button" title="Emoji">
+                <Button variant="ghost" size="icon" type="button" title={tr('common.emoji')}>
                   <Smile className="h-5 w-5 text-yellow-500" />
                 </Button>
               </div>
@@ -710,7 +712,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
             <div className="flex justify-end">
               <Button type="button" variant={showArticlePreview ? 'default' : 'outline'} size="sm" onClick={() => setShowArticlePreview(s => !s)}>
                 <Eye className="h-4 w-4 mr-1" />
-                {showArticlePreview ? (t('post.editMode') || 'Édition') : (t('post.preview') || 'Aperçu')}
+                {showArticlePreview ? (t('post.editMode') || tr('post.editMode')) : (t('post.preview') || tr('work.overview'))}
               </Button>
             </div>
 
@@ -730,7 +732,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                 <Input placeholder={t('post.articleCategory') || 'Category'} value={articleCategory} onChange={(e) => setArticleCategory(e.target.value)} />
                 <Textarea
                   ref={articleTextareaRef}
-                  placeholder={t('post.articleContent') || 'Write your article...'}
+                  placeholder={t('post.articleContent') || tr('post.articleContent')}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="min-h-[250px]"
@@ -740,7 +742,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                     <LinkIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                       className="pl-8"
-                      placeholder={t('post.articleLink') || 'Insert a link from another source...'}
+                      placeholder={t('post.articleLink') || tr('post.articleLink')}
                       value={articleLinkUrl}
                       onChange={(e) => setArticleLinkUrl(e.target.value)}
                     />
@@ -773,7 +775,7 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                             onClick={() => insertIntoArticle(isVideo ? `[video](${i + 1})` : `[image ${i + 1}]`)}
                             className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] rounded px-2 py-0.5 hover:bg-black/80"
                           >
-                            {t('post.insertInText') || 'Insert in text'}
+                            {t('post.insertInText') || tr('post.insertInText')}
                           </button>
                           <button
                             type="button"
@@ -790,14 +792,14 @@ export const PostCreationDialog = ({ trigger, onPostCreated, userAvatar, userNam
                     })}
                   </div>
                 )}
-                <p className="text-xs text-muted-foreground">{t('post.articleHint') || 'Articles are saved to your pages and shared as a preview in the feed.'}</p>
+                <p className="text-xs text-muted-foreground">{t('post.articleHint') || tr('post.articleHint')}</p>
               </>
             )}
           </TabsContent>
 
 
           <TabsContent value="poll" className="space-y-3 mt-4">
-            <Input placeholder={t('post.pollQuestion') || 'Ask a question...'} value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="font-medium" />
+            <Input placeholder={t('post.pollQuestion') || tr('post.pollQuestion')} value={pollQuestion} onChange={(e) => setPollQuestion(e.target.value)} className="font-medium" />
             <input ref={pollMediaRef} type="file" accept="image/*,video/*" className="hidden" onChange={handlePollMediaSelect} />
             {pollMediaPreview ? (
               <div className="relative rounded-lg overflow-hidden bg-muted aspect-video">
@@ -945,13 +947,13 @@ const ArticlePreview: React.FC<{
           <AvatarFallback>{authorName?.[0] || 'U'}</AvatarFallback>
         </Avatar>
         <div className="text-xs">
-          <div className="font-semibold">{authorName || 'You'}</div>
-          <div className="text-muted-foreground">Aperçu en direct</div>
+          <div className="font-semibold">{authorName || tr('postCreationDialog.you')}</div>
+          <div className="text-muted-foreground">{tr('postCreationDialog.livePreview')}</div>
         </div>
       </div>
       {title && <h1 className="text-2xl font-bold leading-tight">{title}</h1>}
       {category && <div className="text-xs text-muted-foreground uppercase tracking-wide">{category}</div>}
-      <div className="space-y-1">{blocks.length ? blocks : <p className="text-muted-foreground italic">Commencez à écrire pour voir l'aperçu...</p>}</div>
+      <div className="space-y-1">{blocks.length ? blocks : <p className="text-muted-foreground italic">{tr('postCreationDialog.startWritingToSeeThePreview')}</p>}</div>
       {mediaPreviews.map((src, i) => {
         const isVid = mediaFiles[i]?.type.startsWith('video/');
         if (isVid ? referencedVids.has(i) : referencedImgs.has(i)) return null;

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 interface SocialTab {
   id: string;
@@ -16,13 +17,13 @@ interface SocialTab {
 }
 
 const platformOptions = [
-  { value: 'facebook', label: 'Facebook', icon: <Facebook className="h-4 w-4" />, color: 'text-blue-600', baseUrl: 'https://facebook.com/' },
-  { value: 'instagram', label: 'Instagram', icon: <Instagram className="h-4 w-4" />, color: 'text-pink-500', baseUrl: 'https://instagram.com/' },
-  { value: 'twitter', label: 'X (Twitter)', icon: <Twitter className="h-4 w-4" />, color: 'text-foreground', baseUrl: 'https://x.com/' },
+  { value: 'facebook', label: tr('sidebar.connectFacebook'), icon: <Facebook className="h-4 w-4" />, color: 'text-blue-600', baseUrl: 'https://facebook.com/' },
+  { value: 'instagram', label: tr('sidebar.connectInstagram'), icon: <Instagram className="h-4 w-4" />, color: 'text-pink-500', baseUrl: 'https://instagram.com/' },
+  { value: 'twitter', label: tr('sidebar.connectX'), icon: <Twitter className="h-4 w-4" />, color: 'text-foreground', baseUrl: 'https://x.com/' },
   { value: 'youtube', label: 'YouTube', icon: <Youtube className="h-4 w-4" />, color: 'text-red-600', baseUrl: 'https://youtube.com/' },
   { value: 'linkedin', label: 'LinkedIn', icon: <Linkedin className="h-4 w-4" />, color: 'text-blue-700', baseUrl: 'https://linkedin.com/' },
-  { value: 'tiktok', label: 'TikTok', icon: <Globe className="h-4 w-4" />, color: 'text-foreground', baseUrl: 'https://tiktok.com/' },
-  { value: 'other', label: 'Other', icon: <Globe className="h-4 w-4" />, color: 'text-muted-foreground', baseUrl: '' },
+  { value: 'tiktok', label: tr('sidebar.connectTikTok'), icon: <Globe className="h-4 w-4" />, color: 'text-foreground', baseUrl: 'https://tiktok.com/' },
+  { value: 'other', label: tr('profile.other'), icon: <Globe className="h-4 w-4" />, color: 'text-muted-foreground', baseUrl: '' },
 ];
 
 const Social: React.FC = () => {

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { geocodePlaces } from '@/lib/mapbox';
 import KartaMap, { type KartaPoint } from './KartaMap';
+import { tr } from '@/i18n';
 
 interface Job { id: string; title: string; company: string; organizationId: string; location: string; salary: string | null; type: string | null }
 
@@ -41,7 +42,7 @@ const WorkMap = () => {
     <KartaMap
       points={points}
       loading={loading}
-      emptyLabel="Aucune offre localisée pour le moment"
+      emptyLabel={tr('workMap.noJobOffersLocatedYet')}
       renderSelected={({ data: job }) => (
         <div className="flex items-start gap-4 pr-4">
           <div className="p-3 bg-primary/10 rounded-lg"><Briefcase className="h-6 w-6 text-primary" /></div>
@@ -54,8 +55,8 @@ const WorkMap = () => {
               {job.type && <span className="px-2 py-0.5 bg-primary/10 rounded-full">{job.type}</span>}
             </div>
             <div className="flex gap-2 mt-3">
-              <Button size="sm" className="flex-1" onClick={() => navigate('/work')}>Voir les offres</Button>
-              <Button size="sm" variant="outline" onClick={() => navigate(`/organization/${job.organizationId}`)}>Organisation</Button>
+              <Button size="sm" className="flex-1" onClick={() => navigate('/work')}>{tr('workMap.viewOffers')}</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate(`/organization/${job.organizationId}`)}>{tr('profile.organization')}</Button>
             </div>
           </div>
         </div>

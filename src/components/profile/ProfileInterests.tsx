@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Plus, X, Sparkles } from "lucide-react";
+import { tr } from '@/i18n';
 
 interface UserInterest {
   id: string;
@@ -20,16 +21,16 @@ interface ProfileInterestsProps {
 }
 
 const interestTypes = [
-  { value: "hobby", label: "Loisir" },
-  { value: "sport", label: "Sport" },
-  { value: "music", label: "Musique" },
-  { value: "art", label: "Art" },
-  { value: "technology", label: "Technologie" },
-  { value: "travel", label: "Voyage" },
-  { value: "food", label: "Cuisine" },
-  { value: "reading", label: "Lecture" },
-  { value: "gaming", label: "Jeux vidéo" },
-  { value: "other", label: "Autre" },
+  { value: "hobby", label: tr('profileInterests.hobby') },
+  { value: "sport", label: tr('landing.sport') },
+  { value: "music", label: tr('landing.music') },
+  { value: "art", label: tr('landing.art') },
+  { value: "technology", label: tr('common.technology') },
+  { value: "travel", label: tr('profileInterests.travel') },
+  { value: "food", label: tr('profileInterests.cooking') },
+  { value: "reading", label: tr('profileInterests.reading') },
+  { value: "gaming", label: tr('profileInterests.videoGames') },
+  { value: "other", label: tr('profile.other') },
 ];
 
 const typeColors: Record<string, string> = {
@@ -88,8 +89,8 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
       if (error) throw error;
 
       toast({
-        title: "Intérêt ajouté",
-        description: "Votre centre d'intérêt a été ajouté",
+        title: tr('profileInterests.interestAdded'),
+        description: tr('profileInterests.yourInterestHasBeenAdded'),
       });
 
       fetchUserInterests();
@@ -98,7 +99,7 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
       setNewInterestType("hobby");
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -116,12 +117,12 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
 
       setUserInterests(userInterests.filter(i => i.id !== interestId));
       toast({
-        title: "Intérêt supprimé",
-        description: "Le centre d'intérêt a été retiré",
+        title: tr('profileInterests.interestRemoved'),
+        description: tr('profileInterests.theInterestHasBeenRemoved'),
       });
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -145,22 +146,22 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Heart className="h-5 w-5" />
-          Centres d'intérêt
+          {tr('profileInterests.interests')}
         </CardTitle>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter
+              {tr('tv.addLink')}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Ajouter un centre d'intérêt</DialogTitle>
+              <DialogTitle>{tr('profileInterests.addAnInterest')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Type</label>
+                <label className="text-sm font-medium">{tr('marketplace.type')}</label>
                 <Select value={newInterestType} onValueChange={setNewInterestType}>
                   <SelectTrigger>
                     <SelectValue />
@@ -175,15 +176,15 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium">{tr('events.description')}</label>
                 <Input
                   value={newInterestValue}
                   onChange={(e) => setNewInterestValue(e.target.value)}
-                  placeholder="Ex: Piano, Football, Photographie..."
+                  placeholder={tr('profileInterests.eGPianoFootballPhotography')}
                 />
               </div>
               <Button onClick={addInterest} className="w-full" disabled={!newInterestValue.trim()}>
-                Ajouter
+                {tr('tv.addLink')}
               </Button>
             </div>
           </DialogContent>
@@ -191,12 +192,12 @@ export const ProfileInterests = ({ userId }: ProfileInterestsProps) => {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="text-center py-8 text-muted-foreground">Chargement...</div>
+          <div className="text-center py-8 text-muted-foreground">{tr('common.loading')}</div>
         ) : userInterests.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Aucun centre d'intérêt ajouté</p>
-            <p className="text-sm">Cliquez sur "Ajouter" pour commencer</p>
+            <p>{tr('profileInterests.noInterestsAdded')}</p>
+            <p className="text-sm">{tr('common.clickAddToGetStarted')}</p>
           </div>
         ) : (
           <div className="space-y-6">

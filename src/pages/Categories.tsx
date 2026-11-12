@@ -11,6 +11,7 @@ import {
   Pagination, PaginationContent, PaginationItem, PaginationLink,
   PaginationNext, PaginationPrevious,
 } from '@/components/ui/pagination';
+import { tr } from '@/i18n';
 
 const PAGE_SIZE = 9;
 
@@ -52,7 +53,7 @@ const Categories: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-1">{t('categories.title') || 'YAT Categories'}</h1>
         <p className="text-sm text-muted-foreground">
-          {t('categories.subtitle') || 'Browse all categories used across the platform'}
+          {t('categories.subtitle') || tr('categories.subtitle')}
         </p>
       </div>
 
@@ -66,7 +67,7 @@ const Categories: React.FC = () => {
         />
       </div>
 
-      {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {loading && <p className="text-sm text-muted-foreground">{tr('common.loading2')}</p>}
 
       {/* Top categories */}
       {!q && topCategories.length > 0 && (

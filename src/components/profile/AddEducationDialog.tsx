@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface AddEducationDialogProps {
   userId: string;
@@ -46,12 +47,12 @@ const AddEducationDialog: React.FC<AddEducationDialogProps> = ({ userId, onAdded
         education_type: form.education_type,
       });
       if (error) throw error;
-      toast.success('Formation ajoutée');
+      toast.success(tr('addEducationDialog.educationAdded'));
       setForm({ institution: '', degree: '', field_of_study: '', start_year: '', end_year: '', is_current: false, description: '', education_type: 'university' });
       setOpen(false);
       onAdded();
     } catch (err) {
-      toast.error("Erreur lors de l'ajout");
+      toast.error(tr('common.errorWhileAdding'));
     } finally {
       setLoading(false);
     }
@@ -61,62 +62,62 @@ const AddEducationDialog: React.FC<AddEducationDialogProps> = ({ userId, onAdded
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <Plus className="h-3.5 w-3.5" /> Ajouter
+          <Plus className="h-3.5 w-3.5" /> {tr('tv.addLink')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nouvelle formation / diplôme</DialogTitle>
+          <DialogTitle>{tr('addEducationDialog.newEducationDegree')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Type *</Label>
+            <Label>{tr('common.type')}</Label>
             <Select value={form.education_type} onValueChange={v => setForm(f => ({ ...f, education_type: v }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="school">École</SelectItem>
-                <SelectItem value="university">Université</SelectItem>
-                <SelectItem value="training">Formation professionnelle</SelectItem>
-                <SelectItem value="certification">Certification</SelectItem>
-                <SelectItem value="diploma">Diplôme</SelectItem>
-                <SelectItem value="other">Autre</SelectItem>
+                <SelectItem value="school">{tr('profile.school')}</SelectItem>
+                <SelectItem value="university">{tr('profile.university')}</SelectItem>
+                <SelectItem value="training">{tr('addEducationDialog.vocationalTraining')}</SelectItem>
+                <SelectItem value="certification">{tr('profile.certification')}</SelectItem>
+                <SelectItem value="diploma">{tr('profile.diploma')}</SelectItem>
+                <SelectItem value="other">{tr('profile.other')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label>Établissement *</Label>
-            <Input value={form.institution} onChange={e => setForm(f => ({ ...f, institution: e.target.value }))} placeholder="Nom de l'établissement" required />
+            <Label>{tr('addEducationDialog.institution')}</Label>
+            <Input value={form.institution} onChange={e => setForm(f => ({ ...f, institution: e.target.value }))} placeholder={tr('addEducationDialog.institutionName')} required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Diplôme / Titre</Label>
-              <Input value={form.degree} onChange={e => setForm(f => ({ ...f, degree: e.target.value }))} placeholder="Licence, Master..." />
+              <Label>{tr('addEducationDialog.degreeTitle')}</Label>
+              <Input value={form.degree} onChange={e => setForm(f => ({ ...f, degree: e.target.value }))} placeholder={tr('addEducationDialog.bachelorSMasterS')} />
             </div>
             <div>
-              <Label>Domaine d'étude</Label>
+              <Label>{tr('addEducationDialog.fieldOfStudy')}</Label>
               <Input value={form.field_of_study} onChange={e => setForm(f => ({ ...f, field_of_study: e.target.value }))} placeholder="Informatique..." />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Année début</Label>
+              <Label>{tr('addEducationDialog.startYear')}</Label>
               <Input type="number" value={form.start_year} onChange={e => setForm(f => ({ ...f, start_year: e.target.value }))} placeholder="2020" />
             </div>
             <div>
-              <Label>Année fin</Label>
+              <Label>{tr('addEducationDialog.endYear')}</Label>
               <Input type="number" value={form.end_year} onChange={e => setForm(f => ({ ...f, end_year: e.target.value }))} placeholder="2024" disabled={form.is_current} />
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Checkbox checked={form.is_current} onCheckedChange={v => setForm(f => ({ ...f, is_current: !!v }))} />
-            <Label className="text-sm">En cours</Label>
+            <Label className="text-sm">{tr('funding.inProgress')}</Label>
           </div>
           <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Détails supplémentaires..." rows={2} />
+            <Label>{tr('events.description')}</Label>
+            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder={tr('addEducationDialog.additionalDetails')} rows={2} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Ajout...' : 'Ajouter'}
+            {loading ? 'Ajout...' : tr('tv.addLink')}
           </Button>
         </form>
       </DialogContent>

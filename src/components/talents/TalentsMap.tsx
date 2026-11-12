@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MapPin, Music, MusicIcon, BookOpen, PenTool, Code, Dumbbell, HeartHandshake, ChevronRight, Heart } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface TalentsMapProps {
   talents: any[];
@@ -104,7 +105,7 @@ const TalentsMap: React.FC<TalentsMapProps> = ({
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-bold text-lg">{talent.name}, {talent.age}</h3>
-                          <p className="text-sm text-primary font-medium">{talent.talent} | {talent.distance}km away</p>
+                          <p className="text-sm text-primary font-medium">{talent.talent} | {talent.distance}{tr('talentsMap.kmAway')}</p>
                         </div>
                         <Button size="sm" variant="outline" className="rounded-full">
                           <MapPin className="h-3 w-3 mr-1" />
@@ -113,30 +114,30 @@ const TalentsMap: React.FC<TalentsMapProps> = ({
                       </div>
                       
                       <p className="mt-2 text-sm">
-                        Latest: '<span className="italic">{talent.preview}</span>' (click to preview)
+                        {tr('talentsMap.latest')}<span className="italic">{talent.preview}</span>{tr('talentsMap.clickToPreview')}
                       </p>
                       
                       <div className="mt-3 flex justify-between items-center">
                         <div className="space-x-2">
                           <Button size="sm" className="rounded-full">
-                            <span>👋 Send Wave</span>
+                            <span>{tr('talentsMap.sendAWave')}</span>
                           </Button>
                           
                           <Button size="sm" variant="outline" className="rounded-full">
                             <HeartHandshake className="h-4 w-4 mr-1" />
-                            <span>Collaborate</span>
+                            <span>{tr('talentsMap.collaborate')}</span>
                           </Button>
                         </div>
                         
                         <Button size="sm" variant="ghost">
-                          <span className="text-xs">View Profile</span>
+                          <span className="text-xs">{tr('marketplace.viewProfile')}</span>
                           <ChevronRight className="h-4 w-4" />
                         </Button>
                       </div>
                       
                       {talent.commonGround && (
                         <div className="mt-3 bg-purple-50 p-2 rounded-lg text-xs text-purple-700">
-                          <span className="font-medium">Common Ground:</span> You and {talent.name.split(' ')[0]} both {talent.commonGround}! Say hi?
+                          <span className="font-medium">{tr('common.commonGround')}</span> {tr('common.youAnd')} {talent.name.split(' ')[0]} both {talent.commonGround}{tr('talentsMap.sayHi')}
                         </div>
                       )}
                     </div>

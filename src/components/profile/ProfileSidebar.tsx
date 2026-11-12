@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 interface TalentPresence {
   id: string;
@@ -36,15 +37,15 @@ interface ProfileSidebarProps {
 }
 
 const sidebarItems = [
-  { key: 'work', label: 'YAT Work', icon: Briefcase, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { key: 'learning', label: 'YAT Learning', icon: GraduationCap, color: 'text-green-500', bgColor: 'bg-green-500/10' },
+  { key: 'work', label: tr('sidebar.yatWork'), icon: Briefcase, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  { key: 'learning', label: tr('sidebar.yatLearning'), icon: GraduationCap, color: 'text-green-500', bgColor: 'bg-green-500/10' },
   { key: 'live', label: 'YAT Live', icon: Radio, color: 'text-red-500', bgColor: 'bg-red-500/10' },
   { key: 'tv', label: 'YAT TV', icon: Tv, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-  { key: 'events', label: 'YAT Events', icon: Calendar, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-  { key: 'karta', label: 'YAT Karta', icon: Map, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
+  { key: 'events', label: tr('sidebar.yatEvents'), icon: Calendar, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
+  { key: 'karta', label: tr('sidebar.yatKarta'), icon: Map, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
   { key: 'yat-coin', label: 'YAT Coin', icon: Coins, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
-  { key: 'marketplace', label: 'YAT Marketplace', icon: ShoppingBag, color: 'text-orange-600', bgColor: 'bg-orange-600/10' },
-  { key: 'social', label: 'YAT Social', icon: Globe, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10' },
+  { key: 'marketplace', label: tr('sidebar.yatMarketplace'), icon: ShoppingBag, color: 'text-orange-600', bgColor: 'bg-orange-600/10' },
+  { key: 'social', label: tr('sidebar.yatSocial'), icon: Globe, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10' },
 ];
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({ 
@@ -67,7 +68,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
     setBusyKey(section);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: t('common.error') || 'Error', description: t('auth.signInRequired') || 'Please sign in', variant: 'destructive' });
+      toast({ title: t('common.error') || 'Error', description: t('auth.signInRequired') || tr('auth.signInRequired'), variant: 'destructive' });
       setBusyKey(null);
       return;
     }
@@ -103,7 +104,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <User className="h-4 w-4" />
-          {t('profile.myYatProfiles') || 'Mes Profils YAT'}
+          {t('profile.myYatProfiles') || tr('profile.myYatProfiles')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2">
@@ -142,7 +143,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
                   checked={isActive}
                   disabled={busyKey === item.key}
                   onCheckedChange={(v) => handleToggle(item.key, v)}
-                  aria-label={`Toggle ${item.label}`}
+                  aria-label={tr('profileSidebar.toggle', { p0: item.label })}
                 />
               </div>
             );
@@ -159,7 +160,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
           >
             <LayoutDashboard className="h-[18px] w-[18px]" />
             <span className="text-sm font-semibold">
-              Talent Dashboard
+              {tr('landing.talentDashboard')}
             </span>
           </Link>
         </nav>

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { talentCategories } from './TalentsData';
 import { Search, MapPin, HeartHandshake, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { tr } from '@/i18n';
 
 interface TalentsFiltersProps {
   onFilterChange: (category: string, distance: number) => void;
@@ -32,7 +33,7 @@ const TalentsFilters: React.FC<TalentsFiltersProps> = ({ onFilterChange }) => {
           <div className="flex-1">
             <h3 className="font-medium mb-3 flex items-center gap-2">
               <Filter className="h-4 w-4 text-purple-600" />
-              <span>Find someone who...</span>
+              <span>{tr('talentsFilters.findSomeoneWho')}</span>
             </h3>
             
             <div className="flex flex-wrap gap-2 mb-4">
@@ -55,17 +56,17 @@ const TalentsFilters: React.FC<TalentsFiltersProps> = ({ onFilterChange }) => {
             <div className="space-y-2 mt-5">
               <h4 className="text-sm font-medium flex items-center gap-2">
                 <HeartHandshake className="h-4 w-4 text-purple-600" />
-                <span>Skills you might like:</span>
+                <span>{tr('talentsFilters.skillsYouMightLike')}</span>
               </h4>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" className="rounded-full">
-                  🕺 ...can teach me hip-hop
+                  {tr('talentsFilters.canTeachMeHipHop')}
                 </Button>
                 <Button variant="outline" size="sm" className="rounded-full">
-                  🧪 ...wants to science-fair team up
+                  {tr('talentsFilters.wantsToScienceFairTeamUp')}
                 </Button>
                 <Button variant="outline" size="sm" className="rounded-full">
-                  🐶 ...also has a golden retriever
+                  {tr('talentsFilters.alsoHasAGoldenRetriever')}
                 </Button>
               </div>
             </div>
@@ -74,11 +75,11 @@ const TalentsFilters: React.FC<TalentsFiltersProps> = ({ onFilterChange }) => {
           <div className="md:w-72 space-y-4 border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6">
             <h3 className="font-medium mb-3 flex items-center gap-2">
               <MapPin className="h-4 w-4 text-purple-600" />
-              <span>Distance</span>
+              <span>{tr('talentsFilters.distance')}</span>
             </h3>
             
             <div className="px-2">
-              <p className="text-sm mb-2">Show talents within: <span className="font-medium">{distanceValue}km</span></p>
+              <p className="text-sm mb-2">{tr('talentsFilters.showTalentsWithin')} <span className="font-medium">{distanceValue}{tr('talentsMap.kmAway')}</span></p>
               <div className="flex items-center gap-3">
                 <span className="text-xs">🏡</span>
                 <Slider
@@ -96,7 +97,7 @@ const TalentsFilters: React.FC<TalentsFiltersProps> = ({ onFilterChange }) => {
               <div className="flex items-start gap-2">
                 <div className="text-blue-500 mt-1">🔒</div>
                 <p className="text-xs text-blue-800">
-                  <span className="font-medium">Safety First:</span> Precise location only shared when you message first
+                  <span className="font-medium">{tr('talentsFilters.safetyFirst')}</span> {tr('talentsFilters.preciseLocationOnlySharedWhenYou')}
                 </p>
               </div>
             </div>

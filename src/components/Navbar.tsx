@@ -12,6 +12,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PostCreationDialog } from './PostCreationDialog';
 import { useUnreadCounts, formatBadge } from '@/hooks/useUnreadCounts';
+import { tr } from '@/i18n';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,7 +32,7 @@ const Navbar: React.FC = () => {
                 variant="ghost" 
                 size="icon"
                 className="rounded-full"
-                aria-label="Menu"
+                aria-label={tr('navbar.menu')}
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -94,7 +95,7 @@ const Navbar: React.FC = () => {
               size="icon"
               className="rounded-full text-muted-foreground hover:text-foreground"
               onClick={toggleTheme}
-              aria-label="Theme"
+              aria-label={tr('settings.theme')}
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
@@ -104,7 +105,7 @@ const Navbar: React.FC = () => {
               className="rounded-full text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link to="/friends" aria-label="Friends">
+              <Link to="/friends" aria-label={tr('sidebar.friends')}>
                 <Users className="h-5 w-5" />
               </Link>
             </Button>
@@ -114,7 +115,7 @@ const Navbar: React.FC = () => {
               className="rounded-full text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link to="/messages" aria-label="Messages" className="relative">
+              <Link to="/messages" aria-label={tr('settings.messagesNotif')} className="relative">
                 <MessageSquare className="h-5 w-5" />
                 {unread.messages > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center tabular-nums ring-2 ring-card">{formatBadge(unread.messages)}</span>
@@ -127,7 +128,7 @@ const Navbar: React.FC = () => {
               className="rounded-full text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link to="/notifications" aria-label="Notifications" className="relative">
+              <Link to="/notifications" aria-label={tr('nav.notifications')} className="relative">
                 <Bell className="h-5 w-5" />
                 {unread.notifications > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center tabular-nums ring-2 ring-card">{formatBadge(unread.notifications)}</span>

@@ -12,6 +12,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import CommunityFeed from '@/components/communities/CommunityFeed';
+import { tr } from '@/i18n';
 
 interface Community {
   id: string;
@@ -64,9 +65,9 @@ const Communities: React.FC = () => {
       .update({ name: editName.trim(), description: editDesc.trim() || null })
       .eq('id', editing.id);
     setSaving(false);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setCommunities(prev => prev.map(c => c.id === editing.id ? { ...c, name: editName.trim(), description: editDesc.trim() || null } : c));
-    toast({ title: 'Communauté mise à jour' });
+    toast({ title: tr('communities.communityUpdated') });
     setEditing(null);
   };
 
@@ -75,10 +76,10 @@ const Communities: React.FC = () => {
     setSaving(true);
     const { error } = await supabase.from('communities').delete().eq('id', editing.id);
     setSaving(false);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setCommunities(prev => prev.filter(c => c.id !== editing.id));
     if (focusId === editing.id) setFocusId(null);
-    toast({ title: 'Communauté supprimée', description: editing.name });
+    toast({ title: tr('communities.communityDeleted'), description: editing.name });
     setEditing(null);
   };
 
@@ -105,7 +106,7 @@ const Communities: React.FC = () => {
 
   const toggleJoin = async (community: Community) => {
     if (!currentUserId) {
-      toast({ title: 'Connexion requise', description: 'Connectez-vous pour rejoindre une communauté.', variant: 'destructive' });
+      toast({ title: tr('messages.loginRequired'), description: tr('communities.logInToJoinACommunity'), variant: 'destructive' });
       return;
     }
     setBusyId(community.id);
@@ -125,11 +126,11 @@ const Communities: React.FC = () => {
           : c
       ));
       toast({
-        title: joining ? 'Bienvenue !' : 'Communauté quittée',
-        description: joining ? `Vous avez rejoint ${community.name}` : `Vous avez quitté ${community.name}`,
+        title: joining ? tr('auth.welcomeBack') : tr('communities.leftTheCommunity'),
+        description: joining ? tr('communities.youJoined', { p0: community.name }) : tr('communities.youLeft', { p0: community.name }),
       });
     } catch (e) {
-      toast({ title: 'Erreur', description: (e as Error).message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: (e as Error).message, variant: 'destructive' });
     } finally {
       setBusyId(null);
     }
@@ -137,7 +138,7 @@ const Communities: React.FC = () => {
 
   const createCommunity = async () => {
     if (!currentUserId) {
-      toast({ title: 'Connexion requise', description: 'Connectez-vous pour créer une communauté.', variant: 'destructive' });
+      toast({ title: tr('messages.loginRequired'), description: tr('communities.logInToCreateACommunity'), variant: 'destructive' });
       return;
     }
     if (!newName.trim()) return;
@@ -152,12 +153,12 @@ const Communities: React.FC = () => {
       // Adding the creator as a member bumps members_count to 1 via trigger.
       await supabase.from('community_members').insert({ community_id: data.id, user_id: currentUserId, role: 'admin' });
       setCommunities((prev) => [{ ...(data as Omit<Community, 'isJoined'>), members_count: 1, isJoined: true }, ...prev]);
-      toast({ title: 'Communauté créée', description: `${data.name} est en ligne.` });
+      toast({ title: tr('communities.communityCreated'), description: tr('communities.isLive', { p0: data.name }) });
       setCreateOpen(false);
       setNewName('');
       setNewDesc('');
     } catch (e) {
-      toast({ title: 'Erreur', description: (e as Error).message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: (e as Error).message, variant: 'destructive' });
     } finally {
       setCreating(false);
     }
@@ -242,7 +243,7 @@ const Communities: React.FC = () => {
                 {communities.length === 0 ? (
                   <div className="text-center py-12 text-gray-500">
                     <Users className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                    <p>Aucune communauté pour le moment. Créez la première !</p>
+                    <p>{tr('communities.noCommunitiesYetCreateTheFirst')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -255,7 +256,7 @@ const Communities: React.FC = () => {
                 {joined.length === 0 ? (
                   <div className="text-center py-12 text-gray-500">
                     <Users className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                    <p>Vous n'avez rejoint aucune communauté.</p>
+                    <p>{tr('communities.youHavenTJoinedAnyCommunity')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -294,19 +295,19 @@ const Communities: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="community-name">Nom</Label>
-              <Input id="community-name" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nom de la communauté" />
+              <Label htmlFor="community-name">{tr('admin.name')}</Label>
+              <Input id="community-name" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={tr('communities.communityName')} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="community-desc">Description</Label>
-              <Textarea id="community-desc" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="De quoi parle votre communauté ?" rows={3} />
+              <Label htmlFor="community-desc">{tr('events.description')}</Label>
+              <Textarea id="community-desc" value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder={tr('communities.whatIsYourCommunityAbout')} rows={3} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>{tr('common.cancel')}</Button>
             <Button onClick={createCommunity} disabled={!newName.trim() || creating}>
               {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-              Créer
+              {tr('common.create')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -315,36 +316,36 @@ const Communities: React.FC = () => {
       <Dialog open={!!editing} onOpenChange={(open) => { if (!open) setEditing(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Paramètres de la communauté</DialogTitle>
+            <DialogTitle>{tr('communities.communitySettings')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-community-name">Nom</Label>
+              <Label htmlFor="edit-community-name">{tr('admin.name')}</Label>
               <Input id="edit-community-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-community-desc">Description</Label>
+              <Label htmlFor="edit-community-desc">{tr('events.description')}</Label>
               <Textarea id="edit-community-desc" value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={3} />
             </div>
             <div className="rounded-lg border border-destructive/30 p-3 space-y-2">
               {confirmDelete ? (
                 <>
-                  <p className="text-sm">Supprimer « {editing?.name} » et toutes ses publications ? Cette action est irréversible.</p>
+                  <p className="text-sm">{tr('communities.delete')} {editing?.name} {tr('communities.andAllItsPostsThisCannot')}</p>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="destructive" onClick={deleteCommunity} disabled={saving}>Oui, supprimer</Button>
-                    <Button size="sm" variant="outline" onClick={() => setConfirmDelete(false)} disabled={saving}>Annuler</Button>
+                    <Button size="sm" variant="destructive" onClick={deleteCommunity} disabled={saving}>{tr('communities.yesDelete')}</Button>
+                    <Button size="sm" variant="outline" onClick={() => setConfirmDelete(false)} disabled={saving}>{tr('common.cancel')}</Button>
                   </div>
                 </>
               ) : (
-                <Button size="sm" variant="outline" className="text-destructive" onClick={() => setConfirmDelete(true)}>Supprimer la communauté</Button>
+                <Button size="sm" variant="outline" className="text-destructive" onClick={() => setConfirmDelete(true)}>{tr('communities.deleteCommunity')}</Button>
               )}
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>{tr('common.cancel')}</Button>
             <Button onClick={saveCommunity} disabled={!editName.trim() || saving}>
               {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Enregistrer
+              {tr('post.update')}
             </Button>
           </DialogFooter>
         </DialogContent>

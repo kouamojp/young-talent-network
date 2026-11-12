@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 declare global {
   interface Window { VKIDSDK?: any }
@@ -56,7 +57,7 @@ const VKLoginButton: React.FC = () => {
         })
           .on(VKID.WidgetEvents.ERROR, (e: any) => {
             console.error('VKID error', e);
-            toast({ title: 'Ошибка ВКонтакте', description: String(e?.code ?? e), variant: 'destructive' });
+            toast({ title: tr('vKLoginButton.vkError'), description: String(e?.code ?? e), variant: 'destructive' });
           })
           .on(VKID.OAuthListInternalEvents.LOGIN_SUCCESS, async (payload: any) => {
             try {
@@ -75,11 +76,11 @@ const VKLoginButton: React.FC = () => {
               });
               if (otpErr) throw otpErr;
 
-              toast({ title: 'Вход выполнен', description: 'Добро пожаловать!' });
+              toast({ title: tr('common.signedIn'), description: tr('common.welcome') });
               navigate('/profile');
             } catch (err: any) {
               console.error(err);
-              toast({ title: 'Ошибка входа', description: err.message ?? String(err), variant: 'destructive' });
+              toast({ title: tr('auth.loginFailed'), description: err.message ?? String(err), variant: 'destructive' });
             }
           });
         renderedRef.current = true;

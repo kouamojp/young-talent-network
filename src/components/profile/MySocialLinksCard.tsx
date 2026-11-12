@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Globe, Plus, Trash2, ExternalLink, Instagram, Youtube, Music, Facebook, Twitter, Linkedin, Twitch } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface SocialLink {
   id: string;
@@ -46,7 +47,7 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
   useEffect(() => { load(); }, [userId]);
 
   const add = async () => {
-    if (!url.trim()) { toast.error('URL requise'); return; }
+    if (!url.trim()) { toast.error(tr('mySocialLinksCard.urlRequired')); return; }
     setSaving(true);
     const { data, error } = await supabase.from('talent_social_links')
       .insert({ user_id: userId, platform, url: url.trim() })
@@ -55,13 +56,13 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
     if (error) { toast.error(error.message); return; }
     if (data) setLinks(l => [...l, data as SocialLink]);
     setUrl('');
-    toast.success('Lien ajouté');
+    toast.success(tr('mySocialLinksCard.linkAdded'));
   };
 
   const remove = async (id: string) => {
     await supabase.from('talent_social_links').delete().eq('id', id);
     setLinks(l => l.filter(x => x.id !== id));
-    toast.success('Supprimé');
+    toast.success(tr('common.deleted'));
   };
 
   const openInYatSocial = (link: SocialLink) => {
@@ -72,7 +73,7 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Globe className="h-4 w-4" /> Mes réseaux sociaux
+          <Globe className="h-4 w-4" /> {tr('mySocialLinksCard.mySocialNetworks')}
           <Badge variant="secondary" className="ml-1">{links.length}</Badge>
         </CardTitle>
       </CardHeader>
@@ -92,7 +93,7 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
             className="flex-1"
           />
           <Button onClick={add} disabled={saving} size="sm">
-            <Plus className="h-4 w-4 mr-1" /> Ajouter
+            <Plus className="h-4 w-4 mr-1" /> {tr('tv.addLink')}
           </Button>
         </div>
 
@@ -107,7 +108,7 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
                     type="button"
                     onClick={() => openInYatSocial(link)}
                     className="flex items-center gap-2 flex-1 min-w-0 text-left"
-                    title="Ouvrir dans YAT Social"
+                    title={tr('mySocialLinksCard.openInYatSocial')}
                   >
                     <Icon className={`h-4 w-4 shrink-0 ${meta.color}`} />
                     <div className="min-w-0 flex-1">
@@ -124,7 +125,7 @@ const MySocialLinksCard: React.FC<Props> = ({ userId }) => {
             })}
           </div>
         ) : (
-          <p className="text-xs text-muted-foreground">Aucun lien. Ajoutez vos réseaux pour les retrouver dans YAT Social.</p>
+          <p className="text-xs text-muted-foreground">{tr('mySocialLinksCard.noLinksAddYourNetworksTo')}</p>
         )}
       </CardContent>
     </Card>

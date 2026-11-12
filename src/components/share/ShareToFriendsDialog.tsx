@@ -9,6 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Send } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface Friend {
   id: string;
@@ -59,7 +60,7 @@ const ShareToFriendsDialog: React.FC<Props> = ({ url, title = '', description = 
   };
 
   const send = async () => {
-    if (!selected.size) { toast.error('Sélectionnez au moins un ami'); return; }
+    if (!selected.size) { toast.error(tr('shareToFriendsDialog.selectAtLeastOneFriend')); return; }
     setSending(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -69,12 +70,12 @@ const ShareToFriendsDialog: React.FC<Props> = ({ url, title = '', description = 
         if (rpcErr) throw rpcErr;
         await supabase.from('messages').insert({ conversation_id: convId as string, sender_id: user.id, content: message });
       }
-      toast.success(`Partagé avec ${selected.size} ami(s)`);
+      toast.success(tr('shareToFriendsDialog.sharedWithFriendS', { p0: selected.size }));
       onShared?.();
       setOpen(false);
       setSelected(new Set());
     } catch (e: any) {
-      toast.error(e.message || 'Échec du partage');
+      toast.error(e.message || tr('shareToFriendsDialog.sharingFailed'));
     } finally {
       setSending(false);
     }
@@ -86,12 +87,12 @@ const ShareToFriendsDialog: React.FC<Props> = ({ url, title = '', description = 
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-md">
-        <DialogHeader><DialogTitle>Partager avec des amis</DialogTitle></DialogHeader>
-        <Textarea value={message} onChange={e => setMessage(e.target.value)} className="min-h-[80px]" placeholder="Ajouter un message..." />
-        <Input placeholder="Rechercher un ami..." value={search} onChange={e => setSearch(e.target.value)} />
+        <DialogHeader><DialogTitle>{tr('shareToFriendsDialog.shareWithFriends')}</DialogTitle></DialogHeader>
+        <Textarea value={message} onChange={e => setMessage(e.target.value)} className="min-h-[80px]" placeholder={tr('shareToFriendsDialog.addAMessage')} />
+        <Input placeholder={tr('shareToFriendsDialog.searchForAFriend')} value={search} onChange={e => setSearch(e.target.value)} />
         <ScrollArea className="h-64 border rounded-md">
           <div className="p-2 space-y-1">
-            {filtered.length === 0 && <p className="text-sm text-muted-foreground p-2">Aucun ami trouvé</p>}
+            {filtered.length === 0 && <p className="text-sm text-muted-foreground p-2">{tr('shareToFriendsDialog.noFriendsFound')}</p>}
             {filtered.map(f => (
               <label key={f.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer">
                 <Checkbox checked={selected.has(f.id)} onCheckedChange={() => toggle(f.id)} />
@@ -102,7 +103,7 @@ const ShareToFriendsDialog: React.FC<Props> = ({ url, title = '', description = 
           </div>
         </ScrollArea>
         <Button onClick={send} disabled={sending || !selected.size} className="w-full">
-          <Send className="h-4 w-4 mr-2" /> Envoyer ({selected.size})
+          <Send className="h-4 w-4 mr-2" /> {tr('shareToFriendsDialog.send')}{selected.size})
         </Button>
       </DialogContent>
     </Dialog>

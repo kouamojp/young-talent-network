@@ -19,6 +19,7 @@ import {
 import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
+import { tr } from '@/i18n';
 
 type MediaKind = 'image' | 'video';
 interface StoryMediaItem { url: string; type: MediaKind }
@@ -228,7 +229,7 @@ export const StoriesBar = () => {
   const saveStory = async () => {
     const totalMedia = existingMedia.length + previews.length;
     if (!text.trim() && totalMedia === 0) {
-      toast({ title: 'Ajoutez du texte ou un média', variant: 'destructive' });
+      toast({ title: tr('post.emptyError'), variant: 'destructive' });
       return;
     }
     setSubmitting(true);
@@ -260,7 +261,7 @@ export const StoriesBar = () => {
           stickers: stickers as any,
         } as any).eq('id', editingId);
         if (error) throw error;
-        toast({ title: 'Story mise à jour' });
+        toast({ title: tr('storiesBar.storyUpdated') });
       } else {
         const { error } = await supabase.from('stories').insert({
           user_id: user.id,
@@ -271,7 +272,7 @@ export const StoriesBar = () => {
           stickers: stickers as any,
         } as any);
         if (error) throw error;
-        toast({ title: 'Story publiée !' });
+        toast({ title: tr('storiesBar.storyPublished') });
       }
 
       setCreating(false);
@@ -285,10 +286,10 @@ export const StoriesBar = () => {
   };
 
   const deleteStory = async (id: string) => {
-    if (!confirm('Supprimer cette story ?')) return;
+    if (!confirm(tr('storiesBar.deleteThisStory'))) return;
     const { error } = await supabase.from('stories').delete().eq('id', id);
     if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Story supprimée' });
+    toast({ title: tr('storiesBar.storyDeleted') });
     setViewing(null);
     loadStories();
   };
@@ -393,7 +394,7 @@ export const StoriesBar = () => {
     const list = Array.from(e.target.files || []);
     if (!list.length) return;
     const oversize = list.find(f => f.size > 50 * 1024 * 1024);
-    if (oversize) { toast({ title: `${oversize.name} dépasse 50MB`, variant: 'destructive' }); return; }
+    if (oversize) { toast({ title: tr('storiesBar.exceeds50mb', { p0: oversize.name }), variant: 'destructive' }); return; }
     const nextFiles = [...files, ...list];
     setFiles(nextFiles);
     list.forEach(f => {
@@ -443,22 +444,22 @@ export const StoriesBar = () => {
     const url = `${window.location.origin}/feed?story=${story.id}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Story', url });
+        await navigator.share({ title: tr('create.story'), url });
       } else {
         await navigator.clipboard.writeText(url);
-        toast({ title: 'Lien copié !' });
+        toast({ title: tr('common.linkCopied') });
       }
     } catch {}
   };
 
   const toggleLike = (story: Story) => {
     setLiked(prev => ({ ...prev, [story.id]: !prev[story.id] }));
-    toast({ title: liked[story.id] ? 'J\'aime retiré' : 'Vous aimez cette story ❤️' });
+    toast({ title: liked[story.id] ? tr('storiesBar.likeRemoved') : tr('storiesBar.youLikeThisStory') });
   };
 
   const submitComment = async () => {
     if (!commentText.trim() || !currentStory || !currentUser) {
-      if (!currentUser) toast({ title: 'Connectez-vous pour commenter', variant: 'destructive' });
+      if (!currentUser) toast({ title: tr('storiesBar.logInToComment'), variant: 'destructive' });
       return;
     }
     setCommentsPosting(true);
@@ -510,14 +511,14 @@ export const StoriesBar = () => {
     setComments(prev => prev.map(c => c.id === editingCommentId ? { ...c, content: editingCommentText.trim() } : c));
     setEditingCommentId(null);
     setEditingCommentText('');
-    toast({ title: 'Commentaire modifié' });
+    toast({ title: tr('storiesBar.commentEdited') });
   };
 
   const deleteComment = async (id: string) => {
     const { error } = await supabase.from('story_comments').delete().eq('id', id);
     if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
     setComments(prev => prev.filter(c => c.id !== id));
-    toast({ title: 'Commentaire supprimé' });
+    toast({ title: tr('storiesBar.commentDeleted') });
   };
 
   // Load comments when panel opens / story changes
@@ -609,7 +610,7 @@ export const StoriesBar = () => {
               </div>
               <div className="absolute bottom-0 left-0 right-0 pt-6 pb-2 px-2 bg-gradient-to-t from-card via-card/90 to-transparent">
                 <p className="text-[11px] font-semibold text-center text-foreground truncate">
-                  {t('stories.create') || 'Créer une story'}
+                  {t('stories.create') || tr('stories.create')}
                 </p>
               </div>
             </button>
@@ -698,10 +699,10 @@ export const StoriesBar = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => startEdit(currentStory)}>
-                          <Pencil className="h-4 w-4 mr-2" /> Modifier
+                          <Pencil className="h-4 w-4 mr-2" /> {tr('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive" onClick={() => deleteStory(currentStory.id)}>
-                          <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                          <Trash2 className="h-4 w-4 mr-2" /> {tr('common.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -718,9 +719,9 @@ export const StoriesBar = () => {
                   videoError ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80 gap-2 p-6 text-center">
                       <AlertTriangle className="h-10 w-10 text-yellow-400" />
-                      <p className="text-sm">Impossible de charger la vidéo.</p>
+                      <p className="text-sm">{tr('storiesBar.couldNotLoadTheVideo')}</p>
                       <Button size="sm" variant="secondary" onClick={() => { setVideoError(false); setVideoLoaded(false); videoElRef.current?.load(); }}>
-                        Réessayer
+                        {tr('common.retry')}
                       </Button>
                     </div>
                   ) : (
@@ -782,7 +783,7 @@ export const StoriesBar = () => {
               {/* Navigation taps + long-press for fast advance/rewind */}
               <button
                 className="absolute left-0 top-16 bottom-32 w-1/3 z-10"
-                aria-label="Précédent"
+                aria-label={tr('common.previous')}
                 onPointerDown={() => startHold(-1)}
                 onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(-1); }}
                 onPointerLeave={endHold}
@@ -790,7 +791,7 @@ export const StoriesBar = () => {
               />
               <button
                 className="absolute right-0 top-16 bottom-32 w-1/3 z-10"
-                aria-label="Suivant"
+                aria-label={tr('common.next')}
                 onPointerDown={() => startHold(1)}
                 onPointerUp={() => { const wh = wasHold(); endHold(); if (!wh) advance(1); }}
                 onPointerLeave={endHold}
@@ -811,7 +812,7 @@ export const StoriesBar = () => {
 
               {paused && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 bg-black/50 text-white text-xs rounded-full px-3 py-1 pointer-events-none">
-                  ⏸ En pause
+                  {tr('storiesBar.paused')}
                 </div>
               )}
 
@@ -819,14 +820,14 @@ export const StoriesBar = () => {
               {showComments && (
                 <div className="absolute inset-x-0 bottom-0 top-1/3 z-30 bg-background/95 backdrop-blur-md rounded-t-2xl flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200">
                   <div className="flex items-center justify-between px-4 py-2 border-b">
-                    <p className="text-sm font-semibold">Commentaires</p>
+                    <p className="text-sm font-semibold">{tr('articles.comments')}</p>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowComments(false)}>
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
                   <div ref={commentsScrollRef} className="flex-1 overflow-y-auto px-3 py-2 space-y-3">
                     {comments.length === 0 && !commentsLoading && (
-                      <p className="text-xs text-center text-muted-foreground py-6">Aucun commentaire. Soyez le premier !</p>
+                      <p className="text-xs text-center text-muted-foreground py-6">{tr('common.noCommentsBeTheFirst')}</p>
                     )}
                     {comments.map((c) => {
                       const isMine = currentUser?.id === c.user_id;
@@ -839,7 +840,7 @@ export const StoriesBar = () => {
                           </Avatar>
                           <div className="flex-1 bg-muted rounded-lg px-2.5 py-1.5">
                             <div className="flex items-start justify-between gap-2">
-                              <p className="text-[11px] font-semibold">{c.profile?.name || 'User'}</p>
+                              <p className="text-[11px] font-semibold">{c.profile?.name || tr('admin.user')}</p>
                               {isMine && !isEditing && (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -849,10 +850,10 @@ export const StoriesBar = () => {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem onClick={() => startEditComment(c)}>
-                                      <Pencil className="h-3.5 w-3.5 mr-2" /> Modifier
+                                      <Pencil className="h-3.5 w-3.5 mr-2" /> {tr('common.edit')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => deleteComment(c.id)} className="text-destructive">
-                                      <Trash2 className="h-3.5 w-3.5 mr-2" /> Supprimer
+                                      <Trash2 className="h-3.5 w-3.5 mr-2" /> {tr('common.delete')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -867,8 +868,8 @@ export const StoriesBar = () => {
                                   autoFocus
                                 />
                                 <div className="flex gap-1.5 justify-end">
-                                  <Button size="sm" variant="ghost" className="h-6 text-[11px] px-2" onClick={() => { setEditingCommentId(null); setEditingCommentText(''); }}>Annuler</Button>
-                                  <Button size="sm" className="h-6 text-[11px] px-2" onClick={saveEditComment} disabled={!editingCommentText.trim()}>Enregistrer</Button>
+                                  <Button size="sm" variant="ghost" className="h-6 text-[11px] px-2" onClick={() => { setEditingCommentId(null); setEditingCommentText(''); }}>{tr('common.cancel')}</Button>
+                                  <Button size="sm" className="h-6 text-[11px] px-2" onClick={saveEditComment} disabled={!editingCommentText.trim()}>{tr('post.update')}</Button>
                                 </div>
                               </div>
                             ) : (
@@ -889,12 +890,12 @@ export const StoriesBar = () => {
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
-                      placeholder="Ajouter un commentaire..."
+                      placeholder={tr('common.addAComment')}
                       className="flex-1 bg-muted rounded-full px-3 py-1.5 text-xs outline-none focus:ring-1 focus:ring-primary"
                       autoFocus
                     />
                     <Button size="sm" onClick={submitComment} disabled={commentsPosting || !commentText.trim()}>
-                      {commentsPosting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Envoyer'}
+                      {commentsPosting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : tr('common.send')}
                     </Button>
                   </div>
                 </div>
@@ -907,7 +908,7 @@ export const StoriesBar = () => {
                   onChange={(e) => setCommentText(e.target.value)}
                   onFocus={() => { if (timerRef.current) clearTimeout(timerRef.current); setShowComments(true); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') submitComment(); }}
-                  placeholder="Envoyer un message..."
+                  placeholder={tr('storiesBar.sendAMessage')}
                   className="flex-1 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/60 rounded-full px-3 py-1.5 text-xs border border-white/20 outline-none focus:border-white/60"
                 />
                 <button onClick={() => toggleLike(currentStory)} className="text-white p-1.5">
@@ -929,7 +930,7 @@ export const StoriesBar = () => {
       <Dialog open={creating} onOpenChange={(o) => { setCreating(o); if (!o) resetForm(); }}>
         <DialogContent className="max-w-3xl w-[95vw] max-h-[95vh] overflow-y-auto">
           <h3 className="font-semibold text-lg">
-            {editingId ? 'Modifier la story' : (t('stories.create') || 'Créer une story')}
+            {editingId ? tr('storiesBar.editStory') : (t('stories.create') || tr('stories.create'))}
           </h3>
 
           <div className="grid md:grid-cols-[1fr_320px] gap-4">
@@ -996,7 +997,7 @@ export const StoriesBar = () => {
 
               {!activePreview && !text && stickers.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <p className="text-white/40 text-sm">{t('stories.preview') || 'Aperçu'}</p>
+                  <p className="text-white/40 text-sm">{t('stories.preview') || tr('work.overview')}</p>
                 </div>
               )}
 
@@ -1021,10 +1022,10 @@ export const StoriesBar = () => {
             {/* Editor */}
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Texte</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr('storiesBar.text')}</label>
                 <Textarea
                   ref={textRef}
-                  placeholder={t('stories.textPlaceholder') || 'Écrivez votre texte... 😊'}
+                  placeholder={t('stories.textPlaceholder') || tr('storiesBar.writeYourText')}
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   className="resize-none"
@@ -1036,7 +1037,7 @@ export const StoriesBar = () => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-1">
-                      <Smile className="h-4 w-4" /> Emoji
+                      <Smile className="h-4 w-4" /> {tr('common.emoji')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-2" align="start">
@@ -1052,12 +1053,12 @@ export const StoriesBar = () => {
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-1" title="Ajouter un sticker sur l'image">
-                      <span className="text-base leading-none">🌟</span> Sticker
+                    <Button variant="outline" size="sm" className="gap-1" title={tr('storiesBar.addAStickerToTheImage')}>
+                      <span className="text-base leading-none">🌟</span> {tr('storiesBar.sticker')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-2" align="start">
-                    <p className="text-[10px] text-muted-foreground mb-1 px-1">Cliquez pour ajouter sur l'image, puis glissez-le.</p>
+                    <p className="text-[10px] text-muted-foreground mb-1 px-1">{tr('storiesBar.clickToAddItToThe')}</p>
                     <div className="grid grid-cols-10 gap-1 max-h-60 overflow-y-auto">
                       {EMOJIS.map(e => (
                         <button key={e} onClick={() => addSticker(e)} className="text-xl hover:bg-muted rounded p-1 transition-colors" type="button">
@@ -1094,7 +1095,7 @@ export const StoriesBar = () => {
                       onClick={() => setTextAlign(a)}
                       className={`px-2 py-1 text-[10px] uppercase ${textAlign === a ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-muted'}`}
                     >
-                      {a === 'top' ? 'Haut' : a === 'center' ? 'Centre' : 'Bas'}
+                      {a === 'top' ? tr('storiesBar.top') : a === 'center' ? tr('storiesBar.center') : tr('storiesBar.bottom')}
                     </button>
                   ))}
                 </div>
@@ -1102,13 +1103,13 @@ export const StoriesBar = () => {
 
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
-                  <Type className="h-3 w-3" /> Taille du texte : {fontSize}px
+                  <Type className="h-3 w-3" /> {tr('storiesBar.textSize')} {fontSize}px
                 </label>
                 <input type="range" min={16} max={64} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-primary" />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Couleur de fond</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr('storiesBar.backgroundColor')}</label>
                 <div className="flex gap-1.5 flex-wrap">
                   {colors.map(c => (
                     <button
@@ -1125,13 +1126,13 @@ export const StoriesBar = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Button variant="outline" size="sm" asChild>
                   <label className="cursor-pointer flex items-center justify-center gap-1">
-                    <ImageIcon className="h-4 w-4" /> Photos
+                    <ImageIcon className="h-4 w-4" /> {tr('common.photos')}
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileSelect} />
                   </label>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <label className="cursor-pointer flex items-center justify-center gap-1">
-                    <Video className="h-4 w-4" /> Vidéos
+                    <Video className="h-4 w-4" /> {tr('sports.videos')}
                     <input type="file" accept="video/*" multiple className="hidden" onChange={handleFileSelect} />
                   </label>
                 </Button>
@@ -1167,7 +1168,7 @@ export const StoriesBar = () => {
 
               <Button onClick={saveStory} disabled={submitting} className="w-full">
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                {editingId ? 'Enregistrer' : (t('stories.publish') || 'Publier')}
+                {editingId ? tr('post.update') : (t('stories.publish') || 'Publier')}
               </Button>
             </div>
           </div>

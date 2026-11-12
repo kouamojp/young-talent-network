@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { tr } from '@/i18n';
 
 interface AISearchDialogProps {
   open: boolean;
@@ -42,7 +43,7 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
       });
     } catch (error: any) {
       toast({
-        title: "Search failed",
+        title: tr('aISearchDialog.searchFailed'),
         description: error.message,
         variant: "destructive",
       });
@@ -57,7 +58,7 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            AI Smart Search
+            {tr('aISearchDialog.aiSmartSearch')}
           </DialogTitle>
         </DialogHeader>
         
@@ -66,7 +67,7 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask anything... Find users, events, jobs, or get recommendations"
+              placeholder={tr('aISearchDialog.askAnythingFindUsersEventsJobs')}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             />
             <Button onClick={handleSearch} disabled={loading}>
@@ -77,13 +78,13 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
           {results && (
             <div className="space-y-4">
               <div className="p-4 bg-secondary/20 rounded-lg">
-                <h3 className="font-semibold mb-2">Summary</h3>
+                <h3 className="font-semibold mb-2">{tr('aISearchDialog.summary')}</h3>
                 <p className="text-sm text-muted-foreground">{results.summary}</p>
               </div>
 
               {results.suggestions && results.suggestions.length > 0 && (
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-2">Suggestions</h3>
+                  <h3 className="font-semibold mb-2">{tr('aISearchDialog.suggestions')}</h3>
                   <ul className="space-y-1">
                     {results.suggestions.map((suggestion: string, i: number) => (
                       <li key={i} className="text-sm">• {suggestion}</li>
@@ -94,7 +95,7 @@ export const AISearchDialog = ({ open, onOpenChange }: AISearchDialogProps) => {
 
               {results.links && results.links.length > 0 && (
                 <div className="p-4 border rounded-lg">
-                  <h3 className="font-semibold mb-2">Recommended Links</h3>
+                  <h3 className="font-semibold mb-2">{tr('aISearchDialog.recommendedLinks')}</h3>
                   <div className="space-y-2">
                     {results.links.map((link: any, i: number) => (
                       <a

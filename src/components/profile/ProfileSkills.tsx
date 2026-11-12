@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Briefcase, Plus, X } from "lucide-react";
+import { tr } from '@/i18n';
 
 interface Skill {
   id: string;
@@ -28,9 +29,9 @@ interface ProfileSkillsProps {
 }
 
 const levelLabels: Record<string, string> = {
-  beginner: "Débutant",
-  intermediate: "Intermédiaire",
-  advanced: "Avancé",
+  beginner: tr('common.beginner'),
+  intermediate: tr('common.intermediate'),
+  advanced: tr('common.advanced'),
   expert: "Expert",
 };
 
@@ -125,8 +126,8 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
       if (error) throw error;
 
       toast({
-        title: "Compétence ajoutée",
-        description: "Votre compétence a été ajoutée avec succès",
+        title: tr('profileSkills.skillAdded'),
+        description: tr('profileSkills.yourSkillHasBeenAddedSuccessfully'),
       });
 
       fetchUserSkills();
@@ -135,7 +136,7 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
       setSelectedLevel("beginner");
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -153,12 +154,12 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
 
       setUserSkills(userSkills.filter(s => s.id !== skillId));
       toast({
-        title: "Compétence supprimée",
-        description: "La compétence a été retirée de votre profil",
+        title: tr('profileSkills.skillRemoved'),
+        description: tr('profileSkills.theSkillHasBeenRemovedFrom'),
       });
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -183,25 +184,25 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Briefcase className="h-5 w-5" />
-          Mes compétences
+          {tr('profileSkills.mySkills')}
         </CardTitle>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter
+              {tr('tv.addLink')}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Ajouter une compétence</DialogTitle>
+              <DialogTitle>{tr('tokenize.addSkill')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Compétence</label>
+                <label className="text-sm font-medium">{tr('common.skill')}</label>
                 <Select value={selectedSkill} onValueChange={setSelectedSkill}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Choisir une compétence" />
+                    <SelectValue placeholder={tr('profileSkills.chooseASkill')} />
                   </SelectTrigger>
                   <SelectContent>
                     {filteredAvailableSkills.map((skill) => (
@@ -213,21 +214,21 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Niveau</label>
+                <label className="text-sm font-medium">{tr('common.level')}</label>
                 <Select value={selectedLevel} onValueChange={setSelectedLevel}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="beginner">Débutant</SelectItem>
-                    <SelectItem value="intermediate">Intermédiaire</SelectItem>
-                    <SelectItem value="advanced">Avancé</SelectItem>
-                    <SelectItem value="expert">Expert</SelectItem>
+                    <SelectItem value="beginner">{tr('common.beginner')}</SelectItem>
+                    <SelectItem value="intermediate">{tr('common.intermediate')}</SelectItem>
+                    <SelectItem value="advanced">{tr('common.advanced')}</SelectItem>
+                    <SelectItem value="expert">{tr('profileSkills.expert')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <Button onClick={addSkill} className="w-full" disabled={!selectedSkill}>
-                Ajouter la compétence
+                {tr('profileSkills.addSkill')}
               </Button>
             </div>
           </DialogContent>
@@ -235,12 +236,12 @@ export const ProfileSkills = ({ userId }: ProfileSkillsProps) => {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="text-center py-8 text-muted-foreground">Chargement...</div>
+          <div className="text-center py-8 text-muted-foreground">{tr('common.loading')}</div>
         ) : userSkills.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Briefcase className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Aucune compétence ajoutée</p>
-            <p className="text-sm">Cliquez sur "Ajouter" pour commencer</p>
+            <p>{tr('profileSkills.noSkillsAdded')}</p>
+            <p className="text-sm">{tr('common.clickAddToGetStarted')}</p>
           </div>
         ) : (
           <div className="space-y-6">

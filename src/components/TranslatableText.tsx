@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TranslateButton from './TranslateButton';
+import { tr } from '@/i18n';
 
 interface Props {
   text: string;
@@ -18,7 +19,7 @@ const TranslatableText: React.FC<Props> = ({ text, className }) => {
           currentLang={translation?.lang || null}
           onTranslated={(t, lang) => setTranslation(t && lang ? { text: t, lang } : null)}
         />
-        {translation && <span className="text-[9px] italic opacity-70">Traduit par IA</span>}
+        {translation && <span className="text-[9px] italic opacity-70">{tr('common.translatedByAi')}</span>}
       </div>
     </div>
   );

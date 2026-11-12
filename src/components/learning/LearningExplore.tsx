@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 interface LearningExploreProps {
   onBack: () => void;
@@ -53,18 +54,18 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
 
   const enroll = async (courseId: string) => {
     if (!userId) {
-      toast({ title: 'Connexion requise', description: 'Connectez-vous pour vous inscrire à un cours.', variant: 'destructive' });
+      toast({ title: tr('messages.loginRequired'), description: tr('learningExplore.logInToEnrollInA'), variant: 'destructive' });
       return;
     }
     setEnrollingId(courseId);
     const { error } = await supabase.from('course_enrollments').insert({ course_id: courseId, student_id: userId });
     setEnrollingId(null);
     if (error && error.code !== '23505') {
-      toast({ title: "Échec de l'inscription", description: error.message, variant: 'destructive' });
+      toast({ title: tr('learningExplore.enrollmentFailed'), description: error.message, variant: 'destructive' });
       return;
     }
     setEnrolledIds(prev => new Set(prev).add(courseId));
-    toast({ title: 'Inscription confirmée', description: 'Retrouvez ce cours dans votre tableau de bord.' });
+    toast({ title: tr('common.enrollmentConfirmed'), description: tr('learningExplore.findThisCourseInYourDashboard') });
   };
 
   const query = searchTerm.toLowerCase();
@@ -73,15 +74,15 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="icon" onClick={onBack} aria-label="Retour">
+        <Button variant="ghost" size="icon" onClick={onBack} aria-label={tr('common.back')}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold"><GraduationCap className="h-6 w-6 text-primary" />Cours</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold"><GraduationCap className="h-6 w-6 text-primary" />{tr('common.courses')}</h1>
       </div>
 
       <div className="relative mb-6">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input className="pl-10" placeholder="Rechercher un cours, une compétence…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <Input className="pl-10" placeholder={tr('learningExplore.searchForACourseASkill')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </div>
 
       {loading ? (
@@ -90,7 +91,7 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
         <div className="rounded-xl border border-dashed border-border p-10 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-muted-foreground/50" />
           <p className="mt-3 text-sm text-muted-foreground">
-            {courses.length === 0 ? 'Aucun cours publié pour le moment.' : 'Aucun cours ne correspond à cette recherche.'}
+            {courses.length === 0 ? tr('learningExplore.noCoursesPublishedYet') : tr('learningExplore.noCourseMatchesThisSearch')}
           </p>
         </div>
       ) : (
@@ -104,7 +105,7 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
                 <div className="flex items-start justify-between gap-3">
                   <Link to={`/course/${course.id}`} className="font-semibold break-words hover:text-primary hover:underline">{course.title}</Link>
                   {course.price !== null && (
-                    <span className="shrink-0 font-semibold tabular-nums">{Number(course.price) === 0 ? 'Gratuit' : `${Number(course.price)} $`}</span>
+                    <span className="shrink-0 font-semibold tabular-nums">{Number(course.price) === 0 ? tr('common.free') : `${Number(course.price)} $`}</span>
                   )}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -117,13 +118,13 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
                 {course.description && <p className="mt-2 text-sm text-muted-foreground line-clamp-2 break-words whitespace-pre-line">{course.description}</p>}
                 <div className="mt-3">
                   {course.instructor_id === userId ? (
-                    <Badge variant="outline">Votre cours</Badge>
+                    <Badge variant="outline">{tr('learningExplore.yourCourse')}</Badge>
                   ) : enrolledIds.has(course.id) ? (
-                    <Button size="sm" variant="secondary" disabled className="gap-1.5"><Check className="h-4 w-4" />Inscrit</Button>
+                    <Button size="sm" variant="secondary" disabled className="gap-1.5"><Check className="h-4 w-4" />{tr('admin.joined')}</Button>
                   ) : (
                     <Button size="sm" onClick={() => enroll(course.id)} disabled={enrollingId === course.id}>
                       {enrollingId === course.id && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-                      S'inscrire
+                      {tr('learningExplore.enroll')}
                     </Button>
                   )}
                 </div>

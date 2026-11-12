@@ -26,6 +26,10 @@ jobs:
       - name: Tests unitaires
         run: npm test
 
+      # Mêmes clés dans les 3 langues, aucune clé inconnue, aucun texte en dur.
+      - name: Traductions
+        run: npm run i18n:check
+
       - name: Build
         run: npm run build
 

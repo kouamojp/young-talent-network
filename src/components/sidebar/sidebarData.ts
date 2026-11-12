@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 
 import { MenuSectionItem } from "./types";
+import { tr } from '@/i18n';
 
 export interface MenuSection {
   titleKey: string;
@@ -158,8 +159,8 @@ export const yatServicesItems: MenuSectionItem[] = [
     badgeColor: "bg-amber-500 text-white",
   },
   {
-    label: "Recherche avancée",
-    description: "Filtres détaillés : type, pays, niveau, compétences...",
+    label: tr('common.advancedSearch'),
+    description: tr('sidebarData.detailedFiltersTypeCountryLevelSkills'),
     icon: Sparkles,
     path: "/advanced-search",
     iconColor: "text-pink-500",
@@ -167,8 +168,8 @@ export const yatServicesItems: MenuSectionItem[] = [
     badgeColor: "bg-pink-500 text-white",
   },
   {
-    label: "Marketplace Talents",
-    description: "Annonces : recrutement, casting, freelance, sponsoring",
+    label: tr('yatcoin.talentMarketplace'),
+    description: tr('sidebarData.listingsRecruitmentCastingFreelanceSponsorsh'),
     icon: Briefcase,
     path: "/talent-marketplace",
     iconColor: "text-orange-500",
@@ -176,8 +177,8 @@ export const yatServicesItems: MenuSectionItem[] = [
     badgeColor: "bg-orange-500 text-white",
   },
   {
-    label: "Vérification",
-    description: "Obtiens un badge vérifié",
+    label: tr('common.verification'),
+    description: tr('sidebarData.getAVerifiedBadge'),
     icon: Shield,
     path: "/verification",
     iconColor: "text-emerald-600",
@@ -260,7 +261,7 @@ export const servicesItems: MenuSectionItem[] = [
 // Connect (social links)
 export const connectItems: MenuSectionItem[] = [
   {
-    label: "Facebook",
+    label: tr('sidebar.connectFacebook'),
     description: "sidebar.connectFacebook",
     icon: Globe,
     path: "#",
@@ -268,7 +269,7 @@ export const connectItems: MenuSectionItem[] = [
     iconColor: "text-blue-600",
   },
   {
-    label: "Instagram",
+    label: tr('sidebar.connectInstagram'),
     description: "sidebar.connectInstagram",
     icon: Globe,
     path: "#",
@@ -276,7 +277,7 @@ export const connectItems: MenuSectionItem[] = [
     iconColor: "text-pink-600",
   },
   {
-    label: "X (Twitter)",
+    label: tr('sidebar.connectX'),
     description: "sidebar.connectX",
     icon: Globe,
     path: "#",
@@ -284,7 +285,7 @@ export const connectItems: MenuSectionItem[] = [
     iconColor: "text-gray-700",
   },
   {
-    label: "TikTok",
+    label: tr('sidebar.connectTikTok'),
     description: "sidebar.connectTikTok",
     icon: Globe,
     path: "#",

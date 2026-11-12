@@ -21,15 +21,16 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SPORT_SCHEMAS } from '@/components/profile/sport-profile-schema';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 
 const jobFormSchema = z.object({
-  title: z.string().min(3, { message: "Le titre doit faire au moins 3 caractères." }),
-  company: z.string().min(2, { message: "Le nom de l'organisation est obligatoire." }),
-  location: z.string().min(2, { message: "Le lieu est obligatoire." }),
-  type: z.string().min(2, { message: "Le type de contrat est obligatoire." }),
-  description: z.string().min(20, { message: "La description doit faire au moins 20 caractères." }),
-  requirements: z.string().min(10, { message: "Les prérequis doivent faire au moins 10 caractères." }),
+  title: z.string().min(3, { message: tr('jobPostingForm.theTitleMustBeAtLeast') }),
+  company: z.string().min(2, { message: tr('jobPostingForm.theOrganizationNameIsRequired') }),
+  location: z.string().min(2, { message: tr('jobPostingForm.theLocationIsRequired') }),
+  type: z.string().min(2, { message: tr('jobPostingForm.theContractTypeIsRequired') }),
+  description: z.string().min(20, { message: tr('jobPostingForm.theDescriptionMustBeAtLeast') }),
+  requirements: z.string().min(10, { message: tr('jobPostingForm.theRequirementsMustBeAtLeast') }),
   salary: z.string().optional(),
   applicationDeadline: z.string().optional(),
   tags: z.string().optional(),
@@ -107,7 +108,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Briefcase className="h-5 w-5" />
-          {initialData?.title ? "Modifier l'offre" : "Nouvelle offre"}
+          {initialData?.title ? tr('jobPostingForm.editJobOffer') : tr('jobPostingForm.newJobOffer')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -119,9 +120,9 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Intitulé du poste</FormLabel>
+                    <FormLabel>{tr('jobPostingForm.jobTitle')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ex. Entraîneur de basket U15" {...field} />
+                      <Input placeholder={tr('jobPostingForm.eGU15BasketballCoach')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,9 +134,9 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="company"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Organisation</FormLabel>
+                    <FormLabel>{tr('profile.organization')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ex. Académie Elite Sports" {...field} />
+                      <Input placeholder={tr('jobPostingForm.eGEliteSportsAcademy')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,11 +150,11 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Lieu</FormLabel>
+                    <FormLabel>{tr('post.addLocation')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input className="pl-8" placeholder="ex. Lyon, France" {...field} />
+                        <Input className="pl-8" placeholder={tr('jobPostingForm.eGLyonFrance')} {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -166,11 +167,11 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type de contrat</FormLabel>
+                    <FormLabel>{tr('jobPostingForm.contractType')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Clock className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input className="pl-8" placeholder="ex. CDI, temps partiel, stage" {...field} />
+                        <Input className="pl-8" placeholder={tr('jobPostingForm.eGPermanentPartTimeInternship')} {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -184,10 +185,10 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description du poste</FormLabel>
+                  <FormLabel>{tr('jobPostingForm.jobDescription')}</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Missions, contexte, ce que vous attendez…"
+                      placeholder={tr('jobPostingForm.tasksContextWhatYouExpect')}
                       className="min-h-[120px]"
                       {...field} 
                     />
@@ -202,10 +203,10 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               name="requirements"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prérequis (un par ligne)</FormLabel>
+                  <FormLabel>{tr('jobPostingForm.requirementsOnePerLine')}</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Compétences, expérience, diplômes…"
+                      placeholder={tr('jobPostingForm.skillsExperienceDegrees')}
                       className="min-h-[100px]"
                       {...field} 
                     />
@@ -221,9 +222,9 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="salary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rémunération (facultatif)</FormLabel>
+                    <FormLabel>{tr('jobPostingForm.compensationOptional')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="ex. 1 800 € brut / mois" {...field} />
+                      <Input placeholder={tr('jobPostingForm.eG1800GrossMonth')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -235,7 +236,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                 name="applicationDeadline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date limite de candidature (facultatif)</FormLabel>
+                    <FormLabel>{tr('jobPostingForm.applicationDeadlineOptional')}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Calendar className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -258,12 +259,12 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
               name="tags"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mots-clés (facultatif)</FormLabel>
+                  <FormLabel>{tr('jobPostingForm.keywordsOptional')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="ex. basket, coaching, jeunes (séparés par des virgules)" {...field} />
+                    <Input placeholder={tr('jobPostingForm.eGBasketballCoachingYouthComma')} {...field} />
                   </FormControl>
                   <FormDescription>
-                    Ils aident les talents à trouver votre offre.
+                    {tr('jobPostingForm.theyHelpTalentsFindYourOffer')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -274,11 +275,11 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-4">
               <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                 <Trophy className="h-4 w-4" />
-                Critères sportifs
-                <Badge variant="outline" className="ml-auto text-[10px]">Facultatif</Badge>
+                {tr('jobPostingForm.sportCriteria')}
+                <Badge variant="outline" className="ml-auto text-[10px]">{tr('jobPostingForm.optional')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                Ciblez les athlètes au profil correspondant (utilisé par la suggestion de candidats).
+                {tr('jobPostingForm.targetAthletesWithAMatchingProfile')}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,7 +288,7 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                   name="sport"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sport</FormLabel>
+                      <FormLabel>{tr('landing.sport')}</FormLabel>
                       <Select
                         value={field.value || ''}
                         onValueChange={(v) => {
@@ -298,10 +299,10 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                         }}
                       >
                         <FormControl>
-                          <SelectTrigger><SelectValue placeholder="Tous sports" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={tr('jobPostingForm.anySport')} /></SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="__none__">Tous sports</SelectItem>
+                          <SelectItem value="__none__">{tr('jobPostingForm.anySport')}</SelectItem>
                           {SPORT_SCHEMAS.map((s) => (
                             <SelectItem key={s.id} value={s.id}>{s.label[lang]}</SelectItem>
                           ))}
@@ -327,10 +328,10 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                           onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
                         >
                           <FormControl>
-                            <SelectTrigger><SelectValue placeholder="Tous postes" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={tr('jobPostingForm.anyPosition')} /></SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="__none__">Tous postes</SelectItem>
+                            <SelectItem value="__none__">{tr('jobPostingForm.anyPosition')}</SelectItem>
                             {roleField.options?.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
                             ))}
@@ -348,16 +349,16 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                     name="minRank"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Niveau minimum</FormLabel>
+                        <FormLabel>{tr('jobPostingForm.minimumLevel')}</FormLabel>
                         <Select
                           value={field.value || ''}
                           onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
                         >
                           <FormControl>
-                            <SelectTrigger><SelectValue placeholder="Tous niveaux" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={tr('common.allLevels')} /></SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="__none__">Tous niveaux</SelectItem>
+                            <SelectItem value="__none__">{tr('common.allLevels')}</SelectItem>
                             {rankField.options?.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
                             ))}
@@ -375,16 +376,16 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
                     name="leagueLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Niveau de ligue</FormLabel>
+                        <FormLabel>{tr('jobPostingForm.leagueLevel')}</FormLabel>
                         <Select
                           value={field.value || ''}
                           onValueChange={(v) => field.onChange(v === '__none__' ? '' : v)}
                         >
                           <FormControl>
-                            <SelectTrigger><SelectValue placeholder="Toutes ligues" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={tr('jobPostingForm.anyLeague')} /></SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="__none__">Toutes ligues</SelectItem>
+                            <SelectItem value="__none__">{tr('jobPostingForm.anyLeague')}</SelectItem>
                             {leaguesField.options?.map((opt) => (
                               <SelectItem key={opt.value} value={opt.value}>{opt.label[lang]}</SelectItem>
                             ))}
@@ -401,10 +402,10 @@ const JobPostingForm: React.FC<JobPostingFormProps> = ({
             <div className="flex justify-end space-x-2">
 
               <Button variant="outline" type="button" onClick={onCancel} disabled={isLoading}>
-                Annuler
+                {tr('common.cancel')}
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Publication…" : "Publier l'offre"}
+                {isLoading ? tr('jobPostingForm.publishing') : tr('jobPostingForm.publishJobOffer')}
               </Button>
             </div>
           </form>

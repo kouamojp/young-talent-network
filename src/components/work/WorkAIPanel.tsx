@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 interface JobLite {
   id?: string;
@@ -38,7 +39,7 @@ export const WorkAIPanel: React.FC = () => {
       if (error) throw error;
       navigate('/messages', { state: { conversationId: data } });
     } catch (err: any) {
-      toast({ title: err.message || 'Failed', variant: 'destructive' });
+      toast({ title: err.message || tr('common.failed'), variant: 'destructive' });
     } finally { setActingId(null); }
   };
 
@@ -49,12 +50,12 @@ export const WorkAIPanel: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/auth'); return; }
       const { error } = await supabase.from('job_applications').insert({
-        job_id: jobId, applicant_id: user.id, cover_letter: 'Candidature envoyée via les recommandations IA YAT Work.'
+        job_id: jobId, applicant_id: user.id, cover_letter: tr('workAIPanel.applicationSentThroughYatWorkAi')
       });
       if (error) throw error;
-      toast({ title: t('work.applicationSent') || 'Candidature envoyée ✓' });
+      toast({ title: t('work.applicationSent') || tr('work.applicationSent') });
     } catch (err: any) {
-      toast({ title: err.message || 'Failed', variant: 'destructive' });
+      toast({ title: err.message || tr('common.failed'), variant: 'destructive' });
     } finally { setActingId(null); }
   };
 
@@ -91,7 +92,7 @@ export const WorkAIPanel: React.FC = () => {
       if (data?.error) throw new Error(data.error);
       setMatches(data?.matches || []);
     } catch (e: any) {
-      toast({ title: e.message || 'Match failed', variant: 'destructive' });
+      toast({ title: e.message || tr('workAIPanel.matchingFailed'), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -105,7 +106,7 @@ export const WorkAIPanel: React.FC = () => {
       if (data?.error) throw new Error(data.error);
       setSuggestions(data?.suggestions || []);
     } catch (e: any) {
-      toast({ title: e.message || 'Suggestion failed', variant: 'destructive' });
+      toast({ title: e.message || tr('workAIPanel.suggestionFailed'), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -125,7 +126,7 @@ export const WorkAIPanel: React.FC = () => {
               onChange={(e) => setSelectedJobId(e.target.value)}
               className="text-sm border rounded px-2 py-1 bg-background max-w-[220px]"
             >
-              <option value="">{t('work.selectJob') || 'Select a job'}</option>
+              <option value="">{t('work.selectJob') || tr('work.selectJob')}</option>
               {myJobs.map(j => <option key={j.id} value={j.id}>{j.title}</option>)}
             </select>
             <Button size="sm" onClick={() => runMatch(selectedJobId)} disabled={!selectedJobId || loading}>
@@ -136,7 +137,7 @@ export const WorkAIPanel: React.FC = () => {
         </div>
 
         {!myJobs.length && (
-          <p className="text-sm text-muted-foreground">{t('work.noJobsYet') || 'Post a job first to get AI-matched candidates.'}</p>
+          <p className="text-sm text-muted-foreground">{t('work.noJobsYet') || tr('work.noJobsYet')}</p>
         )}
 
         {matches.length > 0 && (
@@ -189,7 +190,7 @@ export const WorkAIPanel: React.FC = () => {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-bold">{t('work.aiSuggestedJobs') || 'Jobs matched to your profile'}</h3>
+          <h3 className="text-lg font-bold">{t('work.aiSuggestedJobs') || tr('work.aiSuggestedJobs')}</h3>
         </div>
         <Button size="sm" variant="outline" onClick={runSuggest} disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
@@ -198,7 +199,7 @@ export const WorkAIPanel: React.FC = () => {
       </div>
 
       {!suggestions.length && !loading && (
-        <p className="text-sm text-muted-foreground">{t('work.noSuggestions') || 'No suggestions yet. Complete your profile to get better matches.'}</p>
+        <p className="text-sm text-muted-foreground">{t('work.noSuggestions') || tr('work.noSuggestions')}</p>
       )}
 
       <div className="space-y-2 max-h-[600px] overflow-y-auto">

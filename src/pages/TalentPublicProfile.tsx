@@ -12,6 +12,8 @@ import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import BlockUserButton from '@/components/safety/BlockUserButton';
 import { PROFILE_PUBLIC_COLUMNS, fetchProfileAges, fetchProfilePrivate, fetchPublicContact } from '@/lib/profiles';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
   <div className="flex gap-0.5">
@@ -43,11 +45,11 @@ const SectionHeader = ({ icon: Icon, title }: { icon: React.ElementType; title: 
 );
 
 const SECTION_LABELS: Record<string, { label: string; icon: string }> = {
-  events: { label: 'Events', icon: '📅' },
-  tv: { label: 'TV', icon: '📺' },
-  live: { label: 'LIVE', icon: '🔴' },
-  work: { label: 'Work', icon: '💼' },
-  learning: { label: 'Learning', icon: '🎓' },
+  events: { label: tr('landing.events'), icon: '📅' },
+  tv: { label: tr('talent.tv'), icon: '📺' },
+  live: { label: tr('common.live'), icon: '🔴' },
+  work: { label: tr('talent.work'), icon: '💼' },
+  learning: { label: tr('talent.learning'), icon: '🎓' },
   'yat-coin': { label: 'YAT Coin', icon: '🪙' },
   karta: { label: 'Karta', icon: '🗺️' },
 };
@@ -150,10 +152,10 @@ const TalentPublicProfile: React.FC = () => {
         comment: myComment || null,
       }, { onConflict: 'talent_id,rater_id' });
       if (error) throw error;
-      toast({ title: 'Évaluation enregistrée' });
+      toast({ title: tr('talentPublicProfile.ratingSaved') });
       loadProfile();
     } catch (e: any) {
-      toast({ title: 'Erreur', description: e.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: e.message, variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
@@ -161,7 +163,7 @@ const TalentPublicProfile: React.FC = () => {
 
   const formatDate = (date: string | null) => {
     if (!date) return null;
-    return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    return new Date(date).toLocaleDateString(localeTag(), { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   // Protection des mineurs : la date de naissance exacte n'est jamais affichée
@@ -171,13 +173,13 @@ const TalentPublicProfile: React.FC = () => {
   const showContact = true;
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
-  if (!profile) return <div className="text-center py-20"><p className="text-muted-foreground">Profil introuvable</p></div>;
+  if (!profile) return <div className="text-center py-20"><p className="text-muted-foreground">{tr('talentPublicProfile.profileNotFound')}</p></div>;
 
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-5xl mx-auto px-4 py-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="mb-4 gap-2">
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> {tr('common.back')}
         </Button>
 
         {/* CV Header - inspired by sports profile template */}
@@ -212,14 +214,14 @@ const TalentPublicProfile: React.FC = () => {
                       <span className="font-display text-4xl font-semibold leading-none tabular-nums text-gold">{Number(profile.platform_rating).toFixed(1)}</span>
                       <div className="pb-0.5">
                         <StarRating value={Math.round(Number(profile.platform_rating))} readonly />
-                        <span className="text-xs text-muted-foreground">{profile.rating_count || 0} avis</span>
+                        <span className="text-xs text-muted-foreground">{profile.rating_count || 0} {tr('talentPublicProfile.reviews')}</span>
                       </div>
                     </div>
                   )}
                 </div>
                 {profile.bio && <p className="text-[15px] text-muted-foreground mt-3 max-w-prose leading-relaxed">{profile.bio}</p>}
                 <div className="flex flex-wrap items-center gap-1.5 mt-3">
-                  <Badge variant="outline">{profile.user_type === 'organization' ? 'Organisation' : profile.user_type === 'agent' ? 'Agent' : 'Talent'}</Badge>
+                  <Badge variant="outline">{profile.user_type === 'organization' ? tr('profile.organization') : profile.user_type === 'agent' ? tr('profile.agent') : tr('auth.talent')}</Badge>
                   {profile.sport_type && <Badge variant="secondary">{profile.sport_type}</Badge>}
                   {id && <span className="ml-auto print:hidden"><BlockUserButton userId={id} name={profile.name} /></span>}
                 </div>
@@ -234,24 +236,24 @@ const TalentPublicProfile: React.FC = () => {
           <div className="space-y-4">
             {/* About */}
             <div className="bg-card border border-border rounded-xl overflow-hidden">
-              <SectionHeader icon={User} title="Informations Personnelles" />
+              <SectionHeader icon={User} title={tr('talentPublicProfile.personalInformation')} />
               <div className="px-4 pb-3 space-y-0">
-                <InfoRow label="Nom" value={profile.name} />
-                {isOwnProfile && <InfoRow label="Date de naissance" value={formatDate(profile.birthday)} />}
-                <InfoRow label="Âge" value={profile.age != null ? `${profile.age} ans` : null} />
-                <InfoRow label="Spécialité" value={profile.sport_type} />
-                <InfoRow label="Ville" value={profile.city} />
-                <InfoRow label="Pays" value={profile.country} />
-                {showContact && profile.phone && <InfoRow label="Téléphone" value={profile.phone} />}
-                {showContact && profile.email && <InfoRow label="Email" value={profile.email} />}
-                {profile.website && <InfoRow label="Site web" value={profile.website} />}
+                <InfoRow label={tr('admin.name')} value={profile.name} />
+                {isOwnProfile && <InfoRow label={tr('auth.birthday')} value={formatDate(profile.birthday)} />}
+                <InfoRow label={tr('talentPublicProfile.age')} value={profile.age != null ? `${profile.age} ans` : null} />
+                <InfoRow label={tr('common.specialty')} value={profile.sport_type} />
+                <InfoRow label={tr('settings.city')} value={profile.city} />
+                <InfoRow label={tr('settings.country')} value={profile.country} />
+                {showContact && profile.phone && <InfoRow label={tr('settings.phone')} value={profile.phone} />}
+                {showContact && profile.email && <InfoRow label={tr('auth.email')} value={profile.email} />}
+                {profile.website && <InfoRow label={tr('settings.website')} value={profile.website} />}
               </div>
             </div>
 
             {/* Skills */}
             {skills.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
-                <SectionHeader icon={Briefcase} title="Compétences" />
+                <SectionHeader icon={Briefcase} title={tr('profile.skills')} />
                 <div className="px-4 pb-4 pt-1">
                   <div className="flex flex-wrap gap-1.5">
                     {skills.map((s, i) => <Badge key={i} variant="outline" className="text-xs">{s}</Badge>)}
@@ -263,7 +265,7 @@ const TalentPublicProfile: React.FC = () => {
             {/* Social Links */}
             {socialLinks.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
-                <SectionHeader icon={Globe} title="Réseaux Sociaux" />
+                <SectionHeader icon={Globe} title={tr('talentPublicProfile.socialNetworks')} />
                 <div className="px-4 pb-3 space-y-0">
                   {socialLinks.map(l => (
                     <div key={l.id} className="flex justify-between py-1.5 border-b border-border/50 last:border-0">
@@ -281,13 +283,13 @@ const TalentPublicProfile: React.FC = () => {
             {/* Education */}
             {education.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
-                <SectionHeader icon={GraduationCap} title="Formation & Diplômes" />
+                <SectionHeader icon={GraduationCap} title={tr('profile.education')} />
                 <div className="px-4 pb-4 pt-1 space-y-2">
                   {education.map((e: any) => (
                     <div key={e.id} className="p-3 rounded-lg bg-background">
                       <div className="flex items-start gap-2">
                         <Badge variant="outline" className="text-[10px] shrink-0 mt-0.5">
-                          {e.education_type === 'school' ? 'École' : e.education_type === 'university' ? 'Université' : e.education_type === 'training' ? 'Formation' : e.education_type === 'certification' ? 'Certif.' : e.education_type}
+                          {e.education_type === 'school' ? tr('profile.school') : e.education_type === 'university' ? tr('profile.university') : e.education_type === 'training' ? tr('profile.training') : e.education_type === 'certification' ? 'Certif.' : e.education_type}
                         </Badge>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-xs text-foreground">{e.institution}</p>
@@ -296,7 +298,7 @@ const TalentPublicProfile: React.FC = () => {
                           )}
                           {e.start_year && (
                             <p className="text-[10px] text-muted-foreground mt-0.5">
-                              {e.start_year}{e.is_current ? ' — présent' : e.end_year ? ` — ${e.end_year}` : ''}
+                              {e.start_year}{e.is_current ? tr('talentPublicProfile.present') : e.end_year ? ` — ${e.end_year}` : ''}
                             </p>
                           )}
                         </div>
@@ -310,7 +312,7 @@ const TalentPublicProfile: React.FC = () => {
             {/* Achievements */}
             {achievements.length > 0 && (
               <div className="bg-card border border-border rounded-xl overflow-hidden">
-                <SectionHeader icon={Trophy} title="Réalisations & Prix" />
+                <SectionHeader icon={Trophy} title={tr('profile.achievements')} />
                 <div className="px-4 pb-4 pt-1">
                   <table className="w-full text-xs">
                     <tbody>
@@ -337,7 +339,7 @@ const TalentPublicProfile: React.FC = () => {
         {/* Categories */}
         {categories.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-            <SectionHeader icon={Tag} title="Catégories" />
+            <SectionHeader icon={Tag} title={tr('landing.categories')} />
             <div className="px-4 pb-4 pt-1 flex flex-wrap gap-1.5">
               {categories.map((uc: any) => (
                 <Badge
@@ -358,7 +360,7 @@ const TalentPublicProfile: React.FC = () => {
         {/* Active sections */}
         {presence.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-            <SectionHeader icon={Layers} title="Présent dans les sections" />
+            <SectionHeader icon={Layers} title={tr('talentPublicProfile.presentInSections')} />
             <div className="px-4 pb-4 pt-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
               {presence.map((p: any) => {
                 const meta = SECTION_LABELS[p.section] || { label: p.section, icon: '•' };
@@ -371,7 +373,7 @@ const TalentPublicProfile: React.FC = () => {
                     <span className="text-lg">{meta.icon}</span>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold text-foreground truncate">{meta.label}</p>
-                      {p.featured && <span className="text-[10px] text-primary">★ En vedette</span>}
+                      {p.featured && <span className="text-[10px] text-primary">{tr('talentPublicProfile.featured')}</span>}
                     </div>
                   </button>
                 );
@@ -382,10 +384,10 @@ const TalentPublicProfile: React.FC = () => {
 
         {/* Posts feed */}
         <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-          <SectionHeader icon={Newspaper} title={`Publications (${posts.length})`} />
+          <SectionHeader icon={Newspaper} title={tr('talentPublicProfile.posts', { p0: posts.length })} />
           <div className="px-4 pb-4 pt-1 space-y-3">
             {posts.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">Aucune publication publique pour le moment.</p>
+              <p className="text-sm text-muted-foreground text-center py-6">{tr('talentPublicProfile.noPublicPostsYet')}</p>
             ) : (
               posts.map((post: any) => (
                 <div key={post.id} className="p-3 rounded-lg border border-border/50 bg-muted/30">
@@ -396,7 +398,7 @@ const TalentPublicProfile: React.FC = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-foreground truncate">{profile.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                   </div>
                   {post.content && <p className="text-sm text-foreground whitespace-pre-wrap mb-2">{post.content}</p>}
@@ -414,28 +416,28 @@ const TalentPublicProfile: React.FC = () => {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button className="ml-auto flex items-center gap-1 text-destructive hover:underline">
-                            <Trash2 className="h-3 w-3" /> Supprimer
+                            <Trash2 className="h-3 w-3" /> {tr('common.delete')}
                           </button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Supprimer cette publication ?</AlertDialogTitle>
-                            <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+                            <AlertDialogTitle>{tr('common.deleteThisPost')}</AlertDialogTitle>
+                            <AlertDialogDescription>{tr('common.thisActionIsPermanent')}</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogCancel>{tr('common.cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={async () => {
                                 const { error } = await supabase.from('posts').delete().eq('id', post.id);
                                 if (error) {
-                                  toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+                                  toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
                                 } else {
-                                  toast({ title: 'Publication supprimée' });
+                                  toast({ title: tr('admin.postDeleted') });
                                   setPosts(prev => prev.filter(p => p.id !== post.id));
                                 }
                               }}
                             >
-                              Supprimer
+                              {tr('common.delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -450,7 +452,7 @@ const TalentPublicProfile: React.FC = () => {
 
         {/* Activités dans les autres sections */}
         <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-          <SectionHeader icon={Activity} title="Activités dans les autres sections" />
+          <SectionHeader icon={Activity} title={tr('talentPublicProfile.activityInOtherSections')} />
           <ProfileActivityFeed userIds={id ? [id] : []} />
         </div>
 
@@ -458,7 +460,7 @@ const TalentPublicProfile: React.FC = () => {
         {/* Media Gallery */}
         {media.length > 0 && (
           <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-            <SectionHeader icon={Image} title="Médias & Portfolio" />
+            <SectionHeader icon={Image} title={tr('talentPublicProfile.mediaPortfolio')} />
             <div className="px-4 pb-4 pt-1">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {media.map(m => (
@@ -479,19 +481,19 @@ const TalentPublicProfile: React.FC = () => {
 
         {/* Ratings */}
         <div className="bg-card border border-border rounded-xl overflow-hidden mb-6">
-          <SectionHeader icon={Star} title={`Évaluations (${ratings.length})`} />
+          <SectionHeader icon={Star} title={tr('talentPublicProfile.ratings', { p0: ratings.length })} />
           <div className="p-4 space-y-4">
             {currentUserId && currentUserId !== id && (
               <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-3">
-                <p className="text-sm font-medium">Évaluer ce talent</p>
+                <p className="text-sm font-medium">{tr('talentPublicProfile.rateThisTalent')}</p>
                 <StarRating value={myRating} onChange={setMyRating} />
-                <Textarea placeholder="Commentaire (optionnel)..." value={myComment} onChange={e => setMyComment(e.target.value)} className="text-sm" rows={2} />
+                <Textarea placeholder={tr('talentPublicProfile.commentOptional')} value={myComment} onChange={e => setMyComment(e.target.value)} className="text-sm" rows={2} />
                 <Button size="sm" onClick={submitRating} disabled={submitting || myRating === 0}>
-                  {submitting ? 'Envoi...' : 'Envoyer'}
+                  {submitting ? 'Envoi...' : tr('common.send')}
                 </Button>
               </div>
             )}
-            {!currentUserId && <p className="text-sm text-muted-foreground">Connectez-vous pour évaluer ce talent.</p>}
+            {!currentUserId && <p className="text-sm text-muted-foreground">{tr('talentPublicProfile.logInToRateThisTalent')}</p>}
 
             {ratings.length > 0 ? (
               <div className="space-y-2">
@@ -502,16 +504,16 @@ const TalentPublicProfile: React.FC = () => {
                         <AvatarImage src={r.profiles?.avatar_url || ''} />
                         <AvatarFallback className="text-[10px]">{r.profiles?.name?.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium">{r.profiles?.name || 'Utilisateur'}</span>
+                      <span className="text-sm font-medium">{r.profiles?.name || tr('admin.user')}</span>
                       <StarRating value={r.rating} readonly />
-                      <span className="text-[10px] text-muted-foreground ml-auto">{new Date(r.created_at).toLocaleDateString('fr-FR')}</span>
+                      <span className="text-[10px] text-muted-foreground ml-auto">{new Date(r.created_at).toLocaleDateString(localeTag())}</span>
                     </div>
                     {r.comment && <p className="text-xs text-muted-foreground mt-2">{r.comment}</p>}
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Aucune évaluation pour le moment.</p>
+              <p className="text-sm text-muted-foreground">{tr('talentPublicProfile.noRatingsYet')}</p>
             )}
           </div>
         </div>
@@ -519,7 +521,7 @@ const TalentPublicProfile: React.FC = () => {
         {/* Print button */}
         <div className="flex justify-center mb-8 print:hidden">
           <Button variant="outline" onClick={() => window.print()} className="gap-2">
-            <FileText className="h-4 w-4" /> Imprimer le CV
+            <FileText className="h-4 w-4" /> {tr('talentPublicProfile.printCv')}
           </Button>
         </div>
       </main>

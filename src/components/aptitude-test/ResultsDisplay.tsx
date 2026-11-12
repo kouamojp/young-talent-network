@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { TalentArea, testCategories } from './testData';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 type ResultsDisplayProps = {
   talentAreas: TalentArea[];
@@ -17,46 +18,46 @@ type ResultsDisplayProps = {
 const getMatchedPeople = (category: string, topArea: string) => {
   const peopleByCategory: Record<string, Array<{ name: string; type: string; avatar: string; looking: boolean; message: string; skills: string[] }>> = {
     sports: [
-      { name: 'Coach Martin', type: 'Recruteur', avatar: 'CM', looking: true, message: `Recherche talents en ${topArea}`, skills: ['Football', 'Athlétisme'] },
-      { name: 'Sarah Diallo', type: 'Talent', avatar: 'SD', looking: false, message: 'Mêmes aptitudes sportives que vous', skills: ['Endurance', 'Agilité'] },
-      { name: 'Club Olympique', type: 'Organisation', avatar: 'CO', looking: true, message: 'Recrute dans cette discipline', skills: ['Formation', 'Compétition'] },
-      { name: 'Pierre Nkoulou', type: 'Mentor', avatar: 'PN', looking: true, message: 'Peut vous coacher dans ce domaine', skills: ['Coaching', 'Préparation'] },
-      { name: 'Amina Touré', type: 'Talent', avatar: 'AT', looking: false, message: 'Partage vos forces physiques', skills: ['Sprint', 'Force'] },
+      { name: 'Coach Martin', type: 'Recruteur', avatar: 'CM', looking: true, message: tr('resultsDisplay.lookingForTalentsIn', { p0: topArea }), skills: ['Football', 'Athlétisme'] },
+      { name: 'Sarah Diallo', type: 'Talent', avatar: 'SD', looking: false, message: tr('resultsDisplay.sameAthleticAptitudesAsYou'), skills: ['Endurance', 'Agilité'] },
+      { name: 'Club Olympique', type: 'Organisation', avatar: 'CO', looking: true, message: tr('resultsDisplay.recruitingInThisDiscipline'), skills: ['Formation', 'Compétition'] },
+      { name: 'Pierre Nkoulou', type: 'Mentor', avatar: 'PN', looking: true, message: tr('resultsDisplay.canCoachYouInThisField'), skills: ['Coaching', 'Préparation'] },
+      { name: 'Amina Touré', type: 'Talent', avatar: 'AT', looking: false, message: tr('resultsDisplay.sharesYourPhysicalStrengths'), skills: ['Sprint', 'Force'] },
     ],
     arts: [
-      { name: 'Galerie Moderne', type: 'Organisation', avatar: 'GM', looking: true, message: `Cherche artistes en ${topArea}`, skills: ['Exposition', 'Vernissage'] },
-      { name: 'Jean-Marc D.', type: 'Mentor', avatar: 'JD', looking: true, message: 'Artiste confirmé, disponible pour mentorat', skills: ['Peinture', 'Sculpture'] },
-      { name: 'Lisa Chen', type: 'Talent', avatar: 'LC', looking: false, message: 'Profil artistique similaire au vôtre', skills: ['Design', 'Illustration'] },
-      { name: 'Studio Créatif', type: 'Recruteur', avatar: 'SC', looking: true, message: 'Postes ouverts en création', skills: ['Direction artistique'] },
-      { name: 'Fatou Sow', type: 'Talent', avatar: 'FS', looking: false, message: 'Mêmes capacités créatives', skills: ['Art digital', 'Animation'] },
+      { name: 'Galerie Moderne', type: 'Organisation', avatar: 'GM', looking: true, message: tr('resultsDisplay.lookingForArtistsIn', { p0: topArea }), skills: ['Exposition', 'Vernissage'] },
+      { name: 'Jean-Marc D.', type: 'Mentor', avatar: 'JD', looking: true, message: tr('resultsDisplay.establishedArtistAvailableForMentoring'), skills: ['Peinture', 'Sculpture'] },
+      { name: 'Lisa Chen', type: 'Talent', avatar: 'LC', looking: false, message: tr('resultsDisplay.artisticProfileSimilarToYours'), skills: ['Design', 'Illustration'] },
+      { name: 'Studio Créatif', type: 'Recruteur', avatar: 'SC', looking: true, message: tr('resultsDisplay.openCreativePositions'), skills: ['Direction artistique'] },
+      { name: 'Fatou Sow', type: 'Talent', avatar: 'FS', looking: false, message: tr('resultsDisplay.sameCreativeAbilities'), skills: ['Art digital', 'Animation'] },
     ],
     music: [
-      { name: 'Label Harmonie', type: 'Organisation', avatar: 'LH', looking: true, message: `Recherche talents en ${topArea}`, skills: ['Production', 'Distribution'] },
-      { name: 'DJ Karim', type: 'Mentor', avatar: 'DK', looking: true, message: 'Producteur, offre des sessions de mentorat', skills: ['Beatmaking', 'Mixage'] },
-      { name: 'Nadia M.', type: 'Talent', avatar: 'NM', looking: false, message: 'Compétences musicales proches', skills: ['Chant', 'Piano'] },
-      { name: 'Orchestra YAT', type: 'Recruteur', avatar: 'OY', looking: true, message: 'Auditions ouvertes', skills: ['Classique', 'Jazz'] },
-      { name: 'Youssef B.', type: 'Talent', avatar: 'YB', looking: false, message: 'Même profil musical', skills: ['Guitare', 'Composition'] },
+      { name: 'Label Harmonie', type: 'Organisation', avatar: 'LH', looking: true, message: tr('resultsDisplay.lookingForTalentsIn', { p0: topArea }), skills: ['Production', 'Distribution'] },
+      { name: 'DJ Karim', type: 'Mentor', avatar: 'DK', looking: true, message: tr('resultsDisplay.producerOffersMentoringSessions'), skills: ['Beatmaking', 'Mixage'] },
+      { name: 'Nadia M.', type: 'Talent', avatar: 'NM', looking: false, message: tr('resultsDisplay.similarMusicalSkills'), skills: ['Chant', 'Piano'] },
+      { name: 'Orchestra YAT', type: 'Recruteur', avatar: 'OY', looking: true, message: tr('resultsDisplay.openAuditions'), skills: ['Classique', 'Jazz'] },
+      { name: 'Youssef B.', type: 'Talent', avatar: 'YB', looking: false, message: tr('resultsDisplay.sameMusicalProfile'), skills: ['Guitare', 'Composition'] },
     ],
     technology: [
-      { name: 'TechCorp Africa', type: 'Organisation', avatar: 'TA', looking: true, message: `Recrute en ${topArea}`, skills: ['Dev', 'Cloud'] },
-      { name: 'Dr. Ada Obi', type: 'Mentor', avatar: 'AO', looking: true, message: 'CTO, offre du mentorat tech', skills: ['Architecture', 'IA'] },
-      { name: 'Kevin T.', type: 'Talent', avatar: 'KT', looking: false, message: 'Compétences tech similaires', skills: ['React', 'Python'] },
-      { name: 'StartupHub', type: 'Recruteur', avatar: 'SH', looking: true, message: 'Postes tech disponibles', skills: ['Full-stack', 'DevOps'] },
-      { name: 'Marie L.', type: 'Talent', avatar: 'ML', looking: false, message: 'Même profil technique', skills: ['Data', 'ML'] },
+      { name: 'TechCorp Africa', type: 'Organisation', avatar: 'TA', looking: true, message: tr('resultsDisplay.recruitingIn', { p0: topArea }), skills: ['Dev', 'Cloud'] },
+      { name: 'Dr. Ada Obi', type: 'Mentor', avatar: 'AO', looking: true, message: tr('resultsDisplay.ctoOffersTechMentoring'), skills: ['Architecture', 'IA'] },
+      { name: 'Kevin T.', type: 'Talent', avatar: 'KT', looking: false, message: tr('resultsDisplay.similarTechSkills'), skills: ['React', 'Python'] },
+      { name: 'StartupHub', type: 'Recruteur', avatar: 'SH', looking: true, message: tr('resultsDisplay.techPositionsAvailable'), skills: ['Full-stack', 'DevOps'] },
+      { name: 'Marie L.', type: 'Talent', avatar: 'ML', looking: false, message: tr('resultsDisplay.sameTechnicalProfile'), skills: ['Data', 'ML'] },
     ],
     business: [
-      { name: 'YAT Ventures', type: 'Organisation', avatar: 'YV', looking: true, message: `Cherche profils en ${topArea}`, skills: ['Startup', 'Financement'] },
-      { name: 'CEO Moussa K.', type: 'Mentor', avatar: 'MK', looking: true, message: 'Entrepreneur, disponible pour coaching', skills: ['Leadership', 'Stratégie'] },
-      { name: 'Sophie R.', type: 'Talent', avatar: 'SR', looking: false, message: 'Même profil entrepreneurial', skills: ['Marketing', 'Vente'] },
-      { name: 'BizConnect', type: 'Recruteur', avatar: 'BC', looking: true, message: 'Offres de stage et emploi', skills: ['Management', 'Finance'] },
-      { name: 'Abdou D.', type: 'Talent', avatar: 'AD', looking: false, message: 'Partage vos aptitudes business', skills: ['Négociation', 'Gestion'] },
+      { name: 'YAT Ventures', type: 'Organisation', avatar: 'YV', looking: true, message: tr('resultsDisplay.lookingForProfilesIn', { p0: topArea }), skills: ['Startup', 'Financement'] },
+      { name: 'CEO Moussa K.', type: 'Mentor', avatar: 'MK', looking: true, message: tr('resultsDisplay.entrepreneurAvailableForCoaching'), skills: ['Leadership', 'Stratégie'] },
+      { name: 'Sophie R.', type: 'Talent', avatar: 'SR', looking: false, message: tr('resultsDisplay.sameEntrepreneurialProfile'), skills: ['Marketing', 'Vente'] },
+      { name: 'BizConnect', type: 'Recruteur', avatar: 'BC', looking: true, message: tr('resultsDisplay.internshipAndJobOffers'), skills: ['Management', 'Finance'] },
+      { name: 'Abdou D.', type: 'Talent', avatar: 'AD', looking: false, message: tr('resultsDisplay.sharesYourBusinessAptitudes'), skills: ['Négociation', 'Gestion'] },
     ],
     science: [
-      { name: 'Lab Innovation', type: 'Organisation', avatar: 'LI', looking: true, message: `Cherche chercheurs en ${topArea}`, skills: ['R&D', 'Publication'] },
-      { name: 'Pr. Diop', type: 'Mentor', avatar: 'PD', looking: true, message: 'Professeur, supervise des projets', skills: ['Recherche', 'Enseignement'] },
-      { name: 'Clara N.', type: 'Talent', avatar: 'CN', looking: false, message: 'Même profil scientifique', skills: ['Biologie', 'Chimie'] },
-      { name: 'SciRecruit', type: 'Recruteur', avatar: 'SR', looking: true, message: 'Postes en recherche', skills: ['Laboratoire', 'Analyse'] },
-      { name: 'Omar S.', type: 'Talent', avatar: 'OS', looking: false, message: 'Aptitudes analytiques similaires', skills: ['Data', 'Statistiques'] },
+      { name: 'Lab Innovation', type: 'Organisation', avatar: 'LI', looking: true, message: tr('resultsDisplay.lookingForResearchersIn', { p0: topArea }), skills: ['R&D', 'Publication'] },
+      { name: 'Pr. Diop', type: 'Mentor', avatar: 'PD', looking: true, message: tr('resultsDisplay.professorSupervisesProjects'), skills: ['Recherche', 'Enseignement'] },
+      { name: 'Clara N.', type: 'Talent', avatar: 'CN', looking: false, message: tr('resultsDisplay.sameScientificProfile'), skills: ['Biologie', 'Chimie'] },
+      { name: 'SciRecruit', type: 'Recruteur', avatar: 'SR', looking: true, message: tr('resultsDisplay.researchPositions'), skills: ['Laboratoire', 'Analyse'] },
+      { name: 'Omar S.', type: 'Talent', avatar: 'OS', looking: false, message: tr('resultsDisplay.similarAnalyticalAptitudes'), skills: ['Data', 'Statistiques'] },
     ],
   };
   return peopleByCategory[category] || peopleByCategory.arts;
@@ -66,10 +67,10 @@ const getCapabilities = (talentAreas: TalentArea[]) => {
   const top = talentAreas[0];
   const second = talentAreas[1];
   return [
-    { icon: Star, label: 'Force principale', value: top?.area, detail: `Score de ${top?.score}% — votre domaine d'excellence` },
-    { icon: Zap, label: 'Potentiel élevé', value: second?.area, detail: `Score de ${second?.score}% — fort potentiel de développement` },
-    { icon: Target, label: 'Focus recommandé', value: top?.score >= 80 ? 'Spécialisation' : 'Exploration', detail: top?.score >= 80 ? 'Vous êtes prêt à vous spécialiser' : 'Explorez davantage pour affiner vos forces' },
-    { icon: TrendingUp, label: 'Trajectoire', value: top?.score >= 70 ? 'Ascendante' : 'En construction', detail: top?.score >= 70 ? 'Vos aptitudes sont bien développées' : 'Continuez à pratiquer pour progresser' },
+    { icon: Star, label: tr('resultsDisplay.mainStrength'), value: top?.area, detail: tr('resultsDisplay.scoreOfYourAreaOfExcellence', { p0: top?.score }) },
+    { icon: Zap, label: tr('resultsDisplay.highPotential'), value: second?.area, detail: tr('resultsDisplay.scoreOfStrongDevelopmentPotential', { p0: second?.score }) },
+    { icon: Target, label: tr('resultsDisplay.recommendedFocus'), value: top?.score >= 80 ? 'Spécialisation' : 'Exploration', detail: top?.score >= 80 ? tr('resultsDisplay.youAreReadyToSpecialize') : tr('resultsDisplay.exploreFurtherToRefineYourStrengths') },
+    { icon: TrendingUp, label: tr('resultsDisplay.trajectory'), value: top?.score >= 70 ? 'Ascendante' : 'En construction', detail: top?.score >= 70 ? tr('resultsDisplay.yourAptitudesAreWellDeveloped') : tr('resultsDisplay.keepPracticingToProgress') },
   ];
 };
 
@@ -90,13 +91,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
         <div className="inline-block p-3 bg-white/20 rounded-full mb-3">
           <CheckCircle2 className="h-10 w-10" />
         </div>
-        <h2 className="text-2xl font-bold mb-1">Test Complété ! 🎉</h2>
+        <h2 className="text-2xl font-bold mb-1">{tr('resultsDisplay.testCompleted')}</h2>
         <p className="text-white/90 text-lg">
-          Votre aptitude principale : <strong>{topArea?.area}</strong>
+          {tr('resultsDisplay.yourMainAptitude')} <strong>{topArea?.area}</strong>
         </p>
         <div className="inline-block bg-white/20 rounded-full px-4 py-1 mt-2">
           <span className="text-2xl font-bold">{topArea?.score}%</span>
-          <span className="text-white/80 text-sm ml-1">de compatibilité</span>
+          <span className="text-white/80 text-sm ml-1">{tr('resultsDisplay.match')}</span>
         </div>
       </div>
 
@@ -104,7 +105,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
       <Card className="p-5">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Zap className="h-5 w-5 text-primary" />
-          Vos Capacités & Aptitudes
+          {tr('resultsDisplay.yourAbilitiesAptitudes')}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {capabilities.map((cap, i) => (
@@ -124,7 +125,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
 
       {/* Detailed Scores */}
       <Card className="p-5">
-        <h3 className="text-lg font-semibold mb-4">Profil Détaillé des Aptitudes</h3>
+        <h3 className="text-lg font-semibold mb-4">{tr('resultsDisplay.detailedAptitudeProfile')}</h3>
         <div className="space-y-4">
           {talentAreas.map((area, index) => (
             <div key={index}>
@@ -152,10 +153,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
       <Card className="p-5 border-primary/20">
         <div className="flex items-center gap-2 mb-1">
           <Briefcase className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">Ils recherchent vos aptitudes</h3>
+          <h3 className="text-lg font-semibold">{tr('resultsDisplay.theyAreLookingForYourAptitudes')}</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Recruteurs, organisations et mentors qui cherchent exactement votre profil
+          {tr('resultsDisplay.recruitersOrganizationsAndMentorsLookingFor')}
         </p>
         <div className="space-y-3">
           {seekers.map((person, i) => (
@@ -178,7 +179,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
                 <Badge className="text-xs">{person.type}</Badge>
                 <Button size="sm" variant="default" className="h-8 gap-1">
                   <MessageCircle className="h-3.5 w-3.5" />
-                  <span className="text-xs hidden sm:inline">Contacter</span>
+                  <span className="text-xs hidden sm:inline">{tr('marketplace.contact')}</span>
                 </Button>
               </div>
             </div>
@@ -190,10 +191,10 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
       <Card className="p-5">
         <div className="flex items-center gap-2 mb-1">
           <Users className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-semibold">Talents aux aptitudes similaires</h3>
+          <h3 className="text-lg font-semibold">{tr('resultsDisplay.talentsWithSimilarAptitudes')}</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Ces personnes partagent les mêmes forces et capacités que vous
+          {tr('resultsDisplay.thesePeopleShareTheSameStrengths')}
         </p>
         <div className="space-y-3">
           {similars.map((person, i) => (
@@ -225,12 +226,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
 
       {/* Recommendation */}
       <Card className="p-5 border-primary/20 bg-primary/5">
-        <h3 className="font-semibold mb-2">💡 Recommandation personnalisée</h3>
+        <h3 className="font-semibold mb-2">{tr('resultsDisplay.personalizedRecommendation')}</h3>
         <p className="text-sm text-muted-foreground">
-          Basé sur votre profil, nous vous recommandons d'explorer les formations et opportunités en <strong>{topArea?.area}</strong>. 
-          Connectez-vous avec les mentors et recruteurs de ce domaine pour développer vos talents. 
-          {topArea?.score >= 80 && " Votre score élevé indique que vous êtes prêt pour des opportunités professionnelles !"}
-          {topArea?.score < 80 && topArea?.score >= 65 && " Vous avez un bon potentiel — continuez à vous former pour atteindre l'excellence."}
+          {tr('resultsDisplay.basedOnYourProfileWeRecommend')} <strong>{topArea?.area}</strong>{tr('resultsDisplay.connectWithMentorsAndRecruitersIn')} 
+          {topArea?.score >= 80 && tr('resultsDisplay.yourHighScoreShowsYouAre')}
+          {topArea?.score < 80 && topArea?.score >= 65 && tr('resultsDisplay.youHaveGoodPotentialKeepLearning')}
         </p>
       </Card>
 
@@ -238,15 +238,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ talentAreas, category =
       <div className="flex flex-wrap justify-center gap-3">
         <Button onClick={() => navigate('/yat-database')}>
           <Search className="h-4 w-4 mr-2" />
-          Trouver des profils compatibles
+          {tr('resultsDisplay.findCompatibleProfiles')}
         </Button>
         <Button variant="outline" onClick={() => navigate('/work')}>
           <Briefcase className="h-4 w-4 mr-2" />
-          Voir les opportunités
+          {tr('resultsDisplay.viewOpportunities')}
         </Button>
         <Button variant="ghost" onClick={onRetake}>
           <RotateCcw className="h-4 w-4 mr-2" />
-          Tester une autre catégorie
+          {tr('resultsDisplay.testAnotherCategory')}
         </Button>
       </div>
     </div>

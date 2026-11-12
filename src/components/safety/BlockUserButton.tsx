@@ -6,6 +6,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useBlocks } from '@/hooks/useBlocks';
+import { tr } from '@/i18n';
 
 interface BlockUserButtonProps {
   userId: string;
@@ -41,25 +42,24 @@ const BlockUserButton: React.FC<BlockUserButtonProps> = ({ userId, name, size = 
         disabled={busy}
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ban className="h-4 w-4" />}
-        {blocked ? 'Débloquer' : 'Bloquer'}
+        {blocked ? tr('common.unblock') : tr('common.block')}
       </Button>
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bloquer {name || 'ce membre'} ?</AlertDialogTitle>
+            <AlertDialogTitle>{tr('common.block')} {name || tr('blockUserButton.thisMember')} ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Vous ne pourrez plus vous écrire, et ses publications seront masquées de votre fil. Il ne sera pas prévenu.
-              Vous pourrez le débloquer depuis Paramètres → Confidentialité.
+              {tr('blockUserButton.youWillNoLongerBeAble')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={busy}>Annuler</AlertDialogCancel>
+            <AlertDialogCancel disabled={busy}>{tr('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={busy}
               onClick={(e) => { e.preventDefault(); run(); }}
             >
-              Bloquer
+              {tr('common.block')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

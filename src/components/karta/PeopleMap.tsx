@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import KartaMap, { type KartaPoint } from './KartaMap';
+import { tr } from '@/i18n';
 
 interface Person { id: string; name: string; role: string; sport: string; avatar: string }
 
@@ -39,7 +40,7 @@ const PeopleMap = () => {
     <KartaMap
       points={points}
       loading={loading}
-      emptyLabel="Aucun membre n'a encore partagé sa position"
+      emptyLabel={tr('peopleMap.noMemberHasSharedTheirLocation')}
       renderSelected={({ data: person }) => (
         <div className="flex items-start gap-4 pr-4">
           <Avatar className="h-14 w-14 border-2 border-primary">
@@ -54,10 +55,10 @@ const PeopleMap = () => {
             </div>
             <div className="flex gap-2 mt-3">
               <Button size="sm" className="flex-1 gap-2" onClick={() => navigate(`/messages?to=${person.id}`)}>
-                <MessageCircle className="h-4 w-4" /> Message
+                <MessageCircle className="h-4 w-4" /> {tr('common.message')}
               </Button>
               <Button size="sm" variant="outline" className="gap-2" onClick={() => navigate(profileLink(person))}>
-                <User className="h-4 w-4" /> Profil
+                <User className="h-4 w-4" /> {tr('sidebar.profile')}
               </Button>
             </div>
           </div>

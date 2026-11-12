@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ShareMenu from '@/components/share/ShareMenu';
+import { tr } from '@/i18n';
 
 interface Short {
   id: string;
@@ -129,7 +130,7 @@ const ShortsFeed: React.FC = () => {
   }, [shorts]);
 
   const toggleLike = async (short: Short, idx: number) => {
-    if (!currentUser) { toast.error('Connectez-vous pour aimer'); return; }
+    if (!currentUser) { toast.error(tr('shortsFeed.logInToLike')); return; }
     const wasLiked = short.liked;
     setShorts(prev => prev.map((s, i) => i === idx ? { ...s, liked: !wasLiked, likes: (s.likes || 0) + (wasLiked ? -1 : 1) } : s));
     if (wasLiked) {
@@ -142,21 +143,21 @@ const ShortsFeed: React.FC = () => {
   const togglePlay = (idx: number) => {
     const v = videoRefs.current[idx];
     if (!v) return;
-    if (v.paused) v.play().catch(() => toast.error('Lecture impossible')); else v.pause();
+    if (v.paused) v.play().catch(() => toast.error(tr('common.playbackFailed'))); else v.pause();
   };
 
   const shareUrl = (s: Short) => `${window.location.origin}/media?tab=shorts&v=${s.id}`;
 
   if (loading) {
-    return <div className="text-center py-12 text-muted-foreground text-sm">Chargement des Shorts...</div>;
+    return <div className="text-center py-12 text-muted-foreground text-sm">{tr('shortsFeed.loadingShorts')}</div>;
   }
 
   if (shorts.length === 0) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <Play className="h-10 w-10 mx-auto mb-2 opacity-30" />
-        <p className="text-sm">Aucun Short pour l'instant</p>
-        <p className="text-xs mt-1">Soyez le premier à publier !</p>
+        <p className="text-sm">{tr('shortsFeed.noShortsYet')}</p>
+        <p className="text-xs mt-1">{tr('shortsFeed.beTheFirstToPost')}</p>
         <div className="mt-4 flex justify-center">
           <UploadShortDialog onUploaded={fetchShorts} />
         </div>
@@ -184,12 +185,12 @@ const ShortsFeed: React.FC = () => {
               {videoErrors[short.id] ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80 bg-gradient-to-br from-zinc-900 to-black">
                   <AlertTriangle className="h-10 w-10 mb-2 text-yellow-400" />
-                  <p className="text-sm">Vidéo indisponible</p>
+                  <p className="text-sm">{tr('common.videoUnavailable')}</p>
                   <Button size="sm" variant="secondary" className="mt-3" onClick={() => {
                     setVideoErrors(p => ({ ...p, [short.id]: false }));
                     const v = videoRefs.current[idx];
                     if (v) { v.load(); v.play().catch(() => {}); }
-                  }}>Réessayer</Button>
+                  }}>{tr('common.retry')}</Button>
                 </div>
               ) : (
                 <>
@@ -232,12 +233,12 @@ const ShortsFeed: React.FC = () => {
                   </div>
                   <span className="text-xs mt-1 font-semibold">{short.comments_count || 0}</span>
                 </button>
-                <ShareMenu url={shareUrl(short)} title={short.title || 'Regarde ce Short !'}>
+                <ShareMenu url={shareUrl(short)} title={short.title || tr('shortsFeed.checkOutThisShort')}>
                   <button className="flex flex-col items-center text-white">
                     <div className="bg-black/40 backdrop-blur-sm rounded-full p-2.5">
                       <Share2 className="h-6 w-6" />
                     </div>
-                    <span className="text-xs mt-1 font-semibold">Partager</span>
+                    <span className="text-xs mt-1 font-semibold">{tr('communities.share')}</span>
                   </button>
                 </ShareMenu>
               </div>
@@ -254,14 +255,14 @@ const ShortsFeed: React.FC = () => {
                     @{short.profile?.name || 'user'}
                   </Link>
                   <Button size="sm" variant="outline" className="h-7 px-3 text-xs border-white text-white bg-transparent hover:bg-white hover:text-black ml-1">
-                    Suivre
+                    {tr('tv.follow')}
                   </Button>
                 </div>
                 {short.title && <p className="text-sm font-semibold mb-1">{short.title}</p>}
                 {short.description && <p className="text-xs opacity-90 line-clamp-2">{short.description}</p>}
                 <div className="flex items-center gap-1.5 mt-2 text-xs opacity-90">
                   <Music className="h-3 w-3" />
-                  <span className="truncate">Original audio - @{short.profile?.name || 'user'}</span>
+                  <span className="truncate">{tr('shortsFeed.originalAudio')}{short.profile?.name || 'user'}</span>
                 </div>
               </div>
             </div>
@@ -311,21 +312,21 @@ const CommentsDialog: React.FC<{ short: Short | null; onClose: () => void; curre
   return (
     <Dialog open={!!short} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md max-h-[80vh] flex flex-col">
-        <DialogHeader><DialogTitle>Commentaires</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('articles.comments')}</DialogTitle></DialogHeader>
         <div className="flex-1 overflow-y-auto space-y-3 py-2">
-          {comments.length === 0 && <p className="text-sm text-muted-foreground text-center py-6">Aucun commentaire. Soyez le premier !</p>}
+          {comments.length === 0 && <p className="text-sm text-muted-foreground text-center py-6">{tr('common.noCommentsBeTheFirst')}</p>}
           {comments.map(c => (
             <div key={c.id} className="flex gap-2">
               <Avatar className="h-8 w-8"><AvatarImage src={c.profile?.avatar_url || undefined} /><AvatarFallback>{c.profile?.name?.[0] || 'U'}</AvatarFallback></Avatar>
               <div className="flex-1 bg-muted rounded-lg px-3 py-2">
-                <p className="text-xs font-semibold">{c.profile?.name || 'User'}</p>
+                <p className="text-xs font-semibold">{c.profile?.name || tr('admin.user')}</p>
                 <p className="text-sm">{c.content}</p>
               </div>
             </div>
           ))}
         </div>
         <div className="flex gap-2 pt-2 border-t">
-          <Input value={text} onChange={e => setText(e.target.value)} placeholder="Ajouter un commentaire..." onKeyDown={e => e.key === 'Enter' && submit()} />
+          <Input value={text} onChange={e => setText(e.target.value)} placeholder={tr('common.addAComment')} onKeyDown={e => e.key === 'Enter' && submit()} />
           <Button onClick={submit} disabled={loading || !text.trim()} size="icon"><Send className="h-4 w-4" /></Button>
         </div>
       </DialogContent>
@@ -359,11 +360,11 @@ const UploadShortDialog: React.FC<{ onUploaded: () => void }> = ({ onUploaded })
         description: description || null,
       });
       if (error) throw error;
-      toast.success('Short publié !');
+      toast.success(tr('common.shortPublished'));
       setFile(null); setTitle(''); setDescription(''); setOpen(false);
       onUploaded();
     } catch (e: any) {
-      toast.error(e.message || 'Erreur');
+      toast.error(e.message || tr('settings.error'));
     } finally {
       setUploading(false);
     }
@@ -377,13 +378,13 @@ const UploadShortDialog: React.FC<{ onUploaded: () => void }> = ({ onUploaded })
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Publier un Short</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('shortsFeed.publishAShort')}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <Input type="file" accept="video/*" onChange={e => setFile(e.target.files?.[0] || null)} />
-          <Input placeholder="Titre" value={title} onChange={e => setTitle(e.target.value)} />
-          <Textarea placeholder="Description, #hashtags..." value={description} onChange={e => setDescription(e.target.value)} rows={3} />
+          <Input placeholder={tr('marketplace.title_field')} value={title} onChange={e => setTitle(e.target.value)} />
+          <Textarea placeholder={tr('shortsFeed.descriptionHashtags')} value={description} onChange={e => setDescription(e.target.value)} rows={3} />
           <Button onClick={handleUpload} disabled={!file || uploading} className="w-full">
-            {uploading ? 'Envoi...' : 'Publier'}
+            {uploading ? 'Envoi...' : tr('common.post')}
           </Button>
         </div>
       </DialogContent>

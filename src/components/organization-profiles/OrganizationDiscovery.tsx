@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useOrganizations } from '@/hooks/useOrganizations';
 import OrganizationRow, { OrganizationCrest } from '@/components/organizations/OrganizationRow';
+import { tr } from '@/i18n';
 
 // Une organisation est « récente » pendant ses 30 premiers jours sur YAT.
 const RECENT_MS = 30 * 24 * 60 * 60 * 1000;
@@ -40,9 +41,9 @@ const OrganizationDiscovery: React.FC = () => {
   if (organizations.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border p-10 text-center">
-        <h2 className="text-lg font-semibold">Aucune organisation pour l'instant</h2>
+        <h2 className="text-lg font-semibold">{tr('organizationDiscovery.noOrganizationsYet')}</h2>
         <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
-          Les clubs, écoles, agences et académies apparaîtront ici dès qu'ils auront créé leur profil sur YAT.
+          {tr('organizationDiscovery.clubsSchoolsAgenciesAndAcademiesWill')}
         </p>
       </div>
     );
@@ -93,7 +94,7 @@ const OrganizationDiscovery: React.FC = () => {
         <h2 className="text-lg font-semibold mb-4">{t('orgDisc.allOrgs')}</h2>
         {filteredOrganizations.length === 0 ? (
           <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            Aucune organisation ne correspond à cette recherche.
+            {tr('organizationDiscovery.noOrganizationMatchesThisSearch')}
           </p>
         ) : (
           <div className="rounded-xl border border-border bg-card px-4 py-5 sm:px-5 divide-y divide-border">

@@ -11,6 +11,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Globe, Plus, RefreshCw, Trash2, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { SearchSelfOnlineDialog } from './SearchSelfOnlineDialog';
+import { tr } from '@/i18n';
 
 interface ProfileSource {
   id: string;
@@ -31,10 +32,10 @@ interface ProfileSourcesProps {
 }
 
 const sourceTypeLabels: Record<string, Record<string, string>> = {
-  social: { en: 'Social Network', fr: 'Réseau social', ru: 'Соцсеть' },
-  portfolio: { en: 'Portfolio', fr: 'Portfolio', ru: 'Портфолио' },
-  sports_db: { en: 'Sports Platform', fr: 'Plateforme sportive', ru: 'Спортивная платформа' },
-  other: { en: 'Other', fr: 'Autre', ru: 'Другое' },
+  social: { en: 'Social Network', fr: tr('profileSources.socialNetwork'), ru: tr('profileSources.socialNetwork2') },
+  portfolio: { en: 'Portfolio', fr: 'Portfolio', ru: tr('common.portfolio') },
+  sports_db: { en: 'Sports Platform', fr: 'Plateforme sportive', ru: tr('profileSources.sportsPlatform') },
+  other: { en: 'Other', fr: 'Autre', ru: tr('profile.other') },
 };
 
 const statusConfig: Record<string, { icon: React.ReactNode; color: string }> = {
@@ -82,7 +83,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
     try {
       new URL(newUrl);
     } catch {
-      toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: lang === 'ru' ? 'Введите корректный URL' : 'Enter a valid URL', variant: 'destructive' });
+      toast({ title: lang === 'ru' ? tr('settings.error') : tr('settings.error'), description: lang === 'ru' ? tr('tv.invalidLink') : tr('profileSources.enterAValidUrl'), variant: 'destructive' });
       return;
     }
 
@@ -99,14 +100,14 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
       .single();
 
     if (error) {
-      toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: lang === 'ru' ? tr('settings.error') : tr('settings.error'), description: error.message, variant: 'destructive' });
     } else if (data) {
       setSources(prev => [data as unknown as ProfileSource, ...prev]);
       setNewUrl('');
       setNewLabel('');
       setNewType('other');
       setShowAddForm(false);
-      toast({ title: lang === 'ru' ? 'Источник добавлен' : lang === 'fr' ? 'Source ajoutée' : 'Source added' });
+      toast({ title: lang === 'ru' ? tr('profileSources.sourceAdded') : lang === 'fr' ? tr('profileSources.sourceAdded2') : tr('profileSources.sourceAdded3') });
       // Auto-sync new source
       handleSync(data.id);
     }
@@ -125,14 +126,14 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
       if (error) throw error;
 
       if (data?.success) {
-        toast({ title: lang === 'ru' ? 'Данные обновлены' : lang === 'fr' ? 'Données mises à jour' : 'Data updated' });
+        toast({ title: lang === 'ru' ? tr('profileSources.dataUpdated') : lang === 'fr' ? tr('profileSources.dataUpdated2') : tr('profileSources.dataUpdated3') });
         onDataExtracted?.(sourceId, data.data);
       } else {
-        toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: data?.error, variant: 'destructive' });
+        toast({ title: lang === 'ru' ? tr('settings.error') : tr('settings.error'), description: data?.error, variant: 'destructive' });
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error';
-      toast({ title: lang === 'ru' ? 'Ошибка синхронизации' : 'Sync error', description: msg, variant: 'destructive' });
+      toast({ title: lang === 'ru' ? tr('common.syncError') : tr('profileSources.syncError'), description: msg, variant: 'destructive' });
     } finally {
       setSyncingIds(prev => { const n = new Set(prev); n.delete(sourceId); return n; });
       fetchSources();
@@ -153,7 +154,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
 
     if (!error) {
       setSources(prev => prev.filter(s => s.id !== sourceId));
-      toast({ title: lang === 'ru' ? 'Источник удалён' : lang === 'fr' ? 'Source supprimée' : 'Source deleted' });
+      toast({ title: lang === 'ru' ? tr('profileSources.sourceDeleted') : lang === 'fr' ? tr('profileSources.sourceDeleted2') : tr('profileSources.sourceDeleted3') });
     }
   };
 
@@ -178,7 +179,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
     const content = parts.join('\n').trim();
 
     if (!content) {
-      toast({ title: lang === 'ru' ? 'Нет данных' : lang === 'fr' ? 'Aucune donnée' : 'No data', variant: 'destructive' });
+      toast({ title: lang === 'ru' ? tr('common.noData') : lang === 'fr' ? tr('profileSources.noData') : tr('profileSources.noData2'), variant: 'destructive' });
       return;
     }
 
@@ -196,27 +197,27 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
     setPublishingId(null);
 
     if (error) {
-      toast({ title: lang === 'ru' ? 'Ошибка' : 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: lang === 'ru' ? tr('settings.error') : tr('settings.error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: lang === 'ru' ? 'Публикация создана' : lang === 'fr' ? 'Publication créée' : 'Post created' });
+      toast({ title: lang === 'ru' ? tr('profileSources.postCreated') : lang === 'fr' ? tr('profileSources.postCreated2') : tr('profileSources.postCreated3') });
     }
   };
 
   const labels = {
-    title: { en: 'External Sources', fr: 'Sources externes', ru: 'Внешние источники' },
-    desc: { en: 'Add links to auto-fill your profile from external platforms', fr: 'Ajoutez des liens pour remplir automatiquement votre profil', ru: 'Добавьте ссылки для автозаполнения профиля с внешних платформ' },
-    addSource: { en: 'Add Source', fr: 'Ajouter une source', ru: 'Добавить источник' },
-    syncAll: { en: 'Sync All', fr: 'Tout synchroniser', ru: 'Обновить всё' },
+    title: { en: 'External Sources', fr: 'Sources externes', ru: tr('profile.externalSources') },
+    desc: { en: tr('profileSources.addLinksToAutoFillYour'), fr: tr('profileSources.addLinksToAutoFillYour2'), ru: tr('profileSources.addLinksToAutoFillYour3') },
+    addSource: { en: 'Add Source', fr: tr('profileSources.addASource'), ru: tr('profileSources.addASource2') },
+    syncAll: { en: 'Sync All', fr: 'Tout synchroniser', ru: tr('profileSources.refreshAll') },
     urlPlaceholder: { en: 'https://example.com/profile', fr: 'https://exemple.com/profil', ru: 'https://example.com/profile' },
-    labelPlaceholder: { en: 'Label (optional)', fr: 'Libellé (optionnel)', ru: 'Название (необязательно)' },
-    autoSync: { en: 'Auto-sync', fr: 'Sync auto', ru: 'Авто-обновление' },
-    lastSynced: { en: 'Last synced', fr: 'Dernière sync', ru: 'Посл. обновление' },
-    noSources: { en: 'No sources added yet', fr: 'Aucune source ajoutée', ru: 'Источники не добавлены' },
-    extractedData: { en: 'Extracted Data', fr: 'Données extraites', ru: 'Извлечённые данные' },
-    delete: { en: 'Delete', fr: 'Supprimer', ru: 'Удалить' },
-    confirmDelete: { en: 'Are you sure?', fr: 'Êtes-vous sûr ?', ru: 'Вы уверены?' },
-    confirmDeleteDesc: { en: 'This source and its data will be removed.', fr: 'Cette source et ses données seront supprimées.', ru: 'Этот источник и его данные будут удалены.' },
-    cancel: { en: 'Cancel', fr: 'Annuler', ru: 'Отмена' },
+    labelPlaceholder: { en: 'Label (optional)', fr: tr('myNetworksManager.labelOptional'), ru: tr('myNetworksManager.labelOptional') },
+    autoSync: { en: 'Auto-sync', fr: 'Sync auto', ru: tr('profileSources.autoRefresh') },
+    lastSynced: { en: 'Last synced', fr: tr('profileSources.lastSync'), ru: tr('profileSources.lastSync2') },
+    noSources: { en: tr('profileSources.noSourcesAddedYet'), fr: tr('profileSources.noSourcesAddedYet2'), ru: tr('profileSources.noSourcesAddedYet3') },
+    extractedData: { en: 'Extracted Data', fr: tr('profileSources.extractedData'), ru: tr('profileSources.extractedData2') },
+    delete: { en: 'Delete', fr: 'Supprimer', ru: tr('common.delete') },
+    confirmDelete: { en: tr('profileSettings.areYouSure'), fr: tr('profileSettings.areYouSure'), ru: tr('profileSettings.areYouSure') },
+    confirmDeleteDesc: { en: tr('profileSources.thisSourceAndItsDataWill'), fr: tr('profileSources.thisSourceAndItsDataWill2'), ru: tr('profileSources.thisSourceAndItsDataWill3') },
+    cancel: { en: 'Cancel', fr: 'Annuler', ru: tr('common.cancel') },
   };
 
   const l = (key: keyof typeof labels) => labels[key][lang] || labels[key].en;
@@ -316,7 +317,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
                         <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
                       </Button>
                       {hasData && (
-                        <Button variant="ghost" size="icon" className="h-7 w-7" title={lang === 'ru' ? 'Создать публикацию' : lang === 'fr' ? 'Créer une publication' : 'Create post'} onClick={() => handleCreatePost(source)} disabled={publishingId === source.id}>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" title={lang === 'ru' ? tr('profileSources.createPost') : lang === 'fr' ? tr('post.create') : tr('profileSources.createPost2')} onClick={() => handleCreatePost(source)} disabled={publishingId === source.id}>
                           {publishingId === source.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
                         </Button>
                       )}

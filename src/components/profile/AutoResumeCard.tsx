@@ -9,6 +9,7 @@ import { FileText, Briefcase, GraduationCap, Calendar, Trophy, MapPin, Plus, X, 
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface AutoResumeCardProps {
   userId: string;
@@ -81,8 +82,8 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
         },
         activeSections,
         achievements: achievements.map(a => ({ title: a.title, level: a.level || '', date: a.date || '' })),
-        events: (eventsRes.data || []).map((e: any) => ({ title: e.events?.title || 'Événement', status: e.status || 'attending' })),
-        courses: (coursesRes.data || []).map((c: any) => ({ title: c.courses?.title || 'Formation', progress: c.progress || 0, completed: c.completed || false })),
+        events: (eventsRes.data || []).map((e: any) => ({ title: e.events?.title || tr('common.event'), status: e.status || 'attending' })),
+        courses: (coursesRes.data || []).map((c: any) => ({ title: c.courses?.title || tr('profile.training'), progress: c.progress || 0, completed: c.completed || false })),
         skills: (skillsRes.data || []).map((s: any) => ({ name: s.skills?.name || '', level: s.level || 'débutant' })),
         education: (educationRes.data || []).map((ed: any) => ({
           institution: ed.institution, degree: ed.degree || '', field_of_study: ed.field_of_study || '',
@@ -121,7 +122,7 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
 
       const resumePayload = {
         user_id: userId,
-        title: `CV de ${resumeData?.personalInfo.name || 'Talent'}`,
+        title: tr('autoResumeCard.sCv', { p0: resumeData?.personalInfo.name || 'Talent' }),
         description: editBio,
         is_primary: true,
         achievements: customEntries,
@@ -142,9 +143,9 @@ const AutoResumeCard: React.FC<AutoResumeCardProps> = ({ userId, profile, achiev
         if (error) throw error;
         if (inserted) setResumeId(inserted.id);
       }
-      toast.success('CV sauvegardé');
+      toast.success(tr('autoResumeCard.cvSaved'));
     } catch (err) {
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error(tr('autoResumeCard.errorWhileSaving'));
     } finally {
       setSaving(false);
     }
@@ -182,7 +183,7 @@ ${r.education.length > 0 ? `<h2>Formation & Diplômes</h2>${r.education.map(e =>
 <div class="edu-item">
   <div class="edu-type">${eduTypeLabel(e.education_type)}</div>
   <div class="item-title">${[e.degree, e.field_of_study].filter(Boolean).join(' - ') || e.institution}</div>
-  <div class="item">${e.institution} ${e.start_year ? `(${e.start_year}${e.is_current ? ' - présent' : e.end_year ? ` - ${e.end_year}` : ''})` : ''}</div>
+  <div class="item">${e.institution} ${e.start_year ? `(${e.start_year}${e.is_current ? tr('publicCV.present') : e.end_year ? ` - ${e.end_year}` : ''})` : ''}</div>
 </div>`).join('')}` : ''}
 
 ${r.achievements.length > 0 ? `<h2>Réalisations & Prix</h2><ul>${r.achievements.map(a => `<li>${a.title}${a.level ? ` — ${a.level}` : ''}${a.date ? ` (${new Date(a.date).getFullYear()})` : ''}</li>`).join('')}</ul>` : ''}
@@ -219,7 +220,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
   };
 
   const togglePublic = async (next: boolean) => {
-    if (!resumeId) { toast.error('Sauvegarde le CV d\'abord'); return; }
+    if (!resumeId) { toast.error(tr('autoResumeCard.saveTheCvFirst')); return; }
     let _slug = slug;
     if (next && !_slug) {
       _slug = (resumeData?.personalInfo.name || 'cv').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) + '-' + Math.random().toString(36).slice(2, 8);
@@ -227,15 +228,15 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
     const { error } = await (supabase.from('talent_resumes') as any).update({ is_public: next, slug: _slug }).eq('id', resumeId);
     if (error) { toast.error(error.message); return; }
     setIsPublic(next); setSlug(_slug);
-    toast.success(next ? 'CV public activé' : 'CV rendu privé');
+    toast.success(next ? tr('autoResumeCard.publicCvEnabled') : tr('autoResumeCard.cvMadePrivate'));
   };
 
   const sharePublicCV = async () => {
-    if (!isPublic || !slug) { toast.error('Active d\'abord le partage public'); return; }
+    if (!isPublic || !slug) { toast.error(tr('autoResumeCard.enablePublicSharingFirst')); return; }
     const url = `${window.location.origin}/cv/${slug}`;
-    if (navigator.share) { try { await navigator.share({ url, title: 'Mon CV YAT' }); return; } catch {} }
+    if (navigator.share) { try { await navigator.share({ url, title: tr('autoResumeCard.myYatCv') }); return; } catch {} }
     await navigator.clipboard.writeText(url);
-    toast.success('Lien copié : ' + url);
+    toast.success(tr('autoResumeCard.linkCopied') + url);
   };
 
   return (
@@ -243,20 +244,20 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <FileText className="h-4 w-4" /> CV Intelligent
+            <FileText className="h-4 w-4" /> {tr('autoResumeCard.smartCv')}
           </CardTitle>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="ghost" onClick={buildResume} className="gap-1"><RefreshCw className="h-3.5 w-3.5" /> Générer</Button>
+            <Button size="sm" variant="ghost" onClick={buildResume} className="gap-1"><RefreshCw className="h-3.5 w-3.5" /> {tr('autoResumeCard.generate')}</Button>
             <Button size="sm" variant="outline" onClick={exportPDF} className="gap-1"><Download className="h-3.5 w-3.5" /> PDF</Button>
-            <Button size="sm" variant="outline" onClick={sharePublicCV} disabled={!isPublic} className="gap-1"><Share2 className="h-3.5 w-3.5" /> Partager</Button>
-            <Button size="sm" onClick={saveResume} disabled={saving}>{saving ? '...' : 'Sauvegarder'}</Button>
+            <Button size="sm" variant="outline" onClick={sharePublicCV} disabled={!isPublic} className="gap-1"><Share2 className="h-3.5 w-3.5" /> {tr('communities.share')}</Button>
+            <Button size="sm" onClick={saveResume} disabled={saving}>{saving ? '...' : tr('common.save')}</Button>
           </div>
         </div>
         {resumeId && (
           <div className="flex items-center justify-between mt-3 p-2 rounded-lg bg-muted/40">
             <div className="flex items-center gap-2 text-xs">
               <Globe className="h-3.5 w-3.5" />
-              <span>CV public</span>
+              <span>{tr('autoResumeCard.publicCv')}</span>
               <Switch checked={isPublic} onCheckedChange={togglePublic} />
             </div>
             {isPublic && slug && (
@@ -289,15 +290,15 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
 
         {/* Bio */}
         <div>
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Résumé professionnel</Label>
-          <Textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder="Décrivez votre parcours..." rows={3} className="mt-1" />
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tr('autoResumeCard.professionalSummary')}</Label>
+          <Textarea value={editBio} onChange={e => setEditBio(e.target.value)} placeholder={tr('autoResumeCard.describeYourBackground')} rows={3} className="mt-1" />
         </div>
 
         {/* Education */}
         {resumeData.education.length > 0 && (
           <div>
             <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
-              <GraduationCap className="h-3 w-3" /> Formation & Diplômes ({resumeData.education.length})
+              <GraduationCap className="h-3 w-3" /> {tr('autoResumeCard.educationDegrees')}{resumeData.education.length})
             </Label>
             <div className="mt-2 space-y-2">
               {resumeData.education.map((e, i) => (
@@ -307,7 +308,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
                     <span className="font-medium text-sm">{[e.degree, e.field_of_study].filter(Boolean).join(' - ') || e.institution}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? ' - présent' : e.end_year ? ` - ${e.end_year}` : ''}` : ''}
+                    {e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? tr('publicCV.present') : e.end_year ? ` - ${e.end_year}` : ''}` : ''}
                   </p>
                 </div>
               ))}
@@ -318,7 +319,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
         {/* Active Sections */}
         {resumeData.activeSections.length > 0 && (
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" /> Sections actives</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" /> {tr('autoResumeCard.activeSections')}</Label>
             <div className="flex flex-wrap gap-1.5 mt-2">{resumeData.activeSections.map(s => <Badge key={s} variant="secondary">{sectionLabels[s] || s}</Badge>)}</div>
           </div>
         )}
@@ -326,7 +327,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
         {/* Achievements */}
         {resumeData.achievements.length > 0 && (
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Trophy className="h-3 w-3" /> Réalisations ({resumeData.achievements.length})</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Trophy className="h-3 w-3" /> {tr('autoResumeCard.achievements')}{resumeData.achievements.length})</Label>
             <ul className="mt-2 space-y-1.5">{resumeData.achievements.map((a, i) => (
               <li key={i} className="text-sm flex items-start gap-2"><span className="text-primary mt-1">•</span><span>{a.title}{a.level ? ` — ${a.level}` : ''}{a.date ? ` (${new Date(a.date).getFullYear()})` : ''}</span></li>
             ))}</ul>
@@ -336,7 +337,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
         {/* Events */}
         {resumeData.events.length > 0 && (
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Événements ({resumeData.events.length})</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> {tr('autoResumeCard.events')}{resumeData.events.length})</Label>
             <ul className="mt-2 space-y-1">{resumeData.events.map((e, i) => <li key={i} className="text-sm flex items-start gap-2"><span className="text-primary mt-1">•</span><span>{e.title}</span></li>)}</ul>
           </div>
         )}
@@ -344,7 +345,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
         {/* Courses */}
         {resumeData.courses.length > 0 && (
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><GraduationCap className="h-3 w-3" /> Formations ({resumeData.courses.length})</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1"><GraduationCap className="h-3 w-3" /> {tr('autoResumeCard.courses')}{resumeData.courses.length})</Label>
             <ul className="mt-2 space-y-1">{resumeData.courses.map((c, i) => <li key={i} className="text-sm flex items-start gap-2"><span className="text-primary mt-1">•</span><span>{c.title} {c.completed ? '✓' : `(${c.progress}%)`}</span></li>)}</ul>
           </div>
         )}
@@ -352,14 +353,14 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
         {/* Skills */}
         {resumeData.skills.length > 0 && (
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Compétences</Label>
+            <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tr('profile.skills')}</Label>
             <div className="flex flex-wrap gap-1.5 mt-2">{resumeData.skills.map((s, i) => <Badge key={i} variant="outline">{s.name}</Badge>)}</div>
           </div>
         )}
 
         {/* Custom Entries */}
         <div>
-          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Informations supplémentaires</Label>
+          <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{tr('autoResumeCard.additionalInformation')}</Label>
           <div className="mt-2 space-y-2">
             {customEntries.map((entry, i) => (
               <div key={i} className="flex items-center gap-2 p-2 rounded bg-muted/50">
@@ -368,7 +369,7 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
               </div>
             ))}
             <div className="flex gap-2">
-              <Input value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder="Ajouter une info (diplôme, langue, etc.)" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustomEntry())} />
+              <Input value={newEntry} onChange={e => setNewEntry(e.target.value)} placeholder={tr('autoResumeCard.addInfoDegreeLanguageEtc')} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustomEntry())} />
               <Button size="sm" variant="outline" onClick={addCustomEntry} disabled={!newEntry.trim()}><Plus className="h-3.5 w-3.5" /></Button>
             </div>
           </div>
@@ -380,8 +381,8 @@ ${customEntries.length > 0 ? `<h2>Informations supplémentaires</h2><ul>${custom
 
 function eduTypeLabel(type: string): string {
   const map: Record<string, string> = {
-    school: 'École', university: 'Université', training: 'Formation pro',
-    certification: 'Certification', diploma: 'Diplôme', other: 'Autre',
+    school: tr('profile.school'), university: tr('profile.university'), training: 'Formation pro',
+    certification: 'Certification', diploma: tr('profile.diploma'), other: 'Autre',
   };
   return map[type] || type;
 }

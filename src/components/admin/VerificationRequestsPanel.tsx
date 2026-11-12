@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchProfilePrivate } from '@/lib/profiles';
 import { toast } from 'sonner';
 import { BADGE_META } from '@/components/VerificationBadges';
+import { tr } from '@/i18n';
 
 const VerificationRequestsPanel: React.FC = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -75,7 +76,7 @@ const VerificationRequestsPanel: React.FC = () => {
       .eq('id', selected.id);
     setActing(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(`Demande ${status === 'approved' ? 'approuvée' : status === 'rejected' ? 'refusée' : 'mise en attente d\'info'}`);
+    toast.success(tr('verificationRequestsPanel.request', { p0: status === 'approved' ? tr('verificationRequestsPanel.approved') : status === 'rejected' ? tr('verificationRequestsPanel.rejected') : 'mise en attente d\'info' }));
     setSelected(null);
     load();
   };
@@ -96,11 +97,11 @@ const VerificationRequestsPanel: React.FC = () => {
     <div className="space-y-3">
       <div className="flex items-center gap-2 mb-3">
         <Shield className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold">Demandes de vérification ({requests.length})</h3>
+        <h3 className="text-lg font-semibold">{tr('verificationRequestsPanel.verificationRequests')}{requests.length})</h3>
       </div>
 
       {requests.length === 0 ? (
-        <Card><CardContent className="text-center py-8 text-muted-foreground">Aucune demande</CardContent></Card>
+        <Card><CardContent className="text-center py-8 text-muted-foreground">{tr('friends.noRequests')}</CardContent></Card>
       ) : requests.map(r => (
         <Card key={r.id}>
           <CardContent className="p-4">
@@ -110,12 +111,12 @@ const VerificationRequestsPanel: React.FC = () => {
                 <AvatarFallback>{r.profile?.name?.[0] || '?'}</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <div className="font-semibold">{r.profile?.name || 'Utilisateur'}</div>
+                <div className="font-semibold">{r.profile?.name || tr('admin.user')}</div>
                 <div className="text-xs text-muted-foreground">{r.profile?.email}</div>
               </div>
               <Badge variant="outline">{BADGE_META[r.badge_type]?.label}</Badge>
               {statusBadge(r.status)}
-              <Button size="sm" onClick={() => openRequest(r)}>Examiner</Button>
+              <Button size="sm" onClick={() => openRequest(r)}>{tr('admin.review')}</Button>
             </div>
           </CardContent>
         </Card>
@@ -125,14 +126,14 @@ const VerificationRequestsPanel: React.FC = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Demande de vérification — {selected && BADGE_META[selected.badge_type]?.label}
+              {tr('verificationRequestsPanel.verificationRequest')} {selected && BADGE_META[selected.badge_type]?.label}
             </DialogTitle>
           </DialogHeader>
 
           {selected && (
             <div className="space-y-4">
               <div>
-                <div className="text-sm font-medium mb-1">Utilisateur</div>
+                <div className="text-sm font-medium mb-1">{tr('admin.user')}</div>
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={selected.profile?.avatar_url} />
@@ -144,15 +145,15 @@ const VerificationRequestsPanel: React.FC = () => {
 
               {selected.notes && (
                 <div>
-                  <div className="text-sm font-medium mb-1">Notes du candidat</div>
+                  <div className="text-sm font-medium mb-1">{tr('verificationRequestsPanel.applicantSNotes')}</div>
                   <div className="text-sm p-2 bg-muted rounded">{selected.notes}</div>
                 </div>
               )}
 
               <div>
-                <div className="text-sm font-medium mb-1">Documents</div>
+                <div className="text-sm font-medium mb-1">{tr('verificationRequestsPanel.documents')}</div>
                 {(selected.documents as any[]).length === 0 ? (
-                  <div className="text-sm text-muted-foreground">Aucun document</div>
+                  <div className="text-sm text-muted-foreground">{tr('verificationRequestsPanel.noDocuments')}</div>
                 ) : (
                   <div className="space-y-1">
                     {(selected.documents as any[]).map((d: any) => (
@@ -169,7 +170,7 @@ const VerificationRequestsPanel: React.FC = () => {
 
               {selected.official_links?.length > 0 && (
                 <div>
-                  <div className="text-sm font-medium mb-1">Liens officiels</div>
+                  <div className="text-sm font-medium mb-1">{tr('verificationRequestsPanel.officialLinks')}</div>
                   <div className="space-y-1">
                     {selected.official_links.map((l: string) => (
                       <a key={l} href={l} target="_blank" rel="noopener noreferrer"
@@ -182,7 +183,7 @@ const VerificationRequestsPanel: React.FC = () => {
               )}
 
               <div>
-                <div className="text-sm font-medium mb-1">Notes admin (visible par le candidat)</div>
+                <div className="text-sm font-medium mb-1">{tr('verificationRequestsPanel.adminNotesVisibleToTheApplicant')}</div>
                 <Textarea value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)} rows={3} />
               </div>
             </div>
@@ -190,13 +191,13 @@ const VerificationRequestsPanel: React.FC = () => {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => act('info_requested')} disabled={acting}>
-              <AlertCircle className="h-4 w-4 mr-1" /> Demander plus d'info
+              <AlertCircle className="h-4 w-4 mr-1" /> {tr('verificationRequestsPanel.requestMoreInfo')}
             </Button>
             <Button variant="destructive" onClick={() => act('rejected')} disabled={acting}>
-              <XCircle className="h-4 w-4 mr-1" /> Refuser
+              <XCircle className="h-4 w-4 mr-1" /> {tr('friends.decline')}
             </Button>
             <Button onClick={() => act('approved')} disabled={acting}>
-              <CheckCircle className="h-4 w-4 mr-1" /> Approuver
+              <CheckCircle className="h-4 w-4 mr-1" /> {tr('admin.approve')}
             </Button>
           </DialogFooter>
         </DialogContent>

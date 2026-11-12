@@ -6,9 +6,10 @@ import { Bell, MessageSquare, UserPlus, Calendar, Trophy, Heart, Check } from 'l
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
+import { dateFnsLocale } from '@/i18n/format';
 
 interface Notification {
   id: string;
@@ -78,9 +79,9 @@ const NotificationsTab: React.FC = () => {
       .update({ read: true })
       .eq('user_id', userId)
       .eq('read', false);
-    if (error) { toast.error('Erreur'); return; }
+    if (error) { toast.error(tr('settings.error')); return; }
     setItems(prev => prev.map(n => ({ ...n, read: true })));
-    toast.success('Toutes marquées comme lues');
+    toast.success(tr('notificationsTab.allMarkedAsRead'));
   };
 
   const markRead = async (id: string) => {
@@ -112,11 +113,11 @@ const NotificationsTab: React.FC = () => {
                 <p className={`text-sm ${n.read ? 'font-normal' : 'font-semibold'}`}>{n.title}</p>
                 {n.message && <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>}
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: fr })}
+                  {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: dateFnsLocale() })}
                 </p>
               </div>
               {!n.read && (
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); markRead(n.id); }} title="Marquer comme lu">
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); markRead(n.id); }} title={tr('notificationsTab.markAsRead')}>
                   <Check className="h-4 w-4" />
                 </Button>
               )}
@@ -132,13 +133,13 @@ const NotificationsTab: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          <h3 className="text-xl font-bold">Notifications</h3>
+          <h3 className="text-xl font-bold">{tr('nav.notifications')}</h3>
           {unreadCount > 0 && (
             <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{unreadCount}</span>
           )}
         </div>
         {unreadCount > 0 && (
-          <Button size="sm" variant="outline" onClick={markAllRead}>Tout marquer lu</Button>
+          <Button size="sm" variant="outline" onClick={markAllRead}>{tr('notificationsTab.markAllAsRead')}</Button>
         )}
       </div>
 
@@ -149,18 +150,18 @@ const NotificationsTab: React.FC = () => {
       ) : (
         <Tabs defaultValue="all">
           <TabsList className="mb-4 flex-wrap h-auto">
-            <TabsTrigger value="all">Toutes</TabsTrigger>
-            <TabsTrigger value="unread">Non lues ({unreadCount})</TabsTrigger>
-            <TabsTrigger value="message">Messages</TabsTrigger>
-            <TabsTrigger value="connection">Amis</TabsTrigger>
-            <TabsTrigger value="event">Événements</TabsTrigger>
+            <TabsTrigger value="all">{tr('events.allCategories')}</TabsTrigger>
+            <TabsTrigger value="unread">{tr('notificationsTab.unread')}{unreadCount})</TabsTrigger>
+            <TabsTrigger value="message">{tr('settings.messagesNotif')}</TabsTrigger>
+            <TabsTrigger value="connection">{tr('sidebar.friends')}</TabsTrigger>
+            <TabsTrigger value="event">{tr('landing.events')}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all">{renderList(items, 'Aucune notification pour le moment')}</TabsContent>
-          <TabsContent value="unread">{renderList(items.filter(n => !n.read), 'Tout est à jour')}</TabsContent>
+          <TabsContent value="all">{renderList(items, tr('notificationsTab.noNotificationsYet'))}</TabsContent>
+          <TabsContent value="unread">{renderList(items.filter(n => !n.read), tr('notificationsTab.allCaughtUp'))}</TabsContent>
           <TabsContent value="message">{renderList(filterByType('message'), 'Aucun message')}</TabsContent>
-          <TabsContent value="connection">{renderList(filterByType('connection'), "Aucune demande d'ami")}</TabsContent>
-          <TabsContent value="event">{renderList(filterByType('event'), 'Aucun événement')}</TabsContent>
+          <TabsContent value="connection">{renderList(filterByType('connection'), tr('notificationsTab.noFriendRequests'))}</TabsContent>
+          <TabsContent value="event">{renderList(filterByType('event'), tr('events.noEvents'))}</TabsContent>
         </Tabs>
       )}
     </GlassMorphism>

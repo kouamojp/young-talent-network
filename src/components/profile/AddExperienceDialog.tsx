@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface Props {
   userId: string;
@@ -39,12 +40,12 @@ const AddExperienceDialog: React.FC<Props> = ({ userId, onAdded }) => {
         description: form.description.trim() || null,
       });
       if (error) throw error;
-      toast.success('Expérience ajoutée');
+      toast.success(tr('addExperienceDialog.experienceAdded'));
       setForm({ title: '', organization: '', country: '', city: '', start_date: '', end_date: '', is_current: false, description: '' });
       setOpen(false);
       onAdded();
     } catch (err: any) {
-      toast.error(err.message || 'Erreur');
+      toast.error(err.message || tr('settings.error'));
     } finally {
       setLoading(false);
     }
@@ -54,50 +55,50 @@ const AddExperienceDialog: React.FC<Props> = ({ userId, onAdded }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <Plus className="h-3.5 w-3.5" /> Ajouter
+          <Plus className="h-3.5 w-3.5" /> {tr('tv.addLink')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>Nouvelle expérience</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('addExperienceDialog.newExperience')}</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <Label>Titre *</Label>
-            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Ex: Pianiste principal" required />
+            <Label>{tr('events.eventName')}</Label>
+            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={tr('addExperienceDialog.eGLeadPianist')} required />
           </div>
           <div>
-            <Label>Organisation</Label>
-            <Input value={form.organization} onChange={e => setForm(f => ({ ...f, organization: e.target.value }))} placeholder="Ex: Orchestre national" />
+            <Label>{tr('profile.organization')}</Label>
+            <Input value={form.organization} onChange={e => setForm(f => ({ ...f, organization: e.target.value }))} placeholder={tr('addExperienceDialog.eGNationalOrchestra')} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Pays</Label>
+              <Label>{tr('settings.country')}</Label>
               <Input value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} />
             </div>
             <div>
-              <Label>Ville</Label>
+              <Label>{tr('settings.city')}</Label>
               <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Date de début</Label>
+              <Label>{tr('common.startDate')}</Label>
               <Input type="date" value={form.start_date} onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))} />
             </div>
             <div>
-              <Label>Date de fin</Label>
+              <Label>{tr('addExperienceDialog.endDate')}</Label>
               <Input type="date" value={form.end_date} disabled={form.is_current} onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))} />
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm">
             <Checkbox checked={form.is_current} onCheckedChange={(c) => setForm(f => ({ ...f, is_current: !!c }))} />
-            Poste actuel
+            {tr('addExperienceDialog.currentPosition')}
           </label>
           <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder="Rôle, missions, contexte..." />
+            <Label>{tr('events.description')}</Label>
+            <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} placeholder={tr('addExperienceDialog.roleTasksContext')} />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Ajout...' : "Ajouter l'expérience"}
+            {loading ? 'Ajout...' : tr('addExperienceDialog.addExperience')}
           </Button>
         </form>
       </DialogContent>

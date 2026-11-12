@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from '@/components/ui/use-toast';
 import { invokeFunction } from '@/lib/invokeFunction';
 import { ageFromBirthday, MIN_AGE, PARENTAL_CONSENT_AGE } from '@/lib/age';
+import { tr } from '@/i18n';
 
 interface ComplianceStatus {
   user_type: string;
@@ -57,10 +58,10 @@ const ComplianceGate: React.FC = () => {
   const sendConsentEmail = useCallback(async (silent = false) => {
     const { error } = await invokeFunction('parental-consent', { action: 'send' });
     if (error) {
-      if (!silent) toast({ title: "E-mail non envoyé", description: error, variant: 'destructive' });
+      if (!silent) toast({ title: tr('complianceGate.emailNotSent'), description: error, variant: 'destructive' });
       return false;
     }
-    if (!silent) toast({ title: 'E-mail envoyé', description: 'Demandez à votre parent de cliquer sur le lien reçu.' });
+    if (!silent) toast({ title: tr('complianceGate.emailSent'), description: tr('complianceGate.askYourParentToClickThe') });
     await refresh();
     return true;
   }, [refresh]);
@@ -103,8 +104,8 @@ const BirthdayDialog: React.FC<{ open: boolean; onDismiss: () => void; onSaved: 
       _parent_email: needsParent ? parentEmail.trim() : null,
     });
     setSaving(false);
-    if (error) { toast({ title: 'Enregistrement impossible', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Date de naissance enregistrée' });
+    if (error) { toast({ title: tr('common.couldNotSave'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: tr('complianceGate.dateOfBirthSaved') });
     onSaved();
   };
 
@@ -112,35 +113,35 @@ const BirthdayDialog: React.FC<{ open: boolean; onDismiss: () => void; onSaved: 
     <Dialog open={open} onOpenChange={(o) => { if (!o) onDismiss(); }}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Votre date de naissance</DialogTitle>
+          <DialogTitle>{tr('complianceGate.yourDateOfBirth')}</DialogTitle>
           <DialogDescription>
-            Elle sert uniquement à protéger les jeunes membres. Elle n'est pas affichée sur votre profil et ne pourra plus être modifiée ensuite.
+            {tr('complianceGate.itIsOnlyUsedToProtect')}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="gate-birthday">Date de naissance</Label>
+            <Label htmlFor="gate-birthday">{tr('auth.birthday')}</Label>
             <Input id="gate-birthday" type="date" max={new Date().toISOString().slice(0, 10)} value={birthday} onChange={(e) => setBirthday(e.target.value)} />
           </div>
           {tooYoung && (
             <p className="text-sm text-destructive">
-              YAT est réservé aux {MIN_AGE} ans et plus. Vous pouvez supprimer votre compte depuis{' '}
-              <Link to="/settings" className="underline" onClick={onDismiss}>Paramètres</Link>.
+              {tr('complianceGate.yatIsForPeopleAged')} {MIN_AGE} {tr('complianceGate.andOverYouCanDeleteYour')}{' '}
+              <Link to="/settings" className="underline" onClick={onDismiss}>{tr('sidebar.settings')}</Link>.
             </p>
           )}
           {needsParent && (
             <div className="space-y-1.5">
-              <Label htmlFor="gate-parent-email">E-mail d'un parent</Label>
+              <Label htmlFor="gate-parent-email">{tr('auth.parentEmail')}</Label>
               <Input id="gate-parent-email" type="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} placeholder="parent@exemple.com" />
-              <p className="text-xs text-muted-foreground">Avant {PARENTAL_CONSENT_AGE} ans, un parent doit valider votre compte. Il recevra un e-mail.</p>
+              <p className="text-xs text-muted-foreground">{tr('complianceGate.under')} {PARENTAL_CONSENT_AGE} {tr('complianceGate.aParentMustApproveYourAccount')}</p>
             </div>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onDismiss}>Plus tard</Button>
+          <Button variant="outline" onClick={onDismiss}>{tr('complianceGate.later')}</Button>
           <Button onClick={save} disabled={!birthday || tooYoung || saving || (needsParent && !parentEmail.includes('@'))}>
             {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            Enregistrer
+            {tr('post.update')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -161,7 +162,7 @@ const ConsentBanner: React.FC<{ status: ComplianceStatus; onResend: () => Promis
     const { error } = await (supabase.rpc as any)('set_parent_email', { _parent_email: email.trim() });
     if (error) {
       setSaving(false);
-      toast({ title: 'Modification impossible', description: error.message, variant: 'destructive' });
+      toast({ title: tr('complianceGate.couldNotUpdate'), description: error.message, variant: 'destructive' });
       return;
     }
     await onEmailChanged();
@@ -177,26 +178,26 @@ const ConsentBanner: React.FC<{ status: ComplianceStatus; onResend: () => Promis
         <div className="flex gap-2 text-sm">
           <ShieldAlert className="h-5 w-5 shrink-0 text-amber-600" />
           <p>
-            <strong>Accord parental en attente.</strong>{' '}
+            <strong>{tr('complianceGate.parentalConsentPending')}</strong>{' '}
             {status.parent_email
-              ? <>Un e-mail {status.last_sent_at ? 'a été envoyé' : 'va être envoyé'} à {status.parent_email}. La messagerie sera disponible dès qu'il aura cliqué sur le lien.</>
-              : <>Indiquez l'e-mail d'un parent pour activer la messagerie.</>}
+              ? <>{tr('complianceGate.anEmail')} {status.last_sent_at ? tr('complianceGate.wasSent') : tr('complianceGate.willBeSent')} à {status.parent_email}{tr('complianceGate.messagingWillBeAvailableAsSoon')}</>
+              : <>{tr('complianceGate.enterAParentSEmailTo')}</>}
           </p>
         </div>
         {editing || !status.parent_email ? (
           <div className="flex gap-2 shrink-0">
-            <Input type="email" aria-label="E-mail du parent" placeholder="parent@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-8 w-52 bg-background" />
+            <Input type="email" aria-label={tr('complianceGate.parentSEmail')} placeholder="parent@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-8 w-52 bg-background" />
             <Button size="sm" onClick={changeEmail} disabled={!email.includes('@') || saving}>
-              {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}Envoyer
+              {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}{tr('common.send')}
             </Button>
-            {status.parent_email && <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Annuler</Button>}
+            {status.parent_email && <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>{tr('common.cancel')}</Button>}
           </div>
         ) : (
           <div className="flex gap-2 shrink-0">
             <Button size="sm" variant="outline" onClick={resend} disabled={sending}>
-              {sending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}Renvoyer l'e-mail
+              {sending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}{tr('complianceGate.resendEmail')}
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>Changer d'adresse</Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>{tr('complianceGate.changeAddress')}</Button>
           </div>
         )}
       </div>

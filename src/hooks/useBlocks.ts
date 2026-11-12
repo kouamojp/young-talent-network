@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 /**
  * Users the signed-in user has blocked. A block (either direction) stops all
@@ -29,11 +30,11 @@ export const useBlocks = () => {
     if (!userId) return false;
     const { error } = await (supabase.from as any)('user_blocks').insert({ blocker_id: userId, blocked_id: targetId });
     if (error && error.code !== '23505') {
-      toast({ title: 'Blocage impossible', description: error.message, variant: 'destructive' });
+      toast({ title: tr('useBlocks.couldNotBlock'), description: error.message, variant: 'destructive' });
       return false;
     }
     setBlockedIds(prev => new Set(prev).add(targetId));
-    toast({ title: `${name || 'Ce membre'} est bloqué`, description: 'Il ne peut plus vous écrire et ses publications sont masquées.' });
+    toast({ title: tr('useBlocks.isBlocked', { p0: name || 'Ce membre' }), description: tr('useBlocks.theyCanNoLongerMessageYou') });
     return true;
   }, [userId]);
 
@@ -41,11 +42,11 @@ export const useBlocks = () => {
     if (!userId) return false;
     const { error } = await (supabase.from as any)('user_blocks').delete().eq('blocker_id', userId).eq('blocked_id', targetId);
     if (error) {
-      toast({ title: 'Déblocage impossible', description: error.message, variant: 'destructive' });
+      toast({ title: tr('useBlocks.couldNotUnblock'), description: error.message, variant: 'destructive' });
       return false;
     }
     setBlockedIds(prev => { const next = new Set(prev); next.delete(targetId); return next; });
-    toast({ title: `${name || 'Ce membre'} est débloqué` });
+    toast({ title: tr('useBlocks.isUnblocked', { p0: name || 'Ce membre' }) });
     return true;
   }, [userId]);
 

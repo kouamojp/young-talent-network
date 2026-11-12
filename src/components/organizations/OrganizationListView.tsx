@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useOrganizations } from '@/hooks/useOrganizations';
 import { useLanguage } from '@/i18n/LanguageContext';
 import OrganizationRow from './OrganizationRow';
+import { tr } from '@/i18n';
 
 const ALL = '__all__';
 
@@ -28,7 +29,7 @@ const OrganizationListView: React.FC = () => {
   if (organizations.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-        Aucune organisation inscrite pour l'instant.
+        {tr('organizationListView.noOrganizationsRegisteredYet')}
       </p>
     );
   }
@@ -37,11 +38,11 @@ const OrganizationListView: React.FC = () => {
     <div className="space-y-4">
       {industries.length > 1 && (
         <Select value={industry} onValueChange={setIndustry}>
-          <SelectTrigger className="w-full sm:w-64" aria-label="Secteur">
+          <SelectTrigger className="w-full sm:w-64" aria-label={tr('common.sector')}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ALL}>Tous les secteurs</SelectItem>
+            <SelectItem value={ALL}>{tr('organizationListView.allSectors')}</SelectItem>
             {industries.map(name => <SelectItem key={name} value={name}>{name}</SelectItem>)}
           </SelectContent>
         </Select>

@@ -11,6 +11,7 @@ import { Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { tr } from '@/i18n';
 
 interface ProfileSidebarMenuProps {
   user: {
@@ -44,34 +45,34 @@ const ProfileSidebarMenu: React.FC<ProfileSidebarMenuProps> = ({ user }) => {
                   <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <h1 className="text-xl font-semibold text-gray-900">{user.name}</h1>
-                <p className="text-sm text-gray-500">статус был 15 мин назад</p>
+                <p className="text-sm text-gray-500">{tr('profileSidebarMenu.lastSeen15MinAgo')}</p>
               </div>
 
               <div className="space-y-2 mb-6">
                 <Button className="w-full bg-[#4BB34B] hover:bg-[#3E9A3E] text-white">
-                  Написать сообщение
+                  {tr('profileSidebarMenu.sendAMessage')}
                 </Button>
                 <Button variant="outline" className="w-full text-[#5181B8] border-[#5181B8]">
-                  Добавить в друзья
+                  {tr('profileSidebarMenu.addFriend')}
                 </Button>
               </div>
 
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">25 лет</span>
+                  <span className="text-gray-600">{tr('profileSidebarMenu.25YearsOld')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Москва</span>
+                  <span className="text-gray-600">{tr('profileSidebarMenu.moscow')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Frontend Developer</span>
+                  <span className="text-gray-600">{tr('profileSidebarMenu.frontendDeveloper')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Heart className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">В активном поиске</span>
+                  <span className="text-gray-600">{tr('profileSidebarMenu.activelyLooking')}</span>
                 </div>
               </div>
 
@@ -79,15 +80,15 @@ const ProfileSidebarMenu: React.FC<ProfileSidebarMenuProps> = ({ user }) => {
                 <div className="grid grid-cols-3 gap-4 text-center text-sm">
                   <div>
                     <div className="font-semibold">432</div>
-                    <div className="text-gray-500">друзья</div>
+                    <div className="text-gray-500">{tr('profileSidebarMenu.friends')}</div>
                   </div>
                   <div>
                     <div className="font-semibold">67</div>
-                    <div className="text-gray-500">фото</div>
+                    <div className="text-gray-500">{tr('profileSidebarMenu.photos')}</div>
                   </div>
                   <div>
                     <div className="font-semibold">23</div>
-                    <div className="text-gray-500">видео</div>
+                    <div className="text-gray-500">{tr('profileSidebarMenu.videos')}</div>
                   </div>
                 </div>
               </div>
@@ -99,7 +100,7 @@ const ProfileSidebarMenu: React.FC<ProfileSidebarMenuProps> = ({ user }) => {
                     className="w-full flex items-center justify-center gap-2 bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700"
                   >
                     <Settings className="h-4 w-4" />
-                    <span>Talent Dashboard</span>
+                    <span>{tr('landing.talentDashboard')}</span>
                   </Button>
                 </Link>
               </div>

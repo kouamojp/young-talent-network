@@ -14,6 +14,7 @@ import OrganizationsSection from '@/components/talent-dashboard/OrganizationsSec
 import OverviewSection from '@/components/talent-dashboard/OverviewSection';
 
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 const TalentDashboard: React.FC = () => {
   const [isOpenToWork, setIsOpenToWork] = useState(true);
@@ -41,7 +42,7 @@ const TalentDashboard: React.FC = () => {
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="overview">{tr('agent.overview')}</TabsTrigger>
             <TabsTrigger value="work">{t('talent.work')}</TabsTrigger>
             <TabsTrigger value="learning">{t('talent.learning')}</TabsTrigger>
             <TabsTrigger value="live">{t('talent.live')}</TabsTrigger>

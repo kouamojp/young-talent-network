@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Radio, Calendar, Clock, Users, Loader2, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface StreamRow {
   id: string;
@@ -55,17 +57,17 @@ const LiveSection: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Diffusion en direct</h3>
+        <h3 className="text-lg font-semibold">{tr('liveSection.liveStreaming')}</h3>
         <Button onClick={() => navigate('/live')}>
           <Video className="h-4 w-4 mr-2" />
-          Lancer un direct
+          {tr('liveSection.startALiveStream')}
         </Button>
       </div>
 
       {/* Live now */}
       {liveNow.length > 0 && (
         <div className="space-y-4">
-          <h4 className="font-medium text-gray-900">🔴 En direct maintenant</h4>
+          <h4 className="font-medium text-gray-900">{tr('liveSection.liveNow')}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {liveNow.map((stream) => (
               <Card key={stream.id} className="border-l-4 border-l-destructive">
@@ -73,17 +75,17 @@ const LiveSection: React.FC = () => {
                   <div className="flex items-start justify-between mb-3">
                     <h5 className="font-semibold">{stream.title}</h5>
                     <Badge className="bg-destructive text-destructive-foreground">
-                      <Radio className="h-3 w-3 mr-1 animate-pulse" /> LIVE
+                      <Radio className="h-3 w-3 mr-1 animate-pulse" /> {tr('common.live')}
                     </Badge>
                   </div>
                   <div className="space-y-2 text-sm text-gray-600">
                     {stream.category && (
                       <div className="flex items-center gap-2"><Radio className="h-3 w-3" />{stream.category}</div>
                     )}
-                    <div className="flex items-center gap-2"><Users className="h-3 w-3" />{stream.viewer_count || 0} spectateurs</div>
+                    <div className="flex items-center gap-2"><Users className="h-3 w-3" />{stream.viewer_count || 0} {tr('liveSection.viewers')}</div>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <Button size="sm" className="flex-1" onClick={() => navigate('/live')}>Voir</Button>
+                    <Button size="sm" className="flex-1" onClick={() => navigate('/live')}>{tr('common.view')}</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -94,15 +96,15 @@ const LiveSection: React.FC = () => {
 
       {/* Past streams */}
       <div className="space-y-4">
-        <h4 className="font-medium text-gray-900">🎥 Directs passés</h4>
+        <h4 className="font-medium text-gray-900">{tr('liveSection.pastStreams')}</h4>
         {pastStreams.length === 0 ? (
           <Card className="border-dashed">
             <CardContent className="p-6 text-center">
               <Video className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-600 mb-4">Aucun direct passé pour le moment</p>
+              <p className="text-gray-600 mb-4">{tr('liveSection.noPastStreamsYet')}</p>
               <Button variant="outline" onClick={() => navigate('/live')}>
                 <Video className="h-4 w-4 mr-2" />
-                Lancer votre premier direct
+                {tr('liveSection.startYourFirstLiveStream')}
               </Button>
             </CardContent>
           </Card>
@@ -121,13 +123,13 @@ const LiveSection: React.FC = () => {
                         {stream.started_at && (
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(stream.started_at).toLocaleDateString('fr-FR')}
+                            {new Date(stream.started_at).toLocaleDateString(localeTag())}
                           </span>
                         )}
                         {duration(stream.started_at, stream.ended_at) && (
                           <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration(stream.started_at, stream.ended_at)}</span>
                         )}
-                        <span className="flex items-center gap-1"><Users className="h-3 w-3" />{stream.viewer_count || 0} spectateurs</span>
+                        <span className="flex items-center gap-1"><Users className="h-3 w-3" />{stream.viewer_count || 0} {tr('liveSection.viewers')}</span>
                       </div>
                     </div>
                   </div>

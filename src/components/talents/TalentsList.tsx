@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MapPin, Music, MusicIcon, BookOpen, PenTool, Code, Dumbbell, HeartHandshake, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { tr } from '@/i18n';
 
 interface TalentsListProps {
   talents: any[];
@@ -67,7 +68,7 @@ const TalentsList: React.FC<TalentsListProps> = ({
             </div>
             
             <Badge className="absolute top-2 right-2 bg-white/80 text-primary border-none">
-              {talent.talent} | {talent.age} | {talent.distance}km
+              {talent.talent} | {talent.age} | {talent.distance}{tr('talentsMap.kmAway')}
             </Badge>
           </div>
           
@@ -96,18 +97,18 @@ const TalentsList: React.FC<TalentsListProps> = ({
                 
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" className="rounded-full flex-1">
-                    <span>👋 Wave</span>
+                    <span>{tr('talentsList.wave')}</span>
                   </Button>
                   
                   <Button size="sm" variant="outline" className="rounded-full">
                     <Heart className="h-4 w-4 text-red-500" />
-                    <span className="sr-only">Invite to collaborate</span>
+                    <span className="sr-only">{tr('talentsList.inviteToCollaborate')}</span>
                   </Button>
                 </div>
                 
                 {talent.commonGround && selectedTalent === talent.id && (
                   <div className="mt-3 bg-purple-50 p-2 rounded-lg text-xs text-purple-700 animate-fade-in">
-                    <span className="font-medium">Common Ground:</span> You and {talent.name.split(' ')[0]} both {talent.commonGround}!
+                    <span className="font-medium">{tr('common.commonGround')}</span> {tr('common.youAnd')} {talent.name.split(' ')[0]} both {talent.commonGround}!
                   </div>
                 )}
               </div>

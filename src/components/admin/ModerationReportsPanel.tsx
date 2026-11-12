@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle, ShieldAlert, Shield, CheckCircle2, XCircle, Trash2, Eye, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { tr } from '@/i18n';
 
 interface Report {
   id: string;
@@ -60,20 +61,20 @@ const ModerationReportsPanel: React.FC = () => {
     }).eq('id', id);
     setActing(null);
     if (error) { toast({ title: error.message, variant: 'destructive' }); return; }
-    toast({ title: `Report ${status}` });
+    toast({ title: tr('moderationReportsPanel.report', { p0: status }) });
     load();
   };
 
   const removeContent = async (r: Report) => {
     if (!r.content_id) return;
-    if (!confirm('Supprimer définitivement ce contenu ?')) return;
+    if (!confirm(tr('moderationReportsPanel.permanentlyDeleteThisContent'))) return;
     setActing(r.id);
     try {
       if (r.content_type === 'post') await supabase.from('posts').delete().eq('id', r.content_id);
       else if (r.content_type === 'comment') await supabase.from('comments').delete().eq('id', r.content_id);
       else if (r.content_type === 'message') await supabase.from('messages').delete().eq('id', r.content_id);
       await supabase.from('moderation_reports').update({ status: 'actioned', reviewed_at: new Date().toISOString() }).eq('id', r.id);
-      toast({ title: 'Contenu supprimé' });
+      toast({ title: tr('moderationReportsPanel.contentDeleted') });
       load();
     } catch (e: any) {
       toast({ title: e.message, variant: 'destructive' });
@@ -88,14 +89,14 @@ const ModerationReportsPanel: React.FC = () => {
       <CardHeader>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div>
-            <CardTitle className="flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-primary" /> Anti-spam & Anti-fraude</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">Détections IA et signalements utilisateurs</p>
+            <CardTitle className="flex items-center gap-2"><ShieldAlert className="h-5 w-5 text-primary" /> {tr('moderationReportsPanel.antiSpamAntiFraud')}</CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">{tr('moderationReportsPanel.aiDetectionsAndUserReports')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline">{pendingCount} en attente</Badge>
-            {criticalCount > 0 && <Badge className="bg-destructive">{criticalCount} critiques</Badge>}
-            <Button size="sm" variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>En attente</Button>
-            <Button size="sm" variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>Toutes</Button>
+            <Badge variant="outline">{pendingCount} {tr('moderationReportsPanel.pending')}</Badge>
+            {criticalCount > 0 && <Badge className="bg-destructive">{criticalCount} {tr('moderationReportsPanel.critical')}</Badge>}
+            <Button size="sm" variant={filter === 'pending' ? 'default' : 'outline'} onClick={() => setFilter('pending')}>{tr('friends.pending')}</Button>
+            <Button size="sm" variant={filter === 'all' ? 'default' : 'outline'} onClick={() => setFilter('all')}>{tr('events.allCategories')}</Button>
           </div>
         </div>
       </CardHeader>
@@ -103,7 +104,7 @@ const ModerationReportsPanel: React.FC = () => {
         {loading ? (
           <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
         ) : reports.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">Aucun signalement {filter === 'pending' ? 'en attente' : ''}.</div>
+          <div className="text-center py-8 text-muted-foreground text-sm">{tr('moderationReportsPanel.noReports')} {filter === 'pending' ? tr('moderationReportsPanel.pending') : ''}.</div>
         ) : (
           <ScrollArea className="max-h-[600px]">
             <div className="space-y-3">
@@ -131,14 +132,14 @@ const ModerationReportsPanel: React.FC = () => {
                     {r.status === 'pending' && (
                       <div className="flex gap-2 flex-wrap">
                         <Button size="sm" variant="outline" disabled={acting === r.id} onClick={() => updateStatus(r.id, 'dismissed')}>
-                          <CheckCircle2 className="h-3 w-3 mr-1" />Ignorer (faux positif)
+                          <CheckCircle2 className="h-3 w-3 mr-1" />{tr('moderationReportsPanel.dismissFalsePositive')}
                         </Button>
                         <Button size="sm" variant="outline" disabled={acting === r.id} onClick={() => updateStatus(r.id, 'reviewed')}>
-                          <Eye className="h-3 w-3 mr-1" />Marquer vérifié
+                          <Eye className="h-3 w-3 mr-1" />{tr('moderationReportsPanel.markAsVerified')}
                         </Button>
                         {r.content_id && (
                           <Button size="sm" variant="destructive" disabled={acting === r.id} onClick={() => removeContent(r)}>
-                            <Trash2 className="h-3 w-3 mr-1" />Supprimer le contenu
+                            <Trash2 className="h-3 w-3 mr-1" />{tr('moderationReportsPanel.deleteContent')}
                           </Button>
                         )}
                       </div>

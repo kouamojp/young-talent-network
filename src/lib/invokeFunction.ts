@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 /**
  * Calls an Edge Function and returns `{ data, error }` where `error` is the
@@ -19,5 +20,5 @@ export async function invokeFunction<T = any>(name: string, body: unknown): Prom
   } catch {
     // body was not JSON
   }
-  return { data: null, error: error.message || 'Erreur réseau' };
+  return { data: null, error: error.message || tr('invokeFunction.networkError') };
 }

@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tr } from '@/i18n';
 
 interface AdBannerProps {
   placement?: "feed" | "sidebar" | "banner";
@@ -73,7 +74,7 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
               )}
               <div className="p-2 space-y-1">
                 <div className="flex items-center gap-1">
-                  <Badge variant="secondary" className="px-1 py-0 text-[9px] leading-4">Реклама</Badge>
+                  <Badge variant="secondary" className="px-1 py-0 text-[9px] leading-4">{tr('footer.advertising')}</Badge>
                   {ad.link_url && <ExternalLink className="h-2.5 w-2.5 text-muted-foreground" />}
                 </div>
                 <h4 className="break-words text-[11px] font-semibold leading-snug line-clamp-2">{ad.title}</h4>
@@ -90,7 +91,7 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
                       handleClick(ad);
                     }}
                   >
-                    Подробнее
+                    {tr('funding.viewDetails')}
                   </Button>
                 )}
               </div>
@@ -108,7 +109,7 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
               )}
               <div className="min-w-0 flex-1 overflow-hidden">
                 <div className="mb-1 flex min-w-0 items-center gap-1">
-                  <Badge variant="secondary" className="shrink-0 px-1 py-0 text-[9px] leading-4">Реклама</Badge>
+                  <Badge variant="secondary" className="shrink-0 px-1 py-0 text-[9px] leading-4">{tr('footer.advertising')}</Badge>
                   {ad.link_url && <ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />}
                 </div>
                 <h4 className="break-words text-xs font-semibold leading-snug line-clamp-2">{ad.title}</h4>
@@ -136,7 +137,7 @@ export const AdBanner = ({ placement = "feed", className = "" }: AdBannerProps) 
           )}
           <div className="p-3 space-y-1">
             <div className="flex items-center justify-between">
-              <Badge variant="secondary" className="text-[10px]">Реклама</Badge>
+              <Badge variant="secondary" className="text-[10px]">{tr('footer.advertising')}</Badge>
               {ad.link_url && <ExternalLink className="h-3 w-3 text-muted-foreground" />}
             </div>
             <h4 className="font-semibold text-sm">{ad.title}</h4>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 export interface YatScoreBreakdownItem {
   score: number;
@@ -53,7 +54,7 @@ export function useYatScore(userId?: string) {
       if (err) throw err;
       setData(res as YatScoreData);
     } catch (e: any) {
-      setError(e.message || 'Erreur YAT Score');
+      setError(e.message || tr('useYatScore.yatScoreError'));
     } finally { setLoading(false); }
   }, [userId]);
 

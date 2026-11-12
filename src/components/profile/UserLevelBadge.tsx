@@ -2,6 +2,7 @@ import React from 'react';
 import { getLevelBadge, getXpProgress, UserLevel } from '@/hooks/useUserLevel';
 import { Progress } from '@/components/ui/progress';
 import { Coins } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface UserLevelBadgeProps {
   levelData: UserLevel;
@@ -17,7 +18,7 @@ export const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ levelData, compa
       <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
         style={{ backgroundColor: badge.color + '22', color: badge.color, border: `1px solid ${badge.color}44` }}>
         <span>{badge.icon}</span>
-        <span>Lv.{levelData.level}</span>
+        <span>{tr('common.lv')}{levelData.level}</span>
       </div>
     );
   }
@@ -29,7 +30,7 @@ export const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ levelData, compa
           <span className="text-2xl">{badge.icon}</span>
           <div>
             <p className="font-bold text-sm" style={{ color: badge.color }}>{badge.name}</p>
-            <p className="text-xs text-muted-foreground">Level {levelData.level}</p>
+            <p className="text-xs text-muted-foreground">{tr('userLevelBadge.level')} {levelData.level}</p>
           </div>
         </div>
         <div className="flex items-center gap-1 text-sm font-semibold text-gold tabular-nums">
@@ -40,7 +41,7 @@ export const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ levelData, compa
       <div className="space-y-1">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>{levelData.xp_total} XP</span>
-          <span>Next: {levelData.level * 100} XP</span>
+          <span>{tr('common.next2')} {levelData.level * 100} XP</span>
         </div>
         <Progress value={progress} className="h-2" />
       </div>

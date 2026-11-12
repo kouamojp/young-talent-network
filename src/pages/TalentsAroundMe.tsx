@@ -12,6 +12,7 @@ import { MapPin, Users, Sparkles, Loader2, Locate, Database, Star, MessageCircle
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { countries } from '@/data/countries';
+import { tr } from '@/i18n';
 
 interface NearbyTalent {
   id: string;
@@ -85,7 +86,7 @@ const TalentsAroundMe: React.FC = () => {
 
   const detectLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      toast.error('Géolocalisation non supportée');
+      toast.error(tr('talentsAroundMe.geolocationNotSupported'));
       return;
     }
     setLocating(true);
@@ -93,25 +94,25 @@ const TalentsAroundMe: React.FC = () => {
       pos => {
         setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setLocating(false);
-        toast.success('Position détectée');
+        toast.success(tr('talentsAroundMe.locationDetected'));
       },
       err => {
         setLocating(false);
-        toast.error(err.message || 'Impossible de détecter votre position');
+        toast.error(err.message || tr('talentsAroundMe.couldNotDetectYourLocation'));
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   }, []);
 
   const saveLocationToProfile = async () => {
-    if (!coords || !currentUserId) { toast.error('Connectez-vous d\'abord'); return; }
+    if (!coords || !currentUserId) { toast.error(tr('common.pleaseLogInFirst')); return; }
     setSavingLoc(true);
     const { error } = await supabase.from('profiles')
       .update({ latitude: coords.lat, longitude: coords.lng })
       .eq('id', currentUserId);
     setSavingLoc(false);
     if (error) toast.error(error.message);
-    else { toast.success('Localisation enregistrée sur votre profil'); setMyProfile(p => ({ ...(p || {}), latitude: coords.lat, longitude: coords.lng } as any)); }
+    else { toast.success(tr('talentsAroundMe.locationSavedToYourProfile')); setMyProfile(p => ({ ...(p || {}), latitude: coords.lat, longitude: coords.lng } as any)); }
   };
 
   const hideMyLocation = async () => {
@@ -124,7 +125,7 @@ const TalentsAroundMe: React.FC = () => {
     if (error) { toast.error(error.message); return; }
     setCoords(null);
     setMyProfile(p => ({ ...(p || {}), latitude: null, longitude: null } as any));
-    toast.success('Géolocalisation désactivée. Seule votre ville/pays sera visible.');
+    toast.success(tr('talentsAroundMe.geolocationDisabledOnlyYourCityCountry'));
   };
 
   const fetchTalents = useCallback(async () => {
@@ -165,7 +166,7 @@ const TalentsAroundMe: React.FC = () => {
 
       setTalents(filtered);
     } catch (e: any) {
-      toast.error(e.message || 'Erreur de chargement');
+      toast.error(e.message || tr('talentsAroundMe.loadingError'));
     } finally {
       setLoading(false);
     }
@@ -186,33 +187,33 @@ const TalentsAroundMe: React.FC = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
-                <MapPin className="h-6 w-6" /> Talents Around Me
+                <MapPin className="h-6 w-6" /> {tr('common.talentsAroundMe')}
               </h1>
               <p className="text-sm md:text-base text-white/90 mt-1">
                 {coords
-                  ? <>Il y a <b>{totalProfilesWithLocation}</b> talents dans un rayon de <b>{distance} km</b>.</>
-                  : <>Activez votre position pour découvrir les talents près de vous.</>}
+                  ? <>{tr('talentsAroundMe.thereAre')} <b>{totalProfilesWithLocation}</b> {tr('talentsAroundMe.talentsWithinARadiusOf')} <b>{distance} {tr('talentsMap.kmAway')}</b>.</>
+                  : <>{tr('talentsAroundMe.enableYourLocationToDiscoverTalents')}</>}
               </p>
             </div>
             <div className="flex gap-2 flex-wrap">
               <Button size="sm" onClick={detectLocation} disabled={locating} variant="secondary" className="gap-1">
                 {locating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Locate className="h-3.5 w-3.5" />}
-                Détecter ma position
+                {tr('talentsAroundMe.detectMyLocation')}
               </Button>
               {coords && currentUserId && (!myProfile?.latitude || Number(myProfile.latitude) !== coords.lat) && (
                 <Button size="sm" onClick={saveLocationToProfile} disabled={savingLoc} variant="secondary" className="gap-1">
                   {savingLoc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                  Enregistrer sur mon profil
+                  {tr('talentsAroundMe.saveToMyProfile')}
                 </Button>
               )}
               {currentUserId && (myProfile?.latitude || coords) && (
                 <Button size="sm" onClick={hideMyLocation} disabled={removingLoc} variant="secondary" className="gap-1">
                   {removingLoc ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <EyeOff className="h-3.5 w-3.5" />}
-                  Désactiver ma géoloc
+                  {tr('talentsAroundMe.disableMyGeolocation')}
                 </Button>
               )}
               <Button size="sm" variant="secondary" asChild className="gap-1">
-                <Link to="/yat-database"><Database className="h-3.5 w-3.5" /> YAT Database</Link>
+                <Link to="/yat-database"><Database className="h-3.5 w-3.5" /> {tr('sidebar.yatDatabase')}</Link>
               </Button>
             </div>
           </div>
@@ -225,23 +226,23 @@ const TalentsAroundMe: React.FC = () => {
         <Card>
           <CardContent className="p-4 grid md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Type de profil</label>
+              <label className="text-xs font-medium text-muted-foreground">{tr('common.profileType')}</label>
               <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="talent">Talents</SelectItem>
-                  <SelectItem value="agent">Agents</SelectItem>
-                  <SelectItem value="organization">Organisations</SelectItem>
+                  <SelectItem value="all">{tr('events.all')}</SelectItem>
+                  <SelectItem value="talent">{tr('org.talents')}</SelectItem>
+                  <SelectItem value="agent">{tr('org.agents')}</SelectItem>
+                  <SelectItem value="organization">{tr('sidebar.organizations')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Pays</label>
+              <label className="text-xs font-medium text-muted-foreground">{tr('settings.country')}</label>
               <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectTrigger><SelectValue placeholder="Tous" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr('events.all')} /></SelectTrigger>
                 <SelectContent className="max-h-60">
-                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="all">{tr('events.all')}</SelectItem>
                   {countries.map((c: any) => (
                     <SelectItem key={c.code || c.name} value={c.name}>{c.name}</SelectItem>
                   ))}
@@ -249,18 +250,18 @@ const TalentsAroundMe: React.FC = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">Domaine / mot-clé</label>
-              <Input value={categoryQuery} onChange={e => setCategoryQuery(e.target.value)} placeholder="Football, piano, dev..." />
+              <label className="text-xs font-medium text-muted-foreground">{tr('talentsAroundMe.fieldKeyword')}</label>
+              <Input value={categoryQuery} onChange={e => setCategoryQuery(e.target.value)} placeholder={tr('talentsAroundMe.footballPianoDev')} />
             </div>
             {!coords && (
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground">Ville / Pays (sans GPS)</label>
-                <Input value={cityFallback} onChange={e => setCityFallback(e.target.value)} placeholder="Paris, France..." />
+                <label className="text-xs font-medium text-muted-foreground">{tr('talentsAroundMe.cityCountryWithoutGps')}</label>
+                <Input value={cityFallback} onChange={e => setCityFallback(e.target.value)} placeholder={tr('talentsAroundMe.parisFrance')} />
               </div>
             )}
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground flex justify-between">
-                <span>Rayon</span><b>{distance} km</b>
+                <span>{tr('talentsAroundMe.radius')}</span><b>{distance} {tr('talentsMap.kmAway')}</b>
               </label>
               <Slider value={[distance]} min={1} max={500} step={1} onValueChange={v => setDistance(v[0])} disabled={!coords} />
             </div>
@@ -270,8 +271,8 @@ const TalentsAroundMe: React.FC = () => {
         {/* View toggle */}
         <Tabs value={viewMode} onValueChange={v => setViewMode(v as 'map' | 'list')}>
           <TabsList>
-            <TabsTrigger value="list"><Users className="h-3.5 w-3.5 mr-1" /> Liste</TabsTrigger>
-            <TabsTrigger value="map"><MapPin className="h-3.5 w-3.5 mr-1" /> Carte</TabsTrigger>
+            <TabsTrigger value="list"><Users className="h-3.5 w-3.5 mr-1" /> {tr('talentsAroundMe.list')}</TabsTrigger>
+            <TabsTrigger value="map"><MapPin className="h-3.5 w-3.5 mr-1" /> {tr('search.map')}</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -281,11 +282,11 @@ const TalentsAroundMe: React.FC = () => {
         ) : talents.length === 0 ? (
           <Card><CardContent className="text-center py-12">
             <div className="text-5xl mb-3">🔭</div>
-            <h3 className="font-semibold mb-1">Personne dans ce rayon pour l'instant</h3>
+            <h3 className="font-semibold mb-1">{tr('talentsAroundMe.noOneWithinThisRadiusYet')}</h3>
             <p className="text-sm text-muted-foreground mb-3">
-              {coords ? 'Élargissez le rayon ou changez de filtre.' : 'Activez votre géolocalisation pour voir les talents proches.'}
+              {coords ? tr('talentsAroundMe.widenTheRadiusOrChangeThe') : tr('talentsAroundMe.enableYourGeolocationToSeeNearby')}
             </p>
-            <Button asChild variant="outline" size="sm"><Link to="/yat-database">Explorer tout YAT Database</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/yat-database">{tr('talentsAroundMe.exploreTheWholeYatDatabase')}</Link></Button>
           </CardContent></Card>
         ) : viewMode === 'list' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -309,7 +310,7 @@ const TalentsAroundMe: React.FC = () => {
                         <MapPin className="h-3 w-3" />
                         <span className="truncate">{[t.city, t.country].filter(Boolean).join(', ') || '—'}</span>
                         {t.distance_km !== null && (
-                          <Badge variant="secondary" className="text-[10px] ml-auto">{t.distance_km.toFixed(1)} km</Badge>
+                          <Badge variant="secondary" className="text-[10px] ml-auto">{t.distance_km.toFixed(1)} {tr('talentsMap.kmAway')}</Badge>
                         )}
                       </div>
                       {t.platform_rating ? (
@@ -317,7 +318,7 @@ const TalentsAroundMe: React.FC = () => {
                       ) : null}
                       {t.bio && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{t.bio}</p>}
                       <div className="mt-3 flex gap-1.5">
-                        <Button asChild size="sm" className="flex-1 h-7 text-xs"><Link to={profileLink(t)}>Profil</Link></Button>
+                        <Button asChild size="sm" className="flex-1 h-7 text-xs"><Link to={profileLink(t)}>{tr('sidebar.profile')}</Link></Button>
                         <Button asChild size="sm" variant="outline" className="h-7 w-7 p-0"><Link to="/messages"><MessageCircle className="h-3.5 w-3.5" /></Link></Button>
                       </div>
                     </div>
@@ -333,7 +334,7 @@ const TalentsAroundMe: React.FC = () => {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                   <div className="relative">
                     <div className="absolute inset-0 rounded-full bg-primary/40 animate-ping" style={{ width: 40, height: 40 }} />
-                    <div className="relative h-10 w-10 rounded-full bg-primary border-4 border-white flex items-center justify-center text-white text-[10px] font-bold">Moi</div>
+                    <div className="relative h-10 w-10 rounded-full bg-primary border-4 border-white flex items-center justify-center text-white text-[10px] font-bold">{tr('common.me')}</div>
                   </div>
                 </div>
               )}
@@ -352,14 +353,14 @@ const TalentsAroundMe: React.FC = () => {
                       <AvatarFallback className="text-[10px]">{t.name?.[0]}</AvatarFallback>
                     </Avatar>
                     <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 text-[10px] bg-white px-1 rounded shadow opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                      {t.name} · {t.distance_km.toFixed(1)}km
+                      {t.name} · {t.distance_km.toFixed(1)}{tr('talentsMap.kmAway')}
                     </span>
                   </Link>
                 );
               })}
               {!coords && (
                 <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm bg-white/40 backdrop-blur-sm">
-                  Activez votre géolocalisation pour voir la carte
+                  {tr('talentsAroundMe.enableYourGeolocationToSeeThe')}
                 </div>
               )}
             </div>

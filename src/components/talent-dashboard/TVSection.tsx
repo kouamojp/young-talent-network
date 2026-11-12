@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Tv, Upload, Play, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Episode {
   id: string;
@@ -19,7 +21,7 @@ const VIDEO_TYPES = ['video', 'shorts', 'tv'];
 
 const TVSection: React.FC = () => {
   const navigate = useNavigate();
-  const [channelName, setChannelName] = useState('Ma chaîne');
+  const [channelName, setChannelName] = useState(tr('tVSection.myChannel'));
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,13 +53,13 @@ const TVSection: React.FC = () => {
     return (
       <div className="text-center py-12">
         <Tv className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Créez votre chaîne TV personnelle</h3>
+        <h3 className="text-xl font-semibold mb-2">{tr('tVSection.createYourPersonalTvChannel')}</h3>
         <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          Publiez vos vidéos et bâtissez votre audience. Vos contenus vidéo apparaîtront ici en tant qu'épisodes.
+          {tr('tVSection.publishYourVideosAndBuildYour')}
         </p>
         <Button onClick={() => navigate('/media')} size="lg">
           <Upload className="h-5 w-5 mr-2" />
-          Publier une vidéo
+          {tr('tVSection.publishAVideo')}
         </Button>
       </div>
     );
@@ -71,22 +73,22 @@ const TVSection: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-2xl font-bold">{channelName}</h3>
-              <p className="opacity-90">Votre chaîne TV personnelle</p>
+              <p className="opacity-90">{tr('tVSection.yourPersonalTvChannel')}</p>
             </div>
             <Button variant="secondary" size="sm" onClick={() => navigate('/media')}>
               <Upload className="h-4 w-4 mr-2" />
-              Publier
+              {tr('common.post')}
             </Button>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm opacity-80">Épisodes</p>
+              <p className="text-sm opacity-80">{tr('tVSection.episodes')}</p>
               <p className="text-xl font-bold">{episodes.length}</p>
             </div>
             <div>
-              <p className="text-sm opacity-80">Dernière publication</p>
+              <p className="text-sm opacity-80">{tr('tVSection.latestRelease')}</p>
               <p className="text-xl font-bold">
-                {episodes[0]?.created_at ? new Date(episodes[0].created_at).toLocaleDateString('fr-FR') : '—'}
+                {episodes[0]?.created_at ? new Date(episodes[0].created_at).toLocaleDateString(localeTag()) : '—'}
               </p>
             </div>
           </div>
@@ -95,10 +97,10 @@ const TVSection: React.FC = () => {
 
       {/* Content Management */}
       <div className="flex justify-between items-center">
-        <h4 className="text-lg font-semibold">📡 Bibliothèque de contenu</h4>
+        <h4 className="text-lg font-semibold">{tr('tVSection.contentLibrary')}</h4>
         <Button onClick={() => navigate('/media')}>
           <Plus className="h-4 w-4 mr-2" />
-          Publier une vidéo
+          {tr('tVSection.publishAVideo')}
         </Button>
       </div>
 
@@ -111,15 +113,15 @@ const TVSection: React.FC = () => {
             </div>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
-                <h5 className="font-semibold text-sm line-clamp-1">{episode.title || 'Sans titre'}</h5>
+                <h5 className="font-semibold text-sm line-clamp-1">{episode.title || tr('tVSection.untitled')}</h5>
                 {episode.category && <Badge variant="secondary" className="text-xs">{episode.category}</Badge>}
               </div>
               <p className="text-xs text-gray-600">
-                {new Date(episode.item_date || episode.created_at).toLocaleDateString('fr-FR')}
+                {new Date(episode.item_date || episode.created_at).toLocaleDateString(localeTag())}
               </p>
               <div className="flex gap-2 mt-3">
                 <Button size="sm" className="flex-1 text-xs" onClick={() => window.open(episode.url, '_blank')}>
-                  Voir
+                  {tr('common.view')}
                 </Button>
               </div>
             </CardContent>

@@ -4,6 +4,7 @@ import { toast } from '@/components/ui/use-toast';
 import { ringtone } from '@/lib/ringtone';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import type { TablesUpdate } from '@/integrations/supabase/types';
+import { tr } from '@/i18n';
 
 /**
  * 1:1 audio/video calling built on WebRTC.
@@ -142,8 +143,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.from('notifications').insert({
       user_id: userId,
       type: 'call',
-      title: 'Appel manqué',
-      message: `Appel ${video ? 'vidéo ' : ''}manqué de ${from.name}`,
+      title: tr('callContext.missedCall'),
+      message: tr('callContext.missedCallFrom', { p0: video ? tr('common.video') : '', p1: from.name }),
       link: '/calls',
     });
   }, [userId]);
@@ -237,7 +238,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // ---- Outgoing call ----
   const startCall = useCallback(async (target: CallPeer, video: boolean) => {
-    if (!userId) { toast({ title: 'Connecte-toi pour passer un appel', variant: 'destructive' }); return; }
+    if (!userId) { toast({ title: tr('callContext.logInToMakeACall'), variant: 'destructive' }); return; }
     if (status !== 'idle') return;
     try {
       const callId = crypto.randomUUID();
@@ -284,7 +285,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
           callId,
           isVideo: video,
           offer: pc.localDescription,
-          from: selfRef.current || { id: userId, name: 'Appel entrant', avatar_url: null },
+          from: selfRef.current || { id: userId, name: tr('callContext.incomingCall'), avatar_url: null },
         },
       });
       supabase.removeChannel(calleeChannel);
@@ -295,11 +296,11 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (connectedAtRef.current) return;
         sendToUser(target.id, 'cancel', { callId });
         updateCallLog(dbIdRef.current, { status: 'missed', ended_at: new Date().toISOString() });
-        toast({ title: 'Pas de réponse', description: target.name });
+        toast({ title: tr('callContext.noAnswer'), description: target.name });
         cleanup('ended');
       }, RING_TIMEOUT_MS);
     } catch (err: any) {
-      toast({ title: "Impossible de démarrer l'appel", description: err?.message, variant: 'destructive' });
+      toast({ title: tr('callContext.couldNotStartTheCall'), description: err?.message, variant: 'destructive' });
       cleanup('idle');
     }
   }, [userId, status, buildPeerConnection, logCall, updateCallLog, cleanup]);
@@ -356,7 +357,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       await callChannel.send({ type: 'broadcast', event: 'answer', payload: { answer: pc.localDescription } });
     } catch (err: any) {
-      toast({ title: "Impossible de répondre à l'appel", description: err?.message, variant: 'destructive' });
+      toast({ title: tr('callContext.couldNotAnswerTheCall'), description: err?.message, variant: 'destructive' });
       rejectCall();
     }
   }, [userId, buildPeerConnection, cleanup]);
@@ -408,7 +409,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
     channel
       .on('broadcast', { event: 'invite' }, ({ payload }) => handleInvite(payload as IncomingInvite))
       .on('broadcast', { event: 'reject' }, () => {
-        toast({ title: 'Appel refusé' });
+        toast({ title: tr('callContext.callDeclined') });
         updateCallLog(dbIdRef.current, { status: 'rejected', ended_at: new Date().toISOString() });
         cleanup('ended');
       })

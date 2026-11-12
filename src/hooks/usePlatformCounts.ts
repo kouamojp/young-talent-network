@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { localeTag } from '@/i18n/format';
 
 export interface PlatformCounts {
   talents: number;
@@ -51,4 +52,4 @@ export function usePlatformCounts(): PlatformCounts | null {
 
 /** Affiche un compteur, ou un tiret tant qu'il charge. */
 export const formatCount = (value: number | undefined) =>
-  value === undefined ? '–' : value.toLocaleString();
+  value === undefined ? '–' : value.toLocaleString(localeTag());

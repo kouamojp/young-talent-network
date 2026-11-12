@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Eye } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { tr } from '@/i18n';
 
 export interface ResumeProps {
   id: string;
@@ -34,7 +35,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
               <h3 className="text-lg font-bold">{resume.title}</h3>
               {resume.isActive && (
                 <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                  Active
+                  {tr('profile.active')}
                 </Badge>
               )}
             </div>
@@ -53,7 +54,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
                   <Eye className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>View resume</TooltipContent>
+              <TooltipContent>{tr('resumeCard.viewResume')}</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -67,7 +68,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
                   <Edit className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Edit resume</TooltipContent>
+              <TooltipContent>{tr('resumeCard.editResume')}</TooltipContent>
             </Tooltip>
             
             <Tooltip>
@@ -81,7 +82,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Delete resume</TooltipContent>
+              <TooltipContent>{tr('resumeCard.deleteResume')}</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -94,21 +95,21 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
               </Badge>
             ))}
             {resume.skills.length > 5 && (
-              <Badge variant="outline">+{resume.skills.length - 5} more</Badge>
+              <Badge variant="outline">+{resume.skills.length - 5} {tr('tokenize.more')}</Badge>
             )}
           </div>
         </div>
         
         {resume.achievements.length > 0 && (
           <div className="mt-4">
-            <h4 className="text-sm font-medium mb-1">Key Achievements</h4>
+            <h4 className="text-sm font-medium mb-1">{tr('tokenize.achievements')}</h4>
             <ul className="text-sm text-gray-700 list-disc list-inside">
               {resume.achievements.slice(0, 2).map((achievement, index) => (
                 <li key={index}>{achievement}</li>
               ))}
               {resume.achievements.length > 2 && (
                 <p className="text-sm text-gray-500 italic">
-                  +{resume.achievements.length - 2} more achievements
+                  +{resume.achievements.length - 2} {tr('resumeCard.moreAchievements')}
                 </p>
               )}
             </ul>
@@ -116,7 +117,7 @@ const ResumeCard: React.FC<ResumeCardProps> = ({ resume, onEdit, onDelete, onVie
         )}
         
         <div className="text-xs text-gray-500 mt-3">
-          Last updated: {resume.lastUpdated}
+          {tr('resumeCard.lastUpdated')} {resume.lastUpdated}
         </div>
       </CardContent>
     </Card>

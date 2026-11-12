@@ -3,6 +3,7 @@ import { Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useYatCategories } from '@/hooks/useYatCategories';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 interface CategoryPickerProps {
   selected: string[];
@@ -28,7 +29,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({ selected, onChange, max
     onChange(merged);
   };
 
-  if (loading) return <div className="text-xs text-muted-foreground">Loading…</div>;
+  if (loading) return <div className="text-xs text-muted-foreground">{tr('common.loading2')}</div>;
 
   const suggestionCats = suggestions
     .map((id) => categories.find((c) => c.id === id))
@@ -45,7 +46,7 @@ const CategoryPicker: React.FC<CategoryPickerProps> = ({ selected, onChange, max
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 text-xs font-medium text-primary">
               <Sparkles className="h-3.5 w-3.5" />
-              {t('categories.suggested') || 'Suggested for you'}
+              {t('categories.suggested') || tr('categories.suggested')}
             </div>
             <button
               type="button"

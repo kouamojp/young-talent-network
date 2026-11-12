@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { countries } from '@/data/countries';
 import { toast } from 'sonner';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const mediaCategories = [
   'Sport', 'IT', 'Esports', 'Science', 'Fashion', 'Medicine', 'Music', 'Dance', 'Hobbies', 'Cooking', 'Art', 'Finance',
@@ -157,7 +159,7 @@ const MusicList: React.FC<{ items: MediaItem[]; loading: boolean }> = ({ items, 
     if (!a) return;
     if (playingId === id) { a.pause(); setPlayingId(null); return; }
     Object.entries(audioRefs.current).forEach(([k, el]) => { if (k !== id && el) el.pause(); });
-    a.play().then(() => setPlayingId(id)).catch(() => toast.error('Lecture impossible'));
+    a.play().then(() => setPlayingId(id)).catch(() => toast.error(tr('common.playbackFailed')));
   };
 
   if (loading) return <div className="text-center py-12 text-muted-foreground text-sm">{t('media.loading')}</div>;
@@ -171,13 +173,13 @@ const MusicList: React.FC<{ items: MediaItem[]; loading: boolean }> = ({ items, 
           <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0"><Music className="h-5 w-5 text-primary" /></div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">{item.title}</p>
-            <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
+            <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString(localeTag())}</p>
             <audio
               ref={el => (audioRefs.current[item.id] = el)}
               src={item.url}
               preload="none"
               onEnded={() => setPlayingId(null)}
-              onError={() => { if (playingId === item.id) setPlayingId(null); toast.error('Audio indisponible'); }}
+              onError={() => { if (playingId === item.id) setPlayingId(null); toast.error(tr('media.audioUnavailable')); }}
               className="w-full mt-2"
               controls={playingId === item.id}
             />

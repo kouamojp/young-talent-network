@@ -13,6 +13,7 @@ import { PROFILE_PUBLIC_COLUMNS, fetchProfileAges } from '@/lib/profiles';
 import { useNavigate } from 'react-router-dom';
 import { countries } from '@/data/countries';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 type ProfileType = 'all' | 'talent' | 'agent' | 'organization' | 'recruiter' | 'mentor' | 'sponsor';
 
@@ -134,7 +135,7 @@ const AdvancedSearch: React.FC = () => {
 
       setResults(mapped);
     } catch (e: any) {
-      toast.error(e.message || 'Erreur de recherche');
+      toast.error(e.message || tr('advancedSearch.searchError'));
     } finally {
       setLoading(false);
     }
@@ -171,9 +172,9 @@ const AdvancedSearch: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Sparkles className="h-7 w-7 text-primary" />
-          Recherche avancée
+          {tr('common.advancedSearch')}
         </h1>
-        <p className="text-muted-foreground mt-1">Trouve les bons profils avec des filtres précis</p>
+        <p className="text-muted-foreground mt-1">{tr('advancedSearch.findTheRightProfilesWithPrecise')}</p>
       </div>
 
       <Card className="mb-6">
@@ -182,7 +183,7 @@ const AdvancedSearch: React.FC = () => {
             <div className="relative flex-1">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Nom, titre, mot-clé..."
+                placeholder={tr('advancedSearch.nameTitleKeyword')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -190,33 +191,33 @@ const AdvancedSearch: React.FC = () => {
               />
             </div>
             <Button onClick={handleSearch} disabled={loading}>
-              {loading ? 'Recherche...' : 'Rechercher'}
+              {loading ? 'Recherche...' : tr('common.search')}
             </Button>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <div>
-              <label className="text-xs font-medium mb-1 block">Type de profil</label>
+              <label className="text-xs font-medium mb-1 block">{tr('common.profileType')}</label>
               <Select value={profileType} onValueChange={(v) => setProfileType(v as ProfileType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="talent">Talent</SelectItem>
-                  <SelectItem value="agent">Agent</SelectItem>
-                  <SelectItem value="organization">Organisation</SelectItem>
-                  <SelectItem value="recruiter">Recruteur</SelectItem>
-                  <SelectItem value="mentor">Mentor</SelectItem>
-                  <SelectItem value="sponsor">Sponsor</SelectItem>
+                  <SelectItem value="all">{tr('events.all')}</SelectItem>
+                  <SelectItem value="talent">{tr('auth.talent')}</SelectItem>
+                  <SelectItem value="agent">{tr('profile.agent')}</SelectItem>
+                  <SelectItem value="organization">{tr('profile.organization')}</SelectItem>
+                  <SelectItem value="recruiter">{tr('advancedSearch.recruiter')}</SelectItem>
+                  <SelectItem value="mentor">{tr('advancedSearch.mentor')}</SelectItem>
+                  <SelectItem value="sponsor">{tr('advancedSearch.sponsor')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Pays</label>
+              <label className="text-xs font-medium mb-1 block">{tr('settings.country')}</label>
               <Select value={country} onValueChange={setCountry}>
-                <SelectTrigger><SelectValue placeholder="Tous" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={tr('events.all')} /></SelectTrigger>
                 <SelectContent className="max-h-60">
-                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="all">{tr('events.all')}</SelectItem>
                   {countries.map((c: any) => (
                     <SelectItem key={c.code || c.name} value={c.name}>{c.name}</SelectItem>
                   ))}
@@ -225,32 +226,32 @@ const AdvancedSearch: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Ville</label>
-              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ville" />
+              <label className="text-xs font-medium mb-1 block">{tr('settings.city')}</label>
+              <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder={tr('settings.city')} />
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Domaine</label>
-              <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="Ex: Football, Design..." />
+              <label className="text-xs font-medium mb-1 block">{tr('common.field')}</label>
+              <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder={tr('common.eGFootballDesign')} />
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Niveau</label>
+              <label className="text-xs font-medium mb-1 block">{tr('common.level')}</label>
               <Select value={level} onValueChange={setLevel}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="all">{tr('events.all')}</SelectItem>
                   {LEVELS.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Compétence</label>
+              <label className="text-xs font-medium mb-1 block">{tr('common.skill')}</label>
               <Input
                 value={skill}
                 onChange={(e) => setSkill(e.target.value)}
-                placeholder="Ex: React, Piano..."
+                placeholder={tr('advancedSearch.eGReactPiano')}
                 list="skills-list"
               />
               <datalist id="skills-list">
@@ -259,35 +260,35 @@ const AdvancedSearch: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Langue</label>
+              <label className="text-xs font-medium mb-1 block">{tr('common.language')}</label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes</SelectItem>
+                  <SelectItem value="all">{tr('events.allCategories')}</SelectItem>
                   {LANGUAGES.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Disponibilité</label>
+              <label className="text-xs font-medium mb-1 block">{tr('common.availability')}</label>
               <Select value={availability} onValueChange={setAvailability}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Toutes</SelectItem>
+                  <SelectItem value="all">{tr('events.allCategories')}</SelectItem>
                   {AVAILABILITY.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className="text-xs font-medium mb-1 block">Organisation</label>
-              <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="Nom de l'organisation" />
+              <label className="text-xs font-medium mb-1 block">{tr('profile.organization')}</label>
+              <Input value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder={tr('auth.orgName')} />
             </div>
 
             <div className="col-span-2">
               <label className="text-xs font-medium mb-1 block">
-                Âge : {ageRange[0]} - {ageRange[1]} ans
+                {tr('common.age')} {ageRange[0]} - {ageRange[1]} {tr('search.years')}
               </label>
               <Slider
                 value={ageRange}
@@ -303,16 +304,16 @@ const AdvancedSearch: React.FC = () => {
               <label className="flex items-center gap-2 cursor-pointer">
                 <Checkbox checked={verifiedOnly} onCheckedChange={(v) => setVerifiedOnly(!!v)} />
                 <span className="text-sm flex items-center gap-1">
-                  <BadgeCheck className="h-4 w-4 text-blue-500" /> Vérifiés uniquement
+                  <BadgeCheck className="h-4 w-4 text-blue-500" /> {tr('advancedSearch.verifiedOnly')}
                 </span>
               </label>
             </div>
           </div>
 
           <div className="flex justify-between items-center pt-2 border-t">
-            <Button variant="ghost" size="sm" onClick={resetFilters}>Réinitialiser</Button>
+            <Button variant="ghost" size="sm" onClick={resetFilters}>{tr('common.reset')}</Button>
             <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Filter className="h-3 w-3" /> {Object.values({ profileType, country, level, language, availability }).filter(v => v !== 'all').length + (city ? 1 : 0) + (domain ? 1 : 0) + (skill ? 1 : 0) + (organization ? 1 : 0) + (verifiedOnly ? 1 : 0)} filtres actifs
+              <Filter className="h-3 w-3" /> {Object.values({ profileType, country, level, language, availability }).filter(v => v !== 'all').length + (city ? 1 : 0) + (domain ? 1 : 0) + (skill ? 1 : 0) + (organization ? 1 : 0) + (verifiedOnly ? 1 : 0)} {tr('advancedSearch.activeFilters')}
             </span>
           </div>
         </CardContent>
@@ -320,7 +321,7 @@ const AdvancedSearch: React.FC = () => {
 
       {searched && (
         <div className="mb-4 text-sm text-muted-foreground">
-          {results.length} résultat{results.length !== 1 ? 's' : ''}
+          {results.length} {tr('common.result')}{results.length !== 1 ? 's' : ''}
         </div>
       )}
 
@@ -370,10 +371,10 @@ const AdvancedSearch: React.FC = () => {
 
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" className="flex-1" onClick={() => navigate(getProfileLink(r))}>
-                  <Eye className="h-3 w-3 mr-1" /> Profil
+                  <Eye className="h-3 w-3 mr-1" /> {tr('sidebar.profile')}
                 </Button>
                 <Button size="sm" className="flex-1" onClick={() => handleContact(r.id)}>
-                  <MessageSquare className="h-3 w-3 mr-1" /> Contacter
+                  <MessageSquare className="h-3 w-3 mr-1" /> {tr('marketplace.contact')}
                 </Button>
               </div>
             </CardContent>
@@ -383,7 +384,7 @@ const AdvancedSearch: React.FC = () => {
 
       {searched && !loading && results.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          Aucun résultat. Essaie d'élargir tes filtres.
+          {tr('advancedSearch.noResultsTryWideningYourFilters')}
         </div>
       )}
     </div>

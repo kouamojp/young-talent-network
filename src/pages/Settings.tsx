@@ -25,6 +25,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -81,11 +83,11 @@ const Settings: React.FC = () => {
     const { error } = await (supabase.rpc as any)('delete_own_account');
     if (error) {
       setDeleting(false);
-      toast({ title: 'Suppression impossible', description: error.message, variant: 'destructive' });
+      toast({ title: tr('common.couldNotDelete'), description: error.message, variant: 'destructive' });
       return;
     }
     await supabase.auth.signOut();
-    toast({ title: 'Compte supprimé', description: 'Votre compte et vos données ont été supprimés.' });
+    toast({ title: tr('common.accountDeleted'), description: tr('common.yourAccountAndYourDataHave') });
     navigate('/auth');
   };
 
@@ -102,10 +104,10 @@ const Settings: React.FC = () => {
         await Promise.all(keys.map((k) => caches.delete(k)));
       }
       try { localStorage.clear(); sessionStorage.clear(); } catch {}
-      toast({ title: 'Кэш очищен', description: 'Перезагружаем страницу...' });
+      toast({ title: tr('settings.cacheCleared'), description: tr('settings.reloadingThePage') });
       setTimeout(() => window.location.reload(), 600);
     } catch (e: any) {
-      toast({ title: 'Ошибка', description: e?.message || 'Не удалось очистить кэш', variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: e?.message || tr('settings.couldNotClearTheCache'), variant: 'destructive' });
       setClearing(false);
     }
   };
@@ -273,43 +275,43 @@ const Settings: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-3">
                     <Badge className="text-sm">{currentUser?.user_type}</Badge>
-                    <span className="text-sm text-muted-foreground">{t('common.memberSince')} {new Date(currentUser?.created_at).toLocaleDateString()}</span>
+                    <span className="text-sm text-muted-foreground">{t('common.memberSince')} {new Date(currentUser?.created_at).toLocaleDateString(localeTag())}</span>
                   </div>
                   {currentUser?.user_type === 'talent' && (
                     <div className="rounded-lg border border-border p-3 flex items-center justify-between gap-3 flex-wrap">
                       <div>
-                        <p className="text-sm font-medium">Стать агентом</p>
-                        <p className="text-xs text-muted-foreground">Управляйте талантами и контрактами. Обратное изменение невозможно.</p>
+                        <p className="text-sm font-medium">{tr('settings.becomeAnAgent')}</p>
+                        <p className="text-xs text-muted-foreground">{tr('settings.manageTalentsAndContractsThisChange')}</p>
                       </div>
                       <Button size="sm" onClick={async () => {
-                        if (!confirm('Сменить тип профиля на «Агент»? Это действие необратимо.')) return;
+                        if (!confirm(tr('settings.changeTheProfileTypeToAgent'))) return;
                         const { error } = await supabase.from('profiles').update({ user_type: 'agent' }).eq('id', currentUser.id);
-                        if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
-                        toast({ title: 'Готово', description: 'Профиль обновлён до Агента' });
+                        if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
+                        toast({ title: tr('settings.done'), description: tr('settings.profileUpgradedToAgent') });
                         setCurrentUser({ ...currentUser, user_type: 'agent' });
                         window.dispatchEvent(new CustomEvent('profile-updated', { detail: { user_type: 'agent' } }));
-                      }}>Стать агентом</Button>
+                      }}>{tr('settings.becomeAnAgent')}</Button>
                     </div>
                   )}
                   {currentUser?.user_type === 'agent' && (
                     <div className="rounded-lg border border-border p-3 flex items-center justify-between gap-3 flex-wrap">
                       <div>
-                        <p className="text-sm font-medium">Стать организацией</p>
-                        <p className="text-xs text-muted-foreground">Доступ к управлению организацией. Обратное изменение невозможно.</p>
+                        <p className="text-sm font-medium">{tr('settings.becomeAnOrganization')}</p>
+                        <p className="text-xs text-muted-foreground">{tr('settings.accessToOrganizationManagementThisChange')}</p>
                       </div>
                       <Button size="sm" onClick={async () => {
-                        if (!confirm('Сменить тип профиля на «Организация»? Это действие необратимо.')) return;
+                        if (!confirm(tr('settings.changeTheProfileTypeToOrganization'))) return;
                         const { error } = await supabase.from('profiles').update({ user_type: 'organization' }).eq('id', currentUser.id);
-                        if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
-                        toast({ title: 'Готово', description: 'Профиль обновлён до Организации. Заполните данные организации.' });
+                        if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
+                        toast({ title: tr('settings.done'), description: tr('settings.profileUpgradedToOrganizationFillIn') });
                         setCurrentUser({ ...currentUser, user_type: 'organization' });
                         window.dispatchEvent(new CustomEvent('profile-updated', { detail: { user_type: 'organization' } }));
                         setTimeout(() => navigate('/organizations'), 800);
-                      }}>Стать организацией</Button>
+                      }}>{tr('settings.becomeAnOrganization')}</Button>
                     </div>
                   )}
                   {currentUser?.user_type === 'organization' && (
-                    <p className="text-xs text-muted-foreground">Тип «Организация» — финальный уровень профиля.</p>
+                    <p className="text-xs text-muted-foreground">{tr('settings.organizationIsTheFinalProfileLevel')}</p>
                   )}
                 </CardContent>
               </Card>
@@ -317,16 +319,16 @@ const Settings: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <RefreshCw className="h-5 w-5 text-primary" /> Кэш приложения
+                    <RefreshCw className="h-5 w-5 text-primary" /> {tr('settings.appCache')}
                   </CardTitle>
                   <CardDescription>
-                    Разрегистрирует service workers и очищает кэш браузера. Полезно при странном поведении или устаревшем контенте.
+                    {tr('settings.unregistersServiceWorkersAndClearsThe')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Button variant="outline" className="gap-2" onClick={handleClearCache} disabled={clearing}>
                     {clearing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                    Очистить кэш
+                    {tr('settings.clearCache')}
                   </Button>
                 </CardContent>
               </Card>
@@ -341,21 +343,20 @@ const Settings: React.FC = () => {
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Supprimer définitivement votre compte ?</AlertDialogTitle>
+                          <AlertDialogTitle>{tr('settings.permanentlyDeleteYourAccount')}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Votre profil, vos publications, messages, médias et connexions seront supprimés. Cette action est irréversible.
-                            Tapez <strong>SUPPRIMER</strong> pour confirmer.
+                            {tr('settings.yourProfilePostsMessagesMediaAnd')} <strong>SUPPRIMER</strong> {tr('settings.toConfirm')}
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <Input id="delete-account-confirm" value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} placeholder="SUPPRIMER" autoComplete="off" />
                         <AlertDialogFooter>
-                          <AlertDialogCancel disabled={deleting}>Annuler</AlertDialogCancel>
+                          <AlertDialogCancel disabled={deleting}>{tr('common.cancel')}</AlertDialogCancel>
                           <AlertDialogAction
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             disabled={deleteConfirm !== 'SUPPRIMER' || deleting}
                             onClick={(e) => { e.preventDefault(); handleDeleteAccount(); }}
                           >
-                            {deleting ? 'Suppression…' : 'Supprimer mon compte'}
+                            {deleting ? tr('common.deleting') : tr('settings.deleteAccount')}
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

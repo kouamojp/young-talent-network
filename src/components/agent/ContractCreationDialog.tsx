@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from '@/hooks/use-toast';
 import { FileText, Search, UserPlus } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface TalentOption {
   id: string;
@@ -52,11 +53,11 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
 
   const handleSubmit = async () => {
     if (!selectedTalent) {
-      toast({ title: 'Erreur', description: 'Sélectionnez un talent', variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: tr('contractCreationDialog.selectATalent'), variant: 'destructive' });
       return;
     }
     if (!commissionRate || !durationMonths) {
-      toast({ title: 'Erreur', description: 'Remplissez tous les champs obligatoires', variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: tr('contractCreationDialog.fillInAllRequiredFields'), variant: 'destructive' });
       return;
     }
 
@@ -95,12 +96,12 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
       // Since notifications INSERT policy requires auth.uid() = user_id, we use an edge approach
       // For now, the contract in "pending" state acts as the invitation
 
-      toast({ title: 'Invitation envoyée', description: `Contrat proposé à ${selectedTalent.name}` });
+      toast({ title: tr('contractCreationDialog.invitationSent'), description: tr('contractCreationDialog.contractOfferedTo', { p0: selectedTalent.name }) });
       setOpen(false);
       resetForm();
       onContractCreated?.();
     } catch (err: any) {
-      toast({ title: 'Erreur', description: err.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: err.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -118,21 +119,21 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="gap-2">
-          <UserPlus className="h-4 w-4" /> Inviter un talent
+          <UserPlus className="h-4 w-4" /> {tr('contractCreationDialog.inviteATalent')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-primary" />
-            Créer un contrat
+            {tr('contractCreationDialog.createAContract')}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
           {/* Talent Search */}
           <div className="space-y-2">
-            <Label>Rechercher un talent *</Label>
+            <Label>{tr('contractCreationDialog.searchForATalent')}</Label>
             {selectedTalent ? (
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted">
                 <Avatar className="h-10 w-10">
@@ -143,14 +144,14 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
                   <p className="font-medium text-foreground">{selectedTalent.name}</p>
                   <p className="text-xs text-muted-foreground">{selectedTalent.sport_type}</p>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedTalent(null)}>Changer</Button>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedTalent(null)}>{tr('contractCreationDialog.change')}</Button>
               </div>
             ) : (
               <div className="space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Nom du talent..."
+                    placeholder={tr('contractCreationDialog.talentName')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9"
@@ -182,12 +183,12 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
 
           {/* Commission */}
           <div className="space-y-2">
-            <Label>Commission (%) *</Label>
+            <Label>{tr('contractCreationDialog.commission')}</Label>
             <Input
               type="number"
               min="0"
               max="100"
-              placeholder="Ex: 15"
+              placeholder={tr('contractCreationDialog.eG15')}
               value={commissionRate}
               onChange={(e) => setCommissionRate(e.target.value)}
             />
@@ -195,14 +196,14 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
 
           {/* Duration */}
           <div className="space-y-2">
-            <Label>Durée (mois) *</Label>
+            <Label>{tr('contractCreationDialog.durationMonths')}</Label>
             <Select value={durationMonths} onValueChange={setDurationMonths}>
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionner la durée" />
+                <SelectValue placeholder={tr('contractCreationDialog.selectTheDuration')} />
               </SelectTrigger>
               <SelectContent>
                 {[3, 6, 12, 18, 24, 36].map((m) => (
-                  <SelectItem key={m} value={m.toString()}>{m} mois</SelectItem>
+                  <SelectItem key={m} value={m.toString()}>{m} {tr('common.months')}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -210,9 +211,9 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
 
           {/* Terms */}
           <div className="space-y-2">
-            <Label>Conditions du contrat</Label>
+            <Label>{tr('contractCreationDialog.contractTerms')}</Label>
             <Textarea
-              placeholder="Décrivez les termes et conditions du partenariat..."
+              placeholder={tr('contractCreationDialog.describeTheTermsAndConditionsOf')}
               value={terms}
               onChange={(e) => setTerms(e.target.value)}
               rows={3}
@@ -220,7 +221,7 @@ const ContractCreationDialog: React.FC<ContractCreationDialogProps> = ({ agentId
           </div>
 
           <Button onClick={handleSubmit} disabled={loading} className="w-full">
-            {loading ? 'Envoi...' : 'Envoyer l\'invitation'}
+            {loading ? 'Envoi...' : tr('contractCreationDialog.sendInvitation')}
           </Button>
         </div>
       </DialogContent>

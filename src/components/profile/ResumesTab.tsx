@@ -10,6 +10,8 @@ import ResumeCard, { ResumeProps } from './ResumeCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface JobApplication {
   id: string;
@@ -93,7 +95,7 @@ const ResumesTab: React.FC = () => {
         experience: r.experience || '',
         achievements: r.achievements || [],
         isActive: !!(r.is_primary || r.is_public),
-        lastUpdated: r.updated_at ? new Date(r.updated_at).toLocaleDateString('fr-FR') : '',
+        lastUpdated: r.updated_at ? new Date(r.updated_at).toLocaleDateString(localeTag()) : '',
       }));
 
       const mappedApplications: JobApplication[] = ((applicationsRes.data || []) as unknown as ApplicationRow[]).map((a) => ({
@@ -101,9 +103,9 @@ const ResumesTab: React.FC = () => {
         position: a.job_postings?.title || 'Poste',
         organization: a.job_postings?.organization?.name || a.job_postings?.location || '—',
         status: a.status || 'Applied',
-        appliedDate: a.created_at ? new Date(a.created_at).toLocaleDateString('fr-FR') : '',
+        appliedDate: a.created_at ? new Date(a.created_at).toLocaleDateString(localeTag()) : '',
         deadline: a.job_postings?.application_deadline
-          ? new Date(a.job_postings.application_deadline).toLocaleDateString('fr-FR')
+          ? new Date(a.job_postings.application_deadline).toLocaleDateString(localeTag())
           : '—',
       }));
 
@@ -126,21 +128,21 @@ const ResumesTab: React.FC = () => {
   const handleDeleteResume = async (id: string) => {
     const { error } = await supabase.from('talent_resumes').delete().eq('id', id);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
       return;
     }
     setResumes(prev => prev.filter(resume => resume.id !== id));
-    toast({ title: 'CV supprimé' });
+    toast({ title: tr('resumesTab.cvDeleted') });
   };
 
   return (
     <TooltipProvider>
       <GlassMorphism className="p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold">My Career Profile</h3>
+          <h3 className="text-xl font-bold">{tr('resumesTab.myCareerProfile')}</h3>
           <Button onClick={handleNewResume} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Create New Resume
+            {tr('resumesTab.createNewResume')}
           </Button>
         </div>
 
@@ -153,11 +155,11 @@ const ResumesTab: React.FC = () => {
             <TabsList className="mb-6">
               <TabsTrigger value="resumes" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                My Resumes
+                {tr('resumesTab.myResumes')}
               </TabsTrigger>
               <TabsTrigger value="applications" className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
-                Job Applications
+                {tr('resumesTab.jobApplications')}
               </TabsTrigger>
             </TabsList>
 
@@ -177,12 +179,12 @@ const ResumesTab: React.FC = () => {
                   <Card className="col-span-full py-8 px-4">
                     <CardContent className="flex flex-col items-center text-center">
                       <FileText className="h-12 w-12 text-gray-400 mb-3" />
-                      <h3 className="text-xl font-bold mb-2">No Resumes Yet</h3>
+                      <h3 className="text-xl font-bold mb-2">{tr('resumesTab.noResumesYet')}</h3>
                       <p className="text-gray-600 mb-4">
-                        Create your first resume to showcase your talents and skills!
+                        {tr('resumesTab.createYourFirstResumeToShowcase')}
                       </p>
                       <Button onClick={handleNewResume}>
-                        Create Resume
+                        {tr('resumesTab.createResume')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -195,12 +197,12 @@ const ResumesTab: React.FC = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organization</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applied</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('resumesTab.position')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('profile.organization')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('admin.status')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('resumesTab.applied')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('resumesTab.deadline')}</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{tr('admin.actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -216,7 +218,7 @@ const ResumesTab: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{application.appliedDate}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{application.deadline}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Button variant="ghost" size="sm" onClick={() => navigate('/work')}>View</Button>
+                          <Button variant="ghost" size="sm" onClick={() => navigate('/work')}>{tr('common.view')}</Button>
                         </td>
                       </tr>
                     ))}
@@ -226,9 +228,9 @@ const ResumesTab: React.FC = () => {
                 {applications.length === 0 && (
                   <div className="py-8 px-4 text-center bg-white">
                     <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                    <h3 className="text-lg font-medium mb-2">No Job Applications</h3>
-                    <p className="text-gray-500 mb-4">You haven't applied to any jobs yet</p>
-                    <Button onClick={() => navigate('/work')}>Browse Job Openings</Button>
+                    <h3 className="text-lg font-medium mb-2">{tr('resumesTab.noJobApplications')}</h3>
+                    <p className="text-gray-500 mb-4">{tr('resumesTab.youHavenTAppliedToAny')}</p>
+                    <Button onClick={() => navigate('/work')}>{tr('resumesTab.browseJobOpenings')}</Button>
                   </div>
                 )}
               </div>

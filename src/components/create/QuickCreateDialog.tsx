@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus } from "lucide-react";
+import { tr } from '@/i18n';
 
 interface QuickCreateDialogProps {
   open: boolean;
@@ -60,8 +61,8 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
       }
 
       toast({
-        title: "Created successfully",
-        description: `Your ${type} has been created.`,
+        title: tr('quickCreateDialog.createdSuccessfully'),
+        description: tr('quickCreateDialog.yourHasBeenCreated', { p0: type }),
       });
       
       onOpenChange(false);
@@ -70,7 +71,7 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
       setCategory("");
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -85,21 +86,21 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
-            Create {type.charAt(0).toUpperCase() + type.slice(1)}
+            {tr('common.create')} {type.charAt(0).toUpperCase() + type.slice(1)}
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           {type !== 'post' && (
             <Input
-              placeholder="Title"
+              placeholder={tr('marketplace.title_field')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           )}
           
           <Textarea
-            placeholder={type === 'post' ? "What's on your mind?" : "Description"}
+            placeholder={type === 'post' ? tr('common.whatSOnYourMind') : tr('events.description')}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={4}
@@ -108,19 +109,19 @@ export const QuickCreateDialog = ({ open, onOpenChange, type }: QuickCreateDialo
           {type === 'page' && (
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder={tr('quickCreateDialog.selectCategory')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="work">Work</SelectItem>
-                <SelectItem value="learning">Learning</SelectItem>
-                <SelectItem value="events">Events</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="work">{tr('talent.work')}</SelectItem>
+                <SelectItem value="learning">{tr('talent.learning')}</SelectItem>
+                <SelectItem value="events">{tr('landing.events')}</SelectItem>
+                <SelectItem value="other">{tr('profile.other')}</SelectItem>
               </SelectContent>
             </Select>
           )}
 
           <Button onClick={handleCreate} disabled={loading} className="w-full">
-            {loading ? "Creating..." : "Create"}
+            {loading ? "Creating..." : tr('common.create')}
           </Button>
         </div>
       </DialogContent>

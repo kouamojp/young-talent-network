@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Palette } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 const PRESETS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -42,11 +43,11 @@ export const CardBackgroundPicker: React.FC<Props> = ({ userId, currentBackgroun
       .update({ card_background: bg })
       .eq('user_id', userId);
     if (error) {
-      toast.error('Failed to update card background');
+      toast.error(tr('cardBackgroundPicker.failedToUpdateCardBackground'));
     } else {
       setSelected(bg);
       onUpdate(bg);
-      toast.success('Card background updated!');
+      toast.success(tr('cardBackgroundPicker.cardBackgroundUpdated'));
     }
     setSaving(false);
   };
@@ -56,14 +57,14 @@ export const CardBackgroundPicker: React.FC<Props> = ({ userId, currentBackgroun
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Palette className="h-5 w-5" />
-          Profile Card Background
+          {tr('cardBackgroundPicker.profileCardBackground')}
         </CardTitle>
-        <CardDescription>Choose a background for your public profile card</CardDescription>
+        <CardDescription>{tr('cardBackgroundPicker.chooseABackgroundForYourPublic')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Preview */}
         <div className="rounded-xl p-6 text-white text-center font-semibold shadow-lg" style={{ background: selected }}>
-          Your Profile Card Preview
+          {tr('cardBackgroundPicker.yourProfileCardPreview')}
         </div>
 
         {/* Presets */}
@@ -81,7 +82,7 @@ export const CardBackgroundPicker: React.FC<Props> = ({ userId, currentBackgroun
         {/* Custom */}
         <div className="flex gap-2">
           <Input
-            placeholder="Custom CSS: #hex or linear-gradient(...)"
+            placeholder={tr('cardBackgroundPicker.customCssHexOrLinearGradient')}
             value={custom}
             onChange={(e) => setCustom(e.target.value)}
             className="flex-1"
@@ -91,7 +92,7 @@ export const CardBackgroundPicker: React.FC<Props> = ({ userId, currentBackgroun
             disabled={!custom || saving}
             onClick={() => handleSave(custom)}
           >
-            Apply
+            {tr('work.apply')}
           </Button>
         </div>
       </CardContent>

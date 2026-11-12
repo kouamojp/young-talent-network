@@ -17,6 +17,8 @@ import TranslatableText from '@/components/TranslatableText';
 import { useSearchParams } from 'react-router-dom';
 import { useBlocks } from '@/hooks/useBlocks';
 import { Ban } from 'lucide-react';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const Messages: React.FC = () => {
   const { t } = useLanguage();
@@ -42,7 +44,7 @@ const Messages: React.FC = () => {
 
   const handleCall = (video: boolean) => {
     if (!activeConversation || activeConversation.is_group) {
-      toast({ title: 'Les appels de groupe ne sont pas encore disponibles', variant: 'destructive' });
+      toast({ title: tr('messages.groupCallsAreNotAvailableYet'), variant: 'destructive' });
       return;
     }
     const p = activeConversation.participants[0];
@@ -108,7 +110,7 @@ const Messages: React.FC = () => {
 
   const handleCreateGroup = async () => {
     if (!groupName.trim() || selectedUsers.length < 2) {
-      toast({ title: 'Nom et 2+ membres requis', variant: 'destructive' });
+      toast({ title: tr('messages.nameAnd2MembersRequired'), variant: 'destructive' });
       return;
     }
     const convId = await createGroupConversation(groupName.trim(), selectedUsers);
@@ -133,7 +135,7 @@ const Messages: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file || !currentUserId || !activeConversationId) return;
     if (file.size > 20 * 1024 * 1024) {
-      toast({ title: 'Fichier trop volumineux (max 20MB)', variant: 'destructive' });
+      toast({ title: tr('messages.fileTooLargeMax20mb'), variant: 'destructive' });
       return;
     }
     setUploading(true);
@@ -146,7 +148,7 @@ const Messages: React.FC = () => {
       const mediaType = file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : file.type.startsWith('audio/') ? 'audio' : 'file';
       await sendMessage(activeConversationId, file.name, { media_url: publicUrl, media_type: mediaType });
     } catch (err: any) {
-      toast({ title: "Erreur d'upload", description: err?.message, variant: 'destructive' });
+      toast({ title: tr('messages.uploadError'), description: err?.message, variant: 'destructive' });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -160,7 +162,7 @@ const Messages: React.FC = () => {
       media_type: forwardMessage.media_type || undefined,
       forwarded_from_id: forwardMessage.id,
     });
-    toast({ title: 'Message transféré' });
+    toast({ title: tr('messages.messageForwarded') });
     setForwardMessage(null);
   };
 
@@ -206,14 +208,14 @@ const Messages: React.FC = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{groupMode ? 'Nouveau groupe' : t('messages.newConversation')}</DialogTitle>
+                <DialogTitle>{groupMode ? tr('messages.newGroup') : t('messages.newConversation')}</DialogTitle>
               </DialogHeader>
               <div className="flex gap-2 mb-3">
-                <Button size="sm" variant={!groupMode ? 'default' : 'outline'} onClick={() => setGroupMode(false)}>Direct</Button>
-                <Button size="sm" variant={groupMode ? 'default' : 'outline'} onClick={() => setGroupMode(true)}><Users className="h-4 w-4 mr-1" /> Groupe</Button>
+                <Button size="sm" variant={!groupMode ? 'default' : 'outline'} onClick={() => setGroupMode(false)}>{tr('create.live')}</Button>
+                <Button size="sm" variant={groupMode ? 'default' : 'outline'} onClick={() => setGroupMode(true)}><Users className="h-4 w-4 mr-1" /> {tr('messages.group')}</Button>
               </div>
               {groupMode && (
-                <Input placeholder="Nom du groupe" value={groupName} onChange={e => setGroupName(e.target.value)} className="mb-2" />
+                <Input placeholder={tr('messages.groupName')} value={groupName} onChange={e => setGroupName(e.target.value)} className="mb-2" />
               )}
               <Input placeholder={t('admin.searchUsers')} value={userSearch} onChange={e => setUserSearch(e.target.value)} className="mb-3" />
               <ScrollArea className="h-64">
@@ -235,7 +237,7 @@ const Messages: React.FC = () => {
               </ScrollArea>
               {groupMode && (
                 <Button onClick={handleCreateGroup} className="w-full mt-3" disabled={!groupName.trim() || selectedUsers.length < 2}>
-                  Créer le groupe ({selectedUsers.length})
+                  {tr('messages.createGroup')}{selectedUsers.length})
                 </Button>
               )}
             </DialogContent>
@@ -276,7 +278,7 @@ const Messages: React.FC = () => {
                       {conversation.is_group && <Users className="h-3 w-3" />}
                       {display.name}
                     </h3>
-                    <span className="text-[10px] text-muted-foreground">{lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                    <span className="text-[10px] text-muted-foreground">{lastMessage ? new Date(lastMessage.created_at).toLocaleTimeString(localeTag(), { hour: '2-digit', minute: '2-digit' }) : ''}</span>
                   </div>
                   <p className={`text-xs truncate ${unreadCount > 0 ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
                     {lastMessage?.media_url ? '📎 ' : ''}{lastMessage?.content || t('messages.noMessages')}
@@ -295,7 +297,7 @@ const Messages: React.FC = () => {
     if (m.media_type === 'image') return <img src={m.media_url} alt="" className="rounded-lg max-w-full max-h-64 mt-1" />;
     if (m.media_type === 'video') return <video src={m.media_url} controls className="rounded-lg max-w-full max-h-64 mt-1" />;
     if (m.media_type === 'audio') return <audio src={m.media_url} controls className="mt-1 w-full" />;
-    return <a href={m.media_url} target="_blank" rel="noreferrer" className="block underline mt-1 text-xs">📎 {m.content || 'Fichier'}</a>;
+    return <a href={m.media_url} target="_blank" rel="noreferrer" className="block underline mt-1 text-xs">📎 {m.content || tr('messages.file')}</a>;
   };
 
   const chatView = (
@@ -315,7 +317,7 @@ const Messages: React.FC = () => {
                   {getConvDisplay(activeConversation).name}
                 </h3>
                 <p className="text-[10px] text-muted-foreground">
-                  {activeConversation.is_group ? `${activeConversation.participants.length + 1} membres` : t('messages.activeNow')}
+                  {activeConversation.is_group ? tr('messages.members', { p0: activeConversation.participants.length + 1 }) : t('messages.activeNow')}
                 </p>
               </div>
             </div>
@@ -325,7 +327,7 @@ const Messages: React.FC = () => {
               {!activeConversation.is_group && activeConversation.participants[0] ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label="Plus d'options"><MoreVertical className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" aria-label={tr('messages.moreOptions')}><MoreVertical className="h-4 w-4" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {(() => {
@@ -333,18 +335,18 @@ const Messages: React.FC = () => {
                       const otherName = other.profiles?.name;
                       return isBlocked(other.user_id) ? (
                         <DropdownMenuItem onClick={() => unblock(other.user_id, otherName)}>
-                          <Ban className="h-4 w-4 mr-2" /> Débloquer {otherName}
+                          <Ban className="h-4 w-4 mr-2" /> {tr('common.unblock')} {otherName}
                         </DropdownMenuItem>
                       ) : (
                         <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => block(other.user_id, otherName)}>
-                          <Ban className="h-4 w-4 mr-2" /> Bloquer {otherName}
+                          <Ban className="h-4 w-4 mr-2" /> {tr('common.block')} {otherName}
                         </DropdownMenuItem>
                       );
                     })()}
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button variant="ghost" size="icon" disabled aria-label="Plus d'options"><MoreVertical className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" disabled aria-label={tr('messages.moreOptions')}><MoreVertical className="h-4 w-4" /></Button>
               )}
             </div>
           </div>
@@ -359,13 +361,13 @@ const Messages: React.FC = () => {
                 return (
                   <div key={message.id} className={`flex group ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${bubbleColor} ${isOwn ? 'rounded-br-md' : 'rounded-bl-md'} ${message.pending ? 'opacity-70' : ''}`}>
-                      {message.forwarded_from_id && <p className="text-[10px] italic opacity-70 mb-1">↪ Transféré</p>}
+                      {message.forwarded_from_id && <p className="text-[10px] italic opacity-70 mb-1">{tr('messages.forwarded')}</p>}
                       {message.content && (
                         <TranslatableText text={message.content} className="text-sm whitespace-pre-wrap break-words" />
                       )}
                       {renderMedia(message)}
                       <div className="flex items-center justify-between gap-2 mt-1">
-                        <span className="text-[10px] opacity-70">{new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="text-[10px] opacity-70">{new Date(message.created_at).toLocaleTimeString(localeTag(), { hour: '2-digit', minute: '2-digit' })}</span>
                         <div className="flex items-center gap-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -373,12 +375,12 @@ const Messages: React.FC = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                               <DropdownMenuItem onClick={() => setForwardMessage(message)}>
-                                <Forward className="h-4 w-4 mr-2" /> Transférer
+                                <Forward className="h-4 w-4 mr-2" /> {tr('messages.forward')}
                               </DropdownMenuItem>
                               {!isOwn && (
                                 <DropdownMenuItem onClick={() => toggleMessageRead(message.id, !message.read)}>
                                   {message.read ? <Check className="h-4 w-4 mr-2" /> : <CheckCheck className="h-4 w-4 mr-2" />}
-                                  Marquer comme {message.read ? 'non lu' : 'lu'}
+                                  {tr('messages.markAs')} {message.read ? tr('messages.unread') : 'lu'}
                                 </DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
@@ -422,7 +424,7 @@ const Messages: React.FC = () => {
 
       <Dialog open={!!forwardMessage} onOpenChange={(o) => !o && setForwardMessage(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Transférer vers...</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('messages.forwardTo')}</DialogTitle></DialogHeader>
           <ScrollArea className="h-72">
             {conversations.filter(c => c.id !== activeConversationId).map(conv => {
               const d = getConvDisplay(conv);

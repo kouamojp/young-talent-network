@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { Search, Loader2, ExternalLink, Plus, Send } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface Suggestion {
   platform: string;
@@ -40,18 +41,18 @@ export const SearchSelfOnlineDialog: React.FC<Props> = ({ userId, defaultName = 
   const [publishingFeed, setPublishingFeed] = useState(false);
 
   const L = {
-    title: { en: 'Find me online', fr: 'Me trouver en ligne', ru: 'Найти меня в интернете' },
-    desc: { en: 'AI will suggest where you may have public profiles. Choose which to add as a source or publish to your feed.', fr: 'L\'IA suggère où vous avez des profils publics. Choisissez où ajouter ou publier.', ru: 'ИИ предложит, где у вас могут быть публичные профили. Выберите, что добавить или опубликовать.' },
-    search: { en: 'Search', fr: 'Rechercher', ru: 'Искать' },
-    nameLabel: { en: 'Full name', fr: 'Nom complet', ru: 'Полное имя' },
-    cityLabel: { en: 'City (optional)', fr: 'Ville (optionnel)', ru: 'Город (необязательно)' },
-    sportLabel: { en: 'Specialty (optional)', fr: 'Spécialité (optionnel)', ru: 'Специальность (необязательно)' },
-    addSources: { en: 'Add as profile sources', fr: 'Ajouter comme sources', ru: 'Добавить как источники' },
-    publishFeed: { en: 'Publish to feed', fr: 'Publier dans le fil', ru: 'Опубликовать в ленте' },
-    noResults: { en: 'No suggestions yet — click Search', fr: 'Aucune suggestion — cliquez Rechercher', ru: 'Нет результатов — нажмите Искать' },
-    selectAtLeast: { en: 'Select at least one', fr: 'Sélectionnez au moins un', ru: 'Выберите хотя бы один' },
-    added: { en: 'Added', fr: 'Ajouté', ru: 'Добавлено' },
-    published: { en: 'Published', fr: 'Publié', ru: 'Опубликовано' },
+    title: { en: tr('searchSelfOnlineDialog.findMeOnline'), fr: tr('searchSelfOnlineDialog.findMeOnline2'), ru: tr('searchSelfOnlineDialog.findMeOnline3') },
+    desc: { en: 'AI will suggest where you may have public profiles. Choose which to add as a source or publish to your feed.', fr: tr('searchSelfOnlineDialog.aiSuggestsWhereYouHavePublic'), ru: tr('searchSelfOnlineDialog.aiSuggestsWhereYouHavePublic2') },
+    search: { en: 'Search', fr: 'Rechercher', ru: tr('orgs.search') },
+    nameLabel: { en: 'Full name', fr: 'Nom complet', ru: tr('auth.fullName') },
+    cityLabel: { en: 'City (optional)', fr: 'Ville (optionnel)', ru: tr('searchSelfOnlineDialog.cityOptional') },
+    sportLabel: { en: 'Specialty (optional)', fr: tr('searchSelfOnlineDialog.specialtyOptional'), ru: tr('searchSelfOnlineDialog.specialtyOptional2') },
+    addSources: { en: tr('searchSelfOnlineDialog.addAsProfileSources'), fr: tr('searchSelfOnlineDialog.addAsProfileSources2'), ru: tr('searchSelfOnlineDialog.addAsProfileSources3') },
+    publishFeed: { en: tr('searchSelfOnlineDialog.publishToFeed'), fr: tr('sportProfileEditor.postToFeed'), ru: tr('searchSelfOnlineDialog.publishToFeed2') },
+    noResults: { en: tr('searchSelfOnlineDialog.noSuggestionsYetClickSearch'), fr: 'Aucune suggestion — cliquez Rechercher', ru: tr('searchSelfOnlineDialog.noSuggestionsYetClickSearch2') },
+    selectAtLeast: { en: tr('searchSelfOnlineDialog.selectAtLeastOne'), fr: tr('searchSelfOnlineDialog.selectAtLeastOne2'), ru: tr('searchSelfOnlineDialog.selectAtLeastOne3') },
+    added: { en: 'Added', fr: tr('searchSelfOnlineDialog.added'), ru: tr('searchSelfOnlineDialog.added2') },
+    published: { en: 'Published', fr: tr('common.published'), ru: tr('common.published') },
   };
   const t = (k: keyof typeof L) => L[k][lang] || L[k].en;
 
@@ -67,7 +68,7 @@ export const SearchSelfOnlineDialog: React.FC<Props> = ({ userId, defaultName = 
       if (error) throw error;
       setSuggestions(data?.suggestions || []);
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: e.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -100,7 +101,7 @@ export const SearchSelfOnlineDialog: React.FC<Props> = ({ userId, defaultName = 
       onAdded?.();
       setOpen(false);
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: e.message, variant: 'destructive' });
     } finally {
       setAddingAsSource(false);
     }
@@ -123,7 +124,7 @@ export const SearchSelfOnlineDialog: React.FC<Props> = ({ userId, defaultName = 
       toast({ title: t('published') });
       setOpen(false);
     } catch (e: any) {
-      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: e.message, variant: 'destructive' });
     } finally {
       setPublishingFeed(false);
     }

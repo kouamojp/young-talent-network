@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Edit, Share2 } from 'lucide-react';
 import ShareMenu from '@/components/share/ShareMenu';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 interface ProfileHeaderProps {
   user: {
@@ -40,7 +41,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="h-48 sm:h-72 md:h-96 overflow-hidden">
           <img 
             src={user.coverPhoto} 
-            alt="Cover" 
+            alt={tr('profileHeader.cover')} 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -62,10 +63,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       
       <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
         <div className="flex gap-2">
-          <ShareMenu url={`${window.location.origin}/profile`} title={`${user.name} sur YAT`}>
+          <ShareMenu url={`${window.location.origin}/profile`} title={tr('profileHeader.onYat', { p0: user.name })}>
             <Button variant="outline" className="text-[#1877F2]">
               <Share2 className="mr-2 h-4 w-4" />
-              Partager le profil
+              {tr('profileHeader.shareProfile')}
             </Button>
           </ShareMenu>
         </div>
@@ -74,7 +75,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         {!isEditMode && (
           <Button variant="outline" onClick={() => setIsEditMode(true)}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit Profile
+            {tr('profileHeader.editProfile')}
           </Button>
         )}
       </div>

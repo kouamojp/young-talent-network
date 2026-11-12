@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface MarketplaceListing {
   id: string;
@@ -105,7 +106,7 @@ const Marketplace: React.FC = () => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (mediaFiles.length + files.length > 10) {
-      toast.error('Maximum 10 files allowed');
+      toast.error(tr('marketplace.maximum10FilesAllowed'));
       return;
     }
     const newFiles = [...mediaFiles, ...files];
@@ -134,12 +135,12 @@ const Marketplace: React.FC = () => {
   const isImage = (file: File) => file.type.startsWith('image/');
 
   const handlePublish = async () => {
-    if (!formTitle.trim()) { toast.error('Title is required'); return; }
+    if (!formTitle.trim()) { toast.error(tr('marketplace.titleIsRequired')); return; }
 
     setPublishing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('Please sign in'); setPublishing(false); return; }
+      if (!user) { toast.error(tr('auth.signInRequired')); setPublishing(false); return; }
 
       // Upload files
       const uploadedUrls: string[] = [];
@@ -172,12 +173,12 @@ const Marketplace: React.FC = () => {
 
       if (error) throw error;
 
-      toast.success('Listing published!');
+      toast.success(tr('marketplace.listingPublished'));
       setDialogOpen(false);
       resetForm();
       fetchListings();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to publish');
+      toast.error(err.message || tr('common.failedToPublish'));
     } finally {
       setPublishing(false);
     }
@@ -238,7 +239,7 @@ const Marketplace: React.FC = () => {
                   {/* Media Upload */}
                   <div>
                     <Label className="flex items-center gap-2 mb-2">
-                      <Upload className="h-4 w-4" /> Медиа файлы (фото, видео, документы)
+                      <Upload className="h-4 w-4" /> {tr('marketplace.mediaFilesPhotosVideosDocuments')}
                     </Label>
                     <input
                       ref={fileInputRef}
@@ -254,10 +255,10 @@ const Marketplace: React.FC = () => {
                     >
                       <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="text-sm text-muted-foreground">
-                        Нажмите для загрузки или перетащите файлы
+                        {tr('marketplace.clickToUploadOrDragFiles')}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Фото, видео, PDF · до 10 файлов
+                        {tr('marketplace.photosVideosPdfUpTo10')}
                       </p>
                     </div>
 
@@ -284,7 +285,7 @@ const Marketplace: React.FC = () => {
                             </button>
                             <div className="absolute bottom-1 left-1 bg-black/60 text-white rounded px-1.5 py-0.5 text-[10px] flex items-center gap-1">
                               {getFileIcon(file)}
-                              {(file.size / 1024 / 1024).toFixed(1)} MB
+                              {(file.size / 1024 / 1024).toFixed(1)} {tr('marketplace.mb')}
                             </div>
                           </div>
                         ))}
@@ -297,8 +298,8 @@ const Marketplace: React.FC = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div><Label>{t('marketplace.price')}</Label><Input type="number" value={formPrice} onChange={e => setFormPrice(e.target.value)} placeholder="0" /></div>
                     <div>
-                      <Label>Prix initial (optionnel)</Label>
-                      <Input type="number" value={formOriginalPrice} onChange={e => setFormOriginalPrice(e.target.value)} placeholder="Pour afficher remise" />
+                      <Label>{tr('marketplace.originalPriceOptional')}</Label>
+                      <Input type="number" value={formOriginalPrice} onChange={e => setFormOriginalPrice(e.target.value)} placeholder={tr('marketplace.toShowADiscount')} />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -313,13 +314,13 @@ const Marketplace: React.FC = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label>Stock</Label>
+                      <Label>{tr('marketplace.stock')}</Label>
                       <Select value={formStockStatus} onValueChange={setFormStockStatus}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="in_stock">En stock</SelectItem>
-                          <SelectItem value="low_stock">Stock limité</SelectItem>
-                          <SelectItem value="out_of_stock">Rupture de stock</SelectItem>
+                          <SelectItem value="in_stock">{tr('marketplace.inStock')}</SelectItem>
+                          <SelectItem value="low_stock">{tr('marketplace.limitedStock')}</SelectItem>
+                          <SelectItem value="out_of_stock">{tr('marketplace.outOfStock')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -335,24 +336,24 @@ const Marketplace: React.FC = () => {
                       </Select>
                     </div>
                     <div>
-                      <Label>État</Label>
+                      <Label>{tr('marketplace.condition')}</Label>
                       <Select value={formCondition} onValueChange={setFormCondition}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="new">Neuf</SelectItem>
-                          <SelectItem value="like_new">Comme neuf</SelectItem>
-                          <SelectItem value="used">Occasion</SelectItem>
-                          <SelectItem value="refurbished">Reconditionné</SelectItem>
+                          <SelectItem value="new">{tr('marketplace.new')}</SelectItem>
+                          <SelectItem value="like_new">{tr('marketplace.likeNew')}</SelectItem>
+                          <SelectItem value="used">{tr('marketplace.used')}</SelectItem>
+                          <SelectItem value="refurbished">{tr('marketplace.refurbished')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   <div>
-                    <Label>Localisation</Label>
-                    <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder="Paris, France" />
+                    <Label>{tr('location.label')}</Label>
+                    <Input value={formLocation} onChange={e => setFormLocation(e.target.value)} placeholder={tr('marketplace.parisFrance')} />
                   </div>
                   <Button className="w-full" onClick={handlePublish} disabled={publishing}>
-                    {publishing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Публикация...</> : t('marketplace.publish')}
+                    {publishing ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> {tr('marketplace.publishing')}</> : t('marketplace.publish')}
                   </Button>
                 </div>
               </DialogContent>
@@ -384,7 +385,7 @@ const Marketplace: React.FC = () => {
       {/* Featured Categories (Nengoo-inspired) */}
       <div className="px-4 py-4 max-w-5xl mx-auto">
         <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-          <Tag className="h-4 w-4 text-primary" /> Catégories populaires
+          <Tag className="h-4 w-4 text-primary" /> {tr('categories.top')}
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
           {FEATURED_CATEGORIES.map(cat => {
@@ -426,9 +427,9 @@ const Marketplace: React.FC = () => {
                     stock === 'low_stock' ? 'bg-amber-500 text-white' :
                     'bg-destructive text-destructive-foreground'
                   }`}>
-                    {stock === 'in_stock' ? <><CheckCircle2 className="h-2.5 w-2.5" /> En stock</> :
-                     stock === 'low_stock' ? <><Package className="h-2.5 w-2.5" /> Stock limité</> :
-                     <><XCircle className="h-2.5 w-2.5" /> Rupture</>}
+                    {stock === 'in_stock' ? <><CheckCircle2 className="h-2.5 w-2.5" /> {tr('marketplace.inStock')}</> :
+                     stock === 'low_stock' ? <><Package className="h-2.5 w-2.5" /> {tr('marketplace.limitedStock')}</> :
+                     <><XCircle className="h-2.5 w-2.5" /> {tr('marketplace.soldOut')}</>}
                   </div>
                   {/* Discount badge top-right */}
                   {discount > 0 && (
@@ -474,7 +475,7 @@ const Marketplace: React.FC = () => {
                           <img src={item.profiles.avatar_url} alt="" className="h-full w-full object-cover" />
                         ) : (item.profiles?.name?.charAt(0) || 'U')}
                       </div>
-                      <span className="text-xs text-muted-foreground group-hover/author:text-primary">{item.profiles?.name || 'User'}</span>
+                      <span className="text-xs text-muted-foreground group-hover/author:text-primary">{item.profiles?.name || tr('admin.user')}</span>
                     </Link>
                     <Link to={`/messages?to=${item.user_id}`}>
                       <Button size="sm" variant="outline" className="h-7 text-xs gap-1" disabled={stock === 'out_of_stock'}>

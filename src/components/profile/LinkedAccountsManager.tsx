@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/use-toast';
 import { Link2, Loader2, RefreshCw, Trash2, UserPlus, Check, X } from 'lucide-react';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 type Status = 'pending' | 'accepted' | 'rejected';
 interface LinkRow {
@@ -22,15 +24,15 @@ interface LinkRow {
 interface ProfileLite { id: string; name: string; email: string; avatar_url: string | null; user_type: string }
 
 const ALL_FIELDS = [
-  { key: 'name', label: 'Имя' },
-  { key: 'avatar_url', label: 'Аватар' },
-  { key: 'bio', label: 'Био' },
-  { key: 'city', label: 'Город' },
-  { key: 'country', label: 'Страна' },
-  { key: 'phone', label: 'Телефон' },
-  { key: 'website', label: 'Сайт' },
-  { key: 'cover_photo_url', label: 'Обложка' },
-  { key: 'sport_type', label: 'Спорт' },
+  { key: 'name', label: tr('admin.name') },
+  { key: 'avatar_url', label: tr('linkedAccountsManager.avatar') },
+  { key: 'bio', label: tr('linkedAccountsManager.bio') },
+  { key: 'city', label: tr('settings.city') },
+  { key: 'country', label: tr('settings.country') },
+  { key: 'phone', label: tr('settings.phone') },
+  { key: 'website', label: tr('settings.website') },
+  { key: 'cover_photo_url', label: tr('linkedAccountsManager.cover') },
+  { key: 'sport_type', label: tr('landing.sport') },
 ];
 
 export const LinkedAccountsManager: React.FC = () => {
@@ -83,7 +85,7 @@ export const LinkedAccountsManager: React.FC = () => {
   const handleInvite = async (linkedId: string) => {
     if (!me) return;
     if (ownedLinks.length >= 3) {
-      toast({ title: 'Лимит', description: 'Максимум 3 связанных аккаунта', variant: 'destructive' });
+      toast({ title: tr('linkedAccountsManager.limit'), description: tr('linkedAccountsManager.maximum3LinkedAccounts'), variant: 'destructive' });
       return;
     }
     setBusyId(linkedId);
@@ -92,10 +94,10 @@ export const LinkedAccountsManager: React.FC = () => {
     });
     setBusyId(null);
     if (error) {
-      toast({ title: 'Ошибка', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: 'Приглашение отправлено' });
+    toast({ title: tr('linkedAccountsManager.invitationSent') });
     setSearchResults([]); setQuery('');
     load();
   };
@@ -104,17 +106,17 @@ export const LinkedAccountsManager: React.FC = () => {
     setBusyId(id);
     const { error } = await supabase.from('account_links').update({ status }).eq('id', id);
     setBusyId(null);
-    if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: status === 'accepted' ? 'Связь принята' : 'Отклонено' });
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: status === 'accepted' ? tr('linkedAccountsManager.linkAccepted') : tr('linkedAccountsManager.declined') });
     load();
   };
 
   const handleRemove = async (id: string) => {
-    if (!confirm('Удалить связь?')) return;
+    if (!confirm(tr('linkedAccountsManager.removeTheLink'))) return;
     setBusyId(id);
     const { error } = await supabase.from('account_links').delete().eq('id', id);
     setBusyId(null);
-    if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     load();
   };
 
@@ -123,7 +125,7 @@ export const LinkedAccountsManager: React.FC = () => {
       ? link.sync_fields.filter(f => f !== field)
       : [...link.sync_fields, field];
     const { error } = await supabase.from('account_links').update({ sync_fields: next }).eq('id', link.id);
-    if (error) { toast({ title: 'Ошибка', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setLinks(prev => prev.map(l => l.id === link.id ? { ...l, sync_fields: next } : l));
   };
 
@@ -131,8 +133,8 @@ export const LinkedAccountsManager: React.FC = () => {
     setBusyId(id);
     const { error } = await supabase.rpc('sync_linked_account', { _link_id: id });
     setBusyId(null);
-    if (error) { toast({ title: 'Ошибка синхронизации', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: 'Синхронизировано' });
+    if (error) { toast({ title: tr('common.syncError'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: tr('linkedAccountsManager.synced') });
     load();
     window.dispatchEvent(new CustomEvent('profile-updated'));
   };
@@ -145,23 +147,23 @@ export const LinkedAccountsManager: React.FC = () => {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Link2 className="h-5 w-5 text-primary" /> Связанные аккаунты
+          <Link2 className="h-5 w-5 text-primary" /> {tr('linkedAccountsManager.linkedAccounts')}
           <Badge variant="outline" className="ml-2 text-xs">{ownedLinks.length}/3</Badge>
         </CardTitle>
         <CardDescription>
-          Свяжите до 3 аккаунтов и синхронизируйте выбранные поля профиля между ними.
+          {tr('linkedAccountsManager.linkUpTo3AccountsAnd')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Add new */}
         {ownedLinks.length < 3 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> Найти аккаунт</p>
+            <p className="text-sm font-medium flex items-center gap-1.5"><UserPlus className="h-4 w-4" /> {tr('linkedAccountsManager.findAnAccount')}</p>
             <div className="flex gap-2">
-              <Input placeholder="Email или имя" value={query} onChange={e => setQuery(e.target.value)}
+              <Input placeholder={tr('linkedAccountsManager.emailOrName')} value={query} onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()} />
               <Button onClick={handleSearch} disabled={searching || !query.trim()}>
-                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Найти'}
+                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : tr('search.find')}
               </Button>
             </div>
             {searchResults.length > 0 && (
@@ -176,7 +178,7 @@ export const LinkedAccountsManager: React.FC = () => {
                       </div>
                     </div>
                     <Button size="sm" onClick={() => handleInvite(p.id)} disabled={busyId === p.id}>
-                      Пригласить
+                      {tr('linkedAccountsManager.invite')}
                     </Button>
                   </div>
                 ))}
@@ -188,7 +190,7 @@ export const LinkedAccountsManager: React.FC = () => {
         {/* Incoming */}
         {incomingLinks.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium">Входящие приглашения</p>
+            <p className="text-sm font-medium">{tr('linkedAccountsManager.incomingInvitations')}</p>
             {incomingLinks.filter(l => l.status === 'pending').map(l => {
               const p = profiles[l.owner_user_id];
               return (
@@ -197,7 +199,7 @@ export const LinkedAccountsManager: React.FC = () => {
                     <Avatar className="h-8 w-8"><AvatarImage src={p?.avatar_url || ''} /><AvatarFallback>{p?.name?.[0] || '?'}</AvatarFallback></Avatar>
                     <div className="min-w-0">
                       <p className="text-sm font-medium truncate">{p?.name || l.owner_user_id}</p>
-                      <p className="text-xs text-muted-foreground">хочет синхронизироваться с вами</p>
+                      <p className="text-xs text-muted-foreground">{tr('linkedAccountsManager.wantsToSyncWithYou')}</p>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -217,7 +219,7 @@ export const LinkedAccountsManager: React.FC = () => {
         {/* Owned */}
         <div className="space-y-3">
           {ownedLinks.length === 0 && incomingLinks.length === 0 && (
-            <p className="text-sm text-muted-foreground">Пока нет связанных аккаунтов.</p>
+            <p className="text-sm text-muted-foreground">{tr('linkedAccountsManager.noLinkedAccountsYet')}</p>
           )}
           {ownedLinks.map(l => {
             const p = profiles[l.linked_user_id];
@@ -230,7 +232,7 @@ export const LinkedAccountsManager: React.FC = () => {
                       <p className="text-sm font-medium truncate">{p?.name || l.linked_user_id}</p>
                       <div className="flex items-center gap-1.5">
                         <Badge variant={l.status === 'accepted' ? 'default' : l.status === 'pending' ? 'secondary' : 'outline'} className="text-[10px]">
-                          {l.status === 'pending' ? 'ожидание' : l.status === 'accepted' ? 'принят' : 'отклонён'}
+                          {l.status === 'pending' ? tr('linkedAccountsManager.pending') : l.status === 'accepted' ? tr('linkedAccountsManager.accepted') : tr('linkedAccountsManager.declined2')}
                         </Badge>
                         {p?.user_type && <Badge variant="outline" className="text-[10px]">{p.user_type}</Badge>}
                       </div>
@@ -240,7 +242,7 @@ export const LinkedAccountsManager: React.FC = () => {
                     {l.status === 'accepted' && (
                       <Button size="sm" variant="outline" onClick={() => handleSyncNow(l.id)} disabled={busyId === l.id} className="gap-1">
                         {busyId === l.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                        Синхр.
+                        {tr('linkedAccountsManager.sync')}
                       </Button>
                     )}
                     <Button size="sm" variant="ghost" onClick={() => handleRemove(l.id)} disabled={busyId === l.id}>
@@ -259,7 +261,7 @@ export const LinkedAccountsManager: React.FC = () => {
                       ))}
                     </div>
                     {l.last_synced_at && (
-                      <p className="text-[11px] text-muted-foreground">Последняя синхронизация: {new Date(l.last_synced_at).toLocaleString()}</p>
+                      <p className="text-[11px] text-muted-foreground">{tr('linkedAccountsManager.lastSync')} {new Date(l.last_synced_at).toLocaleString(localeTag())}</p>
                     )}
                   </>
                 )}

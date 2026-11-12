@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Users, Sparkles } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface TalentsHeroProps {
   talentCount: number;
@@ -23,21 +24,21 @@ const TalentsHero: React.FC<TalentsHeroProps> = ({
       <div className="h-80 bg-gradient-to-r from-purple-300 to-blue-300 relative">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-6">
-          <h1 className="text-4xl font-bold mb-2">Talents Around Me</h1>
-          <p className="text-xl mb-1">Discover hidden gems in your neighborhood!</p>
+          <h1 className="text-4xl font-bold mb-2">{tr('common.talentsAroundMe')}</h1>
+          <p className="text-xl mb-1">{tr('talentsHero.discoverHiddenGemsInYourNeighborhood')}</p>
           
           <div className="mt-8 max-w-lg w-full mx-auto bg-white/20 backdrop-blur-sm rounded-full px-6 py-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-3">
               <MapPin className="h-5 w-5" />
               <p className="text-xl font-medium">
-                There are <span className="font-bold text-2xl">{talentCount}</span> amazing talents within <span className="font-bold">{distance}km</span> of you.
+                {tr('talentsHero.thereAre')} <span className="font-bold text-2xl">{talentCount}</span> {tr('talentsHero.amazingTalentsWithin')} <span className="font-bold">{distance}{tr('talentsMap.kmAway')}</span> {tr('talentsHero.ofYou')}
               </p>
             </div>
-            <p className="mb-4">Ready to meet them?</p>
+            <p className="mb-4">{tr('talentsHero.readyToMeetThem')}</p>
             
             <Button className="group relative overflow-hidden rounded-full">
               <span className="relative z-10 flex items-center">
-                Explore Now
+                {tr('talentsHero.exploreNow')}
                 <Sparkles className="ml-2 h-4 w-4 transition-transform group-hover:rotate-12" />
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -49,11 +50,11 @@ const TalentsHero: React.FC<TalentsHeroProps> = ({
               <TabsList className="bg-white/30 backdrop-blur-sm">
                 <TabsTrigger value="map" className="data-[state=active]:bg-white">
                   <MapPin className="h-4 w-4 mr-2" />
-                  Map View
+                  {tr('orgs.mapView')}
                 </TabsTrigger>
                 <TabsTrigger value="list" className="data-[state=active]:bg-white">
                   <Users className="h-4 w-4 mr-2" />
-                  List View
+                  {tr('orgs.listView')}
                 </TabsTrigger>
               </TabsList>
             </Tabs>

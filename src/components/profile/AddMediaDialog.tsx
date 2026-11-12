@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface AddMediaDialogProps {
   userId: string;
@@ -15,18 +16,18 @@ interface AddMediaDialogProps {
 }
 
 const MEDIA_TYPES = [
-  { value: 'image', label: '🖼️ Photo' },
-  { value: 'video', label: '🎬 Vidéo' },
-  { value: 'audio', label: '🎵 Audio' },
-  { value: 'pdf', label: '📄 PDF / Document' },
-  { value: 'youtube', label: '▶️ Lien YouTube' },
-  { value: 'instagram', label: '📸 Lien Instagram' },
-  { value: 'facebook', label: '👤 Lien Facebook' },
-  { value: 'tiktok', label: '🎵 Lien TikTok' },
-  { value: 'link', label: '🔗 Lien externe' },
+  { value: 'image', label: tr('addMediaDialog.photo') },
+  { value: 'video', label: tr('addMediaDialog.video') },
+  { value: 'audio', label: tr('addMediaDialog.audio') },
+  { value: 'pdf', label: tr('addMediaDialog.pdfDocument') },
+  { value: 'youtube', label: tr('addMediaDialog.youtubeLink') },
+  { value: 'instagram', label: tr('addMediaDialog.instagramLink') },
+  { value: 'facebook', label: tr('addMediaDialog.facebookLink') },
+  { value: 'tiktok', label: tr('addMediaDialog.tiktokLink') },
+  { value: 'link', label: tr('addMediaDialog.externalLink') },
 ];
 
-const CATEGORIES = ['Sport', 'Musique', 'Art', 'Photographie', 'Vidéo', 'Mode', 'Académique', 'Projet', 'Récompense', 'Autre'];
+const CATEGORIES = ['Sport', 'Musique', 'Art', 'Photographie', tr('calls.video'), 'Mode', 'Académique', 'Projet', 'Récompense', 'Autre'];
 
 const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
   const [open, setOpen] = React.useState(false);
@@ -49,9 +50,9 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
       if (error) throw error;
       const { data } = supabase.storage.from('profile-files').getPublicUrl(path);
       setForm(f => ({ ...f, url: data.publicUrl }));
-      toast.success('Fichier téléchargé');
+      toast.success(tr('addMediaDialog.fileUploaded'));
     } catch (err: any) {
-      toast.error(err.message || 'Erreur upload');
+      toast.error(err.message || tr('addMediaDialog.uploadError'));
     } finally {
       setUploading(false);
     }
@@ -59,7 +60,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.url.trim()) { toast.error('Ajoute un fichier ou un lien'); return; }
+    if (!form.url.trim()) { toast.error(tr('addMediaDialog.addAFileOrALink')); return; }
     setLoading(true);
     try {
       const { error } = await (supabase.from('talent_media') as any).insert({
@@ -72,12 +73,12 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
         item_date: form.item_date || null,
       });
       if (error) throw error;
-      toast.success('Ajouté au portfolio');
+      toast.success(tr('addMediaDialog.addedToPortfolio'));
       setForm({ title: '', description: '', url: '', media_type: 'image', category: '', item_date: '' });
       setOpen(false);
       onAdded();
     } catch (err: any) {
-      toast.error(err.message || "Erreur lors de l'ajout");
+      toast.error(err.message || tr('common.errorWhileAdding'));
     } finally {
       setLoading(false);
     }
@@ -87,14 +88,14 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" variant="outline" className="gap-1">
-          <Plus className="h-3.5 w-3.5" /> Ajouter
+          <Plus className="h-3.5 w-3.5" /> {tr('tv.addLink')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>Ajouter au portfolio</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('addMediaDialog.addToPortfolio')}</DialogTitle></DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Type *</Label>
+            <Label>{tr('common.type')}</Label>
             <Select value={form.media_type} onValueChange={v => setForm(f => ({ ...f, media_type: v, url: '' }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -105,7 +106,7 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
 
           {isFileType && (
             <div>
-              <Label>Téléverser un fichier</Label>
+              <Label>{tr('addMediaDialog.uploadAFile')}</Label>
               <div className="flex gap-2 mt-1">
                 <Input
                   type="file"
@@ -119,18 +120,18 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
           )}
 
           <div>
-            <Label>{isFileType ? 'Ou URL directe' : 'Lien *'}</Label>
+            <Label>{isFileType ? tr('addMediaDialog.orDirectUrl') : tr('addMediaDialog.link')}</Label>
             <Input value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} placeholder="https://..." />
           </div>
 
           <div>
-            <Label>Titre</Label>
-            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Titre de l'élément" />
+            <Label>{tr('marketplace.title_field')}</Label>
+            <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder={tr('addMediaDialog.itemTitle')} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Catégorie</Label>
+              <Label>{tr('categories.selectCategory')}</Label>
               <Select value={form.category} onValueChange={v => setForm(f => ({ ...f, category: v }))}>
                 <SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger>
                 <SelectContent>
@@ -139,18 +140,18 @@ const AddMediaDialog: React.FC<AddMediaDialogProps> = ({ userId, onAdded }) => {
               </Select>
             </div>
             <div>
-              <Label>Date</Label>
+              <Label>{tr('common.date')}</Label>
               <Input type="date" value={form.item_date} onChange={e => setForm(f => ({ ...f, item_date: e.target.value }))} />
             </div>
           </div>
 
           <div>
-            <Label>Description</Label>
+            <Label>{tr('events.description')}</Label>
             <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Description..." rows={2} />
           </div>
 
           <Button type="submit" className="w-full" disabled={loading || uploading}>
-            {loading ? 'Ajout...' : 'Ajouter au portfolio'}
+            {loading ? 'Ajout...' : tr('addMediaDialog.addToPortfolio')}
           </Button>
         </form>
       </DialogContent>

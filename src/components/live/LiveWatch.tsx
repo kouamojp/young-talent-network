@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Radio, Eye, MapPin, ArrowLeft, Video, StopCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 export interface WatchStream {
   id: string;
@@ -79,10 +80,10 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
       .eq('id', stream.id);
     setEnding(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: 'Direct terminé' });
+    toast({ title: tr('liveWatch.streamEnded') });
     onEnded();
   };
 
@@ -90,7 +91,7 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
     <div className="space-y-4">
       <Button variant="ghost" size="sm" onClick={onBack} className="gap-1.5">
         <ArrowLeft className="h-4 w-4" />
-        Назад / Retour
+        {tr('liveWatch.back')}
       </Button>
 
       {/* Video area */}
@@ -99,13 +100,13 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
         <div className="relative z-10 text-center text-white">
           <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />
           <p className="text-sm opacity-80">
-            {isLive ? 'Flux vidéo en direct' : 'Le direct est terminé'}
+            {isLive ? tr('liveWatch.liveVideoStream') : tr('liveWatch.theStreamHasEnded')}
           </p>
         </div>
         {isLive && (
           <div className="absolute top-3 left-3 z-20">
             <Badge className="bg-destructive text-destructive-foreground text-xs px-2 py-1">
-              <Radio className="h-3 w-3 mr-1 animate-pulse" /> LIVE
+              <Radio className="h-3 w-3 mr-1 animate-pulse" /> {tr('common.live')}
             </Badge>
           </div>
         )}
@@ -140,7 +141,7 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
           {isStreamer && isLive && (
             <Button variant="destructive" size="sm" onClick={handleEndStream} disabled={ending} className="gap-1.5">
               {ending ? <Loader2 className="h-4 w-4 animate-spin" /> : <StopCircle className="h-4 w-4" />}
-              Terminer le direct
+              {tr('liveWatch.endStream')}
             </Button>
           )}
         </div>
@@ -151,9 +152,9 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
 
         {!isLive && (
           <div className="rounded-lg border border-border bg-muted/40 p-4 text-center text-sm text-muted-foreground">
-            Ce direct est terminé.
+            {tr('liveWatch.thisStreamHasEnded')}
             <div className="mt-2">
-              <Button size="sm" variant="outline" onClick={onBack}>Retour aux directs</Button>
+              <Button size="sm" variant="outline" onClick={onBack}>{tr('liveWatch.backToLiveStreams')}</Button>
             </div>
           </div>
         )}

@@ -10,6 +10,8 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const Friends: React.FC = () => {
   const { t } = useLanguage();
@@ -84,13 +86,13 @@ const Friends: React.FC = () => {
       toast({ title: t('friends.requestSent') });
       setPendingRequests(prev => [...prev, { user_id: currentUserId, connected_user_id: userId, status: 'pending' }]);
     } else {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
     }
   };
 
   const acceptRequest = async (req: any) => {
     const { error } = await supabase.from('connections').update({ status: 'accepted' }).eq('id', req.id);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setPendingRequests(prev => prev.filter(p => p.id !== req.id));
     setConnections(prev => [...prev, { ...req, status: 'accepted', profiles: req.requester }]);
     toast({ title: t('friends.accept') });
@@ -98,7 +100,7 @@ const Friends: React.FC = () => {
 
   const declineRequest = async (req: any) => {
     const { error } = await supabase.from('connections').delete().eq('id', req.id);
-    if (error) { toast({ title: 'Error', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setPendingRequests(prev => prev.filter(p => p.id !== req.id));
   };
 
@@ -124,7 +126,7 @@ const Friends: React.FC = () => {
           <TabsTrigger value="friends">{t('friends.myFriends')} ({connections.length})</TabsTrigger>
           <TabsTrigger value="requests">{t('friends.requests')} ({pendingRequests.length})</TabsTrigger>
           <TabsTrigger value="discover">{t('friends.discover')}</TabsTrigger>
-          <TabsTrigger value="feed"><Newspaper className="h-3.5 w-3.5 mr-1" />Publications similaires</TabsTrigger>
+          <TabsTrigger value="feed"><Newspaper className="h-3.5 w-3.5 mr-1" />{tr('friends.similarPosts')}</TabsTrigger>
         </TabsList>
 
         <div className="relative">
@@ -238,7 +240,7 @@ const Friends: React.FC = () => {
           ) : similarPosts.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Newspaper className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Aucune publication trouvée pour vos paramètres. Complétez votre profil pour de meilleurs résultats.</p>
+              <p>{tr('friends.noPostsFoundForYourSettings')}</p>
             </div>
           ) : (
             similarPosts.map(post => (
@@ -253,7 +255,7 @@ const Friends: React.FC = () => {
                       <button onClick={() => goToProfile(post.profiles)} className="font-medium text-sm truncate hover:underline text-left">{post.profiles?.name}</button>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {post.profiles?.sport_type && <Badge variant="secondary" className="text-[10px]">{post.profiles.sport_type}</Badge>}
-                        <span>{new Date(post.created_at).toLocaleDateString('fr-FR')}</span>
+                        <span>{new Date(post.created_at).toLocaleDateString(localeTag())}</span>
                       </div>
                     </div>
                   </div>

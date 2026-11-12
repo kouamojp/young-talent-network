@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { tr } from '@/i18n';
 
 interface Suggestion {
   id?: string;
@@ -84,7 +85,7 @@ export const AgentSuggestionsWidget = () => {
 
       if (userId) setTimeout(() => loadSuggestions(userId), 1000);
     } catch (err: any) {
-      toast({ title: "Erreur agent", description: err.message, variant: "destructive" });
+      toast({ title: tr('agentSuggestionsWidget.agentError'), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -133,7 +134,7 @@ export const AgentSuggestionsWidget = () => {
           {yatScore !== null && (
             <div>
               <div className="flex items-center justify-between text-xs font-medium mb-1">
-                <span className="flex items-center gap-1"><Trophy className="h-3.5 w-3.5 text-amber-500" />YAT Score</span>
+                <span className="flex items-center gap-1"><Trophy className="h-3.5 w-3.5 text-amber-500" />{tr('feed.yatScore')}</span>
                 <span className="text-primary font-bold">{yatScore}/100</span>
               </div>
               <Progress value={yatScore} className="h-1.5" />
@@ -142,7 +143,7 @@ export const AgentSuggestionsWidget = () => {
           {completion !== null && (
             <div>
               <div className="flex items-center justify-between text-xs font-medium mb-1">
-                <span className="flex items-center gap-1"><Target className="h-3.5 w-3.5 text-blue-500" />Profil complété</span>
+                <span className="flex items-center gap-1"><Target className="h-3.5 w-3.5 text-blue-500" />{tr('agentSuggestionsWidget.profileCompleted')}</span>
                 <span>{completion}%</span>
               </div>
               <Progress value={completion} className="h-1.5" />
@@ -182,7 +183,7 @@ export const AgentSuggestionsWidget = () => {
       {/* Suggestions */}
       {suggestions.length === 0 && !loading && (
         <div className="text-center py-4 text-sm text-muted-foreground">
-          <p>Cliquez sur actualiser pour des recommandations IA personnalisées</p>
+          <p>{tr('agentSuggestionsWidget.clickRefreshForPersonalizedAiRecommendations')}</p>
         </div>
       )}
 

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Loader2, ThumbsUp, MessageSquare, Search, Globe, Users, Link as LinkIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 type SortKey = 'recent' | 'oldest' | 'likes' | 'comments';
 type VisibilityFilter = 'all' | 'public' | 'friends' | 'link' | 'mine';
@@ -128,7 +129,7 @@ const Articles: React.FC = () => {
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin" /></div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">No articles found.</div>
+        <div className="text-center py-12 text-muted-foreground">{tr('articles.noArticlesFound')}</div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {filtered.map((a) => (

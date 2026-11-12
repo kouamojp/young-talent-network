@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Trophy, Save, Loader2, Send, Sparkles } from "lucide-react";
 import { SPORT_SCHEMAS, SportField } from "./sport-profile-schema";
+import { tr } from '@/i18n';
 
 interface Props {
   userId: string;
@@ -90,7 +91,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
         .eq("id", existing.id);
       if (error) {
         toast({
-          title: "Error",
+          title: tr('settings.error'),
           description: error.message,
           variant: "destructive",
         });
@@ -114,7 +115,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
         .single();
       if (error) {
         toast({
-          title: "Error",
+          title: tr('settings.error'),
           description: error.message,
           variant: "destructive",
         });
@@ -126,7 +127,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
     setSaving(false);
     toast({
       title:
-        lang === "ru" ? "Сохранено" : lang === "fr" ? "Enregistré" : "Saved",
+        lang === "ru" ? tr('settings.saved') : lang === "fr" ? tr('sportProfileEditor.saved') : tr('settings.saved'),
     });
   };
 
@@ -146,10 +147,10 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
         toast({
           title:
             lang === "ru"
-              ? "Нет источников"
+              ? tr('sportProfileEditor.noSyncedSources')
               : lang === "fr"
-                ? "Aucune source synchronisée"
-                : "No synced sources",
+                ? tr('sportProfileEditor.noSyncedSources2')
+                : tr('sportProfileEditor.noSyncedSources3'),
           variant: "destructive",
         });
         return;
@@ -175,16 +176,16 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
         toast({
           title:
             lang === "ru"
-              ? "Поля заполнены ИИ"
+              ? tr('sportProfileEditor.aiFilledFields')
               : lang === "fr"
-                ? "Champs remplis par IA"
-                : "AI-filled fields",
+                ? tr('sportProfileEditor.aiFilledFields2')
+                : tr('sportProfileEditor.aiFilledFields3'),
         });
       }
     } catch (err: any) {
       toast({
-        title: "Error",
-        description: err.message || "AI fill failed",
+        title: tr('settings.error'),
+        description: err.message || tr('sportProfileEditor.aiFillFailed'),
         variant: "destructive",
       });
     } finally {
@@ -202,7 +203,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
     );
     if (!filled.length) {
       toast({
-        title: lang === "ru" ? "Заполните поля" : "Fill fields first",
+        title: lang === "ru" ? tr('sportProfileEditor.fillInTheFieldsFirst') : tr('sportProfileEditor.fillInTheFieldsFirst2'),
         variant: "destructive",
       });
       return;
@@ -239,7 +240,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
     setPublishing(false);
     if (error)
       toast({
-        title: "Error",
+        title: tr('settings.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -247,10 +248,10 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
       toast({
         title:
           lang === "ru"
-            ? "Опубликовано"
+            ? tr('common.published')
             : lang === "fr"
-              ? "Publié"
-              : "Published",
+              ? tr('sportProfileEditor.published')
+              : tr('sportProfileEditor.published2'),
       });
   };
 
@@ -350,17 +351,17 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <Trophy className="h-4 w-4 text-primary" />
               {lang === "ru"
-                ? "Спортивный профиль"
+                ? tr('sportProfileEditor.detailedSportProfile')
                 : lang === "fr"
-                  ? "Profil sportif détaillé"
-                  : "Detailed sport profile"}
+                  ? tr('sportProfileEditor.detailedSportProfile2')
+                  : tr('sportProfileEditor.detailedSportProfile3')}
             </CardTitle>
             <CardDescription className="text-xs mt-1">
               {lang === "ru"
-                ? "Подробные параметры по виду спорта"
+                ? tr('sportProfileEditor.detailedParametersBySport')
                 : lang === "fr"
-                  ? "Paramètres détaillés par sport"
-                  : "Detailed parameters by sport"}
+                  ? tr('sportProfileEditor.detailedParametersBySport2')
+                  : tr('sportProfileEditor.detailedParametersBySport3')}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -376,10 +377,10 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
                 <Sparkles className="h-3 w-3 mr-1" />
               )}
               {lang === "ru"
-                ? "ИИ из источников"
+                ? tr('sportProfileEditor.aiFillFromSources')
                 : lang === "fr"
-                  ? "Remplir via IA"
-                  : "AI-fill from sources"}
+                  ? tr('sportProfileEditor.aiFillFromSources2')
+                  : tr('sportProfileEditor.aiFillFromSources3')}
             </Button>
           </div>
         </div>
@@ -428,7 +429,7 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
         <div className="flex items-center justify-between gap-2 pt-4 border-t mt-4 flex-wrap">
           <label className="flex items-center gap-2 text-xs">
             <Switch checked={isPublic} onCheckedChange={setIsPublic} />
-            {lang === "ru" ? "Виден всем" : lang === "fr" ? "Public" : "Public"}
+            {lang === "ru" ? tr('sportProfileEditor.visibleToEveryone') : lang === "fr" ? tr('post.vis.public') : tr('post.vis.public')}
           </label>
           <div className="flex gap-2 ml-auto">
             <Button
@@ -443,10 +444,10 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
                 <Send className="h-3 w-3 mr-1" />
               )}
               {lang === "ru"
-                ? "В ленту"
+                ? tr('sportProfileEditor.postToFeed')
                 : lang === "fr"
-                  ? "Publier"
-                  : "Post to feed"}
+                  ? tr('common.post')
+                  : tr('sportProfileEditor.postToFeed2')}
             </Button>
             <Button size="sm" onClick={handleSave} disabled={saving}>
               {saving ? (
@@ -455,10 +456,10 @@ export const SportProfileEditor: React.FC<Props> = ({ userId }) => {
                 <Save className="h-3 w-3 mr-1" />
               )}
               {lang === "ru"
-                ? "Сохранить"
+                ? tr('common.save')
                 : lang === "fr"
-                  ? "Enregistrer"
-                  : "Save"}
+                  ? tr('post.update')
+                  : tr('common.save')}
             </Button>
           </div>
         </div>

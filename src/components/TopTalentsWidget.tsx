@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Trophy, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 interface TopTalent {
   user_id: string;
@@ -58,7 +59,7 @@ const TopTalentsWidget: React.FC = () => {
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="h-4 w-4 text-yellow-500" />
         <h3 className="font-semibold text-sm">
-          {t('feed.topTalents') || 'Топ талантов недели'}
+          {t('feed.topTalents') || tr('feed.topTalents')}
         </h3>
       </div>
       <ul className="space-y-2">
@@ -73,7 +74,7 @@ const TopTalentsWidget: React.FC = () => {
               <p className="text-sm font-medium truncate">{talent.name}</p>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <TrendingUp className="h-3 w-3" />
-                <span>Lv.{talent.level} · {talent.xp_total} XP</span>
+                <span>{tr('common.lv')}{talent.level} · {talent.xp_total} XP</span>
               </div>
             </div>
           </li>

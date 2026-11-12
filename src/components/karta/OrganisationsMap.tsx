@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { geocodePlaces } from '@/lib/mapbox';
 import KartaMap, { type KartaPoint } from './KartaMap';
+import { tr } from '@/i18n';
 
 interface Org { id: string; name: string; industry: string | null; headquarters: string; logo: string | null; website: string | null }
 
@@ -38,7 +39,7 @@ const OrganisationsMap = () => {
     <KartaMap
       points={points}
       loading={loading}
-      emptyLabel="Aucune organisation localisée pour le moment"
+      emptyLabel={tr('organisationsMap.noOrganizationsLocatedYet')}
       renderSelected={({ data: org }) => (
         <div className="flex items-start gap-4 pr-4">
           <Avatar className="h-14 w-14 border-2 border-primary">
@@ -56,7 +57,7 @@ const OrganisationsMap = () => {
                 </a>
               )}
             </div>
-            <Button size="sm" className="mt-3 w-full" onClick={() => navigate(`/organization/${org.id}`)}>Voir le profil</Button>
+            <Button size="sm" className="mt-3 w-full" onClick={() => navigate(`/organization/${org.id}`)}>{tr('marketplace.viewProfile')}</Button>
           </div>
         </div>
       )}

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Briefcase, DollarSign, Clock, MapPin, Eye, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Experience {
   id: string;
@@ -30,7 +32,7 @@ interface Request {
 }
 
 const formatDate = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : '';
+  iso ? new Date(iso).toLocaleDateString(localeTag(), { month: 'short', year: 'numeric' }) : '';
 
 const WorkSection: React.FC = () => {
   const navigate = useNavigate();
@@ -54,7 +56,7 @@ const WorkSection: React.FC = () => {
 
   const timeline = (job: Experience) => {
     const start = formatDate(job.start_date);
-    const end = job.is_current ? 'Présent' : formatDate(job.end_date);
+    const end = job.is_current ? tr('workSection.present') : formatDate(job.end_date);
     return [start, end].filter(Boolean).join(' - ');
   };
 
@@ -68,16 +70,16 @@ const WorkSection: React.FC = () => {
     <div className="space-y-6">
       <Tabs defaultValue="jobs" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="jobs">💼 Expériences</TabsTrigger>
-          <TabsTrigger value="requests">📩 Demandes</TabsTrigger>
+          <TabsTrigger value="jobs">{tr('workSection.experience')}</TabsTrigger>
+          <TabsTrigger value="requests">{tr('workSection.requests')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="jobs" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Expérience professionnelle</h3>
+            <h3 className="text-lg font-semibold">{tr('workSection.workExperience')}</h3>
             <Button onClick={() => navigate('/profile')}>
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter
+              {tr('tv.addLink')}
             </Button>
           </div>
 
@@ -85,10 +87,10 @@ const WorkSection: React.FC = () => {
             <Card className="border-dashed">
               <CardContent className="p-6 text-center">
                 <Briefcase className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 mb-4">Ajoutez votre expérience professionnelle</p>
+                <p className="text-gray-600 mb-4">{tr('workSection.addYourWorkExperience')}</p>
                 <Button variant="outline" onClick={() => navigate('/profile')}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Ajouter une expérience
+                  {tr('workSection.addExperience')}
                 </Button>
               </CardContent>
             </Card>
@@ -102,7 +104,7 @@ const WorkSection: React.FC = () => {
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="font-semibold">{job.title}</h4>
                           {job.is_current && (
-                            <Badge variant="secondary" className="text-xs">Actuel</Badge>
+                            <Badge variant="secondary" className="text-xs">{tr('workSection.current')}</Badge>
                           )}
                         </div>
                         {job.organization && <p className="text-gray-600 mb-1">{job.organization}</p>}
@@ -115,7 +117,7 @@ const WorkSection: React.FC = () => {
                           )}
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>Modifier</Button>
+                      <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>{tr('common.edit')}</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -126,10 +128,10 @@ const WorkSection: React.FC = () => {
 
         <TabsContent value="requests" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Mes demandes</h3>
+            <h3 className="text-lg font-semibold">{tr('common.myRequests')}</h3>
             <Button onClick={() => navigate('/work')}>
               <Plus className="h-4 w-4 mr-2" />
-              Publier
+              {tr('common.post')}
             </Button>
           </div>
 
@@ -137,10 +139,10 @@ const WorkSection: React.FC = () => {
             <Card className="border-dashed">
               <CardContent className="p-6 text-center">
                 <DollarSign className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600 mb-4">Publiez une demande pour trouver des talents</p>
+                <p className="text-gray-600 mb-4">{tr('workSection.postARequestToFindTalents')}</p>
                 <Button variant="outline" onClick={() => navigate('/work')}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Créer une demande
+                  {tr('workSection.createARequest')}
                 </Button>
               </CardContent>
             </Card>

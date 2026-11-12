@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, Mail, Phone, Globe, Star, Download, Share2, GraduationCap, Trophy, Briefcase, Award } from 'lucide-react';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 const PublicCV: React.FC = () => {
   const { slug } = useParams();
@@ -43,22 +44,22 @@ const PublicCV: React.FC = () => {
 
   const handleShare = async () => {
     const url = window.location.href;
-    if (navigator.share) { try { await navigator.share({ url, title: 'CV YAT' }); } catch {} }
-    else { await navigator.clipboard.writeText(url); toast.success('Lien copié !'); }
+    if (navigator.share) { try { await navigator.share({ url, title: tr('publicCV.yatCv') }); } catch {} }
+    else { await navigator.clipboard.writeText(url); toast.success(tr('common.linkCopied')); }
   };
 
   const handlePrint = () => window.print();
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
-  if (!data) return <div className="container mx-auto py-12 text-center"><h2 className="text-2xl font-bold">CV introuvable ou privé</h2></div>;
+  if (!data) return <div className="container mx-auto py-12 text-center"><h2 className="text-2xl font-bold">{tr('publicCV.cvNotFoundOrPrivate')}</h2></div>;
 
   const p = extras.profile;
 
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4 print:py-0 print:px-0">
       <div className="flex justify-end gap-2 mb-4 print:hidden">
-        <Button variant="outline" size="sm" onClick={handleShare}><Share2 className="h-4 w-4 mr-1" /> Partager</Button>
-        <Button size="sm" onClick={handlePrint}><Download className="h-4 w-4 mr-1" /> Télécharger / Imprimer</Button>
+        <Button variant="outline" size="sm" onClick={handleShare}><Share2 className="h-4 w-4 mr-1" /> {tr('communities.share')}</Button>
+        <Button size="sm" onClick={handlePrint}><Download className="h-4 w-4 mr-1" /> {tr('publicCV.downloadPrint')}</Button>
       </div>
 
       <Card className="overflow-hidden shadow-lg print:shadow-none">
@@ -70,7 +71,7 @@ const PublicCV: React.FC = () => {
               <AvatarFallback className="text-3xl">{p?.name?.[0] || 'U'}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-[200px]">
-              <h1 className="text-3xl font-bold">{p?.name || 'Talent'}</h1>
+              <h1 className="text-3xl font-bold">{p?.name || tr('auth.talent')}</h1>
               {p?.bio && <p className="opacity-90 mt-1 text-sm">{p.bio}</p>}
               <div className="flex flex-wrap gap-3 mt-3 text-sm opacity-90">
                 {p?.email && <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{p.email}</span>}
@@ -86,20 +87,20 @@ const PublicCV: React.FC = () => {
         <CardContent className="p-8 space-y-7">
           {data.description && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-2 uppercase tracking-wide">Profil</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-2 uppercase tracking-wide">{tr('sidebar.profile')}</h2>
               <p className="text-sm leading-relaxed whitespace-pre-line">{data.description}</p>
             </section>
           )}
 
           {extras.experiences.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Briefcase className="h-4 w-4" /> Expériences</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Briefcase className="h-4 w-4" /> {tr('common.experience')}</h2>
               <div className="space-y-3">
                 {extras.experiences.map((e: any) => (
                   <div key={e.id}>
                     <div className="flex items-baseline justify-between gap-2">
                       <h3 className="font-semibold">{e.position} <span className="font-normal text-muted-foreground">— {e.company}</span></h3>
-                      <span className="text-xs text-muted-foreground">{e.start_date ? new Date(e.start_date).getFullYear() : ''}{e.is_current ? ' - présent' : e.end_date ? ` - ${new Date(e.end_date).getFullYear()}` : ''}</span>
+                      <span className="text-xs text-muted-foreground">{e.start_date ? new Date(e.start_date).getFullYear() : ''}{e.is_current ? tr('publicCV.present') : e.end_date ? ` - ${new Date(e.end_date).getFullYear()}` : ''}</span>
                     </div>
                     {e.description && <p className="text-sm text-muted-foreground mt-1">{e.description}</p>}
                   </div>
@@ -110,12 +111,12 @@ const PublicCV: React.FC = () => {
 
           {extras.education.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><GraduationCap className="h-4 w-4" /> Formation</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><GraduationCap className="h-4 w-4" /> {tr('profile.training')}</h2>
               <div className="space-y-3">
                 {extras.education.map((e: any) => (
                   <div key={e.id}>
                     <h3 className="font-semibold text-sm">{[e.degree, e.field_of_study].filter(Boolean).join(' — ') || e.institution}</h3>
-                    <p className="text-xs text-muted-foreground">{e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? ' - présent' : e.end_year ? ` - ${e.end_year}` : ''}` : ''}</p>
+                    <p className="text-xs text-muted-foreground">{e.institution} {e.start_year ? `• ${e.start_year}${e.is_current ? tr('publicCV.present') : e.end_year ? ` - ${e.end_year}` : ''}` : ''}</p>
                   </div>
                 ))}
               </div>
@@ -124,7 +125,7 @@ const PublicCV: React.FC = () => {
 
           {extras.skills.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide">Compétences</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide">{tr('profile.skills')}</h2>
               <div className="flex flex-wrap gap-1.5">
                 {extras.skills.map((s: any) => <Badge key={s.id} variant="secondary">{s.skills?.name}</Badge>)}
               </div>
@@ -133,7 +134,7 @@ const PublicCV: React.FC = () => {
 
           {extras.achievements.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Trophy className="h-4 w-4" /> Réalisations</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Trophy className="h-4 w-4" /> {tr('common.achievements')}</h2>
               <ul className="space-y-1.5">
                 {extras.achievements.map((a: any) => (
                   <li key={a.id} className="text-sm flex items-start gap-2">
@@ -147,7 +148,7 @@ const PublicCV: React.FC = () => {
 
           {data.achievements && Array.isArray(data.achievements) && data.achievements.length > 0 && (
             <section>
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Award className="h-4 w-4" /> Certifications & Langues</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide flex items-center gap-2"><Award className="h-4 w-4" /> {tr('publicCV.certificationsLanguages')}</h2>
               <ul className="space-y-1.5">
                 {data.achievements.map((a: string, i: number) => (
                   <li key={i} className="text-sm flex items-start gap-2"><span className="text-primary mt-1">•</span><span>{a}</span></li>
@@ -158,7 +159,7 @@ const PublicCV: React.FC = () => {
 
           {extras.media.length > 0 && (
             <section className="print:hidden">
-              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide">Portfolio</h2>
+              <h2 className="text-lg font-bold text-primary border-b-2 border-primary pb-1 mb-3 uppercase tracking-wide">{tr('common.portfolio')}</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {extras.media.slice(0, 8).map((m: any) => (
                   <a key={m.id} href={m.url} target="_blank" rel="noopener noreferrer" className="block aspect-square rounded overflow-hidden bg-muted hover:opacity-80 transition">
@@ -175,7 +176,7 @@ const PublicCV: React.FC = () => {
         </CardContent>
       </Card>
 
-      <p className="text-center text-xs text-muted-foreground mt-4 print:hidden">CV généré par YAT — Young & Talent Network</p>
+      <p className="text-center text-xs text-muted-foreground mt-4 print:hidden">{tr('publicCV.cvGeneratedByYatYoungTalent')}</p>
     </div>
   );
 };

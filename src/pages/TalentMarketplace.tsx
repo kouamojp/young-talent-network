@@ -18,26 +18,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { countries } from '@/data/countries';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const REQUEST_TYPES = [
-  { key: 'recruitment', label: 'Recrutement', icon: '💼' },
-  { key: 'collaboration', label: 'Collaboration', icon: '🤝' },
-  { key: 'sponsoring', label: 'Sponsoring', icon: '💰' },
-  { key: 'training', label: 'Formation', icon: '🎓' },
-  { key: 'event', label: 'Événement', icon: '🎉' },
-  { key: 'freelance', label: 'Mission freelance', icon: '⚡' },
-  { key: 'sport_trial', label: 'Essai sportif', icon: '⚽' },
-  { key: 'casting', label: 'Casting artistique', icon: '🎬' },
+  { key: 'recruitment', label: tr('org.recruitment'), icon: '💼' },
+  { key: 'collaboration', label: tr('talentMarketplace.collaboration'), icon: '🤝' },
+  { key: 'sponsoring', label: tr('talentMarketplace.sponsorship'), icon: '💰' },
+  { key: 'training', label: tr('profile.training'), icon: '🎓' },
+  { key: 'event', label: tr('common.event'), icon: '🎉' },
+  { key: 'freelance', label: tr('talentMarketplace.freelanceJob'), icon: '⚡' },
+  { key: 'sport_trial', label: tr('talentMarketplace.sportsTrial'), icon: '⚽' },
+  { key: 'casting', label: tr('talentMarketplace.artisticCasting'), icon: '🎬' },
 ];
 
 const typeMeta = (k: string) => REQUEST_TYPES.find(t => t.key === k) || { label: k, icon: '📌' };
 
 const SORT_OPTIONS = [
-  { key: 'newest', label: 'Plus récent' },
-  { key: 'deadline_asc', label: 'Date limite proche' },
-  { key: 'budget_desc', label: 'Budget ↓' },
-  { key: 'budget_asc', label: 'Budget ↑' },
-  { key: 'views_desc', label: 'Plus vus' },
+  { key: 'newest', label: tr('talentMarketplace.newest') },
+  { key: 'deadline_asc', label: tr('talentMarketplace.deadlineSoon') },
+  { key: 'budget_desc', label: tr('talentMarketplace.budget') },
+  { key: 'budget_asc', label: tr('talentMarketplace.budget2') },
+  { key: 'views_desc', label: tr('talentMarketplace.mostViewed') },
 ];
 
 const extractBudgetNumber = (budget: string | null): number => {
@@ -135,7 +137,7 @@ const TalentMarketplace: React.FC = () => {
 
   const submitRequest = async () => {
     if (!userId) { navigate('/auth'); return; }
-    if (!form.title || !form.description) { toast.error('Titre et description requis'); return; }
+    if (!form.title || !form.description) { toast.error(tr('talentMarketplace.titleAndDescriptionRequired')); return; }
     setSubmitting(true);
     const payload = {
       ...form,
@@ -146,7 +148,7 @@ const TalentMarketplace: React.FC = () => {
     const { error } = await supabase.from('talent_requests').insert(payload);
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success('Demande publiée !');
+    toast.success(tr('talentMarketplace.requestPublished'));
     setCreateOpen(false);
     setForm({ request_type: 'recruitment', title: '', description: '', domain: '', country: '', city: '', budget: '', deadline: '', conditions: '', contact: '' });
     load(userId);
@@ -160,11 +162,11 @@ const TalentMarketplace: React.FC = () => {
       message: applyMessage,
     });
     if (error) {
-      if (error.code === '23505') toast.error('Tu as déjà postulé');
+      if (error.code === '23505') toast.error(tr('talentMarketplace.youHaveAlreadyApplied'));
       else toast.error(error.message);
       return;
     }
-    toast.success('Candidature envoyée !');
+    toast.success(tr('talentMarketplace.applicationSent'));
     setApplyOpen(null); setApplyMessage('');
     load(userId);
   };
@@ -174,10 +176,10 @@ const TalentMarketplace: React.FC = () => {
     const existing = saved.find(s => s.saved_user_id === savedUserId);
     if (existing) {
       await supabase.from('saved_profiles').delete().eq('id', existing.id);
-      toast.success('Retiré des favoris');
+      toast.success(tr('talentMarketplace.removedFromSaved'));
     } else {
       await supabase.from('saved_profiles').insert({ user_id: userId, saved_user_id: savedUserId });
-      toast.success('Profil sauvegardé');
+      toast.success(tr('talentMarketplace.profileSaved'));
     }
     load(userId);
   };
@@ -277,9 +279,9 @@ const TalentMarketplace: React.FC = () => {
 
   const shareFilters = async () => {
     const url = window.location.href;
-    if (navigator.share) { try { await navigator.share({ url, title: 'YAT Marketplace — Filtres' }); return; } catch {} }
+    if (navigator.share) { try { await navigator.share({ url, title: tr('talentMarketplace.yatMarketplaceFilters') }); return; } catch {} }
     await navigator.clipboard.writeText(url);
-    toast.success('Lien des filtres copié');
+    toast.success(tr('talentMarketplace.filterLinkCopied'));
   };
 
   const clearFilters = () => {
@@ -328,7 +330,7 @@ const TalentMarketplace: React.FC = () => {
               <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{[r.city, r.country].filter(Boolean).join(', ')}</span>
             )}
             {r.deadline && (
-              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(r.deadline).toLocaleDateString()}</span>
+              <span className="flex items-center gap-1"><Calendar className="h-3 w-3" />{new Date(r.deadline).toLocaleDateString(localeTag())}</span>
             )}
           </div>
           {r.poster && (
@@ -337,12 +339,12 @@ const TalentMarketplace: React.FC = () => {
                 <AvatarImage src={r.poster.avatar_url} />
                 <AvatarFallback>{r.poster.name?.[0]}</AvatarFallback>
               </Avatar>
-              <span className="text-muted-foreground">par {r.poster.name}</span>
+              <span className="text-muted-foreground">{tr('funding.by')} {r.poster.name}</span>
             </div>
           )}
           {!own && (
             <Button size="sm" className="w-full" onClick={() => { setApplyOpen(r); setApplyMessage(''); }}>
-              <Send className="h-3 w-3 mr-1" /> Envoyer une proposition
+              <Send className="h-3 w-3 mr-1" /> {tr('talentMarketplace.sendAProposal')}
             </Button>
           )}
         </CardContent>
@@ -356,20 +358,20 @@ const TalentMarketplace: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <Briefcase className="h-7 w-7 text-primary" />
-            YAT Marketplace de Talents
+            {tr('talentMarketplace.yatTalentMarketplace')}
           </h1>
-          <p className="text-muted-foreground mt-1">Annonces, candidatures et talents sauvegardés</p>
+          <p className="text-muted-foreground mt-1">{tr('talentMarketplace.listingsApplicationsAndSavedTalents')}</p>
         </div>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-1" /> Publier une demande</Button>
+            <Button><Plus className="h-4 w-4 mr-1" /> {tr('talentMarketplace.postARequest')}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader><DialogTitle>Nouvelle demande de talent</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{tr('talentMarketplace.newTalentRequest')}</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Type *</Label>
+                  <Label>{tr('common.type')}</Label>
                   <Select value={form.request_type} onValueChange={(v) => setForm({ ...form, request_type: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -378,21 +380,21 @@ const TalentMarketplace: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label>Domaine</Label>
-                  <Input value={form.domain} onChange={(e) => setForm({ ...form, domain: e.target.value })} placeholder="Ex: Football, Design..." />
+                  <Label>{tr('common.field')}</Label>
+                  <Input value={form.domain} onChange={(e) => setForm({ ...form, domain: e.target.value })} placeholder={tr('common.eGFootballDesign')} />
                 </div>
               </div>
               <div>
-                <Label>Titre *</Label>
+                <Label>{tr('events.eventName')}</Label>
                 <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} maxLength={120} />
               </div>
               <div>
-                <Label>Description *</Label>
+                <Label>{tr('talentMarketplace.description')}</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={5} maxLength={3000} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label>Pays</Label>
+                  <Label>{tr('settings.country')}</Label>
                   <Select value={form.country} onValueChange={(v) => setForm({ ...form, country: v })}>
                     <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                     <SelectContent className="max-h-60">
@@ -401,31 +403,31 @@ const TalentMarketplace: React.FC = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label>Ville</Label>
+                  <Label>{tr('settings.city')}</Label>
                   <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
                 </div>
                 <div>
-                  <Label>Budget / Rémunération</Label>
-                  <Input value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="Ex: 500€/jour" />
+                  <Label>{tr('talentMarketplace.budgetCompensation')}</Label>
+                  <Input value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder={tr('talentMarketplace.eG500Day')} />
                 </div>
                 <div>
-                  <Label>Date limite</Label>
+                  <Label>{tr('talentMarketplace.deadline')}</Label>
                   <Input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} />
                 </div>
               </div>
               <div>
-                <Label>Conditions</Label>
+                <Label>{tr('footer.terms')}</Label>
                 <Textarea value={form.conditions} onChange={(e) => setForm({ ...form, conditions: e.target.value })} rows={2} />
               </div>
               <div>
-                <Label>Contact</Label>
-                <Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} placeholder="Email, téléphone, lien..." />
+                <Label>{tr('marketplace.contact')}</Label>
+                <Input value={form.contact} onChange={(e) => setForm({ ...form, contact: e.target.value })} placeholder={tr('talentMarketplace.emailPhoneLink')} />
               </div>
             </div>
             <DialogFooter>
               <Button onClick={submitRequest} disabled={submitting}>
                 {submitting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-                Publier
+                {tr('common.post')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -434,10 +436,10 @@ const TalentMarketplace: React.FC = () => {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="flex-wrap">
-          <TabsTrigger value="browse"><Search className="h-4 w-4 mr-1" />Explorer</TabsTrigger>
-          <TabsTrigger value="mine"><Inbox className="h-4 w-4 mr-1" />Mes annonces</TabsTrigger>
-          <TabsTrigger value="applications"><Send className="h-4 w-4 mr-1" />Mes candidatures</TabsTrigger>
-          <TabsTrigger value="saved"><Bookmark className="h-4 w-4 mr-1" />Profils sauvegardés</TabsTrigger>
+          <TabsTrigger value="browse"><Search className="h-4 w-4 mr-1" />{tr('common.explore')}</TabsTrigger>
+          <TabsTrigger value="mine"><Inbox className="h-4 w-4 mr-1" />{tr('talentMarketplace.myListings')}</TabsTrigger>
+          <TabsTrigger value="applications"><Send className="h-4 w-4 mr-1" />{tr('talentMarketplace.myApplications')}</TabsTrigger>
+          <TabsTrigger value="saved"><Bookmark className="h-4 w-4 mr-1" />{tr('talentMarketplace.savedProfiles')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="browse">
@@ -447,7 +449,7 @@ const TalentMarketplace: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div className="relative md:col-span-2">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input placeholder="Rechercher par titre, description, domaine..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+                  <Input placeholder={tr('talentMarketplace.searchByTitleDescriptionField')} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
                 </div>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="gap-2">
@@ -460,13 +462,13 @@ const TalentMarketplace: React.FC = () => {
                 </Select>
                 <Button variant="outline" onClick={() => setShowFilters(v => !v)} className="gap-2">
                   <SlidersHorizontal className="h-4 w-4" />
-                  Filtres avancés
+                  {tr('talentMarketplace.advancedFilters')}
                   {activeFilterCount > 0 && (
                     <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]">{activeFilterCount}</Badge>
                   )}
                 </Button>
-                <Button variant="outline" onClick={shareFilters} className="gap-2" title="Partager le lien des filtres">
-                  <Share2 className="h-4 w-4" /> Partager
+                <Button variant="outline" onClick={shareFilters} className="gap-2" title={tr('talentMarketplace.shareTheFilterLink')}>
+                  <Share2 className="h-4 w-4" /> {tr('communities.share')}
                 </Button>
               </div>
 
@@ -474,57 +476,57 @@ const TalentMarketplace: React.FC = () => {
               {showFilters && (
                 <div className="mt-4 pt-4 border-t border-border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Type de demande</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('talentMarketplace.requestType')}</Label>
                     <Select value={filterType} onValueChange={setFilterType}>
                       <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Tous types</SelectItem>
+                        <SelectItem value="all">{tr('talentMarketplace.allTypes')}</SelectItem>
                         {REQUEST_TYPES.map(t => <SelectItem key={t.key} value={t.key}>{t.icon} {t.label}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Pays</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('settings.country')}</Label>
                     <Select value={filterCountry} onValueChange={setFilterCountry}>
                       <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                       <SelectContent className="max-h-60">
-                        <SelectItem value="all">Tous pays</SelectItem>
+                        <SelectItem value="all">{tr('talentMarketplace.allCountries')}</SelectItem>
                         {countries.map((c: any) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Ville</Label>
-                    <Input className="mt-1" placeholder="Ex: Paris" value={filterCity} onChange={(e) => setFilterCity(e.target.value)} />
+                    <Label className="text-xs text-muted-foreground">{tr('settings.city')}</Label>
+                    <Input className="mt-1" placeholder={tr('talentMarketplace.eGParis')} value={filterCity} onChange={(e) => setFilterCity(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Domaine</Label>
-                    <Input className="mt-1" placeholder="Ex: Football" value={filterDomain} onChange={(e) => setFilterDomain(e.target.value)} list="domain-suggestions" />
+                    <Label className="text-xs text-muted-foreground">{tr('common.field')}</Label>
+                    <Input className="mt-1" placeholder={tr('talentMarketplace.eGFootball')} value={filterDomain} onChange={(e) => setFilterDomain(e.target.value)} list="domain-suggestions" />
                     <datalist id="domain-suggestions">
                       {allDomains.map(d => <option key={d} value={d} />)}
                     </datalist>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Budget min (€)</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('talentMarketplace.minBudget')}</Label>
                     <Input className="mt-1" type="number" placeholder="0" value={filterBudgetMin} onChange={(e) => setFilterBudgetMin(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Budget max (€)</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('talentMarketplace.maxBudget')}</Label>
                     <Input className="mt-1" type="number" placeholder="∞" value={filterBudgetMax} onChange={(e) => setFilterBudgetMax(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Date limite après</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('talentMarketplace.deadlineAfter')}</Label>
                     <Input className="mt-1" type="date" value={filterDeadlineAfter} onChange={(e) => setFilterDeadlineAfter(e.target.value)} />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Date limite avant</Label>
+                    <Label className="text-xs text-muted-foreground">{tr('talentMarketplace.deadlineBefore')}</Label>
                     <Input className="mt-1" type="date" value={filterDeadlineBefore} onChange={(e) => setFilterDeadlineBefore(e.target.value)} />
                   </div>
                   <div className="sm:col-span-2 lg:col-span-4 flex items-center gap-2">
                     <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
-                      <X className="h-3.5 w-3.5" /> Réinitialiser les filtres
+                      <X className="h-3.5 w-3.5" /> {tr('talentMarketplace.resetFilters')}
                     </Button>
-                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} {tr('common.result')}{filtered.length !== 1 ? 's' : ''}</span>
                   </div>
                 </div>
               )}
@@ -563,15 +565,15 @@ const TalentMarketplace: React.FC = () => {
           )}
           {!loading && filtered.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">Aucune annonce ne correspond à tes filtres.</p>
-              <Button variant="outline" onClick={clearFilters}><X className="h-4 w-4 mr-2" /> Réinitialiser</Button>
+              <p className="text-muted-foreground mb-4">{tr('talentMarketplace.noListingMatchesYourFilters')}</p>
+              <Button variant="outline" onClick={clearFilters}><X className="h-4 w-4 mr-2" /> {tr('common.reset')}</Button>
             </div>
           )}
         </TabsContent>
 
         <TabsContent value="mine">
           {myRequests.length === 0 ? (
-            <Card><CardContent className="text-center py-8 text-muted-foreground">Tu n'as pas encore publié d'annonce.</CardContent></Card>
+            <Card><CardContent className="text-center py-8 text-muted-foreground">{tr('talentMarketplace.youHavenTPostedAnyListing')}</CardContent></Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {myRequests.map(r => <RequestCard key={r.id} r={r} own />)}
@@ -581,7 +583,7 @@ const TalentMarketplace: React.FC = () => {
 
         <TabsContent value="applications">
           {myApplications.length === 0 ? (
-            <Card><CardContent className="text-center py-8 text-muted-foreground">Tu n'as pas encore postulé.</CardContent></Card>
+            <Card><CardContent className="text-center py-8 text-muted-foreground">{tr('talentMarketplace.youHavenTAppliedYet')}</CardContent></Card>
           ) : (
             <div className="space-y-3">
               {myApplications.map(a => (
@@ -604,7 +606,7 @@ const TalentMarketplace: React.FC = () => {
 
         <TabsContent value="saved">
           {saved.length === 0 ? (
-            <Card><CardContent className="text-center py-8 text-muted-foreground">Aucun profil sauvegardé.</CardContent></Card>
+            <Card><CardContent className="text-center py-8 text-muted-foreground">{tr('talentMarketplace.noSavedProfiles')}</CardContent></Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {saved.map(s => s.profile && (
@@ -628,16 +630,16 @@ const TalentMarketplace: React.FC = () => {
 
       <Dialog open={!!applyOpen} onOpenChange={(o) => !o && setApplyOpen(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Postuler — {applyOpen?.title}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('talentMarketplace.apply')} {applyOpen?.title}</DialogTitle></DialogHeader>
           <Textarea
-            placeholder="Présente-toi et explique pourquoi tu es pertinent..."
+            placeholder={tr('talentMarketplace.introduceYourselfAndExplainWhyYou')}
             value={applyMessage}
             onChange={(e) => setApplyMessage(e.target.value)}
             rows={6}
             maxLength={2000}
           />
           <DialogFooter>
-            <Button onClick={apply}><Send className="h-4 w-4 mr-2" />Envoyer</Button>
+            <Button onClick={apply}><Send className="h-4 w-4 mr-2" />{tr('common.send')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

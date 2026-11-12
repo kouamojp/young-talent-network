@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Clock, MessageCircle, Heart, UserPlus, FileText, History, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { tr } from '@/i18n';
+import { dateFnsLocale } from '@/i18n/format';
 
 type ActivityType = 'post' | 'comment' | 'like' | 'connection';
 
@@ -150,7 +151,7 @@ const ActivityHistoryWidget: React.FC = () => {
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-sm flex items-center gap-2">
             <History className="h-4 w-4 text-primary" />
-            Historique d'activité
+            {tr('activityHistoryWidget.activityHistory')}
           </h3>
           <div className="flex gap-1">
             {(['all', 'me', 'friends'] as const).map(f => (
@@ -161,7 +162,7 @@ const ActivityHistoryWidget: React.FC = () => {
                 className="h-6 px-2 text-[10px]"
                 onClick={() => setFilter(f)}
               >
-                {f === 'all' ? 'Tout' : f === 'me' ? 'Moi' : 'Amis'}
+                {f === 'all' ? tr('marketplace.all') : f === 'me' ? tr('common.me') : tr('sidebar.friends')}
               </Button>
             ))}
           </div>
@@ -172,7 +173,7 @@ const ActivityHistoryWidget: React.FC = () => {
           <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
         ) : filtered.length === 0 ? (
           <div className="text-center text-xs text-muted-foreground py-6 px-4">
-            Aucune activité récente. Connectez-vous avec des amis pour voir leur historique.
+            {tr('activityHistoryWidget.noRecentActivityConnectWithFriends')}
           </div>
         ) : (
           <ScrollArea className="h-[360px]">
@@ -198,16 +199,16 @@ const ActivityHistoryWidget: React.FC = () => {
                       <p className="text-xs leading-snug">
                         <span className="font-semibold">{a.user_name}</span>{' '}
                         <span className="text-muted-foreground">
-                          {a.type === 'post' && 'a publié :'}
-                          {a.type === 'comment' && 'a commenté :'}
-                          {a.type === 'like' && 'a aimé une publication'}
+                          {a.type === 'post' && tr('activityHistoryWidget.posted')}
+                          {a.type === 'comment' && tr('activityHistoryWidget.commented')}
+                          {a.type === 'like' && tr('activityHistoryWidget.likedAPost')}
                           {a.type === 'connection' && ''}
                         </span>{' '}
                         {a.content && <span className="text-foreground/80">"{a.content}"</span>}
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
                         <Clock className="h-2.5 w-2.5" />
-                        {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: fr })}
+                        {formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: dateFnsLocale() })}
                       </p>
                     </div>
                   </li>

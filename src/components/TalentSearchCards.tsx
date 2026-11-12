@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchProfileAges } from '@/lib/profiles';
 import { useNavigate } from 'react-router-dom';
 import { countries } from '@/data/countries';
+import { tr } from '@/i18n';
 
 interface TalentResult {
   id: string;
@@ -91,17 +92,17 @@ const TalentSearchCards: React.FC = () => {
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Filters sidebar */}
       <div className={`lg:w-64 shrink-0 space-y-4 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-        <h3 className="font-semibold text-sm text-foreground">Paramètres de recherche</h3>
+        <h3 className="font-semibold text-sm text-foreground">{tr('talentSearchCards.searchSettings')}</h3>
         
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-primary mb-1 block">Région</label>
+            <label className="text-xs font-medium text-primary mb-1 block">{tr('events.region')}</label>
             <Select value={country} onValueChange={setCountry}>
               <SelectTrigger className="text-sm">
-                <SelectValue placeholder="Choix de pays" />
+                <SelectValue placeholder={tr('talentSearchCards.country')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tous les pays</SelectItem>
+                <SelectItem value="all">{tr('talentSearchCards.allCountries')}</SelectItem>
                 {countries.map(c => (
                   <SelectItem key={c.value} value={c.label}>{c.label}</SelectItem>
                 ))}
@@ -110,21 +111,21 @@ const TalentSearchCards: React.FC = () => {
           </div>
           
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1 block">Ville</label>
+            <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr('settings.city')}</label>
             <Input
               value={city}
               onChange={e => setCity(e.target.value)}
-              placeholder="Choix de ville"
+              placeholder={tr('talentSearchCards.city')}
               className="text-sm"
             />
           </div>
 
           <div>
-            <label className="text-xs font-medium text-primary mb-1 block">Spécialité</label>
+            <label className="text-xs font-medium text-primary mb-1 block">{tr('common.specialty')}</label>
             <Input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Sport, compétence..."
+              placeholder={tr('talentSearchCards.sportSkill')}
               className="text-sm"
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
             />
@@ -133,7 +134,7 @@ const TalentSearchCards: React.FC = () => {
 
         <Button onClick={handleSearch} disabled={loading} className="w-full gap-2">
           <Search className="h-4 w-4" />
-          {loading ? 'Recherche...' : 'Trouver'}
+          {loading ? 'Recherche...' : tr('search.find')}
         </Button>
       </div>
 
@@ -145,7 +146,7 @@ const TalentSearchCards: React.FC = () => {
             <Input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Rechercher un talent..."
+              placeholder={tr('talentSearchCards.searchForATalent')}
               className="flex-1"
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
             />
@@ -160,19 +161,19 @@ const TalentSearchCards: React.FC = () => {
             className="gap-1.5 text-xs"
           >
             <Filter className="h-3.5 w-3.5" />
-            Filtres
+            {tr('common.filters')}
             <ChevronDown className={`h-3 w-3 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </Button>
         </div>
 
         {searched && (
           <p className="text-sm text-muted-foreground mb-4">
-            Trouvé {totalCount} personne{totalCount !== 1 ? 's' : ''}
+            {tr('search.found')} {totalCount} {tr('talentSearchCards.person')}{totalCount !== 1 ? 's' : ''}
           </p>
         )}
 
         {searched && results.length === 0 && (
-          <p className="text-center text-muted-foreground py-12">Aucun talent trouvé pour ces critères.</p>
+          <p className="text-center text-muted-foreground py-12">{tr('common.noTalentFoundForTheseCriteria')}</p>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -199,25 +200,25 @@ const TalentSearchCards: React.FC = () => {
               <div className="w-full mt-3 space-y-1.5 text-xs text-left">
                 {t.age != null && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Âge :</span>
-                    <span className="font-medium text-foreground">{t.age} ans</span>
+                    <span className="text-muted-foreground">{tr('common.age')}</span>
+                    <span className="font-medium text-foreground">{t.age} {tr('search.years')}</span>
                   </div>
                 )}
                 {(t.city || t.country) && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Lieu:</span>
+                    <span className="text-muted-foreground">{tr('talentSearchCards.location')}</span>
                     <span className="font-medium text-foreground">{[t.city, t.country].filter(Boolean).join(', ')}</span>
                   </div>
                 )}
                 {t.country && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Pays:</span>
+                    <span className="text-muted-foreground">{tr('talentSearchCards.country2')}</span>
                     <span className="font-medium text-foreground">{t.country}</span>
                   </div>
                 )}
                 {t.sport_type && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Spécialité:</span>
+                    <span className="text-muted-foreground">{tr('talentSearchCards.specialty')}</span>
                     <span className="font-medium text-foreground">{t.sport_type}</span>
                   </div>
                 )}
@@ -237,7 +238,7 @@ const TalentSearchCards: React.FC = () => {
                 onClick={() => navigate(`/talent/${t.id}`)}
               >
                 <FileText className="h-3.5 w-3.5" />
-                Plus d'informations
+                {tr('talentSearchCards.moreInformation')}
               </Button>
             </div>
           ))}

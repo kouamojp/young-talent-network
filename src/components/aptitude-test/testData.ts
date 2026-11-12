@@ -1,3 +1,4 @@
+import { tr } from '@/i18n';
 export type Option = {
   id: string;
   text: string;
@@ -25,205 +26,205 @@ export type TestCategory = {
 };
 
 export const testCategories: TestCategory[] = [
-  { id: 'sports', name: 'Sports', icon: '⚽', description: 'Test your athletic aptitudes and physical abilities', color: 'from-green-500 to-emerald-600' },
-  { id: 'arts', name: 'Arts & Creativity', icon: '🎨', description: 'Discover your creative and artistic talents', color: 'from-pink-500 to-rose-600' },
-  { id: 'music', name: 'Music', icon: '🎵', description: 'Evaluate your musical ear and rhythm abilities', color: 'from-purple-500 to-violet-600' },
-  { id: 'technology', name: 'Technology', icon: '💻', description: 'Assess your tech skills and logical thinking', color: 'from-blue-500 to-cyan-600' },
-  { id: 'business', name: 'Business & Leadership', icon: '📊', description: 'Measure your entrepreneurial and leadership skills', color: 'from-amber-500 to-orange-600' },
-  { id: 'science', name: 'Science & Research', icon: '🔬', description: 'Test your analytical and scientific reasoning', color: 'from-teal-500 to-cyan-600' },
+  { id: 'sports', name: tr('testData.sports'), icon: '⚽', description: tr('testData.testYourAthleticAptitudesAndPhysical'), color: 'from-green-500 to-emerald-600' },
+  { id: 'arts', name: tr('testData.artsCreativity'), icon: '🎨', description: tr('testData.discoverYourCreativeAndArtisticTalents'), color: 'from-pink-500 to-rose-600' },
+  { id: 'music', name: tr('landing.music'), icon: '🎵', description: tr('testData.evaluateYourMusicalEarAndRhythm'), color: 'from-purple-500 to-violet-600' },
+  { id: 'technology', name: tr('testData.technology'), icon: '💻', description: tr('testData.assessYourTechSkillsAndLogical'), color: 'from-blue-500 to-cyan-600' },
+  { id: 'business', name: tr('testData.businessLeadership'), icon: '📊', description: tr('testData.measureYourEntrepreneurialAndLeadershipSkill'), color: 'from-amber-500 to-orange-600' },
+  { id: 'science', name: tr('testData.scienceResearch'), icon: '🔬', description: tr('testData.testYourAnalyticalAndScientificReasoning'), color: 'from-teal-500 to-cyan-600' },
 ];
 
 export const questionsByCategory: Record<string, Question[]> = {
   sports: [
-    { id: 1, category: 'sports', question: "How do you react under competitive pressure?", options: [
-      { id: "a", text: "I thrive and perform better under pressure" },
-      { id: "b", text: "I stay calm and maintain my routine" },
-      { id: "c", text: "I sometimes feel anxious but push through" },
-      { id: "d", text: "I prefer low-pressure environments" },
+    { id: 1, category: 'sports', question: tr('testData.howDoYouReactUnderCompetitive'), options: [
+      { id: "a", text: tr('testData.iThriveAndPerformBetterUnder') },
+      { id: "b", text: tr('testData.iStayCalmAndMaintainMy') },
+      { id: "c", text: tr('testData.iSometimesFeelAnxiousButPush') },
+      { id: "d", text: tr('testData.iPreferLowPressureEnvironments') },
     ]},
-    { id: 2, category: 'sports', question: "What type of physical activity do you enjoy most?", options: [
-      { id: "a", text: "Team sports (football, basketball, volleyball)" },
-      { id: "b", text: "Individual sports (swimming, athletics, tennis)" },
-      { id: "c", text: "Combat sports (boxing, judo, karate)" },
-      { id: "d", text: "Artistic sports (dance, gymnastics, figure skating)" },
+    { id: 2, category: 'sports', question: tr('testData.whatTypeOfPhysicalActivityDo'), options: [
+      { id: "a", text: tr('testData.teamSportsFootballBasketballVolleyball') },
+      { id: "b", text: tr('testData.individualSportsSwimmingAthleticsTennis') },
+      { id: "c", text: tr('testData.combatSportsBoxingJudoKarate') },
+      { id: "d", text: tr('testData.artisticSportsDanceGymnasticsFigureSkating') },
     ]},
-    { id: 3, category: 'sports', question: "How important is strategy vs. raw physical ability?", options: [
-      { id: "a", text: "Strategy is everything - I'm a tactical thinker" },
-      { id: "b", text: "Physical ability matters most - strength and speed" },
-      { id: "c", text: "Balance of both is ideal" },
-      { id: "d", text: "Flexibility and coordination matter more" },
+    { id: 3, category: 'sports', question: tr('testData.howImportantIsStrategyVsRaw'), options: [
+      { id: "a", text: tr('testData.strategyIsEverythingIMA') },
+      { id: "b", text: tr('testData.physicalAbilityMattersMostStrengthAnd') },
+      { id: "c", text: tr('testData.balanceOfBothIsIdeal') },
+      { id: "d", text: tr('testData.flexibilityAndCoordinationMatterMore') },
     ]},
-    { id: 4, category: 'sports', question: "How do you handle training routines?", options: [
-      { id: "a", text: "I love structured, intense training schedules" },
-      { id: "b", text: "I prefer varied and fun training sessions" },
-      { id: "c", text: "I train best alone with self-discipline" },
-      { id: "d", text: "I need a coach or group to stay motivated" },
+    { id: 4, category: 'sports', question: tr('testData.howDoYouHandleTrainingRoutines'), options: [
+      { id: "a", text: tr('testData.iLoveStructuredIntenseTrainingSchedules') },
+      { id: "b", text: tr('testData.iPreferVariedAndFunTraining') },
+      { id: "c", text: tr('testData.iTrainBestAloneWithSelf') },
+      { id: "d", text: tr('testData.iNeedACoachOrGroup') },
     ]},
-    { id: 5, category: 'sports', question: "What motivates you most in sports?", options: [
-      { id: "a", text: "Winning competitions and trophies" },
-      { id: "b", text: "Personal improvement and breaking records" },
-      { id: "c", text: "Team spirit and camaraderie" },
-      { id: "d", text: "Health, wellness and self-expression" },
+    { id: 5, category: 'sports', question: tr('testData.whatMotivatesYouMostInSports'), options: [
+      { id: "a", text: tr('testData.winningCompetitionsAndTrophies') },
+      { id: "b", text: tr('testData.personalImprovementAndBreakingRecords') },
+      { id: "c", text: tr('testData.teamSpiritAndCamaraderie') },
+      { id: "d", text: tr('testData.healthWellnessAndSelfExpression') },
     ]},
   ],
   arts: [
-    { id: 1, category: 'arts', question: "When you see a blank canvas, you think:", options: [
-      { id: "a", text: "Endless possibilities - I want to paint immediately" },
-      { id: "b", text: "I'd rather sculpt or work with materials" },
-      { id: "c", text: "I think of photography or digital art" },
-      { id: "d", text: "I'd prefer to write or tell a story" },
+    { id: 1, category: 'arts', question: tr('testData.whenYouSeeABlankCanvas'), options: [
+      { id: "a", text: tr('testData.endlessPossibilitiesIWantToPaint') },
+      { id: "b", text: tr('testData.iDRatherSculptOrWork') },
+      { id: "c", text: tr('testData.iThinkOfPhotographyOrDigital') },
+      { id: "d", text: tr('testData.iDPreferToWriteOr') },
     ]},
-    { id: 2, category: 'arts', question: "How do you express your emotions?", options: [
-      { id: "a", text: "Through visual art (drawing, painting)" },
-      { id: "b", text: "Through performance (acting, dance)" },
-      { id: "c", text: "Through writing (poetry, stories)" },
-      { id: "d", text: "Through design (fashion, architecture)" },
+    { id: 2, category: 'arts', question: tr('testData.howDoYouExpressYourEmotions'), options: [
+      { id: "a", text: tr('testData.throughVisualArtDrawingPainting') },
+      { id: "b", text: tr('testData.throughPerformanceActingDance') },
+      { id: "c", text: tr('testData.throughWritingPoetryStories') },
+      { id: "d", text: tr('testData.throughDesignFashionArchitecture') },
     ]},
-    { id: 3, category: 'arts', question: "Your approach to creativity is:", options: [
-      { id: "a", text: "Spontaneous - I follow inspiration" },
-      { id: "b", text: "Methodical - I plan and sketch first" },
-      { id: "c", text: "Collaborative - I work best with others" },
-      { id: "d", text: "Technical - I master tools and techniques" },
+    { id: 3, category: 'arts', question: tr('testData.yourApproachToCreativityIs'), options: [
+      { id: "a", text: tr('testData.spontaneousIFollowInspiration') },
+      { id: "b", text: tr('testData.methodicalIPlanAndSketchFirst') },
+      { id: "c", text: tr('testData.collaborativeIWorkBestWithOthers') },
+      { id: "d", text: tr('testData.technicalIMasterToolsAndTechniques') },
     ]},
-    { id: 4, category: 'arts', question: "Which artistic environment appeals to you?", options: [
-      { id: "a", text: "A quiet studio with natural light" },
-      { id: "b", text: "A bustling stage or gallery" },
-      { id: "c", text: "A digital workspace with screens" },
-      { id: "d", text: "The outdoors and nature" },
+    { id: 4, category: 'arts', question: tr('testData.whichArtisticEnvironmentAppealsToYou'), options: [
+      { id: "a", text: tr('testData.aQuietStudioWithNaturalLight') },
+      { id: "b", text: tr('testData.aBustlingStageOrGallery') },
+      { id: "c", text: tr('testData.aDigitalWorkspaceWithScreens') },
+      { id: "d", text: tr('testData.theOutdoorsAndNature') },
     ]},
-    { id: 5, category: 'arts', question: "What do you value most in art?", options: [
-      { id: "a", text: "Emotional impact and storytelling" },
-      { id: "b", text: "Technical mastery and skill" },
-      { id: "c", text: "Innovation and pushing boundaries" },
-      { id: "d", text: "Cultural significance and tradition" },
+    { id: 5, category: 'arts', question: tr('testData.whatDoYouValueMostIn'), options: [
+      { id: "a", text: tr('testData.emotionalImpactAndStorytelling') },
+      { id: "b", text: tr('testData.technicalMasteryAndSkill') },
+      { id: "c", text: tr('testData.innovationAndPushingBoundaries') },
+      { id: "d", text: tr('testData.culturalSignificanceAndTradition') },
     ]},
   ],
   music: [
-    { id: 1, category: 'music', question: "How do you relate to music?", options: [
-      { id: "a", text: "I play one or more instruments" },
-      { id: "b", text: "I love singing and vocal performance" },
-      { id: "c", text: "I'm into production and mixing" },
-      { id: "d", text: "I compose and write songs" },
+    { id: 1, category: 'music', question: tr('testData.howDoYouRelateToMusic'), options: [
+      { id: "a", text: tr('testData.iPlayOneOrMoreInstruments') },
+      { id: "b", text: tr('testData.iLoveSingingAndVocalPerformance') },
+      { id: "c", text: tr('testData.iMIntoProductionAndMixing') },
+      { id: "d", text: tr('testData.iComposeAndWriteSongs') },
     ]},
-    { id: 2, category: 'music', question: "What genre speaks to you most?", options: [
-      { id: "a", text: "Classical / Jazz - complex harmonies" },
-      { id: "b", text: "Pop / R&B - melody and vocals" },
-      { id: "c", text: "Hip-hop / Electronic - beats and production" },
-      { id: "d", text: "Rock / Folk - raw emotion and storytelling" },
+    { id: 2, category: 'music', question: tr('testData.whatGenreSpeaksToYouMost'), options: [
+      { id: "a", text: tr('testData.classicalJazzComplexHarmonies') },
+      { id: "b", text: tr('testData.popRBMelodyAndVocals') },
+      { id: "c", text: tr('testData.hipHopElectronicBeatsAndProduction') },
+      { id: "d", text: tr('testData.rockFolkRawEmotionAndStorytelling') },
     ]},
-    { id: 3, category: 'music', question: "How do you learn music best?", options: [
-      { id: "a", text: "Reading sheet music and theory" },
-      { id: "b", text: "By ear - listening and reproducing" },
-      { id: "c", text: "Through digital tools and software" },
-      { id: "d", text: "Jamming with other musicians" },
+    { id: 3, category: 'music', question: tr('testData.howDoYouLearnMusicBest'), options: [
+      { id: "a", text: tr('testData.readingSheetMusicAndTheory') },
+      { id: "b", text: tr('testData.byEarListeningAndReproducing') },
+      { id: "c", text: tr('testData.throughDigitalToolsAndSoftware') },
+      { id: "d", text: tr('testData.jammingWithOtherMusicians') },
     ]},
-    { id: 4, category: 'music', question: "Your ideal music career would be:", options: [
-      { id: "a", text: "Solo performer / Virtuoso" },
-      { id: "b", text: "Band member / Orchestra player" },
-      { id: "c", text: "Producer / Sound engineer" },
-      { id: "d", text: "Music teacher / Mentor" },
+    { id: 4, category: 'music', question: tr('testData.yourIdealMusicCareerWouldBe'), options: [
+      { id: "a", text: tr('testData.soloPerformerVirtuoso') },
+      { id: "b", text: tr('testData.bandMemberOrchestraPlayer') },
+      { id: "c", text: tr('testData.producerSoundEngineer') },
+      { id: "d", text: tr('testData.musicTeacherMentor') },
     ]},
-    { id: 5, category: 'music', question: "What's your strongest musical skill?", options: [
-      { id: "a", text: "Rhythm and timing" },
-      { id: "b", text: "Melody and pitch recognition" },
-      { id: "c", text: "Improvisation and creativity" },
-      { id: "d", text: "Stage presence and performance" },
+    { id: 5, category: 'music', question: tr('testData.whatSYourStrongestMusicalSkill'), options: [
+      { id: "a", text: tr('testData.rhythmAndTiming') },
+      { id: "b", text: tr('testData.melodyAndPitchRecognition') },
+      { id: "c", text: tr('testData.improvisationAndCreativity') },
+      { id: "d", text: tr('testData.stagePresenceAndPerformance') },
     ]},
   ],
   technology: [
-    { id: 1, category: 'technology', question: "How do you approach problem-solving?", options: [
-      { id: "a", text: "Break it down into logical steps" },
-      { id: "b", text: "Look for creative/unconventional solutions" },
-      { id: "c", text: "Research existing solutions first" },
-      { id: "d", text: "Prototype quickly and iterate" },
+    { id: 1, category: 'technology', question: tr('testData.howDoYouApproachProblemSolving'), options: [
+      { id: "a", text: tr('testData.breakItDownIntoLogicalSteps') },
+      { id: "b", text: tr('testData.lookForCreativeUnconventionalSolutions') },
+      { id: "c", text: tr('testData.researchExistingSolutionsFirst') },
+      { id: "d", text: tr('testData.prototypeQuicklyAndIterate') },
     ]},
-    { id: 2, category: 'technology', question: "Which tech area interests you most?", options: [
-      { id: "a", text: "Software development and coding" },
-      { id: "b", text: "AI and machine learning" },
-      { id: "c", text: "Cybersecurity and networking" },
-      { id: "d", text: "Design and user experience" },
+    { id: 2, category: 'technology', question: tr('testData.whichTechAreaInterestsYouMost'), options: [
+      { id: "a", text: tr('testData.softwareDevelopmentAndCoding') },
+      { id: "b", text: tr('testData.aiAndMachineLearning') },
+      { id: "c", text: tr('testData.cybersecurityAndNetworking') },
+      { id: "d", text: tr('testData.designAndUserExperience') },
     ]},
-    { id: 3, category: 'technology', question: "How do you learn new technologies?", options: [
-      { id: "a", text: "Online courses and documentation" },
-      { id: "b", text: "Building projects from scratch" },
-      { id: "c", text: "Contributing to open-source" },
-      { id: "d", text: "Attending workshops and hackathons" },
+    { id: 3, category: 'technology', question: tr('testData.howDoYouLearnNewTechnologies'), options: [
+      { id: "a", text: tr('testData.onlineCoursesAndDocumentation') },
+      { id: "b", text: tr('testData.buildingProjectsFromScratch') },
+      { id: "c", text: tr('testData.contributingToOpenSource') },
+      { id: "d", text: tr('testData.attendingWorkshopsAndHackathons') },
     ]},
-    { id: 4, category: 'technology', question: "What motivates you in tech?", options: [
-      { id: "a", text: "Solving complex problems" },
-      { id: "b", text: "Building products people use" },
-      { id: "c", text: "Pushing technological boundaries" },
-      { id: "d", text: "Making money and career growth" },
+    { id: 4, category: 'technology', question: tr('testData.whatMotivatesYouInTech'), options: [
+      { id: "a", text: tr('testData.solvingComplexProblems') },
+      { id: "b", text: tr('testData.buildingProductsPeopleUse') },
+      { id: "c", text: tr('testData.pushingTechnologicalBoundaries') },
+      { id: "d", text: tr('testData.makingMoneyAndCareerGrowth') },
     ]},
-    { id: 5, category: 'technology', question: "Your ideal tech role is:", options: [
-      { id: "a", text: "Full-stack developer" },
-      { id: "b", text: "Data scientist / AI engineer" },
-      { id: "c", text: "Tech lead / Architect" },
-      { id: "d", text: "Product manager / Designer" },
+    { id: 5, category: 'technology', question: tr('testData.yourIdealTechRoleIs'), options: [
+      { id: "a", text: tr('testData.fullStackDeveloper') },
+      { id: "b", text: tr('testData.dataScientistAiEngineer') },
+      { id: "c", text: tr('testData.techLeadArchitect') },
+      { id: "d", text: tr('testData.productManagerDesigner') },
     ]},
   ],
   business: [
-    { id: 1, category: 'business', question: "How do you handle decision-making?", options: [
-      { id: "a", text: "Data-driven - I analyze numbers first" },
-      { id: "b", text: "Intuitive - I trust my gut feeling" },
-      { id: "c", text: "Collaborative - I consult my team" },
-      { id: "d", text: "Strategic - I think long-term impact" },
+    { id: 1, category: 'business', question: tr('testData.howDoYouHandleDecisionMaking'), options: [
+      { id: "a", text: tr('testData.dataDrivenIAnalyzeNumbersFirst') },
+      { id: "b", text: tr('testData.intuitiveITrustMyGutFeeling') },
+      { id: "c", text: tr('testData.collaborativeIConsultMyTeam') },
+      { id: "d", text: tr('testData.strategicIThinkLongTermImpact') },
     ]},
-    { id: 2, category: 'business', question: "What's your leadership style?", options: [
-      { id: "a", text: "Visionary - I inspire with big ideas" },
-      { id: "b", text: "Servant leader - I empower my team" },
-      { id: "c", text: "Results-driven - I focus on outcomes" },
-      { id: "d", text: "Adaptive - I change approach as needed" },
+    { id: 2, category: 'business', question: tr('testData.whatSYourLeadershipStyle'), options: [
+      { id: "a", text: tr('testData.visionaryIInspireWithBigIdeas') },
+      { id: "b", text: tr('testData.servantLeaderIEmpowerMyTeam') },
+      { id: "c", text: tr('testData.resultsDrivenIFocusOnOutcomes') },
+      { id: "d", text: tr('testData.adaptiveIChangeApproachAsNeeded') },
     ]},
-    { id: 3, category: 'business', question: "Which business area excites you?", options: [
-      { id: "a", text: "Marketing and branding" },
-      { id: "b", text: "Finance and investment" },
-      { id: "c", text: "Operations and management" },
-      { id: "d", text: "Entrepreneurship and startups" },
+    { id: 3, category: 'business', question: tr('testData.whichBusinessAreaExcitesYou'), options: [
+      { id: "a", text: tr('testData.marketingAndBranding') },
+      { id: "b", text: tr('testData.financeAndInvestment') },
+      { id: "c", text: tr('testData.operationsAndManagement') },
+      { id: "d", text: tr('testData.entrepreneurshipAndStartups') },
     ]},
-    { id: 4, category: 'business', question: "How do you handle risk?", options: [
-      { id: "a", text: "I take calculated risks with research" },
-      { id: "b", text: "I'm a natural risk-taker" },
-      { id: "c", text: "I prefer safe, proven strategies" },
-      { id: "d", text: "I balance risk and safety" },
+    { id: 4, category: 'business', question: tr('testData.howDoYouHandleRisk'), options: [
+      { id: "a", text: tr('testData.iTakeCalculatedRisksWithResearch') },
+      { id: "b", text: tr('testData.iMANaturalRiskTaker') },
+      { id: "c", text: tr('testData.iPreferSafeProvenStrategies') },
+      { id: "d", text: tr('testData.iBalanceRiskAndSafety') },
     ]},
-    { id: 5, category: 'business', question: "What's most important in business?", options: [
-      { id: "a", text: "Innovation and disruption" },
-      { id: "b", text: "Customer satisfaction" },
-      { id: "c", text: "Profit and growth" },
-      { id: "d", text: "Social impact and sustainability" },
+    { id: 5, category: 'business', question: tr('testData.whatSMostImportantInBusiness'), options: [
+      { id: "a", text: tr('testData.innovationAndDisruption') },
+      { id: "b", text: tr('testData.customerSatisfaction') },
+      { id: "c", text: tr('testData.profitAndGrowth') },
+      { id: "d", text: tr('testData.socialImpactAndSustainability') },
     ]},
   ],
   science: [
-    { id: 1, category: 'science', question: "What's your approach to research?", options: [
-      { id: "a", text: "Hypothesis-driven experimentation" },
-      { id: "b", text: "Data analysis and pattern recognition" },
-      { id: "c", text: "Literature review and synthesis" },
-      { id: "d", text: "Fieldwork and observation" },
+    { id: 1, category: 'science', question: tr('testData.whatSYourApproachToResearch'), options: [
+      { id: "a", text: tr('testData.hypothesisDrivenExperimentation') },
+      { id: "b", text: tr('testData.dataAnalysisAndPatternRecognition') },
+      { id: "c", text: tr('testData.literatureReviewAndSynthesis') },
+      { id: "d", text: tr('testData.fieldworkAndObservation') },
     ]},
-    { id: 2, category: 'science', question: "Which scientific field fascinates you?", options: [
-      { id: "a", text: "Physics and mathematics" },
-      { id: "b", text: "Biology and life sciences" },
-      { id: "c", text: "Chemistry and materials" },
-      { id: "d", text: "Environmental and earth sciences" },
+    { id: 2, category: 'science', question: tr('testData.whichScientificFieldFascinatesYou'), options: [
+      { id: "a", text: tr('testData.physicsAndMathematics') },
+      { id: "b", text: tr('testData.biologyAndLifeSciences') },
+      { id: "c", text: tr('testData.chemistryAndMaterials') },
+      { id: "d", text: tr('testData.environmentalAndEarthSciences') },
     ]},
-    { id: 3, category: 'science', question: "How do you process complex information?", options: [
-      { id: "a", text: "Visual models and diagrams" },
-      { id: "b", text: "Mathematical formulas" },
-      { id: "c", text: "Written explanations" },
-      { id: "d", text: "Hands-on experiments" },
+    { id: 3, category: 'science', question: tr('testData.howDoYouProcessComplexInformation'), options: [
+      { id: "a", text: tr('testData.visualModelsAndDiagrams') },
+      { id: "b", text: tr('testData.mathematicalFormulas') },
+      { id: "c", text: tr('testData.writtenExplanations') },
+      { id: "d", text: tr('testData.handsOnExperiments') },
     ]},
-    { id: 4, category: 'science', question: "What drives your curiosity?", options: [
-      { id: "a", text: "Understanding how things work" },
-      { id: "b", text: "Discovering something new" },
-      { id: "c", text: "Solving real-world problems" },
-      { id: "d", text: "Teaching and sharing knowledge" },
+    { id: 4, category: 'science', question: tr('testData.whatDrivesYourCuriosity'), options: [
+      { id: "a", text: tr('testData.understandingHowThingsWork') },
+      { id: "b", text: tr('testData.discoveringSomethingNew') },
+      { id: "c", text: tr('testData.solvingRealWorldProblems') },
+      { id: "d", text: tr('testData.teachingAndSharingKnowledge') },
     ]},
-    { id: 5, category: 'science', question: "Your ideal science career:", options: [
-      { id: "a", text: "Academic researcher / Professor" },
-      { id: "b", text: "Industry R&D scientist" },
-      { id: "c", text: "Science communicator / Writer" },
-      { id: "d", text: "Medical / Healthcare professional" },
+    { id: 5, category: 'science', question: tr('testData.yourIdealScienceCareer'), options: [
+      { id: "a", text: tr('testData.academicResearcherProfessor') },
+      { id: "b", text: tr('testData.industryRDScientist') },
+      { id: "c", text: tr('testData.scienceCommunicatorWriter') },
+      { id: "d", text: tr('testData.medicalHealthcareProfessional') },
     ]},
   ],
 };
@@ -234,40 +235,40 @@ export const questions = questionsByCategory.arts;
 export const getResultsByCategory = (category: string, answers: Record<number, string>): TalentArea[] => {
   const resultMaps: Record<string, TalentArea[]> = {
     sports: [
-      { area: "Team Sports", score: 0, description: "Strong aptitude for collaborative team-based sports" },
-      { area: "Individual Performance", score: 0, description: "Excel in solo competitive disciplines" },
-      { area: "Combat & Martial Arts", score: 0, description: "Natural fit for combat sports and martial arts" },
-      { area: "Artistic Sports", score: 0, description: "Talent for dance, gymnastics and expressive movement" },
+      { area: tr('testData.teamSports'), score: 0, description: tr('testData.strongAptitudeForCollaborativeTeamBased') },
+      { area: tr('testData.individualPerformance'), score: 0, description: tr('testData.excelInSoloCompetitiveDisciplines') },
+      { area: tr('testData.combatMartialArts'), score: 0, description: tr('testData.naturalFitForCombatSportsAnd') },
+      { area: tr('testData.artisticSports'), score: 0, description: tr('testData.talentForDanceGymnasticsAndExpressive') },
     ],
     arts: [
-      { area: "Visual Arts", score: 0, description: "Strong aptitude for painting, drawing and visual expression" },
-      { area: "Performing Arts", score: 0, description: "Natural talent for stage, acting and live performance" },
-      { area: "Digital Arts", score: 0, description: "Skills in digital creation, photography and design" },
-      { area: "Literary Arts", score: 0, description: "Gift for writing, storytelling and narrative" },
+      { area: tr('testData.visualArts'), score: 0, description: tr('testData.strongAptitudeForPaintingDrawingAnd') },
+      { area: tr('testData.performingArts'), score: 0, description: tr('testData.naturalTalentForStageActingAnd') },
+      { area: tr('testData.digitalArts'), score: 0, description: tr('testData.skillsInDigitalCreationPhotographyAnd') },
+      { area: tr('testData.literaryArts'), score: 0, description: tr('testData.giftForWritingStorytellingAndNarrative') },
     ],
     music: [
-      { area: "Instrumental Performance", score: 0, description: "Technical mastery of musical instruments" },
-      { area: "Vocal Performance", score: 0, description: "Singing ability and vocal control" },
-      { area: "Music Production", score: 0, description: "Skills in recording, mixing and sound design" },
-      { area: "Composition", score: 0, description: "Talent for creating original music and songwriting" },
+      { area: tr('testData.instrumentalPerformance'), score: 0, description: tr('testData.technicalMasteryOfMusicalInstruments') },
+      { area: tr('testData.vocalPerformance'), score: 0, description: tr('testData.singingAbilityAndVocalControl') },
+      { area: tr('testData.musicProduction'), score: 0, description: tr('testData.skillsInRecordingMixingAndSound') },
+      { area: tr('testData.composition'), score: 0, description: tr('testData.talentForCreatingOriginalMusicAnd') },
     ],
     technology: [
-      { area: "Software Development", score: 0, description: "Coding and application building skills" },
-      { area: "AI & Data Science", score: 0, description: "Machine learning and data analysis aptitude" },
-      { area: "System Architecture", score: 0, description: "Design of complex technical systems" },
-      { area: "UX/Product Design", score: 0, description: "User experience and product thinking" },
+      { area: tr('testData.softwareDevelopment'), score: 0, description: tr('testData.codingAndApplicationBuildingSkills') },
+      { area: tr('testData.aiDataScience'), score: 0, description: tr('testData.machineLearningAndDataAnalysisAptitude') },
+      { area: tr('testData.systemArchitecture'), score: 0, description: tr('testData.designOfComplexTechnicalSystems') },
+      { area: tr('testData.uxProductDesign'), score: 0, description: tr('testData.userExperienceAndProductThinking') },
     ],
     business: [
-      { area: "Marketing & Brand", score: 0, description: "Marketing strategy and brand building" },
-      { area: "Finance & Investment", score: 0, description: "Financial analysis and investment skills" },
-      { area: "Leadership & Management", score: 0, description: "People management and organizational leadership" },
-      { area: "Entrepreneurship", score: 0, description: "Startup mindset and business creation" },
+      { area: tr('testData.marketingBrand'), score: 0, description: tr('testData.marketingStrategyAndBrandBuilding') },
+      { area: tr('testData.financeInvestment'), score: 0, description: tr('testData.financialAnalysisAndInvestmentSkills') },
+      { area: tr('testData.leadershipManagement'), score: 0, description: tr('testData.peopleManagementAndOrganizationalLeadership') },
+      { area: tr('testData.entrepreneurship'), score: 0, description: tr('testData.startupMindsetAndBusinessCreation') },
     ],
     science: [
-      { area: "Pure Research", score: 0, description: "Theoretical and experimental research aptitude" },
-      { area: "Applied Science", score: 0, description: "Practical application of scientific knowledge" },
-      { area: "Data Analysis", score: 0, description: "Statistical analysis and pattern recognition" },
-      { area: "Science Communication", score: 0, description: "Ability to explain and teach complex concepts" },
+      { area: tr('testData.pureResearch'), score: 0, description: tr('testData.theoreticalAndExperimentalResearchAptitude') },
+      { area: tr('testData.appliedScience'), score: 0, description: tr('testData.practicalApplicationOfScientificKnowledge') },
+      { area: tr('testData.dataAnalysis'), score: 0, description: tr('testData.statisticalAnalysisAndPatternRecognition') },
+      { area: tr('testData.scienceCommunication'), score: 0, description: tr('testData.abilityToExplainAndTeachComplex') },
     ],
   };
 

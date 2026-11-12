@@ -51,6 +51,7 @@ import { fetchOwnProfile } from '@/lib/profiles';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { tr } from '@/i18n';
 
 interface TalentPresence {
   id: string;
@@ -173,13 +174,13 @@ const Profile: React.FC = () => {
   const sectionTabs = [
     {
       key: "work",
-      label: "YAT Work",
+      label: tr('sidebar.yatWork'),
       icon: Briefcase,
       color: "bg-blue-500/20 text-blue-500",
     },
     {
       key: "learning",
-      label: "YAT Learning",
+      label: tr('sidebar.yatLearning'),
       icon: GraduationCap,
       color: "bg-green-500/20 text-green-500",
     },
@@ -197,13 +198,13 @@ const Profile: React.FC = () => {
     },
     {
       key: "events",
-      label: "YAT Events",
+      label: tr('sidebar.yatEvents'),
       icon: Calendar,
       color: "bg-orange-500/20 text-orange-500",
     },
     {
       key: "karta",
-      label: "YAT Karta",
+      label: tr('sidebar.yatKarta'),
       icon: Map,
       color: "bg-teal-500/20 text-teal-500",
     },
@@ -215,13 +216,13 @@ const Profile: React.FC = () => {
     },
     {
       key: "marketplace",
-      label: "YAT Marketplace",
+      label: tr('sidebar.yatMarketplace'),
       icon: ShoppingBag,
       color: "bg-orange-600/20 text-orange-600",
     },
     {
       key: "social",
-      label: "YAT Social",
+      label: tr('sidebar.yatSocial'),
       icon: Globe,
       color: "bg-indigo-500/20 text-indigo-500",
     },
@@ -507,7 +508,7 @@ const Profile: React.FC = () => {
               >
                 {t("feed.whatsNew", {
                   name: (displayProfile.name || "").split(" ")[0],
-                }) || "Quoi de neuf ?"}
+                }) || tr('post.placeholder')}
               </Button>
             }
             userAvatar={displayProfile.avatar_url || displayProfile.avatar}
@@ -547,7 +548,7 @@ const Profile: React.FC = () => {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Award className="h-4 w-4" /> Бейджи
+                  <Award className="h-4 w-4" /> {tr('profile.badges')}
                   <Badge variant="secondary">{userBadges.length}</Badge>
                 </CardTitle>
               </CardHeader>
@@ -579,7 +580,7 @@ const Profile: React.FC = () => {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <History className="h-4 w-4" /> История YAT Coin
+                <History className="h-4 w-4" /> {tr('profile.yatCoinHistory')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -601,7 +602,7 @@ const Profile: React.FC = () => {
                           {tx.reason === "post" ? "📝" : "❤️"}
                         </span>
                         <span className="capitalize">
-                          {tx.reason === "post" ? "Публикация" : "Лайк"}
+                          {tx.reason === "post" ? tr('profile.post') : tr('profile.like')}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
@@ -621,7 +622,7 @@ const Profile: React.FC = () => {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Ещё нет начислений. Создавайте посты и получайте лайки!
+                  {tr('profile.noEarningsYetCreatePostsAnd')}
                 </p>
               )}
             </CardContent>
@@ -639,8 +640,8 @@ const Profile: React.FC = () => {
           {userId && (
             <Tabs defaultValue="sources" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="sources">Sources externes</TabsTrigger>
-                <TabsTrigger value="networks">Mes réseaux</TabsTrigger>
+                <TabsTrigger value="sources">{tr('profile.externalSources')}</TabsTrigger>
+                <TabsTrigger value="networks">{tr('common.myNetworks')}</TabsTrigger>
               </TabsList>
               <TabsContent value="sources" className="mt-2">
                 <ProfileSources userId={userId} />

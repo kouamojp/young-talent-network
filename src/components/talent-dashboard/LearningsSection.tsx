@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, BookOpen, Clock, Users, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import { tr } from '@/i18n';
 
 interface CourseRow {
   id: string;
@@ -64,14 +65,14 @@ const LearningsSection: React.FC = () => {
     <div className="space-y-6">
       {enrollments.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Mes cours suivis</h3>
+          <h3 className="text-lg font-semibold">{tr('learningsSection.myEnrolledCourses')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {enrollments.map(e => (
               <Card key={e.course_id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/course/${e.course_id}`)}>
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-semibold break-words">{e.course?.title || 'Cours'}</h4>
-                    {e.completed && <Badge className="shrink-0">Terminé</Badge>}
+                    <h4 className="font-semibold break-words">{e.course?.title || tr('common.courses')}</h4>
+                    {e.completed && <Badge className="shrink-0">{tr('funding.completed')}</Badge>}
                   </div>
                   <Progress value={e.progress || 0} />
                   <p className="text-xs text-muted-foreground tabular-nums">{e.progress || 0} %</p>
@@ -83,10 +84,10 @@ const LearningsSection: React.FC = () => {
       )}
 
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Contenus pédagogiques</h3>
+        <h3 className="text-lg font-semibold">{tr('learningsSection.learningContent')}</h3>
         <Button onClick={() => navigate('/learning')}>
           <Plus className="h-4 w-4 mr-2" />
-          Ajouter un contenu
+          {tr('learningsSection.addContent')}
         </Button>
       </div>
 
@@ -94,10 +95,10 @@ const LearningsSection: React.FC = () => {
         <Card className="border-dashed">
           <CardContent className="p-6 text-center">
             <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-600 mb-4">Partagez votre savoir en créant un cours</p>
+            <p className="text-gray-600 mb-4">{tr('learningsSection.shareYourKnowledgeByCreatingA')}</p>
             <Button variant="outline" onClick={() => navigate('/learning')}>
               <BookOpen className="h-4 w-4 mr-2" />
-              Créer un cours
+              {tr('learning.createCourse')}
             </Button>
           </CardContent>
         </Card>
@@ -124,15 +125,15 @@ const LearningsSection: React.FC = () => {
                 {item.description && <p className="text-sm text-gray-600 line-clamp-2">{item.description}</p>}
 
                 <div className="flex justify-between text-sm text-gray-600">
-                  <span className="flex items-center gap-1"><Users className="h-3 w-3" />{item.students} inscrits</span>
+                  <span className="flex items-center gap-1"><Users className="h-3 w-3" />{item.students} {tr('common.enrolled')}</span>
                   {item.duration_hours != null && (
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{item.duration_hours}h</span>
                   )}
-                  <span className="font-semibold">{item.price != null && item.price > 0 ? `${item.price} €` : 'Gratuit'}</span>
+                  <span className="font-semibold">{item.price != null && item.price > 0 ? `${item.price} €` : tr('common.free')}</span>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button size="sm" className="flex-1" onClick={() => navigate(`/course/${item.id}`)}>Gérer les leçons</Button>
+                  <Button size="sm" className="flex-1" onClick={() => navigate(`/course/${item.id}`)}>{tr('learningsSection.manageLessons')}</Button>
                 </div>
               </CardContent>
             </Card>

@@ -6,19 +6,20 @@ import { Button } from '@/components/ui/button';
 import { Briefcase, GraduationCap, Radio, Tv, Calendar, Map, Coins, ShoppingBag, Globe, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 interface Presence { id: string; section: string; is_active: boolean; visibility: string }
 
 const SECTIONS = [
-  { key: 'work', label: 'YAT Work', icon: Briefcase, color: 'bg-blue-500/20 text-blue-600', route: '/work' },
-  { key: 'learning', label: 'YAT Learning', icon: GraduationCap, color: 'bg-green-500/20 text-green-600', route: '/learning' },
+  { key: 'work', label: tr('sidebar.yatWork'), icon: Briefcase, color: 'bg-blue-500/20 text-blue-600', route: '/work' },
+  { key: 'learning', label: tr('sidebar.yatLearning'), icon: GraduationCap, color: 'bg-green-500/20 text-green-600', route: '/learning' },
   { key: 'live', label: 'YAT Live', icon: Radio, color: 'bg-red-500/20 text-red-600', route: '/live' },
   { key: 'tv', label: 'YAT TV', icon: Tv, color: 'bg-purple-500/20 text-purple-600', route: '/tv' },
-  { key: 'events', label: 'YAT Events', icon: Calendar, color: 'bg-orange-500/20 text-orange-600', route: '/events' },
-  { key: 'karta', label: 'YAT Karta', icon: Map, color: 'bg-teal-500/20 text-teal-600', route: '/karta' },
+  { key: 'events', label: tr('sidebar.yatEvents'), icon: Calendar, color: 'bg-orange-500/20 text-orange-600', route: '/events' },
+  { key: 'karta', label: tr('sidebar.yatKarta'), icon: Map, color: 'bg-teal-500/20 text-teal-600', route: '/karta' },
   { key: 'yat-coin', label: 'YAT Coin', icon: Coins, color: 'bg-yellow-500/20 text-yellow-600', route: '/yat-coin' },
-  { key: 'marketplace', label: 'YAT Marketplace', icon: ShoppingBag, color: 'bg-orange-600/20 text-orange-700', route: '/marketplace' },
-  { key: 'social', label: 'YAT Social', icon: Globe, color: 'bg-indigo-500/20 text-indigo-600', route: '/social' },
+  { key: 'marketplace', label: tr('sidebar.yatMarketplace'), icon: ShoppingBag, color: 'bg-orange-600/20 text-orange-700', route: '/marketplace' },
+  { key: 'social', label: tr('sidebar.yatSocial'), icon: Globe, color: 'bg-indigo-500/20 text-indigo-600', route: '/social' },
 ];
 
 const OverviewSection: React.FC = () => {
@@ -40,7 +41,7 @@ const OverviewSection: React.FC = () => {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Vue d'ensemble de mes profils YAT</CardTitle>
+        <CardTitle className="text-base">{tr('overviewSection.overviewOfMyYatProfiles')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

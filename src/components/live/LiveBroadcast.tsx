@@ -9,6 +9,7 @@ import { streamCategories } from './data/liveData';
 import { VideoIcon, MapPin, Sparkles, LightbulbIcon, Loader2 } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface LiveBroadcastProps {
   onWentLive?: (streamId: string) => void;
@@ -35,10 +36,10 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
   }, []);
 
   const titleSuggestions = [
-    "My First Guitar Composition 🎸",
-    "Soccer Training Drills - Day 5",
-    "Painting Landscapes with Watercolors",
-    "Coding a Simple Game in Python"
+    tr('liveBroadcast.myFirstGuitarComposition'),
+    tr('liveBroadcast.footballTrainingDrillsDay5'),
+    tr('liveBroadcast.paintingLandscapesWithWatercolors'),
+    tr('liveBroadcast.codingASimpleGameInPython')
   ];
   
   const selectRandomTitle = () => {
@@ -60,7 +61,7 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: "Connexion requise", description: "Connectez-vous pour lancer un direct.", variant: "destructive" });
+      toast({ title: tr('messages.loginRequired'), description: tr('liveBroadcast.logInToStartALive'), variant: "destructive" });
       setSubmitting(false);
       return;
     }
@@ -84,13 +85,13 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
     setSubmitting(false);
 
     if (error || !data) {
-      toast({ title: "Échec du lancement", description: error?.message, variant: "destructive" });
+      toast({ title: tr('liveBroadcast.couldNotStart'), description: error?.message, variant: "destructive" });
       return;
     }
 
     toast({
-      title: "You're live!",
-      description: "Your stream has started. Share it with your followers!",
+      title: tr('liveBroadcast.youReLive'),
+      description: tr('liveBroadcast.yourStreamHasStartedShareIt'),
       variant: "default",
     });
     onWentLive?.(data.id);
@@ -101,9 +102,9 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
       <div className="bg-white/60 rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
           <VideoIcon className="h-5 w-5 text-red-500" />
-          Go LIVE! Share Your Talent
+          {tr('liveBroadcast.goLiveShareYourTalent')}
         </h2>
-        <p className="text-gray-600 mb-6">Simple 3-step setup to start streaming</p>
+        <p className="text-gray-600 mb-6">{tr('liveBroadcast.simple3StepSetupToStart')}</p>
         
         <div className="flex items-center justify-between mb-8">
           {[1, 2, 3].map(stepNumber => (
@@ -124,7 +125,7 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
                   {step > stepNumber ? '✓' : stepNumber}
                 </div>
                 <span className="text-sm">
-                  {stepNumber === 1 ? 'Theme' : stepNumber === 2 ? 'Location' : 'Details'}
+                  {stepNumber === 1 ? tr('settings.theme') : stepNumber === 2 ? tr('post.addLocation') : tr('liveBroadcast.details')}
                 </span>
               </div>
               
@@ -139,11 +140,11 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
         
         {step === 1 && (
           <div className="space-y-6">
-            <h3 className="text-lg font-medium mb-2">What's your vibe today?</h3>
+            <h3 className="text-lg font-medium mb-2">{tr('liveBroadcast.whatSYourVibeToday')}</h3>
             <div className="space-y-4">
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={tr('liveBroadcast.selectACategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {streamCategories.map(cat => (
@@ -159,7 +160,7 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
               
               {category && (
                 <div>
-                  <label className="block text-sm font-medium mb-2">Subcategories</label>
+                  <label className="block text-sm font-medium mb-2">{tr('liveBroadcast.subcategories')}</label>
                   <div className="flex flex-wrap gap-2">
                     {streamCategories.find(c => c.id === category)?.subcategories.map((sub, index) => (
                       <Button key={index} variant="outline" size="sm" className="rounded-full">
@@ -172,47 +173,47 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
             </div>
             
             <div className="flex justify-end">
-              <Button onClick={goToNextStep} disabled={!category}>Next: Location</Button>
+              <Button onClick={goToNextStep} disabled={!category}>{tr('liveBroadcast.nextLocation')}</Button>
             </div>
           </div>
         )}
         
         {step === 2 && (
           <div className="space-y-6">
-            <h3 className="text-lg font-medium mb-2">Share your creative space!</h3>
+            <h3 className="text-lg font-medium mb-2">{tr('liveBroadcast.shareYourCreativeSpace')}</h3>
             <div className="space-y-4">
               <div className="flex items-center gap-2 bg-blue-50 p-3 rounded-md">
                 <MapPin className="h-5 w-5 text-blue-500" />
                 <div>
-                  <span className="font-medium">Auto-detected:</span> <span className="text-gray-600">{detectedLocation || 'Non défini'}</span>
+                  <span className="font-medium">{tr('liveBroadcast.autoDetected')}</span> <span className="text-gray-600">{detectedLocation || tr('liveBroadcast.notSet')}</span>
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Use different location (optional)</label>
+                <label className="block text-sm font-medium mb-2">{tr('liveBroadcast.useADifferentLocationOptional')}</label>
                 <Input 
-                  placeholder="Enter city, country..."
+                  placeholder={tr('liveBroadcast.enterCityCountry')}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
-                <p className="text-xs text-gray-500 mt-1">Leave blank to use auto-detected location</p>
+                <p className="text-xs text-gray-500 mt-1">{tr('liveBroadcast.leaveBlankToUseTheAuto')}</p>
               </div>
             </div>
             
             <div className="flex justify-between">
-              <Button variant="outline" onClick={goToPrevStep}>Back: Theme</Button>
-              <Button onClick={goToNextStep}>Next: Details</Button>
+              <Button variant="outline" onClick={goToPrevStep}>{tr('liveBroadcast.backTheme')}</Button>
+              <Button onClick={goToNextStep}>{tr('liveBroadcast.nextDetails')}</Button>
             </div>
           </div>
         )}
         
         {step === 3 && (
           <div className="space-y-6">
-            <h3 className="text-lg font-medium mb-2">Almost ready to go live!</h3>
+            <h3 className="text-lg font-medium mb-2">{tr('liveBroadcast.almostReadyToGoLive')}</h3>
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-sm font-medium">Stream Title</label>
+                  <label className="block text-sm font-medium">{tr('liveBroadcast.streamTitle')}</label>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -220,21 +221,21 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
                     className="text-xs flex items-center gap-1 h-6 text-purple-600"
                   >
                     <Sparkles className="h-3 w-3" />
-                    <span>Suggest</span>
+                    <span>{tr('liveBroadcast.suggest')}</span>
                   </Button>
                 </div>
                 <Input 
-                  placeholder="Enter a catchy title for your stream..."
+                  placeholder={tr('liveBroadcast.enterACatchyTitleForYour')}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
-                <p className="text-xs text-gray-500 mt-1">Catchy title = more viewers!</p>
+                <p className="text-xs text-gray-500 mt-1">{tr('liveBroadcast.catchyTitleMoreViewers')}</p>
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1">Stream Description (optional)</label>
+                <label className="block text-sm font-medium mb-1">{tr('liveBroadcast.streamDescriptionOptional')}</label>
                 <Textarea 
-                  placeholder="Tell viewers what to expect in your stream..."
+                  placeholder={tr('liveBroadcast.tellViewersWhatToExpectIn')}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
@@ -246,25 +247,25 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
               <CardContent className="p-4 flex items-start gap-3">
                 <LightbulbIcon className="h-5 w-5 text-yellow-500 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-sm">Pro Tips</h4>
+                  <h4 className="font-medium text-sm">{tr('liveBroadcast.proTips')}</h4>
                   <ul className="text-xs text-gray-700 list-disc list-inside mt-1 space-y-1">
-                    <li>Good lighting makes your stream look professional</li>
-                    <li>Test your mic before going live</li>
-                    <li>Interact with your viewers by responding to comments</li>
+                    <li>{tr('liveBroadcast.goodLightingMakesYourStreamLook')}</li>
+                    <li>{tr('liveBroadcast.testYourMicBeforeGoingLive')}</li>
+                    <li>{tr('liveBroadcast.interactWithYourViewersByResponding')}</li>
                   </ul>
                 </div>
               </CardContent>
             </Card>
             
             <div className="flex justify-between">
-              <Button variant="outline" onClick={goToPrevStep}>Back: Location</Button>
+              <Button variant="outline" onClick={goToPrevStep}>{tr('liveBroadcast.backLocation')}</Button>
               <Button
                 onClick={handleGoLive}
                 disabled={!title.trim() || submitting}
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
                 {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <VideoIcon className="mr-2 h-4 w-4" />}
-                Go LIVE Now!
+                {tr('liveBroadcast.goLiveNow')}
               </Button>
             </div>
           </div>
@@ -274,9 +275,9 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
       <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex items-start gap-3">
         <Sparkles className="h-5 w-5 text-purple-500 mt-0.5" />
         <div>
-          <h3 className="font-medium text-sm">Surprise Rewards for First-Time Streamers!</h3>
+          <h3 className="font-medium text-sm">{tr('liveBroadcast.surpriseRewardsForFirstTimeStreamers')}</h3>
           <p className="text-xs text-gray-700 mt-1">
-            Complete your first stream and get special badges and increased visibility on the platform.
+            {tr('liveBroadcast.completeYourFirstStreamAndGet')}
           </p>
         </div>
       </div>

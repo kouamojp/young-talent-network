@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight } from 'lucide-react';
 import { TestCategory } from './testData';
+import { tr } from '@/i18n';
 
 type CategorySelectorProps = {
   categories: TestCategory[];
@@ -13,9 +14,9 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ categories, onSelec
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold mb-2">Choisissez une catégorie</h2>
+        <h2 className="text-xl font-bold mb-2">{tr('common.chooseACategory')}</h2>
         <p className="text-muted-foreground text-sm">
-          Sélectionnez le domaine dans lequel vous souhaitez tester vos aptitudes et découvrir vos capacités
+          {tr('categorySelector.selectTheFieldInWhichYou')}
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -32,8 +33,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({ categories, onSelec
             <h3 className="font-semibold text-lg mb-1">{cat.name}</h3>
             <p className="text-sm text-muted-foreground mb-3">{cat.description}</p>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">5 questions</Badge>
-              <Badge variant="secondary" className="text-xs">~3 min</Badge>
+              <Badge variant="outline" className="text-xs">{tr('categorySelector.5Questions')}</Badge>
+              <Badge variant="secondary" className="text-xs">{tr('categorySelector.3Min')}</Badge>
             </div>
           </Card>
         ))}

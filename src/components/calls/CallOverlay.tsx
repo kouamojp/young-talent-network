@@ -3,6 +3,7 @@ import { useCall } from '@/contexts/CallContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Phone, PhoneOff, Video, Mic, MicOff, VideoOff } from 'lucide-react';
+import { tr } from '@/i18n';
 
 const formatDuration = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -40,16 +41,16 @@ const CallOverlay: React.FC = () => {
           <h2 className="text-xl font-bold">{peer?.name}</h2>
           <p className="text-muted-foreground text-sm mb-8 flex items-center justify-center gap-1">
             {isVideo ? <Video className="h-4 w-4" /> : <Phone className="h-4 w-4" />}
-            Appel {isVideo ? 'vidéo' : 'audio'} entrant…
+            {tr('callOverlay.call')} {isVideo ? tr('common.video') : 'audio'} {tr('callOverlay.incoming')}
           </p>
           <div className="flex items-center justify-center gap-8">
             <button onClick={rejectCall} className="flex flex-col items-center gap-1">
               <span className="h-14 w-14 rounded-full bg-destructive flex items-center justify-center text-white"><PhoneOff className="h-6 w-6" /></span>
-              <span className="text-xs text-muted-foreground">Refuser</span>
+              <span className="text-xs text-muted-foreground">{tr('friends.decline')}</span>
             </button>
             <button onClick={acceptCall} className="flex flex-col items-center gap-1">
               <span className="h-14 w-14 rounded-full bg-green-600 flex items-center justify-center text-white animate-pulse"><Phone className="h-6 w-6" /></span>
-              <span className="text-xs text-muted-foreground">Accepter</span>
+              <span className="text-xs text-muted-foreground">{tr('friends.accept')}</span>
             </button>
           </div>
         </div>
@@ -76,9 +77,9 @@ const CallOverlay: React.FC = () => {
 
         {/* Status line */}
         <div className="absolute top-6 left-1/2 -translate-x-1/2 text-center">
-          {status === 'outgoing' && <p className="text-white/80 animate-pulse">Appel en cours…</p>}
+          {status === 'outgoing' && <p className="text-white/80 animate-pulse">{tr('callOverlay.calling')}</p>}
           {status === 'connected' && <p className="text-white/80">{formatDuration(elapsed)}</p>}
-          {status === 'ended' && <p className="text-white/80">Appel terminé</p>}
+          {status === 'ended' && <p className="text-white/80">{tr('callOverlay.callEnded')}</p>}
         </div>
 
         {/* Local preview */}

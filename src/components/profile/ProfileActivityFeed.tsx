@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, GraduationCap, Briefcase, Radio, ShoppingBag, Image as ImageIcon, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Props {
   userIds: string[];
@@ -33,7 +35,7 @@ const ICONS: Record<Activity['kind'], React.ElementType> = {
 };
 
 const KIND_LABEL: Record<Activity['kind'], string> = {
-  event: 'Événement',
+  event: tr('common.event'),
   course: 'Cours',
   job: 'Offre',
   live: 'LIVE',
@@ -50,7 +52,7 @@ const KIND_COLOR: Record<Activity['kind'], string> = {
   media: 'bg-pink-500/10 text-pink-600 border-pink-500/30',
 };
 
-export const ProfileActivityFeed: React.FC<Props> = ({ userIds, title = 'Activités', limit = 5 }) => {
+export const ProfileActivityFeed: React.FC<Props> = ({ userIds, title = tr('common.activity'), limit = 5 }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,13 +98,13 @@ export const ProfileActivityFeed: React.FC<Props> = ({ userIds, title = 'Activit
 
   if (loading) {
     return (
-      <div className="p-6 text-center text-sm text-muted-foreground">Chargement des activités…</div>
+      <div className="p-6 text-center text-sm text-muted-foreground">{tr('profileActivityFeed.loadingActivity')}</div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="p-6 text-center text-sm text-muted-foreground">Aucune activité publique dans les autres sections.</div>
+      <div className="p-6 text-center text-sm text-muted-foreground">{tr('profileActivityFeed.noPublicActivityInTheOther')}</div>
     );
   }
 
@@ -131,7 +133,7 @@ export const ProfileActivityFeed: React.FC<Props> = ({ userIds, title = 'Activit
                 </p>
               )}
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                {it.date ? new Date(it.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+                {it.date ? new Date(it.date).toLocaleDateString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
               </p>
             </div>
           </button>

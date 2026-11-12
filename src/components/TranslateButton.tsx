@@ -4,9 +4,10 @@ import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { tr } from '@/i18n';
 
 export const TRANSLATE_LANGUAGES = [
-  { code: 'auto', label: 'Auto-détection', flag: '🌐' },
+  { code: 'auto', label: tr('translateButton.autoDetect'), flag: '🌐' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'ru', label: 'Русский', flag: '🇷🇺' },
@@ -51,7 +52,7 @@ const TranslateButton: React.FC<Props> = ({ text, onTranslated, currentLang, siz
       if (!resp.ok) throw new Error(json.error || 'Erreur traduction');
       onTranslated(json.translated, target);
     } catch (e: any) {
-      toast({ title: 'Traduction échouée', description: e.message, variant: 'destructive' });
+      toast({ title: tr('translateButton.translationFailed'), description: e.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -67,11 +68,11 @@ const TranslateButton: React.FC<Props> = ({ text, onTranslated, currentLang, siz
           disabled={loading}
         >
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Languages className="h-3 w-3" />}
-          {label || (currentLang ? 'Traduit' : 'Traduire')}
+          {label || (currentLang ? tr('translateButton.translated') : tr('translateButton.translate'))}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuLabel className="text-xs">Traduire vers</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-xs">{tr('translateButton.translateTo')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {TRANSLATE_LANGUAGES.map(l => (
           <DropdownMenuItem key={l.code} onClick={() => translate(l.code)} className="text-sm">
@@ -84,7 +85,7 @@ const TranslateButton: React.FC<Props> = ({ text, onTranslated, currentLang, siz
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => onTranslated(null, null)} className="text-sm text-muted-foreground">
-              Voir l'original
+              {tr('translateButton.seeOriginal')}
             </DropdownMenuItem>
           </>
         )}

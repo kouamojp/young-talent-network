@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 declare global {
   interface Window {
@@ -40,18 +41,18 @@ const TelegramLoginButton: React.FC = () => {
     const friendly = (raw: string): string => {
       const m = (raw || '').toLowerCase();
       if (m.includes('bad telegram signature') || m.includes('signature'))
-        return 'Неверная подпись Telegram. Попробуйте войти ещё раз.';
+        return tr('telegramLoginButton.invalidTelegramSignaturePleaseTrySigning');
       if (m.includes('outdated') || m.includes('auth_date') || m.includes('expired'))
-        return 'Срок действия данных Telegram истёк. Пожалуйста, повторите вход.';
+        return tr('telegramLoginButton.theTelegramDataHasExpiredPlease');
       if (m.includes('invalid payload') || m.includes('invalid'))
-        return 'Некорректные данные от Telegram. Попробуйте ещё раз.';
+        return tr('telegramLoginButton.invalidDataFromTelegramPleaseTry');
       if (m.includes('not configured'))
-        return 'Telegram-вход временно недоступен. Попробуйте позже.';
+        return tr('telegramLoginButton.telegramSignInIsTemporarilyUnavailable');
       if (m.includes('failed to generate token'))
-        return 'Не удалось создать сессию. Попробуйте ещё раз.';
+        return tr('telegramLoginButton.couldNotCreateASessionPlease');
       if (m.includes('network') || m.includes('fetch'))
-        return 'Проблема с сетью. Проверьте подключение и повторите.';
-      return raw || 'Не удалось войти через Telegram.';
+        return tr('telegramLoginButton.networkProblemCheckYourConnectionAnd');
+      return raw || tr('telegramLoginButton.couldNotSignInWithTelegram');
     };
 
     window.onTelegramAuth = async (tgUser: any) => {
@@ -73,12 +74,12 @@ const TelegramLoginButton: React.FC = () => {
           token_hash: data.token_hash,
         });
         if (otpErr) throw otpErr;
-        toast({ title: 'Вход выполнен', description: 'Добро пожаловать!' });
+        toast({ title: tr('common.signedIn'), description: tr('common.welcome') });
         navigate('/profile');
       } catch (err: any) {
         console.error('Telegram auth error:', err);
         toast({
-          title: 'Ошибка входа через Telegram',
+          title: tr('telegramLoginButton.telegramSignInError'),
           description: friendly(err?.message ?? String(err)),
           variant: 'destructive',
         });
@@ -106,7 +107,7 @@ const TelegramLoginButton: React.FC = () => {
   if (!botUsername) {
     return (
       <div className="w-full text-center text-xs text-muted-foreground py-2 border rounded-md">
-        Загрузка Telegram…
+        {tr('telegramLoginButton.loadingTelegram')}
       </div>
     );
   }

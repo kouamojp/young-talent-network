@@ -1,3 +1,4 @@
+import { tr } from '@/i18n';
 
 export interface Category {
   id: number;
@@ -52,8 +53,8 @@ export const categories: Category[] = [
     icon: '🏆',
     color: 'bg-green-100',
     performanceTracking: {
-      title: "Athlete Profile Hub",
-      description: "Accessible from any sport category!",
+      title: tr('categories.athleteProfileHub'),
+      description: tr('categories.accessibleFromAnySportCategory'),
       features: [
         "🎮 Unlock achievements (e.g., 'Fast Footwork Frenzy')",
         "🤝 Compare stats with friends (friendly mode!)",
@@ -65,10 +66,10 @@ export const categories: Category[] = [
       {
         name: 'Team Sports',
         performanceMetrics: [
-          { name: "Speed drills", icon: "👟", description: "Track your sprint times and agility" },
-          { name: "Passing accuracy", icon: "🎯", description: "Measure passing completion percentage" },
-          { name: "Tactical IQ test", icon: "🧠", description: "Test your game awareness and decision making" },
-          { name: "Team synergy score", icon: "💛", description: "Rate how well you collaborate with teammates" }
+          { name: "Speed drills", icon: "👟", description: tr('categories.trackYourSprintTimesAndAgility') },
+          { name: "Passing accuracy", icon: "🎯", description: tr('categories.measurePassingCompletionPercentage') },
+          { name: "Tactical IQ test", icon: "🧠", description: tr('categories.testYourGameAwarenessAndDecision') },
+          { name: "Team synergy score", icon: "💛", description: tr('categories.rateHowWellYouCollaborateWith') }
         ],
         items: [
           { name: 'Football (Soccer)', icon: '⚽' },
@@ -86,10 +87,10 @@ export const categories: Category[] = [
       {
         name: 'Individual Sports',
         performanceMetrics: [
-          { name: "Serve/swing force", icon: "💪", description: "Measure the power of your shots" },
-          { name: "Precision radar", icon: "🎯", description: "Track your accuracy and consistency" },
-          { name: "Focus endurance", icon: "🧘", description: "Evaluate your mental concentration over time" },
-          { name: "Progress dashboard", icon: "📈", description: "Visualize your improvement over time" }
+          { name: "Serve/swing force", icon: "💪", description: tr('categories.measureThePowerOfYourShots') },
+          { name: "Precision radar", icon: "🎯", description: tr('categories.trackYourAccuracyAndConsistency') },
+          { name: "Focus endurance", icon: "🧘", description: tr('categories.evaluateYourMentalConcentrationOverTime') },
+          { name: "Progress dashboard", icon: "📈", description: tr('categories.visualizeYourImprovementOverTime') }
         ],
         items: [
           { name: 'Tennis', icon: '🎾' },
@@ -107,10 +108,10 @@ export const categories: Category[] = [
       {
         name: 'Martial Arts',
         performanceMetrics: [
-          { name: "Reaction time", icon: "⚡", description: "Test how quickly you respond to stimuli" },
-          { name: "Strike impact", icon: "🥊", description: "Measure the force of your strikes" },
-          { name: "Defense agility", icon: "🛡️", description: "Evaluate your defensive movements and evasions" },
-          { name: "Mental resilience", icon: "❤️", description: "Track your mental toughness under pressure" }
+          { name: "Reaction time", icon: "⚡", description: tr('categories.testHowQuicklyYouRespondTo') },
+          { name: "Strike impact", icon: "🥊", description: tr('categories.measureTheForceOfYourStrikes') },
+          { name: "Defense agility", icon: "🛡️", description: tr('categories.evaluateYourDefensiveMovementsAndEvasions') },
+          { name: "Mental resilience", icon: "❤️", description: tr('categories.trackYourMentalToughnessUnderPressure') }
         ],
         items: [
           { name: 'Karate', icon: '🥋' },
@@ -128,10 +129,10 @@ export const categories: Category[] = [
       {
         name: 'Quidditch for Beginners',
         performanceMetrics: [
-          { name: "Broom balance", icon: "🧹", description: "Test your stability while riding a broom" },
-          { name: "Snitch spotting", icon: "✨", description: "Measure your ability to spot the golden snitch" },
-          { name: "Quaffle accuracy", icon: "🎯", description: "Track your scoring percentage with the quaffle" },
-          { name: "Air time tracker", icon: "☁️", description: "Measure time spent airborne during practice" }
+          { name: "Broom balance", icon: "🧹", description: tr('categories.testYourStabilityWhileRidingA') },
+          { name: "Snitch spotting", icon: "✨", description: tr('categories.measureYourAbilityToSpotThe') },
+          { name: "Quaffle accuracy", icon: "🎯", description: tr('categories.trackYourScoringPercentageWithThe') },
+          { name: "Air time tracker", icon: "☁️", description: tr('categories.measureTimeSpentAirborneDuringPractice') }
         ],
         items: [
           { name: 'Basics of Broom Handling', icon: '🧹' },
@@ -144,10 +145,10 @@ export const categories: Category[] = [
       {
         name: 'Yoga & Wellness',
         performanceMetrics: [
-          { name: "Pose hold time", icon: "🕊️", description: "Track how long you can maintain challenging poses" },
-          { name: "Mind/body sync", icon: "☯️", description: "Measure your breath-movement coordination" },
-          { name: "Recovery score", icon: "🌿", description: "Evaluate how quickly your body recovers after sessions" },
-          { name: "Stress-o-meter", icon: "😌", description: "Monitor your stress levels before and after practice" }
+          { name: "Pose hold time", icon: "🕊️", description: tr('categories.trackHowLongYouCanMaintain') },
+          { name: "Mind/body sync", icon: "☯️", description: tr('categories.measureYourBreathMovementCoordination') },
+          { name: "Recovery score", icon: "🌿", description: tr('categories.evaluateHowQuicklyYourBodyRecovers') },
+          { name: "Stress-o-meter", icon: "😌", description: tr('categories.monitorYourStressLevelsBeforeAnd') }
         ],
         items: [
           { name: 'Hatha Yoga', icon: '🧘' },

@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { cn } from '@/lib/utils';
+import { tr } from '@/i18n';
 
 interface TalentPresence {
   id: string;
@@ -18,15 +19,15 @@ interface TalentPresence {
 }
 
 const SERVICES = [
-  { key: 'work', label: 'YAT Work', icon: Briefcase, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
-  { key: 'learning', label: 'YAT Learning', icon: GraduationCap, color: 'text-green-500', bgColor: 'bg-green-500/10' },
+  { key: 'work', label: tr('sidebar.yatWork'), icon: Briefcase, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+  { key: 'learning', label: tr('sidebar.yatLearning'), icon: GraduationCap, color: 'text-green-500', bgColor: 'bg-green-500/10' },
   { key: 'live', label: 'YAT Live', icon: Radio, color: 'text-red-500', bgColor: 'bg-red-500/10' },
   { key: 'tv', label: 'YAT TV', icon: Tv, color: 'text-purple-500', bgColor: 'bg-purple-500/10' },
-  { key: 'events', label: 'YAT Events', icon: Calendar, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
-  { key: 'karta', label: 'YAT Karta', icon: Map, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
+  { key: 'events', label: tr('sidebar.yatEvents'), icon: Calendar, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
+  { key: 'karta', label: tr('sidebar.yatKarta'), icon: Map, color: 'text-teal-500', bgColor: 'bg-teal-500/10' },
   { key: 'yat-coin', label: 'YAT Coin', icon: Coins, color: 'text-yellow-500', bgColor: 'bg-yellow-500/10' },
-  { key: 'marketplace', label: 'YAT Marketplace', icon: ShoppingBag, color: 'text-orange-600', bgColor: 'bg-orange-600/10' },
-  { key: 'social', label: 'YAT Social', icon: Globe, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10' },
+  { key: 'marketplace', label: tr('sidebar.yatMarketplace'), icon: ShoppingBag, color: 'text-orange-600', bgColor: 'bg-orange-600/10' },
+  { key: 'social', label: tr('sidebar.yatSocial'), icon: Globe, color: 'text-indigo-500', bgColor: 'bg-indigo-500/10' },
 ];
 
 export const YatServicesManager: React.FC = () => {
@@ -93,7 +94,7 @@ export const YatServicesManager: React.FC = () => {
           {t('services.title') || 'YAT Services'}
         </CardTitle>
         <CardDescription className="flex items-center gap-2">
-          {t('services.description') || 'Activate or deactivate the YAT services you want to use.'}
+          {t('services.description') || tr('services.description')}
           <Badge variant="secondary" className="ml-auto">
             {activeCount}/{SERVICES.length} {t('services.active') || 'active'}
           </Badge>

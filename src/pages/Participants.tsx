@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface Person {
   id: string;
@@ -20,7 +21,7 @@ interface Person {
 
 const PeopleList: React.FC<{ people: Person[]; onOpen: (p: Person) => void }> = ({ people, onOpen }) => {
   if (people.length === 0) {
-    return <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">Personne ne correspond à cette recherche.</p>;
+    return <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">{tr('participants.noOneMatchesThisSearch')}</p>;
   }
   return (
     <ul className="rounded-xl border border-border bg-card divide-y divide-border">
@@ -35,7 +36,7 @@ const PeopleList: React.FC<{ people: Person[]; onOpen: (p: Person) => void }> = 
                 <AvatarFallback>{p.name?.charAt(0) || '?'}</AvatarFallback>
               </Avatar>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{p.name || 'Sans nom'}</span>
+                <span className="block truncate font-semibold">{p.name || tr('common.unnamed')}</span>
                 <span className="flex flex-wrap gap-x-3 text-sm text-muted-foreground">
                   {role && <span className="truncate">{role}</span>}
                   {place && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" /><span className="truncate">{place}</span></span>}
@@ -83,11 +84,11 @@ const Participants: React.FC = () => {
   return (
     <div className="min-h-screen">
       <main className="max-w-3xl mx-auto px-4 py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-semibold mb-6">Participants</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold mb-6">{tr('landing.participants')}</h1>
 
         <div className="relative mb-6">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-10" placeholder="Rechercher par nom, discipline ou ville" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <Input className="pl-10" placeholder={tr('participants.searchByNameDisciplineOrCity')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
 
         {loading ? (
@@ -95,8 +96,8 @@ const Participants: React.FC = () => {
         ) : (
           <Tabs defaultValue="talents">
             <TabsList className="mb-4">
-              <TabsTrigger value="talents">Talents ({talents.length})</TabsTrigger>
-              <TabsTrigger value="agents">Agents ({agents.length})</TabsTrigger>
+              <TabsTrigger value="talents">{tr('common.talents')}{talents.length})</TabsTrigger>
+              <TabsTrigger value="agents">{tr('participants.agents')}{agents.length})</TabsTrigger>
             </TabsList>
             <TabsContent value="talents"><PeopleList people={talents} onOpen={open} /></TabsContent>
             <TabsContent value="agents"><PeopleList people={agents} onOpen={open} /></TabsContent>

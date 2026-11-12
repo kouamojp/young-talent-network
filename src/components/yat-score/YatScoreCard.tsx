@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trophy, Sparkles, ArrowRight, Loader2, RefreshCw, TrendingUp, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useYatScore } from '@/hooks/useYatScore';
+import { tr } from '@/i18n';
 
 interface Props {
   userId?: string;
@@ -33,8 +34,8 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
         <div className="flex items-center gap-2">
           <Trophy className={`h-5 w-5 ${tone}`} />
           <div>
-            <h3 className="font-semibold text-sm">YAT Score</h3>
-            <p className="text-[11px] text-muted-foreground">Mesure de votre attractivité</p>
+            <h3 className="font-semibold text-sm">{tr('feed.yatScore')}</h3>
+            <p className="text-[11px] text-muted-foreground">{tr('yatScoreCard.aMeasureOfYourAttractiveness')}</p>
           </div>
         </div>
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={refresh} disabled={loading}>
@@ -45,7 +46,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between">
           <span className={`text-3xl font-bold ${tone}`}>{data.yat_score}<span className="text-base text-muted-foreground">/100</span></span>
-          <Badge variant="outline" className="text-[10px]">Profil {data.profile_completion}%</Badge>
+          <Badge variant="outline" className="text-[10px]">{tr('sidebar.profile')} {data.profile_completion}%</Badge>
         </div>
         <Progress value={data.yat_score} className="h-2" />
         <p className="text-xs text-muted-foreground">{data.summary}</p>
@@ -53,7 +54,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
 
       {!compact && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold flex items-center gap-1"><Sparkles className="h-3.5 w-3.5 text-primary" /> Détail du score</p>
+          <p className="text-xs font-semibold flex items-center gap-1"><Sparkles className="h-3.5 w-3.5 text-primary" /> {tr('yatScoreCard.scoreBreakdown')}</p>
           {Object.entries(data.breakdown).map(([key, b]) => (
             <div key={key} className="space-y-1">
               <div className="flex items-center justify-between text-[11px]">
@@ -69,7 +70,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
       {data.improvements.length > 0 && (
         <div className="space-y-1 p-2 rounded-lg bg-amber-500/5 border border-amber-500/20">
           <p className="text-xs font-semibold flex items-center gap-1 text-amber-700 dark:text-amber-400">
-            <AlertCircle className="h-3.5 w-3.5" /> À améliorer
+            <AlertCircle className="h-3.5 w-3.5" /> {tr('yatScoreCard.toImprove')}
           </p>
           {data.improvements.slice(0, 3).map(s => (
             <div key={s} className="text-[11px] text-muted-foreground">→ {s}</div>
@@ -80,7 +81,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
       {data.strengths.length > 0 && !compact && (
         <div className="space-y-1 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
           <p className="text-xs font-semibold flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Vos forces
+            <CheckCircle2 className="h-3.5 w-3.5" /> {tr('yatScoreCard.yourStrengths')}
           </p>
           {data.strengths.slice(0, 3).map(s => (
             <div key={s} className="text-[11px] text-muted-foreground">✓ {s}</div>
@@ -90,7 +91,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
 
       {data.tips.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5 text-primary" /> Conseils ciblés</p>
+          <p className="text-xs font-semibold flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5 text-primary" /> {tr('yatScoreCard.targetedTips')}</p>
           {data.tips.slice(0, compact ? 2 : 4).map((t, i) => (
             <button
               key={i}
@@ -98,7 +99,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
               className="w-full text-left text-[11px] flex items-start gap-2 p-2 rounded-md hover:bg-muted/50 transition-colors group"
             >
               <span className="flex-1">{t.tip}</span>
-              {t.gain > 0 && <Badge variant="outline" className="text-[9px] shrink-0">+{t.gain}pts</Badge>}
+              {t.gain > 0 && <Badge variant="outline" className="text-[9px] shrink-0">+{t.gain}{tr('yatScoreCard.pts')}</Badge>}
               {t.action_link && <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition" />}
             </button>
           ))}
@@ -107,7 +108,7 @@ export const YatScoreCard = ({ userId, compact, showAnalyzeButton = true }: Prop
 
       {showAnalyzeButton && (
         <Button size="sm" variant="outline" className="w-full" onClick={() => navigate('/assistant')}>
-          <Sparkles className="h-3.5 w-3.5 mr-2" /> Analyser mon profil avec l'IA
+          <Sparkles className="h-3.5 w-3.5 mr-2" /> {tr('yatScoreCard.analyzeMyProfileWithAi')}
         </Button>
       )}
     </Card>

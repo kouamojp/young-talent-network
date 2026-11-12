@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, Heart, Users, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const AnalyticsDashboard: React.FC = () => {
   const [stats, setStats] = useState({ connections: 0, posts: 0, likes: 0, events: 0 });
@@ -32,10 +34,10 @@ const AnalyticsDashboard: React.FC = () => {
   }, []);
 
   const tiles = [
-    { title: 'Connexions', value: stats.connections, icon: Users, color: 'text-purple-600' },
-    { title: 'Publications', value: stats.posts, icon: FileText, color: 'text-blue-600' },
-    { title: "J'aime reçus", value: stats.likes, icon: Heart, color: 'text-pink-600' },
-    { title: 'Événements', value: stats.events, icon: TrendingUp, color: 'text-green-600' },
+    { title: tr('feed.connections'), value: stats.connections, icon: Users, color: 'text-purple-600' },
+    { title: tr('sidebar.posts'), value: stats.posts, icon: FileText, color: 'text-blue-600' },
+    { title: tr('analyticsDashboard.likesReceived'), value: stats.likes, icon: Heart, color: 'text-pink-600' },
+    { title: tr('landing.events'), value: stats.events, icon: TrendingUp, color: 'text-green-600' },
   ];
 
   return (
@@ -46,7 +48,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-bold">{stat.value.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{stat.value.toLocaleString(localeTag())}</p>
               </div>
               <stat.icon className={`h-8 w-8 ${stat.color}`} />
             </div>

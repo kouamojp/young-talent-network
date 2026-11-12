@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import i18n from './index';
+import { changeLanguage, currentLanguage, tr } from './index';
 import type { Language, TranslationKey } from './types';
 
 // Country code → language mapping (ISO 3166-1 alpha-2)
@@ -17,12 +16,11 @@ const COUNTRY_TO_LANG: Record<string, Language> = {
 };
 
 /**
- * LanguageProvider keeps the geolocation-based first-visit detection.
- * i18next itself is initialized in ./index and bound globally via initReactI18next,
- * so no I18nextProvider is required here.
+ * First-visit language detection by country (IP geolocation), used only when
+ * the visitor has never chosen a language. i18next itself is initialised in
+ * src/main.tsx before the app renders.
  */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Geolocation-based language detection (only if the user has not made a manual choice)
   useEffect(() => {
     if (localStorage.getItem('yat-language')) return;
     if (localStorage.getItem('yat-language-geo-tried')) return;
@@ -34,18 +32,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     fetch('https://ipapi.co/json/', { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
+        localStorage.setItem('yat-language-geo-tried', '1');
         if (cancelled || !data?.country_code) return;
         const mapped = COUNTRY_TO_LANG[data.country_code as string];
-        if (mapped) {
-          // changeLanguage persists to localStorage via the language detector cache.
-          i18n.changeLanguage(mapped);
-        }
+        // Saves the language and reloads once if it differs from the current one.
+        if (mapped) changeLanguage(mapped);
       })
-      .catch(() => { /* ignore */ })
-      .finally(() => {
-        clearTimeout(timeout);
-        localStorage.setItem('yat-language-geo-tried', '1');
-      });
+      .catch(() => { localStorage.setItem('yat-language-geo-tried', '1'); })
+      .finally(() => clearTimeout(timeout));
 
     return () => { cancelled = true; controller.abort(); clearTimeout(timeout); };
   }, []);
@@ -54,27 +48,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 };
 
 /**
- * Drop-in replacement for the previous custom hook. Same shape { t, language, setLanguage }
- * so no consumer needs to change. `t` supports the existing {param} interpolation.
+ * Hook kept for existing components: { t, language, setLanguage }.
+ * `t` is the same function as the global `tr` from '@/i18n'.
  */
-export const useLanguage = () => {
-  const { t: i18nT, i18n: instance } = useTranslation();
-
-  const t = (key: TranslationKey, params?: Record<string, string>): string => {
-    let value = i18nT(key) as string;
-    if (params) {
-      for (const [k, v] of Object.entries(params)) {
-        value = value.replace(`{${k}}`, v);
-      }
-    }
-    return value;
-  };
-
-  return {
-    t,
-    language: (instance.resolvedLanguage || instance.language) as Language,
-    setLanguage: (lang: Language) => {
-      instance.changeLanguage(lang);
-    },
-  };
-};
+export const useLanguage = () => ({
+  t: (key: TranslationKey, params?: Record<string, string | number | null | undefined>) => tr(key, params),
+  language: currentLanguage(),
+  setLanguage: changeLanguage,
+});

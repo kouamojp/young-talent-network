@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { ChevronRight } from 'lucide-react';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const newsCategories = ['All', 'Sports', 'Arts', 'Music', 'Technology', 'Business', 'Entertainment', 'Education', 'Community'];
 
@@ -56,7 +58,7 @@ const News: React.FC = () => {
     if (diffH < 24) return `${diffH}h ago`;
     const diffD = Math.floor(diffH / 24);
     if (diffD < 7) return `${diffD}d ago`;
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(localeTag());
   };
 
   const PostCard = ({ post, featured = false }: { post: any; featured?: boolean }) => (
@@ -71,7 +73,7 @@ const News: React.FC = () => {
         <div className="flex items-center gap-3 mb-3">
           <Avatar className="h-8 w-8"><AvatarImage src={post.profiles?.avatar_url} /><AvatarFallback>{post.profiles?.name?.[0] || 'U'}</AvatarFallback></Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{post.profiles?.name || 'Anonymous'}</p>
+            <p className="text-sm font-medium truncate">{post.profiles?.name || tr('news.anonymous')}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" /><span>{formatDate(post.created_at)}</span>
               {post.profiles?.sport_type && <Badge variant="outline" className="text-[10px] px-1.5 py-0">{post.profiles.sport_type}</Badge>}
@@ -177,11 +179,11 @@ const News: React.FC = () => {
                 <h3 className="font-semibold flex items-center gap-2 mb-3"><TrendingUp className="h-4 w-4 text-orange-500" /> {t('news.trendingTopics')}</h3>
                 <div className="space-y-3">
                   {trendingTopics.length === 0 && (
-                    <p className="text-sm text-muted-foreground">Aucun hashtag dans les publications récentes.</p>
+                    <p className="text-sm text-muted-foreground">{tr('news.noHashtagsInRecentPosts')}</p>
                   )}
                   {trendingTopics.map((topic, i) => (
                     <div key={i} className="flex items-center justify-between group cursor-pointer hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors">
-                      <div><p className="text-sm font-medium text-primary">{topic.tag}</p><p className="text-xs text-muted-foreground">{topic.posts.toLocaleString()} {t('news.posts')}</p></div>
+                      <div><p className="text-sm font-medium text-primary">{topic.tag}</p><p className="text-xs text-muted-foreground">{topic.posts.toLocaleString(localeTag())} {t('news.posts')}</p></div>
                       <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   ))}
@@ -193,7 +195,7 @@ const News: React.FC = () => {
                   {posts.slice(0, 5).map((post, i) => (
                     <div key={i} className="flex items-center gap-3 group cursor-pointer hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors">
                       <Avatar className="h-8 w-8"><AvatarImage src={post.profiles?.avatar_url} /><AvatarFallback>{post.profiles?.name?.[0] || 'U'}</AvatarFallback></Avatar>
-                      <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate">{post.profiles?.name || 'Anonymous'}</p><p className="text-xs text-muted-foreground">{post.profiles?.city || post.profiles?.country || 'Global'}</p></div>
+                      <div className="flex-1 min-w-0"><p className="text-sm font-medium truncate">{post.profiles?.name || tr('news.anonymous')}</p><p className="text-xs text-muted-foreground">{post.profiles?.city || post.profiles?.country || tr('news.global')}</p></div>
                     </div>
                   ))}
                 </div>

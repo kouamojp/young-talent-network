@@ -8,6 +8,7 @@ import GlassMorphism from '@/components/GlassMorphism';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { tr } from '@/i18n';
 
 const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -30,22 +31,22 @@ const ResetPassword: React.FC = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password.length < 6) {
-      toast({ title: 'Error', description: 'Password too short (min 6 chars)', variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: tr('resetPassword.passwordTooShortMin6Characters'), variant: 'destructive' });
       return;
     }
     if (password !== confirm) {
-      toast({ title: 'Error', description: 'Passwords do not match', variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: tr('resetPassword.passwordsDoNotMatch'), variant: 'destructive' });
       return;
     }
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      toast({ title: t('auth.passwordUpdated') || 'Password updated', description: t('auth.canLoginNow') || 'You can now log in.' });
+      toast({ title: t('auth.passwordUpdated') || 'Password updated', description: t('auth.canLoginNow') || tr('auth.canLoginNow') });
       await supabase.auth.signOut();
       navigate('/auth');
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: err.message, variant: 'destructive' });
     } finally { setLoading(false); }
   };
 
@@ -54,26 +55,26 @@ const ResetPassword: React.FC = () => {
       <GlassMorphism className="w-full max-w-md p-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t('auth.resetTitle') || 'Réinitialiser le mot de passe'}</CardTitle>
+            <CardTitle>{t('auth.resetTitle') || tr('auth.resetTitle')}</CardTitle>
             <CardDescription>
-              {ready ? (t('auth.enterNewPassword') || 'Entrez votre nouveau mot de passe.') : (t('auth.waitingRecovery') || 'Lien invalide ou expiré. Demandez un nouveau lien depuis la page de connexion.')}
+              {ready ? (t('auth.enterNewPassword') || tr('auth.enterNewPassword')) : (t('auth.waitingRecovery') || tr('auth.waitingRecovery'))}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={onSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-password">{t('auth.newPassword') || 'Nouveau mot de passe'}</Label>
+                <Label htmlFor="new-password">{t('auth.newPassword') || tr('auth.newPassword')}</Label>
                 <Input id="new-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={!ready} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">{t('auth.confirmPassword') || 'Confirmer le mot de passe'}</Label>
+                <Label htmlFor="confirm-password">{t('auth.confirmPassword') || tr('auth.confirmPassword')}</Label>
                 <Input id="confirm-password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required disabled={!ready} />
               </div>
               <Button type="submit" className="w-full" disabled={loading || !ready}>
-                {loading ? '…' : (t('auth.updatePassword') || 'Mettre à jour')}
+                {loading ? '…' : (t('auth.updatePassword') || tr('auth.updatePassword'))}
               </Button>
               <Button type="button" variant="ghost" className="w-full" onClick={() => navigate('/auth')}>
-                {t('auth.backToLogin') || 'Retour à la connexion'}
+                {t('auth.backToLogin') || tr('auth.backToLogin')}
               </Button>
             </form>
           </CardContent>

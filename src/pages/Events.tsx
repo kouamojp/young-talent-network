@@ -19,6 +19,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
 import { useYatCategories } from '@/hooks/useYatCategories';
 import { LocationPicker, LocationValue } from '@/components/location/LocationPicker';
+import { tr } from '@/i18n';
 
 const thematicCategories = [
   { name: 'Спорт / Sport', subcategories: sportCategories.map(s => s.name) },
@@ -90,14 +91,14 @@ const Events: React.FC = () => {
 
   const handleExtractFromUrl = async () => {
     let raw = sourceUrl.trim();
-    if (!raw) { toast.error('URL required'); return; }
+    if (!raw) { toast.error(tr('events.urlRequired')); return; }
     if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
     try {
       const u = new URL(raw);
       if (!/^https?:$/.test(u.protocol) || !u.hostname.includes('.')) throw new Error();
       raw = u.toString();
     } catch {
-      toast.error('Invalid URL');
+      toast.error(tr('events.invalidUrl'));
       return;
     }
     setSourceUrl(raw);
@@ -114,9 +115,9 @@ const Events: React.FC = () => {
       if (data.location) setNewLocation({ address: data.location, latitude: null as any, longitude: null as any } as any);
       if (data.price) setNewPrice(data.currency ? `${data.price} ${data.currency}` : String(data.price));
       if (data.is_virtual) setNewIsVirtual(true);
-      toast.success('Extracted ✓');
+      toast.success(tr('events.extracted'));
     } catch (e: any) {
-      toast.error(e.message || 'Extraction failed');
+      toast.error(e.message || tr('events.extractionFailed'));
     } finally {
       setExtracting(false);
     }
@@ -227,7 +228,7 @@ const Events: React.FC = () => {
                 <DialogHeader><DialogTitle>{t('events.createEvent')}</DialogTitle></DialogHeader>
                 <div className="space-y-3">
                   <div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-2 space-y-2">
-                    <label className="text-xs font-medium text-foreground">🔗 Import from URL</label>
+                    <label className="text-xs font-medium text-foreground">{tr('events.importFromUrl')}</label>
                     <div className="flex gap-2">
                       <Input
                         placeholder="https://eventbrite.com/..."
@@ -236,19 +237,19 @@ const Events: React.FC = () => {
                         className="text-sm"
                       />
                       <Button type="button" size="sm" onClick={handleExtractFromUrl} disabled={extracting || !sourceUrl}>
-                        {extracting ? '...' : 'Extract'}
+                        {extracting ? '...' : tr('events.extract')}
                       </Button>
                     </div>
-                    <p className="text-[10px] text-muted-foreground">AI extracts title, dates, location, price, image & description.</p>
+                    <p className="text-[10px] text-muted-foreground">{tr('events.aiExtractsTitleDatesLocationPrice')}</p>
                   </div>
                   {newImageUrl && (
                     <img src={newImageUrl} alt="" className="w-full h-32 object-cover rounded-lg border border-border" />
                   )}
-                  <Input placeholder="Image URL" value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="text-xs" />
+                  <Input placeholder={tr('events.imageUrl')} value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} className="text-xs" />
                   <Input placeholder={t('events.eventName')} value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                   <Textarea placeholder={t('events.description')} value={newDescription} onChange={e => setNewDescription(e.target.value)} rows={3} />
                   <LocationPicker value={newLocation} onChange={setNewLocation} placeholder={t('events.location')} />
-                  <Input placeholder="Price (e.g. 25 EUR)" value={newPrice} onChange={e => setNewPrice(e.target.value)} className="text-sm" />
+                  <Input placeholder={tr('events.priceEG25Eur')} value={newPrice} onChange={e => setNewPrice(e.target.value)} className="text-sm" />
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-xs text-muted-foreground">{t('events.start')}</label>

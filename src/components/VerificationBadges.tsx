@@ -3,14 +3,15 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { BadgeCheck, Award, Building2, Search, GraduationCap, Heart, Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 export const BADGE_META: Record<string, { label: string; icon: any; color: string }> = {
-  talent: { label: 'Talent vérifié', icon: Star, color: 'bg-blue-500' },
-  agent: { label: 'Agent certifié', icon: Award, color: 'bg-purple-500' },
-  organization: { label: 'Organisation vérifiée', icon: Building2, color: 'bg-emerald-500' },
-  recruiter: { label: 'Recruteur vérifié', icon: Search, color: 'bg-amber-500' },
-  mentor: { label: 'Mentor vérifié', icon: GraduationCap, color: 'bg-indigo-500' },
-  sponsor: { label: 'Sponsor vérifié', icon: Heart, color: 'bg-pink-500' },
+  talent: { label: tr('verificationBadges.verifiedTalent'), icon: Star, color: 'bg-blue-500' },
+  agent: { label: tr('verificationBadges.certifiedAgent'), icon: Award, color: 'bg-purple-500' },
+  organization: { label: tr('verificationBadges.verifiedOrganization'), icon: Building2, color: 'bg-emerald-500' },
+  recruiter: { label: tr('verificationBadges.verifiedRecruiter'), icon: Search, color: 'bg-amber-500' },
+  mentor: { label: tr('verificationBadges.verifiedMentor'), icon: GraduationCap, color: 'bg-indigo-500' },
+  sponsor: { label: tr('verificationBadges.verifiedSponsor'), icon: Heart, color: 'bg-pink-500' },
 };
 
 interface Props {

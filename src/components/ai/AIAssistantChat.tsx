@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
+import { tr } from '@/i18n';
 
 interface Message {
   role: "user" | "assistant";
@@ -16,14 +17,14 @@ interface Message {
 type Mode = 'chat' | 'compose-post' | 'compose-message' | 'profile-tips' | 'translate' | 'admin';
 
 const QUICK_ACTIONS: { icon: any; label: string; prompt: string; mode: Mode }[] = [
-  { icon: Briefcase, label: "Trouver des opportunités", prompt: "Quelles sont les meilleures opportunités (emplois, événements, formations, bourses, sponsorships) qui matchent mon profil ? Donne le score de compatibilité.", mode: 'chat' },
-  { icon: UserPlus, label: "Suggestions de réseau", prompt: "Recommande-moi des talents, organisations, agents, mentors, sponsors et recruteurs à contacter avec un score de compatibilité (%).", mode: 'chat' },
-  { icon: TrendingUp, label: "Améliorer mon YAT Score", prompt: "Analyse mon profil et donne-moi un plan d'action pour augmenter mon YAT Score et ma visibilité.", mode: 'profile-tips' },
-  { icon: Edit3, label: "Rédiger un post", prompt: "Aide-moi à rédiger un post engageant. Voici l'idée : ", mode: 'compose-post' },
-  { icon: MessageCircle, label: "Message networking", prompt: "Rédige-moi un message professionnel d'approche pour : ", mode: 'compose-message' },
-  { icon: Calendar, label: "Événements à venir", prompt: "Quels événements correspondent à mon talent et ma localisation ?", mode: 'chat' },
-  { icon: Search, label: "Découvrir des talents", prompt: "Recommande-moi les talents les plus prometteurs à suivre ou à recruter selon mon profil et mes objectifs.", mode: 'chat' },
-  { icon: Languages, label: "Traduire un texte", prompt: "Traduis ce texte (précise la langue cible : EN, FR, RU, ES, AR, PT, ZH) : ", mode: 'translate' },
+  { icon: Briefcase, label: tr('work.findOpportunities'), prompt: tr('aIAssistantChat.whatAreTheBestOpportunitiesJobs'), mode: 'chat' },
+  { icon: UserPlus, label: tr('aIAssistantChat.networkSuggestions'), prompt: tr('aIAssistantChat.recommendTalentsOrganizationsAgentsMentorsSp'), mode: 'chat' },
+  { icon: TrendingUp, label: tr('aIAssistantChat.improveMyYatScore'), prompt: tr('aIAssistantChat.analyzeMyProfileAndGiveMe'), mode: 'profile-tips' },
+  { icon: Edit3, label: tr('aIAssistantChat.writeAPost'), prompt: tr('aIAssistantChat.helpMeWriteAnEngagingPost'), mode: 'compose-post' },
+  { icon: MessageCircle, label: tr('aIAssistantChat.networkingMessage'), prompt: tr('aIAssistantChat.writeMeAProfessionalOutreachMessage'), mode: 'compose-message' },
+  { icon: Calendar, label: tr('feed.upcomingEvents'), prompt: tr('aIAssistantChat.whichEventsMatchMyTalentAnd'), mode: 'chat' },
+  { icon: Search, label: tr('aIAssistantChat.discoverTalents'), prompt: tr('aIAssistantChat.recommendTheMostPromisingTalentsTo'), mode: 'chat' },
+  { icon: Languages, label: tr('aIAssistantChat.translateAText'), prompt: tr('aIAssistantChat.translateThisTextSpecifyTheTarget'), mode: 'translate' },
 ];
 
 export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) => {
@@ -65,7 +66,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast({ title: "Connectez-vous d'abord", variant: "destructive" });
+        toast({ title: tr('common.pleaseLogInFirst'), variant: "destructive" });
         setLoading(false);
         return;
       }
@@ -120,7 +121,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
         }
       }
     } catch (err: any) {
-      toast({ title: "Erreur", description: err.message, variant: "destructive" });
+      toast({ title: tr('settings.error'), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
       setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 100);
@@ -145,7 +146,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
           <Sparkles className="h-5 w-5 text-primary" />
           <div>
             <div className="font-semibold text-sm">YAT AI Assistant</div>
-            <div className="text-[10px] text-muted-foreground">Talent advisor • Networking • Opportunities</div>
+            <div className="text-[10px] text-muted-foreground">{tr('aIAssistantChat.talentAdvisorNetworkingOpportunities')}</div>
           </div>
         </div>
         {!fullPage && (
@@ -161,8 +162,8 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
           <div className="space-y-3">
             <div className="text-center text-sm py-2 space-y-1">
               <Sparkles className="h-7 w-7 mx-auto text-primary/50" />
-              <p className="font-medium">Bonjour 👋 Je suis votre coach YAT.</p>
-              <p className="text-xs text-muted-foreground">Opportunités, réseau, profil, posts, messages : choisissez une action.</p>
+              <p className="font-medium">{tr('aIAssistantChat.helloIMYourYatCoach')}</p>
+              <p className="text-xs text-muted-foreground">{tr('aIAssistantChat.opportunitiesNetworkProfilePostsMessagesChoo')}</p>
             </div>
             <div className="grid grid-cols-2 gap-2">
               {QUICK_ACTIONS.map((a, i) => (
@@ -203,9 +204,9 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
       {mode !== 'chat' && messages.length > 0 && (
         <div className="px-3 py-1 border-t bg-primary/5 flex items-center justify-between">
           <span className="text-[10px] text-primary font-medium">
-            Mode : {mode === 'compose-post' ? '✏️ Rédaction post' : mode === 'compose-message' ? '💬 Message pro' : mode === 'profile-tips' ? '📊 Conseils profil' : mode === 'translate' ? '🌐 Traduction' : '🛡️ Admin'}
+            {tr('aIAssistantChat.mode')} {mode === 'compose-post' ? tr('aIAssistantChat.postWriting') : mode === 'compose-message' ? tr('aIAssistantChat.professionalMessage') : mode === 'profile-tips' ? tr('aIAssistantChat.profileTips') : mode === 'translate' ? tr('aIAssistantChat.translation') : tr('aIAssistantChat.admin')}
           </span>
-          <button onClick={() => setMode('chat')} className="text-[10px] text-muted-foreground hover:text-foreground">Retour chat</button>
+          <button onClick={() => setMode('chat')} className="text-[10px] text-muted-foreground hover:text-foreground">{tr('aIAssistantChat.backToChat')}</button>
         </div>
       )}
 
@@ -216,7 +217,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Posez votre question..."
+            placeholder={tr('aIAssistantChat.askYourQuestion')}
             className="text-sm"
             disabled={loading}
           />
@@ -237,7 +238,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-20 md:bottom-6 right-20 z-50 h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-          aria-label="Ouvrir YAT AI Assistant"
+          aria-label={tr('aIAssistantChat.openYatAiAssistant')}
         >
           <Sparkles className="h-6 w-6" />
         </button>

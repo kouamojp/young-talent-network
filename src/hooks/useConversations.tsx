@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 export interface Message {
   id: string;
@@ -98,7 +99,7 @@ export const useConversations = () => {
       setConversations(Array.from(convMap.values()));
     } catch (error) {
       console.error('Error fetching conversations:', error);
-      toast({ title: "Failed to load conversations", variant: "destructive" });
+      toast({ title: tr('useConversations.failedToLoadConversations'), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -122,7 +123,7 @@ export const useConversations = () => {
       await fetchConversations(true);
       return data as string;
     } catch (error: any) {
-      toast({ title: "Failed to create conversation", description: error?.message, variant: "destructive" });
+      toast({ title: tr('useConversations.failedToCreateConversation'), description: error?.message, variant: "destructive" });
       return null;
     }
   };
@@ -135,7 +136,7 @@ export const useConversations = () => {
       await fetchConversations(true);
       return data as string;
     } catch (error: any) {
-      toast({ title: "Failed to create group", description: error?.message, variant: "destructive" });
+      toast({ title: tr('useConversations.failedToCreateGroup'), description: error?.message, variant: "destructive" });
       return null;
     }
   };
@@ -185,9 +186,9 @@ export const useConversations = () => {
       // 42501 = refused by the "Messaging safety rules" policy.
       const refused = error?.code === '42501';
       toast({
-        title: refused ? 'Message non envoyé' : 'Failed to send message',
+        title: refused ? tr('useConversations.messageNotSent') : tr('useConversations.failedToSendMessage'),
         description: refused
-          ? "Vous ne pouvez pas écrire dans cette conversation : un membre est bloqué, un accord parental est en attente, ou un adulte et un mineur ne sont pas connectés (demande d'ami acceptée)."
+          ? tr('useConversations.youCannotWriteInThisConversation')
           : undefined,
         variant: "destructive",
       });
@@ -200,7 +201,7 @@ export const useConversations = () => {
       // qu'on marque comme lu / non lu un message *reçu*.
       const { error } = await (supabase.rpc as any)('set_message_read', { _message_id: messageId, _read: read });
       if (error) {
-        toast({ title: 'Mise à jour impossible', description: error.message, variant: 'destructive' });
+        toast({ title: tr('common.couldNotUpdate'), description: error.message, variant: 'destructive' });
         return;
       }
       await fetchConversations(true);

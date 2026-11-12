@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import ModerationReportsPanel from '@/components/admin/ModerationReportsPanel';
 import VerificationRequestsPanel from '@/components/admin/VerificationRequestsPanel';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const AdminPanel: React.FC = () => {
   const { t } = useLanguage();
@@ -47,14 +49,14 @@ const AdminPanel: React.FC = () => {
   const [marketplaceListings, setMarketplaceListings] = useState<any[]>([]);
 
   const AD_SIZE_HINTS: Record<string, string> = {
-    feed: 'Рекоменд. 1200×400 (3:1), до 2 МБ',
-    sidebar: 'Рекоменд. 400×400 (1:1), до 1 МБ',
-    banner: 'Рекоменд. 1600×300 (≈16:3), до 2 МБ',
+    feed: tr('adminPanel.recommended120040031Up'),
+    sidebar: tr('adminPanel.recommended40040011Up'),
+    banner: tr('adminPanel.recommended1600300163Up'),
   };
 
   const handleAdImageUpload = async (file: File) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast({ title: 'Файл больше 5 МБ', variant: 'destructive' }); return; }
+    if (file.size > 5 * 1024 * 1024) { toast({ title: tr('adminPanel.fileLargerThan5Mb'), variant: 'destructive' }); return; }
     setAdUploading(true);
     try {
       const ext = file.name.split('.').pop();
@@ -63,9 +65,9 @@ const AdminPanel: React.FC = () => {
       if (error) throw error;
       const { data } = supabase.storage.from('ad-files').getPublicUrl(path);
       setEditAd((prev: any) => ({ ...(prev || {}), image_url: data.publicUrl }));
-      toast({ title: 'Изображение загружено' });
+      toast({ title: tr('adminPanel.imageUploaded') });
     } catch (e: any) {
-      toast({ title: e.message || 'Ошибка загрузки', variant: 'destructive' });
+      toast({ title: e.message || tr('adminPanel.uploadError'), variant: 'destructive' });
     } finally { setAdUploading(false); }
   };
 
@@ -73,11 +75,11 @@ const AdminPanel: React.FC = () => {
     const { error } = await supabase.from('marketplace_listings').update({ status }).eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setMarketplaceListings(prev => prev.map(l => l.id === id ? { ...l, status } : l));
-    toast({ title: `Объявление → ${status}` });
+    toast({ title: tr('adminPanel.listing', { p0: status }) });
   };
 
   const deleteListing = async (id: string) => {
-    if (!confirm('Удалить объявление?')) return;
+    if (!confirm(tr('adminPanel.deleteTheListing'))) return;
     const { error } = await supabase.from('marketplace_listings').delete().eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setMarketplaceListings(prev => prev.filter(l => l.id !== id));
@@ -91,7 +93,7 @@ const AdminPanel: React.FC = () => {
     }).eq('id', editUser.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...editUser } : u));
-    setEditUser(null); toast({ title: 'User updated' });
+    setEditUser(null); toast({ title: tr('adminPanel.userUpdated') });
   };
 
   const savePost = async () => {
@@ -102,21 +104,21 @@ const AdminPanel: React.FC = () => {
     }).eq('id', editPost.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
-    setEditPost(null); toast({ title: 'Post updated' });
+    setEditPost(null); toast({ title: tr('post.updated') });
   };
 
   const setPostStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('posts').update({ status, is_published: status === 'published' }).eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setPosts(prev => prev.map(p => p.id === id ? { ...p, status, is_published: status === 'published' } : p));
-    toast({ title: `Post → ${status}` });
+    toast({ title: tr('adminPanel.post', { p0: status }) });
   };
 
   const setEventStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('events').update({ status }).eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setEvents(prev => prev.map(e => e.id === id ? { ...e, status } : e));
-    toast({ title: `Event → ${status}` });
+    toast({ title: tr('adminPanel.event', { p0: status }) });
   };
 
   const saveEvent = async () => {
@@ -127,7 +129,7 @@ const AdminPanel: React.FC = () => {
     }).eq('id', editEvent.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setEvents(prev => prev.map(e => e.id === editEvent.id ? { ...e, ...editEvent } : e));
-    setEditEvent(null); toast({ title: 'Event updated' });
+    setEditEvent(null); toast({ title: tr('adminPanel.eventUpdated') });
   };
 
   const saveCommunity = async () => {
@@ -137,22 +139,22 @@ const AdminPanel: React.FC = () => {
     }).eq('id', editCommunity.id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setCommunities(prev => prev.map(c => c.id === editCommunity.id ? { ...c, ...editCommunity } : c));
-    setEditCommunity(null); toast({ title: 'Community updated' });
+    setEditCommunity(null); toast({ title: tr('adminPanel.communityUpdated') });
   };
 
   const deleteUser = async (id: string) => {
-    if (!confirm('Delete this user profile?')) return;
+    if (!confirm(tr('adminPanel.deleteThisUserProfile'))) return;
     const { error } = await supabase.from('profiles').delete().eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setUsers(prev => prev.filter(u => u.id !== id));
-    toast({ title: 'User deleted' });
+    toast({ title: tr('adminPanel.userDeleted') });
   };
 
   const deleteCommunity = async (id: string) => {
     const { error } = await supabase.from('communities').delete().eq('id', id);
     if (error) return toast({ title: error.message, variant: 'destructive' });
     setCommunities(prev => prev.filter(c => c.id !== id));
-    toast({ title: 'Community deleted' });
+    toast({ title: tr('adminPanel.communityDeleted') });
   };
 
   const saveAd = async () => {
@@ -172,7 +174,7 @@ const AdminPanel: React.FC = () => {
       if (error) return toast({ title: error.message, variant: 'destructive' });
       if (data) setAds(prev => [data, ...prev]);
     }
-    setEditAd(null); toast({ title: 'Ad saved' });
+    setEditAd(null); toast({ title: tr('adminPanel.adSaved') });
   };
 
   const deleteAd = async (id: string) => {
@@ -261,10 +263,10 @@ const AdminPanel: React.FC = () => {
         { onConflict: 'user_id,role' }
       );
       if (error) throw error;
-      toast({ title: t('admin.roleAssigned') || 'Role assigned successfully' });
+      toast({ title: t('admin.roleAssigned') || tr('adminPanel.roleAssignedSuccessfully') });
       setRoleDialogOpen(false);
     } catch (err: any) {
-      toast({ title: err?.message || t('admin.roleError') || 'Error assigning role', variant: 'destructive' });
+      toast({ title: err?.message || t('admin.roleError') || tr('admin.roleError'), variant: 'destructive' });
     }
   };
 
@@ -304,7 +306,7 @@ const AdminPanel: React.FC = () => {
       <div className="p-8 text-center">
         <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
         <h2 className="text-xl font-bold mb-2">{t('admin.accessDenied') || 'Access Denied'}</h2>
-        <p className="text-muted-foreground">{t('admin.noPermission') || 'You do not have permission to access this page.'}</p>
+        <p className="text-muted-foreground">{t('admin.noPermission') || tr('admin.noPermission')}</p>
         <Button className="mt-4" onClick={() => navigate('/')}>{t('common.goHome') || 'Go Home'}</Button>
       </div>
     );
@@ -354,7 +356,7 @@ const AdminPanel: React.FC = () => {
               <Select value={selectedRole} onValueChange={setSelectedRole}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="admin">{tr('admin.admin')}</SelectItem>
                   <SelectItem value="moderator">{t('admin.moderator') || 'Moderator'}</SelectItem>
                   <SelectItem value="user">{t('admin.user') || 'User'}</SelectItem>
                 </SelectContent>
@@ -405,10 +407,10 @@ const AdminPanel: React.FC = () => {
           <TabsTrigger value="content">{t('admin.contentManagement') || 'Content'}</TabsTrigger>
           <TabsTrigger value="events">{t('admin.eventsManagement') || 'Events'}</TabsTrigger>
           <TabsTrigger value="moderation">{t('admin.contentModeration') || 'Moderation'}</TabsTrigger>
-          <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />Communities</TabsTrigger>
-          <TabsTrigger value="marketplace"><ShoppingBag className="h-4 w-4 mr-1" />Маркетплейс</TabsTrigger>
-          <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />Реклама</TabsTrigger>
-          <TabsTrigger value="verification"><Shield className="h-4 w-4 mr-1" />Vérification</TabsTrigger>
+          <TabsTrigger value="communities"><Building2 className="h-4 w-4 mr-1" />{tr('sidebar.communities')}</TabsTrigger>
+          <TabsTrigger value="marketplace"><ShoppingBag className="h-4 w-4 mr-1" />{tr('adminPanel.marketplace')}</TabsTrigger>
+          <TabsTrigger value="ads"><Megaphone className="h-4 w-4 mr-1" />{tr('footer.advertising')}</TabsTrigger>
+          <TabsTrigger value="verification"><Shield className="h-4 w-4 mr-1" />{tr('common.verification')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="verification" className="space-y-4">
@@ -421,21 +423,21 @@ const AdminPanel: React.FC = () => {
             <Card>
               <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Shield className="h-5 w-5 text-red-500" />{t('admin.superAdmin') || 'Super Admin'}</CardTitle></CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.superAdminDesc') || 'Full platform access and management'}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.superAdminDesc') || tr('adminPanel.fullPlatformAccessAndManagement')}</p>
                 <Badge className="bg-red-100 text-red-800">{t('admin.fullAccess') || 'Full Access'}</Badge>
               </CardContent>
             </Card>
             <Card>
               <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Lock className="h-5 w-5 text-blue-500" />{t('admin.moderator') || 'Moderator'}</CardTitle></CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.moderatorDesc') || 'Content moderation and user support'}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.moderatorDesc') || tr('adminPanel.contentModerationAndUserSupport')}</p>
                 <Badge className="bg-blue-100 text-blue-800">{t('admin.limitedAccess') || 'Limited Access'}</Badge>
               </CardContent>
             </Card>
             <Card>
               <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Users className="h-5 w-5 text-gray-500" />{t('admin.user') || 'User'}</CardTitle></CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">{t('admin.userDesc') || 'Standard platform access'}</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('admin.userDesc') || tr('adminPanel.standardPlatformAccess')}</p>
                 <Badge variant="secondary">{t('admin.standardAccess') || 'Standard Access'}</Badge>
               </CardContent>
             </Card>
@@ -498,7 +500,7 @@ const AdminPanel: React.FC = () => {
                       <TableCell className="text-muted-foreground">{user.email}</TableCell>
                       <TableCell>{getRoleBadge(user.user_type)}</TableCell>
                       <TableCell>{user.country || '—'}</TableCell>
-                      <TableCell className="text-muted-foreground">{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-muted-foreground">{new Date(user.created_at).toLocaleDateString(localeTag())}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Button size="sm" variant="ghost" onClick={() => navigate(`/talent/${user.id}`)}><Eye className="h-4 w-4" /></Button>
@@ -525,8 +527,8 @@ const AdminPanel: React.FC = () => {
                   <div key={post.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-medium text-sm">{post.profiles?.name || 'Unknown'}</span>
-                        <span className="text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</span>
+                        <span className="font-medium text-sm">{post.profiles?.name || tr('adminPanel.unknown')}</span>
+                        <span className="text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString(localeTag())}</span>
                         <Badge variant={post.status === 'published' ? 'default' : post.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
                           {post.status || 'published'}
                         </Badge>
@@ -534,15 +536,15 @@ const AdminPanel: React.FC = () => {
                       <p className="text-sm text-muted-foreground truncate">{post.content}</p>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setPostStatus(post.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setPostStatus(post.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setPostStatus(post.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('create.post')} onClick={() => setPostStatus(post.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('search.hide')} onClick={() => setPostStatus(post.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('adminPanel.draft')} onClick={() => setPostStatus(post.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditPost({ ...post })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeletePost(post.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}
-                {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
+                {posts.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || tr('adminPanel.noContentYet')}</p>}
               </div>
             </CardContent>
           </Card>
@@ -563,18 +565,18 @@ const AdminPanel: React.FC = () => {
                           {event.status || 'published'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground">{event.location || '—'} • {new Date(event.start_date).toLocaleDateString(localeTag())}</p>
                     </div>
                     <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" title="Publish" onClick={() => setEventStatus(event.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Hide" onClick={() => setEventStatus(event.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Draft" onClick={() => setEventStatus(event.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('create.post')} onClick={() => setEventStatus(event.id, 'published')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('search.hide')} onClick={() => setEventStatus(event.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('adminPanel.draft')} onClick={() => setEventStatus(event.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="outline" onClick={() => setEditEvent({ ...event })}><Pencil className="h-4 w-4" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => handleDeleteEvent(event.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}
-                {events.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || 'No content yet'}</p>}
+                {events.length === 0 && <p className="text-muted-foreground text-center py-4">{t('admin.noContent') || tr('adminPanel.noContentYet')}</p>}
               </div>
             </CardContent>
           </Card>
@@ -584,7 +586,7 @@ const AdminPanel: React.FC = () => {
         <TabsContent value="moderation" className="space-y-4">
           <ModerationReportsPanel />
           <Card>
-            <CardHeader><CardTitle>Recent Posts</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{tr('adminPanel.recentPosts')}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {posts.slice(0, 5).map((post, i) => (
@@ -607,7 +609,7 @@ const AdminPanel: React.FC = () => {
         {/* Communities Tab */}
         <TabsContent value="communities" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle>Communities</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{tr('sidebar.communities')}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {communities.map(c => (
@@ -615,7 +617,7 @@ const AdminPanel: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{c.name}</p>
-                        {c.is_private && <Badge variant="secondary" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />Private</Badge>}
+                        {c.is_private && <Badge variant="secondary" className="text-[10px]"><Lock className="h-3 w-3 mr-1" />{tr('profile.private')}</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-1">{c.description || '—'}</p>
                     </div>
@@ -625,7 +627,7 @@ const AdminPanel: React.FC = () => {
                     </div>
                   </div>
                 ))}
-                {communities.length === 0 && <p className="text-muted-foreground text-center py-4">No communities</p>}
+                {communities.length === 0 && <p className="text-muted-foreground text-center py-4">{tr('adminPanel.noCommunities')}</p>}
               </div>
             </CardContent>
           </Card>
@@ -634,7 +636,7 @@ const AdminPanel: React.FC = () => {
         {/* Marketplace Tab */}
         <TabsContent value="marketplace" className="space-y-4">
           <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />Объявления Marketplace</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />{tr('adminPanel.marketplaceListings')}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {marketplaceListings.map(l => (
@@ -644,21 +646,21 @@ const AdminPanel: React.FC = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium truncate">{l.title}</p>
                         <Badge variant={l.status === 'active' ? 'default' : l.status === 'hidden' ? 'destructive' : 'secondary'} className="text-[10px]">
-                          {l.status === 'active' ? 'Опубликовано' : l.status === 'hidden' ? 'Скрыто' : l.status === 'draft' ? 'Черновик' : l.status}
+                          {l.status === 'active' ? tr('common.published') : l.status === 'hidden' ? tr('adminPanel.hidden') : l.status === 'draft' ? tr('adminPanel.draft2') : l.status}
                         </Badge>
                         <Badge variant="outline" className="text-[10px]">{l.type}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{l.profiles?.name || '—'} · {l.currency}{l.price} · {l.category}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Button size="sm" variant="ghost" title="Опубликовать" onClick={() => setListingStatus(l.id, 'active')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Скрыть" onClick={() => setListingStatus(l.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
-                      <Button size="sm" variant="ghost" title="Черновик" onClick={() => setListingStatus(l.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('marketplace.publish')} onClick={() => setListingStatus(l.id, 'active')}><CheckCircle className="h-4 w-4 text-green-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('search.hide')} onClick={() => setListingStatus(l.id, 'hidden')}><EyeOff className="h-4 w-4 text-orange-600" /></Button>
+                      <Button size="sm" variant="ghost" title={tr('adminPanel.draft2')} onClick={() => setListingStatus(l.id, 'draft')}><FileEdit className="h-4 w-4 text-blue-600" /></Button>
                       <Button size="sm" variant="destructive" onClick={() => deleteListing(l.id)}><Trash2 className="h-4 w-4" /></Button>
                     </div>
                   </div>
                 ))}
-                {marketplaceListings.length === 0 && <p className="text-muted-foreground text-center py-6">Нет объявлений.</p>}
+                {marketplaceListings.length === 0 && <p className="text-muted-foreground text-center py-6">{tr('adminPanel.noListings')}</p>}
               </div>
             </CardContent>
           </Card>
@@ -671,25 +673,25 @@ const AdminPanel: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Всего показов</span>
+                  <span className="text-xs text-muted-foreground">{tr('adminPanel.totalImpressions')}</span>
                   <Eye className="h-4 w-4 text-cyan-600" />
                 </div>
-                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.views_count || 0), 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.views_count || 0), 0).toLocaleString(localeTag())}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Всего кликов</span>
+                  <span className="text-xs text-muted-foreground">{tr('adminPanel.totalClicks')}</span>
                   <MousePointerClick className="h-4 w-4 text-emerald-600" />
                 </div>
-                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.clicks_count || 0), 0).toLocaleString()}</p>
+                <p className="text-2xl font-bold">{ads.reduce((s, a) => s + (a.clicks_count || 0), 0).toLocaleString(localeTag())}</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Средний CTR</span>
+                  <span className="text-xs text-muted-foreground">{tr('adminPanel.averageCtr')}</span>
                   <BarChart3 className="h-4 w-4 text-orange-600" />
                 </div>
                 <p className="text-2xl font-bold">
@@ -705,7 +707,7 @@ const AdminPanel: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
-              <CardHeader><CardTitle className="text-base">🏆 Топ по кликам</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">{tr('adminPanel.topByClicks')}</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {[...ads].sort((a, b) => (b.clicks_count || 0) - (a.clicks_count || 0)).slice(0, 5).map((ad, i) => (
@@ -715,12 +717,12 @@ const AdminPanel: React.FC = () => {
                       <Badge variant="outline">{ad.clicks_count || 0}</Badge>
                     </div>
                   ))}
-                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">{tr('common.noData')}</p>}
                 </div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader><CardTitle className="text-base">👁 Топ по показам</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-base">{tr('adminPanel.topByImpressions')}</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {[...ads].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 5).map((ad, i) => (
@@ -730,7 +732,7 @@ const AdminPanel: React.FC = () => {
                       <Badge variant="outline">{ad.views_count || 0}</Badge>
                     </div>
                   ))}
-                  {ads.length === 0 && <p className="text-xs text-muted-foreground">Нет данных</p>}
+                  {ads.length === 0 && <p className="text-xs text-muted-foreground">{tr('common.noData')}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -738,9 +740,9 @@ const AdminPanel: React.FC = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />Все объявления</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5" />{tr('adminPanel.allAds')}</CardTitle>
               <Button size="sm" onClick={() => setEditAd({ title: '', placement: 'feed', is_active: true })}>
-                <Plus className="h-4 w-4 mr-1" />Новое
+                <Plus className="h-4 w-4 mr-1" />{tr('common.new')}
               </Button>
             </CardHeader>
             <CardContent>
@@ -755,11 +757,11 @@ const AdminPanel: React.FC = () => {
                           <p className="font-medium truncate">{ad.title}</p>
                           <Badge variant="outline" className="text-[10px]">{ad.placement}</Badge>
                           <Badge variant={ad.is_active ? 'default' : 'secondary'} className="text-[10px]">
-                            {ad.is_active ? 'Активна' : 'Выкл'}
+                            {ad.is_active ? tr('adminPanel.active') : tr('adminPanel.off')}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground truncate">{ad.link_url || ad.description || '—'}</p>
-                        <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count} • CTR {ctr}{ctr !== '—' ? '%' : ''}</p>
+                        <p className="text-[10px] text-muted-foreground">👁 {ad.views_count} • 🖱 {ad.clicks_count} {tr('adminPanel.ctr')} {ctr}{ctr !== '—' ? '%' : ''}</p>
                       </div>
                       <div className="flex items-center gap-1">
                         <Switch checked={ad.is_active} onCheckedChange={() => toggleAd(ad)} />
@@ -769,7 +771,7 @@ const AdminPanel: React.FC = () => {
                     </div>
                   );
                 })}
-                {ads.length === 0 && <p className="text-muted-foreground text-center py-6">Нет рекламы. Нажмите «Новое» чтобы создать.</p>}
+                {ads.length === 0 && <p className="text-muted-foreground text-center py-6">{tr('adminPanel.noAdsClickNewToCreate')}</p>}
               </div>
             </CardContent>
           </Card>
@@ -779,31 +781,31 @@ const AdminPanel: React.FC = () => {
       {/* Edit User Dialog */}
       <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Edit User</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('adminPanel.editUser')}</DialogTitle></DialogHeader>
           {editUser && (
             <div className="space-y-3">
-              <div><Label>Name</Label><Input value={editUser.name || ''} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} /></div>
-              <div><Label>Bio</Label><Textarea value={editUser.bio || ''} onChange={(e) => setEditUser({ ...editUser, bio: e.target.value })} /></div>
+              <div><Label>{tr('admin.name')}</Label><Input value={editUser.name || ''} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} /></div>
+              <div><Label>{tr('settings.bio')}</Label><Textarea value={editUser.bio || ''} onChange={(e) => setEditUser({ ...editUser, bio: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-2">
-                <div><Label>City</Label><Input value={editUser.city || ''} onChange={(e) => setEditUser({ ...editUser, city: e.target.value })} /></div>
-                <div><Label>Country</Label><Input value={editUser.country || ''} onChange={(e) => setEditUser({ ...editUser, country: e.target.value })} /></div>
+                <div><Label>{tr('settings.city')}</Label><Input value={editUser.city || ''} onChange={(e) => setEditUser({ ...editUser, city: e.target.value })} /></div>
+                <div><Label>{tr('settings.country')}</Label><Input value={editUser.country || ''} onChange={(e) => setEditUser({ ...editUser, country: e.target.value })} /></div>
               </div>
               <div>
-                <Label>User Type</Label>
+                <Label>{tr('adminPanel.userType')}</Label>
                 <Select value={editUser.user_type || 'talent'} onValueChange={(v) => setEditUser({ ...editUser, user_type: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="talent">Talent</SelectItem>
-                    <SelectItem value="agent">Agent</SelectItem>
-                    <SelectItem value="organization">Organization</SelectItem>
+                    <SelectItem value="talent">{tr('auth.talent')}</SelectItem>
+                    <SelectItem value="agent">{tr('profile.agent')}</SelectItem>
+                    <SelectItem value="organization">{tr('profile.organization')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditUser(null)}>Cancel</Button>
-            <Button onClick={saveUser}>Save</Button>
+            <Button variant="outline" onClick={() => setEditUser(null)}>{tr('common.cancel')}</Button>
+            <Button onClick={saveUser}>{tr('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -811,37 +813,37 @@ const AdminPanel: React.FC = () => {
       {/* Edit Post Dialog */}
       <Dialog open={!!editPost} onOpenChange={(o) => !o && setEditPost(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Edit Post</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('adminPanel.editPost')}</DialogTitle></DialogHeader>
           {editPost && (
             <div className="space-y-3">
-              <div><Label>Content</Label><Textarea rows={5} value={editPost.content || ''} onChange={(e) => setEditPost({ ...editPost, content: e.target.value })} /></div>
+              <div><Label>{tr('adminPanel.content')}</Label><Textarea rows={5} value={editPost.content || ''} onChange={(e) => setEditPost({ ...editPost, content: e.target.value })} /></div>
               <div>
-                <Label>Visibility</Label>
+                <Label>{tr('common.visibility')}</Label>
                 <Select value={editPost.visibility || 'public'} onValueChange={(v) => setEditPost({ ...editPost, visibility: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="friends">Friends</SelectItem>
-                    <SelectItem value="link">Link only</SelectItem>
+                    <SelectItem value="public">{tr('post.vis.public')}</SelectItem>
+                    <SelectItem value="friends">{tr('sidebar.friends')}</SelectItem>
+                    <SelectItem value="link">{tr('adminPanel.linkOnly')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>{tr('admin.status')}</Label>
                 <Select value={editPost.status || 'published'} onValueChange={(v) => setEditPost({ ...editPost, status: v, is_published: v === 'published' })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Черновик</SelectItem>
-                    <SelectItem value="published">Опубликован</SelectItem>
-                    <SelectItem value="hidden">Скрыт</SelectItem>
+                    <SelectItem value="draft">{tr('adminPanel.draft2')}</SelectItem>
+                    <SelectItem value="published">{tr('adminPanel.published')}</SelectItem>
+                    <SelectItem value="hidden">{tr('adminPanel.hidden2')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditPost(null)}>Cancel</Button>
-            <Button onClick={savePost}>Save</Button>
+            <Button variant="outline" onClick={() => setEditPost(null)}>{tr('common.cancel')}</Button>
+            <Button onClick={savePost}>{tr('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -849,28 +851,28 @@ const AdminPanel: React.FC = () => {
       {/* Edit Event Dialog */}
       <Dialog open={!!editEvent} onOpenChange={(o) => !o && setEditEvent(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Edit Event</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('adminPanel.editEvent')}</DialogTitle></DialogHeader>
           {editEvent && (
             <div className="space-y-3">
-              <div><Label>Title</Label><Input value={editEvent.title || ''} onChange={(e) => setEditEvent({ ...editEvent, title: e.target.value })} /></div>
-              <div><Label>Description</Label><Textarea value={editEvent.description || ''} onChange={(e) => setEditEvent({ ...editEvent, description: e.target.value })} /></div>
-              <div><Label>Location</Label><Input value={editEvent.location || ''} onChange={(e) => setEditEvent({ ...editEvent, location: e.target.value })} /></div>
+              <div><Label>{tr('marketplace.title_field')}</Label><Input value={editEvent.title || ''} onChange={(e) => setEditEvent({ ...editEvent, title: e.target.value })} /></div>
+              <div><Label>{tr('events.description')}</Label><Textarea value={editEvent.description || ''} onChange={(e) => setEditEvent({ ...editEvent, description: e.target.value })} /></div>
+              <div><Label>{tr('post.addLocation')}</Label><Input value={editEvent.location || ''} onChange={(e) => setEditEvent({ ...editEvent, location: e.target.value })} /></div>
               <div>
-                <Label>Status</Label>
+                <Label>{tr('admin.status')}</Label>
                 <Select value={editEvent.status || 'published'} onValueChange={(v) => setEditEvent({ ...editEvent, status: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Черновик</SelectItem>
-                    <SelectItem value="published">Опубликован</SelectItem>
-                    <SelectItem value="hidden">Скрыт</SelectItem>
+                    <SelectItem value="draft">{tr('adminPanel.draft2')}</SelectItem>
+                    <SelectItem value="published">{tr('adminPanel.published')}</SelectItem>
+                    <SelectItem value="hidden">{tr('adminPanel.hidden2')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditEvent(null)}>Cancel</Button>
-            <Button onClick={saveEvent}>Save</Button>
+            <Button variant="outline" onClick={() => setEditEvent(null)}>{tr('common.cancel')}</Button>
+            <Button onClick={saveEvent}>{tr('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -878,20 +880,20 @@ const AdminPanel: React.FC = () => {
       {/* Edit Community Dialog */}
       <Dialog open={!!editCommunity} onOpenChange={(o) => !o && setEditCommunity(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Редактировать сообщество</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{tr('adminPanel.editCommunity')}</DialogTitle></DialogHeader>
           {editCommunity && (
             <div className="space-y-3">
-              <div><Label>Название</Label><Input value={editCommunity.name || ''} onChange={(e) => setEditCommunity({ ...editCommunity, name: e.target.value })} /></div>
-              <div><Label>Описание</Label><Textarea rows={4} value={editCommunity.description || ''} onChange={(e) => setEditCommunity({ ...editCommunity, description: e.target.value })} /></div>
+              <div><Label>{tr('marketplace.title_field')}</Label><Input value={editCommunity.name || ''} onChange={(e) => setEditCommunity({ ...editCommunity, name: e.target.value })} /></div>
+              <div><Label>{tr('events.description')}</Label><Textarea rows={4} value={editCommunity.description || ''} onChange={(e) => setEditCommunity({ ...editCommunity, description: e.target.value })} /></div>
               <div className="flex items-center justify-between">
-                <Label>Приватное сообщество</Label>
+                <Label>{tr('adminPanel.privateCommunity')}</Label>
                 <Switch checked={!!editCommunity.is_private} onCheckedChange={(v) => setEditCommunity({ ...editCommunity, is_private: v })} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditCommunity(null)}>Отмена</Button>
-            <Button onClick={saveCommunity}>Сохранить</Button>
+            <Button variant="outline" onClick={() => setEditCommunity(null)}>{tr('common.cancel')}</Button>
+            <Button onClick={saveCommunity}>{tr('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -899,14 +901,14 @@ const AdminPanel: React.FC = () => {
       {/* Edit Ad Dialog */}
       <Dialog open={!!editAd} onOpenChange={(o) => !o && setEditAd(null)}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>{editAd?.id ? 'Редактировать рекламу' : 'Новая реклама'}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editAd?.id ? tr('adminPanel.editAd') : tr('adminPanel.newAd')}</DialogTitle></DialogHeader>
           {editAd && (
             <div className="space-y-3">
-              <div><Label>Заголовок *</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
-              <div><Label>Описание</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
+              <div><Label>{tr('adminPanel.title')}</Label><Input value={editAd.title || ''} onChange={(e) => setEditAd({ ...editAd, title: e.target.value })} /></div>
+              <div><Label>{tr('events.description')}</Label><Textarea rows={2} value={editAd.description || ''} onChange={(e) => setEditAd({ ...editAd, description: e.target.value })} /></div>
               <div>
                 <Label className="flex items-center justify-between">
-                  <span>Изображение</span>
+                  <span>{tr('adminPanel.image')}</span>
                   <span className="text-[10px] text-muted-foreground font-normal">{AD_SIZE_HINTS[editAd.placement || 'feed']}</span>
                 </Label>
                 <div className="flex gap-2 items-start mt-1">
@@ -915,7 +917,7 @@ const AdminPanel: React.FC = () => {
                   )}
                   <div className="flex-1 space-y-2">
                     <Input
-                      placeholder="URL или загрузите файл"
+                      placeholder={tr('adminPanel.urlOrUploadAFile')}
                       value={editAd.image_url || ''}
                       onChange={(e) => setEditAd({ ...editAd, image_url: e.target.value })}
                     />
@@ -930,7 +932,7 @@ const AdminPanel: React.FC = () => {
                       <Button size="sm" variant="outline" type="button" disabled={adUploading}
                         onClick={() => document.getElementById('ad-file-input')?.click()}>
                         {adUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Upload className="h-3.5 w-3.5 mr-1" />}
-                        Загрузить
+                        {tr('media.upload')}
                       </Button>
                       {editAd.image_url && (
                         <Button size="sm" variant="ghost" type="button" onClick={() => setEditAd({ ...editAd, image_url: '' })}>
@@ -941,33 +943,33 @@ const AdminPanel: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div><Label>Ссылка</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
+              <div><Label>{tr('adminPanel.link')}</Label><Input placeholder="https://..." value={editAd.link_url || ''} onChange={(e) => setEditAd({ ...editAd, link_url: e.target.value })} /></div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <Label>Размещение</Label>
+                  <Label>{tr('adminPanel.placement')}</Label>
                   <Select value={editAd.placement || 'feed'} onValueChange={(v) => setEditAd({ ...editAd, placement: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="feed">Лента</SelectItem>
-                      <SelectItem value="sidebar">Боковая панель</SelectItem>
-                      <SelectItem value="banner">Баннер</SelectItem>
+                      <SelectItem value="feed">{tr('adminPanel.feed')}</SelectItem>
+                      <SelectItem value="sidebar">{tr('adminPanel.sidebar')}</SelectItem>
+                      <SelectItem value="banner">{tr('adminPanel.banner')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Окончание</Label>
+                  <Label>{tr('adminPanel.end')}</Label>
                   <Input type="datetime-local" value={editAd.ends_at ? new Date(editAd.ends_at).toISOString().slice(0,16) : ''} onChange={(e) => setEditAd({ ...editAd, ends_at: e.target.value ? new Date(e.target.value).toISOString() : null })} />
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <Label>Активна</Label>
+                <Label>{tr('adminPanel.active')}</Label>
                 <Switch checked={!!editAd.is_active} onCheckedChange={(v) => setEditAd({ ...editAd, is_active: v })} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditAd(null)}>Отмена</Button>
-            <Button onClick={saveAd} disabled={!editAd?.title}>Сохранить</Button>
+            <Button variant="outline" onClick={() => setEditAd(null)}>{tr('common.cancel')}</Button>
+            <Button onClick={saveAd} disabled={!editAd?.title}>{tr('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

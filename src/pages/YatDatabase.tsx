@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link, useSearchParams } from 'react-router-dom';
 import CategorySearchFilter from '@/components/categories/CategorySearchFilter';
 import { useYatCategories } from '@/hooks/useYatCategories';
+import { tr } from '@/i18n';
 
 type ParticipantType = 'all' | 'talent' | 'agent' | 'organization';
 
@@ -35,15 +36,15 @@ interface ParticipantResult {
 }
 
 const sectionOptions = [
-  { key: 'work', label: 'YAT Work', icon: Briefcase },
-  { key: 'learning', label: 'YAT Learning', icon: GraduationCap },
+  { key: 'work', label: tr('sidebar.yatWork'), icon: Briefcase },
+  { key: 'learning', label: tr('sidebar.yatLearning'), icon: GraduationCap },
   { key: 'live', label: 'YAT Live', icon: Radio },
   { key: 'tv', label: 'YAT TV', icon: Tv },
-  { key: 'events', label: 'YAT Events', icon: Calendar },
-  { key: 'karta', label: 'YAT Karta', icon: Map },
+  { key: 'events', label: tr('sidebar.yatEvents'), icon: Calendar },
+  { key: 'karta', label: tr('sidebar.yatKarta'), icon: Map },
   { key: 'yat-coin', label: 'YAT Coin', icon: Coins },
-  { key: 'marketplace', label: 'Marketplace', icon: ShoppingBag },
-  { key: 'social', label: 'Social', icon: Globe },
+  { key: 'marketplace', label: tr('yatDatabase.marketplace'), icon: ShoppingBag },
+  { key: 'social', label: tr('yatDatabase.social'), icon: Globe },
 ];
 
 const YatDatabase: React.FC = () => {
@@ -296,10 +297,10 @@ const YatDatabase: React.FC = () => {
             <div className="p-3 rounded-xl bg-primary/10">
               <Database className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">YAT Database</h1>
+            <h1 className="text-3xl font-bold text-foreground">{tr('sidebar.yatDatabase')}</h1>
           </div>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Moteur de recherche de tous les participants de la plateforme — Talents, Agents et Organisations.
+            {tr('yatDatabase.searchEngineForAllPlatformParticipants')}
           </p>
         </div>
 
@@ -308,19 +309,19 @@ const YatDatabase: React.FC = () => {
           <Card className="text-center p-4">
             <div className="text-2xl font-bold text-blue-600">{stats.talents}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <Users className="h-3 w-3" /> Talents
+              <Users className="h-3 w-3" /> {tr('org.talents')}
             </div>
           </Card>
           <Card className="text-center p-4">
             <div className="text-2xl font-bold text-emerald-600">{stats.agents}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <UserCheck className="h-3 w-3" /> Agents
+              <UserCheck className="h-3 w-3" /> {tr('org.agents')}
             </div>
           </Card>
           <Card className="text-center p-4">
             <div className="text-2xl font-bold text-purple-600">{stats.organizations}</div>
             <div className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-              <Building2 className="h-3 w-3" /> Organisations
+              <Building2 className="h-3 w-3" /> {tr('sidebar.organizations')}
             </div>
           </Card>
         </div>
@@ -334,7 +335,7 @@ const YatDatabase: React.FC = () => {
                 <Input
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder="Rechercher par nom, compétence, sport, industrie..."
+                  placeholder={tr('yatDatabase.searchByNameSkillSportIndustry')}
                   className="pl-9"
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 />
@@ -342,17 +343,17 @@ const YatDatabase: React.FC = () => {
               <Input
                 value={countryFilter}
                 onChange={e => setCountryFilter(e.target.value)}
-                placeholder="Ville, pays..."
+                placeholder={tr('common.cityCountry')}
                 className="sm:w-48"
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
               />
               <Button onClick={handleSearch} disabled={loading} className="gap-1.5">
                 <Filter className="h-3.5 w-3.5" />
-                {loading ? 'Recherche...' : 'Rechercher'}
+                {loading ? 'Recherche...' : tr('common.search')}
               </Button>
-              <Button onClick={applySimilarParams} variant="outline" className="gap-1.5" title="Применить мои параметры">
+              <Button onClick={applySimilarParams} variant="outline" className="gap-1.5" title={tr('yatDatabase.applyMySettings')}>
                 <Star className="h-3.5 w-3.5" />
-                Похожие параметры
+                {tr('yatDatabase.similarSettings')}
               </Button>
             </div>
 
@@ -364,7 +365,7 @@ const YatDatabase: React.FC = () => {
             />
 
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-xs font-medium text-muted-foreground">Type:</span>
+              <span className="text-xs font-medium text-muted-foreground">{tr('yatDatabase.type')}</span>
               {(['all', 'talent', 'agent', 'organization'] as const).map(t => (
                 <Button
                   key={t}
@@ -373,23 +374,23 @@ const YatDatabase: React.FC = () => {
                   className="h-7 text-xs gap-1"
                   onClick={() => setTypeFilter(t)}
                 >
-                  {t === 'all' && 'Tous'}
-                  {t === 'talent' && <><Users className="h-3 w-3" /> Talents</>}
-                  {t === 'agent' && <><UserCheck className="h-3 w-3" /> Agents</>}
-                  {t === 'organization' && <><Building2 className="h-3 w-3" /> Organisations</>}
+                  {t === 'all' && tr('events.all')}
+                  {t === 'talent' && <><Users className="h-3 w-3" /> {tr('org.talents')}</>}
+                  {t === 'agent' && <><UserCheck className="h-3 w-3" /> {tr('org.agents')}</>}
+                  {t === 'organization' && <><Building2 className="h-3 w-3" /> {tr('sidebar.organizations')}</>}
                 </Button>
               ))}
             </div>
 
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-xs font-medium text-muted-foreground">Section:</span>
+              <span className="text-xs font-medium text-muted-foreground">{tr('yatDatabase.section')}</span>
               <Button
                 size="sm"
                 variant={sectionFilter === 'all' ? 'default' : 'outline'}
                 className="h-7 text-xs"
                 onClick={() => setSectionFilter('all')}
               >
-                Toutes
+                {tr('events.allCategories')}
               </Button>
               {sectionOptions.map(s => (
                 <Button
@@ -413,7 +414,7 @@ const YatDatabase: React.FC = () => {
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <Star className="h-4 w-4 text-primary" />
-                Рекомендации — похожие на вас
+                {tr('yatDatabase.recommendationsSimilarToYou')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -429,7 +430,7 @@ const YatDatabase: React.FC = () => {
                       <div className="flex items-center gap-1 flex-wrap">
                         <Badge variant="outline" className={`text-[9px] gap-0.5 ${getTypeBadgeColor(r.type)}`}>
                           {getTypeIcon(r.type)}
-                          {r.type === 'talent' ? 'Talent' : 'Agent'}
+                          {r.type === 'talent' ? tr('auth.talent') : tr('profile.agent')}
                         </Badge>
                         {r.sport_type && <span className="text-[10px] text-muted-foreground truncate">{r.sport_type}</span>}
                       </div>
@@ -445,14 +446,14 @@ const YatDatabase: React.FC = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {results.length} résultat{results.length !== 1 ? 's' : ''} trouvé{results.length !== 1 ? 's' : ''}
+              {results.length} {tr('common.result')}{results.length !== 1 ? 's' : ''} {tr('yatDatabase.found')}{results.length !== 1 ? 's' : ''}
             </span>
           </div>
 
           {searched && results.length === 0 && (
             <Card className="p-8 text-center">
               <Database className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-              <p className="text-muted-foreground">Aucun participant trouvé pour ces critères.</p>
+              <p className="text-muted-foreground">{tr('yatDatabase.noParticipantFoundForTheseCriteria')}</p>
             </Card>
           )}
 
@@ -473,7 +474,7 @@ const YatDatabase: React.FC = () => {
                         </Link>
                         <Badge variant="outline" className={`text-[10px] gap-1 ${getTypeBadgeColor(r.type)}`}>
                           {getTypeIcon(r.type)}
-                          {r.type === 'talent' ? 'Talent' : r.type === 'agent' ? 'Agent' : 'Organisation'}
+                          {r.type === 'talent' ? tr('auth.talent') : r.type === 'agent' ? tr('profile.agent') : tr('profile.organization')}
                         </Badge>
                         {r.rating > 0 && (
                           <span className="flex items-center gap-0.5 text-xs text-yellow-600">
@@ -481,7 +482,7 @@ const YatDatabase: React.FC = () => {
                           </span>
                         )}
                         {r.extra?.verified && (
-                          <Badge className="text-[10px] bg-emerald-500">Vérifié</Badge>
+                          <Badge className="text-[10px] bg-emerald-500">{tr('orgDisc.verified')}</Badge>
                         )}
                       </div>
 
@@ -516,7 +517,7 @@ const YatDatabase: React.FC = () => {
                     <Link to={getProfileLink(r)}>
                       <Button variant="outline" size="sm" className="gap-1 shrink-0">
                         <Eye className="h-3.5 w-3.5" />
-                        Voir
+                        {tr('common.view')}
                       </Button>
                     </Link>
                   </div>

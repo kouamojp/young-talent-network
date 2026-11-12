@@ -11,6 +11,7 @@ import { useMusicPlayer, MusicTrack } from '@/contexts/MusicPlayerContext';
 import { GENRES, STYLES } from '@/components/music/musicConstants';
 import { toast } from 'sonner';
 import { Play, Heart, Upload, Sparkles, Mic2, Music as MusicIcon, Disc3, Library, PlusCircle, Radio } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface Album { id: string; title: string; cover_url: string | null; year: number | null; user_id: string; }
 
@@ -23,8 +24,8 @@ const Music: React.FC = () => {
           <div className="flex items-center gap-3">
             <Disc3 className="h-8 w-8" />
             <div>
-              <h1 className="text-2xl font-bold">YAT Musique</h1>
-              <p className="text-sm text-white/80">Streaming des créations IA et humaines de la communauté</p>
+              <h1 className="text-2xl font-bold">{tr('music.yatMusic')}</h1>
+              <p className="text-sm text-white/80">{tr('music.streamingOfTheCommunitySAi')}</p>
             </div>
           </div>
         </div>
@@ -33,9 +34,9 @@ const Music: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-4 w-full grid grid-cols-3">
-            <TabsTrigger value="discover" className="gap-1.5"><Radio className="h-4 w-4" /> Découverte</TabsTrigger>
-            <TabsTrigger value="library" className="gap-1.5"><Library className="h-4 w-4" /> Bibliothèque</TabsTrigger>
-            <TabsTrigger value="creator" className="gap-1.5"><PlusCircle className="h-4 w-4" /> Créateur</TabsTrigger>
+            <TabsTrigger value="discover" className="gap-1.5"><Radio className="h-4 w-4" /> {tr('orgs.discovery')}</TabsTrigger>
+            <TabsTrigger value="library" className="gap-1.5"><Library className="h-4 w-4" /> {tr('music.library')}</TabsTrigger>
+            <TabsTrigger value="creator" className="gap-1.5"><PlusCircle className="h-4 w-4" /> {tr('music.creator')}</TabsTrigger>
           </TabsList>
           <TabsContent value="discover"><DiscoverView /></TabsContent>
           <TabsContent value="library"><LibraryView /></TabsContent>
@@ -58,8 +59,8 @@ const TrackRow: React.FC<{ track: MusicTrack; queue: MusicTrack[]; onLike?: () =
         <div className="flex items-center gap-1.5">
           <p className="text-sm font-medium truncate">{track.title}</p>
           {track.origin === 'ai'
-            ? <Badge variant="secondary" className="h-4 px-1 text-[9px] gap-0.5"><Sparkles className="h-2.5 w-2.5" />IA</Badge>
-            : <Badge variant="secondary" className="h-4 px-1 text-[9px] gap-0.5"><Mic2 className="h-2.5 w-2.5" />Humain</Badge>}
+            ? <Badge variant="secondary" className="h-4 px-1 text-[9px] gap-0.5"><Sparkles className="h-2.5 w-2.5" />{tr('music.ai')}</Badge>
+            : <Badge variant="secondary" className="h-4 px-1 text-[9px] gap-0.5"><Mic2 className="h-2.5 w-2.5" />{tr('music.human')}</Badge>}
         </div>
         <p className="text-xs text-muted-foreground truncate">
           {[track.genre, track.style].filter(Boolean).join(' · ') || '—'}
@@ -111,7 +112,7 @@ const DiscoverView: React.FC = () => {
 
   const toggleLike = async (id: string) => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast.error('Connectez-vous pour liker'); return; }
+    if (!user) { toast.error(tr('music.logInToLike')); return; }
     if (likes.has(id)) {
       await supabase.from('music_likes').delete().eq('user_id', user.id).eq('track_id', id);
       setLikes(prev => { const n = new Set(prev); n.delete(id); return n; });
@@ -123,27 +124,27 @@ const DiscoverView: React.FC = () => {
 
   return (
     <div className="space-y-3">
-      <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un morceau…" />
+      <Input value={search} onChange={e => setSearch(e.target.value)} placeholder={tr('music.searchForATrack')} />
       <div className="grid grid-cols-3 gap-2">
         <Select value={genre} onValueChange={setGenre}>
-          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Genre" /></SelectTrigger>
-          <SelectContent><SelectItem value="all">Tous genres</SelectItem>{GENRES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={tr('music.genre')} /></SelectTrigger>
+          <SelectContent><SelectItem value="all">{tr('music.allGenres')}</SelectItem>{GENRES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
         </Select>
         <Select value={style} onValueChange={setStyle}>
-          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Style" /></SelectTrigger>
-          <SelectContent><SelectItem value="all">Tous styles</SelectItem>{STYLES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={tr('music.style')} /></SelectTrigger>
+          <SelectContent><SelectItem value="all">{tr('music.allStyles')}</SelectItem>{STYLES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
         </Select>
         <Select value={origin} onValueChange={setOrigin}>
-          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Origine" /></SelectTrigger>
+          <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={tr('music.origin')} /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">IA + Humain</SelectItem>
-            <SelectItem value="human">Uniquement humain</SelectItem>
-            <SelectItem value="ai">Uniquement IA</SelectItem>
+            <SelectItem value="all">{tr('music.aiHuman')}</SelectItem>
+            <SelectItem value="human">{tr('music.humanOnly')}</SelectItem>
+            <SelectItem value="ai">{tr('music.aiOnly')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      {loading ? <p className="text-center text-sm text-muted-foreground py-8">Chargement…</p>
-        : tracks.length === 0 ? <p className="text-center text-sm text-muted-foreground py-8">Aucun morceau. Soyez le premier à publier !</p>
+      {loading ? <p className="text-center text-sm text-muted-foreground py-8">{tr('common.loading3')}</p>
+        : tracks.length === 0 ? <p className="text-center text-sm text-muted-foreground py-8">{tr('music.noTracksBeTheFirstTo')}</p>
         : <div className="space-y-2">{tracks.map(t => <TrackRow key={t.id} track={t} queue={tracks} onLike={() => toggleLike(t.id)} liked={likes.has(t.id)} />)}</div>}
     </div>
   );
@@ -168,18 +169,18 @@ const LibraryView: React.FC = () => {
   };
   useEffect(() => { load(); }, []);
 
-  if (loading) return <p className="text-center text-sm text-muted-foreground py-8">Chargement…</p>;
+  if (loading) return <p className="text-center text-sm text-muted-foreground py-8">{tr('common.loading3')}</p>;
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><Heart className="h-4 w-4 text-red-500" /> Morceaux likés</h2>
-        {liked.length === 0 ? <p className="text-xs text-muted-foreground">Aucun favori pour l'instant.</p>
+        <h2 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><Heart className="h-4 w-4 text-red-500" /> {tr('music.likedTracks')}</h2>
+        {liked.length === 0 ? <p className="text-xs text-muted-foreground">{tr('music.noFavoritesYet')}</p>
           : <div className="space-y-2">{liked.map(t => <TrackRow key={t.id} track={t} queue={liked} />)}</div>}
       </div>
       <div>
-        <h2 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><Disc3 className="h-4 w-4" /> Mes albums</h2>
-        {albums.length === 0 ? <p className="text-xs text-muted-foreground">Aucun album créé.</p>
+        <h2 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><Disc3 className="h-4 w-4" /> {tr('music.myAlbums')}</h2>
+        {albums.length === 0 ? <p className="text-xs text-muted-foreground">{tr('music.noAlbumCreated')}</p>
           : <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {albums.map(a => (
                 <Card key={a.id} className="p-2">
@@ -286,7 +287,7 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    if (!file || !title) { toast.error('Titre + fichier audio requis'); return; }
+    if (!file || !title) { toast.error(tr('music.titleAudioFileRequired')); return; }
     const v = await validateAudioFile(file);
     if (!v.ok) { toast.error((v as { error: string }).error); return; }
     setBusy(true);
@@ -301,36 +302,36 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
         album_id: albumId !== 'none' ? albumId : null,
       });
       if (error) throw error;
-      toast.success('Morceau publié !');
+      toast.success(tr('music.trackPublished'));
       setOpen(false); setTitle(''); setFile(null); setCover(null); setGenre(''); setStyle(''); setAlbumId('none');
       onDone();
-    } catch (e: any) { toast.error(e.message || 'Upload échoué'); }
+    } catch (e: any) { toast.error(e.message || tr('music.uploadFailed')); }
     finally { setBusy(false); }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button size="sm" className="gap-1.5"><Upload className="h-4 w-4" />Publier un morceau</Button></DialogTrigger>
+      <DialogTrigger asChild><Button size="sm" className="gap-1.5"><Upload className="h-4 w-4" />{tr('music.publishATrack')}</Button></DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>Publier un morceau</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('music.publishATrack')}</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <Input placeholder="Titre" value={title} onChange={e => setTitle(e.target.value)} />
+          <Input placeholder={tr('marketplace.title_field')} value={title} onChange={e => setTitle(e.target.value)} />
           <div>
-            <label className="text-xs text-muted-foreground">Fichier audio</label>
+            <label className="text-xs text-muted-foreground">{tr('music.audioFile')}</label>
             <Input type="file" accept=".mp3,.wav,.flac,.aac,.ogg,.oga,.m4a,.mp4,.webm,audio/*" onChange={e => setFile(e.target.files?.[0] || null)} />
-            <p className="text-[10px] text-muted-foreground mt-1">MP3, WAV, FLAC, AAC, OGG, M4A, WEBM — max 15 min, 50 Mo (200 Mo pour WAV/FLAC)</p>
+            <p className="text-[10px] text-muted-foreground mt-1">{tr('music.mp3WavFlacAacOggM4a')}</p>
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Pochette (optionnel)</label>
+            <label className="text-xs text-muted-foreground">{tr('music.coverArtOptional')}</label>
             <Input type="file" accept="image/*" onChange={e => setCover(e.target.files?.[0] || null)} />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <Select value={genre} onValueChange={setGenre}>
-              <SelectTrigger><SelectValue placeholder="Genre" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={tr('music.genre')} /></SelectTrigger>
               <SelectContent>{GENRES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={style} onValueChange={setStyle}>
-              <SelectTrigger><SelectValue placeholder="Style" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={tr('music.style')} /></SelectTrigger>
               <SelectContent>{STYLES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
@@ -338,19 +339,19 @@ const UploadTrackDialog: React.FC<{ albums: Album[]; onDone: () => void }> = ({ 
             <Select value={origin} onValueChange={(v: any) => setOrigin(v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="human">🎤 Humain</SelectItem>
-                <SelectItem value="ai">🎵 IA</SelectItem>
+                <SelectItem value="human">{tr('music.human2')}</SelectItem>
+                <SelectItem value="ai">{tr('music.ai2')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={albumId} onValueChange={setAlbumId}>
-              <SelectTrigger><SelectValue placeholder="Album" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={tr('music.album')} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Aucun album</SelectItem>
+                <SelectItem value="none">{tr('music.noAlbum')}</SelectItem>
                 {albums.map(a => <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={submit} disabled={busy} className="w-full">{busy ? 'Envoi…' : 'Publier'}</Button>
+          <Button onClick={submit} disabled={busy} className="w-full">{busy ? tr('music.uploading') : tr('common.post')}</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -365,7 +366,7 @@ const CreateAlbumDialog: React.FC<{ onDone: () => void }> = ({ onDone }) => {
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    if (!title) { toast.error('Titre requis'); return; }
+    if (!title) { toast.error(tr('music.titleRequired')); return; }
     setBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -375,7 +376,7 @@ const CreateAlbumDialog: React.FC<{ onDone: () => void }> = ({ onDone }) => {
         user_id: user.id, title, cover_url, year: year ? parseInt(year) : null,
       });
       if (error) throw error;
-      toast.success('Album créé !');
+      toast.success(tr('music.albumCreated'));
       setOpen(false); setTitle(''); setYear(''); setCover(null);
       onDone();
     } catch (e: any) { toast.error(e.message); }
@@ -384,17 +385,17 @@ const CreateAlbumDialog: React.FC<{ onDone: () => void }> = ({ onDone }) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button size="sm" variant="outline" className="gap-1.5"><Disc3 className="h-4 w-4" />Créer un album</Button></DialogTrigger>
+      <DialogTrigger asChild><Button size="sm" variant="outline" className="gap-1.5"><Disc3 className="h-4 w-4" />{tr('music.createAnAlbum')}</Button></DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Nouvel album</DialogTitle></DialogHeader>
+        <DialogHeader><DialogTitle>{tr('music.newAlbum')}</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          <Input placeholder="Titre de l'album" value={title} onChange={e => setTitle(e.target.value)} />
-          <Input placeholder="Année (ex: 2026)" type="number" value={year} onChange={e => setYear(e.target.value)} />
+          <Input placeholder={tr('music.albumTitle')} value={title} onChange={e => setTitle(e.target.value)} />
+          <Input placeholder={tr('music.yearEG2026')} type="number" value={year} onChange={e => setYear(e.target.value)} />
           <div>
-            <label className="text-xs text-muted-foreground">Pochette</label>
+            <label className="text-xs text-muted-foreground">{tr('music.coverArt')}</label>
             <Input type="file" accept="image/*" onChange={e => setCover(e.target.files?.[0] || null)} />
           </div>
-          <Button onClick={submit} disabled={busy} className="w-full">{busy ? 'Création…' : 'Créer'}</Button>
+          <Button onClick={submit} disabled={busy} className="w-full">{busy ? tr('music.creating') : tr('common.create')}</Button>
         </div>
       </DialogContent>
     </Dialog>

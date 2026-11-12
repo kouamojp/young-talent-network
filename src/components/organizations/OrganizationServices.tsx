@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 interface Service {
   id: string;
@@ -61,17 +62,17 @@ const OrganizationServices: React.FC<{ ownerId: string; isOwner: boolean; ownerN
       : (supabase.from as any)('organization_services').update({ ...row, updated_at: new Date().toISOString() }).eq('id', (editing as Service).id);
     const { error } = await query;
     setSaving(false);
-    if (error) { toast({ title: 'Enregistrement impossible', description: error.message, variant: 'destructive' }); return; }
-    toast({ title: editing === 'new' ? 'Service ajouté' : 'Service mis à jour' });
+    if (error) { toast({ title: tr('common.couldNotSave'), description: error.message, variant: 'destructive' }); return; }
+    toast({ title: editing === 'new' ? tr('organizationServices.serviceAdded') : tr('organizationServices.serviceUpdated') });
     setEditing(null);
     load();
   };
 
   const remove = async (s: Service) => {
     const { error } = await (supabase.from as any)('organization_services').delete().eq('id', s.id);
-    if (error) { toast({ title: 'Suppression impossible', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('common.couldNotDelete'), description: error.message, variant: 'destructive' }); return; }
     setServices(prev => prev.filter(x => x.id !== s.id));
-    toast({ title: 'Service supprimé' });
+    toast({ title: tr('organizationServices.serviceDeleted') });
   };
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
@@ -79,19 +80,19 @@ const OrganizationServices: React.FC<{ ownerId: string; isOwner: boolean; ownerN
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-foreground">Services ({services.length})</h3>
-        {isOwner && <Button size="sm" onClick={() => open('new')}><Plus className="h-4 w-4 mr-1.5" />Ajouter un service</Button>}
+        <h3 className="text-lg font-semibold text-foreground">{tr('organizationServices.services')}{services.length})</h3>
+        {isOwner && <Button size="sm" onClick={() => open('new')}><Plus className="h-4 w-4 mr-1.5" />{tr('organizationServices.addAService')}</Button>}
       </div>
 
       {services.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-semibold">Aucun service</h3>
+            <h3 className="font-semibold">{tr('common.noServices')}</h3>
             <p className="text-muted-foreground">
               {isOwner
-                ? 'Présentez ce que vous proposez aux talents : coaching, détection, stages, formations…'
-                : `${ownerName} n'a pas encore présenté de service.`}
+                ? tr('organizationServices.presentWhatYouOfferTalentsCoaching')
+                : tr('organizationServices.hasNotListedAnyServicesYet', { p0: ownerName })}
             </p>
           </CardContent>
         </Card>
@@ -108,8 +109,8 @@ const OrganizationServices: React.FC<{ ownerId: string; isOwner: boolean; ownerN
                 {s.description && <p className="text-sm text-muted-foreground whitespace-pre-line break-words">{s.description}</p>}
                 {isOwner && (
                   <div className="flex gap-2 pt-1">
-                    <Button size="sm" variant="outline" onClick={() => open(s)}><Pencil className="h-3.5 w-3.5 mr-1.5" />Modifier</Button>
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)}><Trash2 className="h-3.5 w-3.5 mr-1.5" />Supprimer</Button>
+                    <Button size="sm" variant="outline" onClick={() => open(s)}><Pencil className="h-3.5 w-3.5 mr-1.5" />{tr('common.edit')}</Button>
+                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)}><Trash2 className="h-3.5 w-3.5 mr-1.5" />{tr('common.delete')}</Button>
                   </div>
                 )}
               </CardContent>
@@ -120,31 +121,31 @@ const OrganizationServices: React.FC<{ ownerId: string; isOwner: boolean; ownerN
 
       <Dialog open={!!editing} onOpenChange={(o) => { if (!o) setEditing(null); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{editing === 'new' ? 'Nouveau service' : 'Modifier le service'}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing === 'new' ? tr('organizationServices.newService') : tr('organizationServices.editService')}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="svc-title">Nom du service *</Label>
-              <Input id="svc-title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="ex. Stage de détection U17" />
+              <Label htmlFor="svc-title">{tr('organizationServices.serviceName')}</Label>
+              <Input id="svc-title" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={tr('organizationServices.eGU17ScoutingCamp')} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="svc-category">Catégorie</Label>
-                <Input id="svc-category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="ex. Coaching" />
+                <Label htmlFor="svc-category">{tr('categories.selectCategory')}</Label>
+                <Input id="svc-category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder={tr('organizationServices.eGCoaching')} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="svc-price">Tarif</Label>
-                <Input id="svc-price" value={form.price_label} onChange={e => setForm({ ...form, price_label: e.target.value })} placeholder="ex. Gratuit, 50 € / séance" />
+                <Label htmlFor="svc-price">{tr('organizationServices.price')}</Label>
+                <Input id="svc-price" value={form.price_label} onChange={e => setForm({ ...form, price_label: e.target.value })} placeholder={tr('organizationServices.eGFree50Session')} />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="svc-desc">Description</Label>
-              <Textarea id="svc-desc" rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="À qui s'adresse ce service, comment y participer…" />
+              <Label htmlFor="svc-desc">{tr('events.description')}</Label>
+              <Textarea id="svc-desc" rows={4} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder={tr('organizationServices.whoThisServiceIsForHow')} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setEditing(null)}>{tr('common.cancel')}</Button>
             <Button onClick={save} disabled={!form.title.trim() || saving}>
-              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Enregistrer
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{tr('post.update')}
             </Button>
           </DialogFooter>
         </DialogContent>

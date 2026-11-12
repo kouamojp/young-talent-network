@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { getLevelBadge, getXpProgress, useUserLevel } from '@/hooks/useUserLevel';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface CoinTransaction {
   id: string;
@@ -47,8 +49,8 @@ const YatCoin: React.FC = () => {
       <main className="max-w-xl mx-auto px-4 py-16 text-center">
         <Coins className="mx-auto h-10 w-10 text-gold" />
         <h1 className="mt-4 text-2xl font-semibold">YAT Coin</h1>
-        <p className="mt-2 text-muted-foreground">Connectez-vous pour voir votre solde et vos gains.</p>
-        <Button className="mt-6" onClick={() => navigate('/auth')}>Se connecter</Button>
+        <p className="mt-2 text-muted-foreground">{tr('yatCoin.logInToSeeYourBalance')}</p>
+        <Button className="mt-6" onClick={() => navigate('/auth')}>{tr('common.connect2')}</Button>
       </main>
     );
   }
@@ -65,18 +67,18 @@ const YatCoin: React.FC = () => {
             style={{ background: 'radial-gradient(closest-side, hsl(var(--primary) / 0.55), transparent)' }}
           />
           <div className="relative">
-            <p className="text-sm text-white/65">Votre solde</p>
+            <p className="text-sm text-white/65">{tr('yatCoin.yourBalance')}</p>
             <p className="mt-1 flex items-center gap-3 font-display text-4xl md:text-5xl font-semibold tabular-nums text-gold">
               <Coins className="h-9 w-9 shrink-0" />
               {levelData ? levelData.yat_coins.toFixed(4) : '–'}
             </p>
             <p className="mt-3 max-w-md text-sm text-white/65">
-              Vous gagnez des YAT Coins et de l'expérience à chaque publication et à chaque like reçu.
+              {tr('yatCoin.youEarnYatCoinsAndExperience')}
             </p>
             {levelData && badge && (
               <div className="mt-6 max-w-md">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white">{badge.icon} {badge.name} · niveau {levelData.level}</span>
+                  <span className="text-white">{badge.icon} {badge.name} {tr('yatCoin.level')} {levelData.level}</span>
                   <span className="text-white/65 tabular-nums">{levelData.xp_total} / {levelData.level * 100} XP</span>
                 </div>
                 <Progress value={getXpProgress(levelData.xp_total, levelData.level)} className="mt-2 h-2 bg-white/15" />
@@ -86,11 +88,11 @@ const YatCoin: React.FC = () => {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold mb-3">Historique</h2>
+          <h2 className="text-lg font-semibold mb-3">{tr('calls.history')}</h2>
           {history.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-8 text-center">
-              <p className="text-sm text-muted-foreground">Aucun gain pour l'instant. Publiez quelque chose pour gagner vos premiers YAT Coins.</p>
-              <Button className="mt-4" variant="outline" onClick={() => navigate('/feed')}>Aller au fil</Button>
+              <p className="text-sm text-muted-foreground">{tr('yatCoin.noEarningsYetPostSomethingTo')}</p>
+              <Button className="mt-4" variant="outline" onClick={() => navigate('/feed')}>{tr('yatCoin.goToFeed')}</Button>
             </div>
           ) : (
             <ul className="rounded-xl border border-border bg-card divide-y divide-border">
@@ -100,8 +102,8 @@ const YatCoin: React.FC = () => {
                     ? <PenLine className="h-4 w-4 shrink-0 text-primary" />
                     : <Heart className="h-4 w-4 shrink-0 text-destructive" />}
                   <span className="min-w-0 flex-1">
-                    <span className="block font-medium">{tx.reason === 'post' ? 'Publication' : 'Like reçu'}</span>
-                    <span className="block text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleDateString()}</span>
+                    <span className="block font-medium">{tx.reason === 'post' ? tr('post.tab.post') : tr('yatCoin.likeReceived')}</span>
+                    <span className="block text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleDateString(localeTag())}</span>
                   </span>
                   {!!tx.xp_earned && <span className="text-xs text-muted-foreground tabular-nums">+{tx.xp_earned} XP</span>}
                   <span className="font-semibold text-gold tabular-nums">+{Number(tx.amount).toFixed(4)}</span>

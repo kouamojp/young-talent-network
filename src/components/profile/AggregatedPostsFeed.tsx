@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, MessageCircle, Newspaper } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Props {
   userIds: string[];
@@ -30,7 +32,7 @@ type ProfileRow = {
   user_type: string | null;
 };
 
-export const AggregatedPostsFeed: React.FC<Props> = ({ userIds, labels, limit = 20, emptyMessage = 'Aucune publication publique.' }) => {
+export const AggregatedPostsFeed: React.FC<Props> = ({ userIds, labels, limit = 20, emptyMessage = tr('aggregatedPostsFeed.noPublicPosts') }) => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [profilesMap, setProfilesMap] = useState<Record<string, ProfileRow>>({});
@@ -72,7 +74,7 @@ export const AggregatedPostsFeed: React.FC<Props> = ({ userIds, labels, limit = 
     }
   };
 
-  if (loading) return <div className="p-6 text-center text-sm text-muted-foreground">Chargement…</div>;
+  if (loading) return <div className="p-6 text-center text-sm text-muted-foreground">{tr('common.loading3')}</div>;
 
   if (posts.length === 0) {
     return (
@@ -103,12 +105,12 @@ export const AggregatedPostsFeed: React.FC<Props> = ({ userIds, labels, limit = 
                     onClick={() => navigate(`/talent/${p.user_id}`)}
                     className="text-sm font-semibold text-foreground truncate hover:text-primary"
                   >
-                    {author?.name || 'Utilisateur'}
+                    {author?.name || tr('admin.user')}
                   </button>
                   {label && <Badge variant="outline" className="text-[10px] py-0">{label}</Badge>}
                 </div>
                 <p className="text-[10px] text-muted-foreground">
-                  {new Date(p.created_at).toLocaleString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {new Date(p.created_at).toLocaleString(localeTag(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             </div>

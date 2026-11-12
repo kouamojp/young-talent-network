@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Loader2, MapPin, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MAPBOX_TOKEN, type LngLat } from '@/lib/mapbox';
+import { tr } from '@/i18n';
 
 export interface KartaPoint<T> { id: string; lngLat: LngLat; data: T }
 
@@ -63,7 +64,7 @@ function KartaMap<T>({ points, loading, emptyLabel, renderSelected }: KartaMapPr
   if (!MAPBOX_TOKEN) {
     return (
       <Card><CardContent className="p-6 flex items-center gap-2 text-muted-foreground">
-        <MapPin className="h-5 w-5" /> Carte indisponible : la clé Mapbox (VITE_MAPBOX_TOKEN) n'est pas configurée.
+        <MapPin className="h-5 w-5" /> {tr('kartaMap.mapUnavailableTheMapboxKeyVite')}
       </CardContent></Card>
     );
   }
@@ -73,13 +74,13 @@ function KartaMap<T>({ points, loading, emptyLabel, renderSelected }: KartaMapPr
       <div ref={container} className="w-full h-[600px] rounded-lg shadow-lg" />
       {(loading || points.length === 0) && (
         <div className="absolute top-3 left-3 flex items-center gap-2 rounded-full bg-card/95 border border-border px-3 py-1.5 text-sm shadow">
-          {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Chargement…</> : <><MapPin className="h-4 w-4 text-muted-foreground" /> {emptyLabel}</>}
+          {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> {tr('common.loading3')}</> : <><MapPin className="h-4 w-4 text-muted-foreground" /> {emptyLabel}</>}
         </div>
       )}
       {selected && (
         <Card className="absolute bottom-4 left-4 right-4 max-w-md mx-auto shadow-xl">
           <CardContent className="p-4 relative">
-            <button type="button" onClick={() => setSelected(null)} aria-label="Fermer" className="absolute top-2 right-2 text-muted-foreground hover:text-foreground">
+            <button type="button" onClick={() => setSelected(null)} aria-label={tr('kartaMap.close')} className="absolute top-2 right-2 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
             {renderSelected(selected)}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Building, Briefcase, Users, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface Affiliation {
   id: string;
@@ -52,7 +53,7 @@ const OrganizationsSection: React.FC = () => {
       }[]).map((o) => ({
         id: `owned-${o.id}`,
         name: o.company_name,
-        role: 'Propriétaire',
+        role: tr('organizationsSection.owner'),
         type: 'Propriétaire',
         status: 'Active',
         industry: o.industry,
@@ -87,10 +88,10 @@ const OrganizationsSection: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">🏢 Mes organisations</h3>
+        <h3 className="text-lg font-semibold">{tr('organizationsSection.myOrganizations')}</h3>
         <Button onClick={() => navigate('/organizations')}>
           <Plus className="h-4 w-4 mr-2" />
-          Ajouter
+          {tr('tv.addLink')}
         </Button>
       </div>
 
@@ -98,11 +99,11 @@ const OrganizationsSection: React.FC = () => {
         <Card className="border-dashed border-2">
           <CardContent className="p-6 text-center">
             <Building className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-            <h4 className="font-semibold mb-2">Aucune affiliation</h4>
-            <p className="text-gray-600 mb-4">Rejoignez ou créez une organisation pour la voir apparaître ici</p>
+            <h4 className="font-semibold mb-2">{tr('organizationsSection.noAffiliation')}</h4>
+            <p className="text-gray-600 mb-4">{tr('organizationsSection.joinOrCreateAnOrganizationTo')}</p>
             <Button variant="outline" onClick={() => navigate('/organizations')}>
               <Building className="h-4 w-4 mr-2" />
-              Explorer les organisations
+              {tr('organizationsSection.exploreOrganizations')}
             </Button>
           </CardContent>
         </Card>
@@ -124,14 +125,14 @@ const OrganizationsSection: React.FC = () => {
                           <p className="text-gray-600">{org.role}</p>
                         </div>
                         <div className="flex gap-2">
-                          <Badge className={typeColor(org.type)}>{org.type}</Badge>
+                          <Badge className={typeColor(org.type)}>{org.type === 'Propriétaire' ? tr('organizationsSection.owner') : tr('common.member')}</Badge>
                           <Badge className={statusColor(org.status)}>{org.status}</Badge>
                         </div>
                       </div>
                       {org.industry && <p className="text-sm text-gray-600">{org.industry}</p>}
                     </div>
 
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/organizations')}>Voir</Button>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/organizations')}>{tr('common.view')}</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -143,14 +144,14 @@ const OrganizationsSection: React.FC = () => {
               <CardContent className="p-4 text-center">
                 <Briefcase className="h-6 w-6 text-blue-600 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-blue-700">{ownedCount}</p>
-                <p className="text-sm text-blue-600">Propriétaire</p>
+                <p className="text-sm text-blue-600">{tr('organizationsSection.owner')}</p>
               </CardContent>
             </Card>
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4 text-center">
                 <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-green-700">{memberCount}</p>
-                <p className="text-sm text-green-600">Membre</p>
+                <p className="text-sm text-green-600">{tr('common.member')}</p>
               </CardContent>
             </Card>
           </div>

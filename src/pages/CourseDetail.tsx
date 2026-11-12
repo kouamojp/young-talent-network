@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 interface Course {
   id: string; title: string; description: string | null; category: string | null; level: string | null;
@@ -67,9 +68,9 @@ const CourseDetail: React.FC = () => {
     setBusy('enroll');
     const { error } = await supabase.from('course_enrollments').insert({ course_id: id, student_id: userId });
     setBusy(null);
-    if (error && error.code !== '23505') { toast({ title: "Inscription impossible", description: error.message, variant: 'destructive' }); return; }
+    if (error && error.code !== '23505') { toast({ title: tr('courseDetail.couldNotEnroll'), description: error.message, variant: 'destructive' }); return; }
     setEnrolled(true);
-    toast({ title: 'Inscription confirmée' });
+    toast({ title: tr('common.enrollmentConfirmed') });
   };
 
   const toggleLesson = async (lesson: Lesson) => {
@@ -80,12 +81,12 @@ const CourseDetail: React.FC = () => {
       ? await (supabase.from as any)('course_lesson_progress').delete().eq('user_id', userId).eq('lesson_id', lesson.id)
       : await (supabase.from as any)('course_lesson_progress').insert({ user_id: userId, lesson_id: lesson.id });
     setBusy(null);
-    if (error) { toast({ title: 'Mise à jour impossible', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('common.couldNotUpdate'), description: error.message, variant: 'destructive' }); return; }
     const next = new Set(doneIds);
     if (done) next.delete(lesson.id); else next.add(lesson.id);
     setDoneIds(next);
     if (!done && next.size === lessons.length) {
-      toast({ title: 'Cours terminé 🎓', description: 'Bravo ! Vous gagnez 50 XP.' });
+      toast({ title: tr('courseDetail.courseCompleted'), description: tr('courseDetail.wellDoneYouEarn50Xp') });
     }
   };
 
@@ -100,7 +101,7 @@ const CourseDetail: React.FC = () => {
       video_url: newLesson.video_url.trim() || null,
     });
     setBusy(null);
-    if (error) { toast({ title: "Ajout impossible", description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('courseDetail.couldNotAdd'), description: error.message, variant: 'destructive' }); return; }
     setNewLesson({ title: '', content: '', video_url: '' });
     load();
   };
@@ -109,7 +110,7 @@ const CourseDetail: React.FC = () => {
     setBusy(lesson.id);
     const { error } = await (supabase.from as any)('course_lessons').delete().eq('id', lesson.id);
     setBusy(null);
-    if (error) { toast({ title: 'Suppression impossible', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('common.couldNotDelete'), description: error.message, variant: 'destructive' }); return; }
     setLessons(prev => prev.filter(l => l.id !== lesson.id));
   };
 
@@ -117,52 +118,52 @@ const CourseDetail: React.FC = () => {
   if (!course) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-center space-y-4">
-        <p className="text-muted-foreground">Ce cours n'existe pas ou a été supprimé.</p>
-        <Button variant="outline" onClick={() => navigate('/learning')}>Retour aux cours</Button>
+        <p className="text-muted-foreground">{tr('courseDetail.thisCourseDoesNotExistOr')}</p>
+        <Button variant="outline" onClick={() => navigate('/learning')}>{tr('courseDetail.backToCourses')}</Button>
       </div>
     );
   }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="h-4 w-4" />Retour</Button>
+      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="h-4 w-4" />{tr('common.back')}</Button>
 
       <header className="bg-card border border-border rounded-xl overflow-hidden">
         {course.thumbnail_url && <img src={course.thumbnail_url} alt="" className="w-full h-48 object-cover" />}
         <div className="p-6 space-y-3">
-          <div className="flex items-center gap-2 text-primary"><GraduationCap className="h-5 w-5" /><span className="text-sm font-medium">Cours</span></div>
+          <div className="flex items-center gap-2 text-primary"><GraduationCap className="h-5 w-5" /><span className="text-sm font-medium">{tr('common.courses')}</span></div>
           <h1 className="text-2xl font-bold break-words">{course.title}</h1>
           <div className="flex flex-wrap items-center gap-2 text-sm">
             {course.category && <Badge variant="secondary">{course.category}</Badge>}
             {course.level && <Badge variant="outline">{course.level}</Badge>}
             {!!course.duration_hours && <span className="inline-flex items-center gap-1 text-muted-foreground"><Clock className="h-4 w-4" />{course.duration_hours} h</span>}
-            <span className="font-semibold">{!course.price || Number(course.price) === 0 ? 'Gratuit' : `${Number(course.price)} €`}</span>
+            <span className="font-semibold">{!course.price || Number(course.price) === 0 ? tr('common.free') : `${Number(course.price)} €`}</span>
           </div>
           {course.instructor?.name && (
             <p className="text-sm text-muted-foreground">
-              Par <Link to={`/talent/${course.instructor_id}`} className="text-foreground hover:underline">{course.instructor.name}</Link>
+              {tr('courseDetail.by')} <Link to={`/talent/${course.instructor_id}`} className="text-foreground hover:underline">{course.instructor.name}</Link>
             </p>
           )}
           {course.description && <p className="text-[15px] whitespace-pre-line break-words">{course.description}</p>}
 
           {!isInstructor && (enrolled ? (
             <div className="space-y-1.5 pt-2">
-              <div className="flex justify-between text-sm"><span>Progression</span><span className="tabular-nums">{doneCount}/{lessons.length} leçons · {pct} %</span></div>
+              <div className="flex justify-between text-sm"><span>{tr('funding.progress')}</span><span className="tabular-nums">{doneCount}/{lessons.length} {tr('courseDetail.lessons')} {pct} %</span></div>
               <Progress value={pct} />
             </div>
           ) : (
             <Button onClick={enroll} disabled={busy === 'enroll'} className="mt-2">
-              {busy === 'enroll' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}S'inscrire au cours
+              {busy === 'enroll' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{tr('courseDetail.enrollInTheCourse')}
             </Button>
           ))}
         </div>
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Leçons ({lessons.length})</h2>
+        <h2 className="text-lg font-semibold">{tr('courseDetail.lessons2')}{lessons.length})</h2>
         {lessons.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            {isInstructor ? 'Ajoutez la première leçon ci-dessous.' : "Le formateur n'a pas encore publié de leçon."}
+            {isInstructor ? tr('courseDetail.addTheFirstLessonBelow') : tr('courseDetail.theInstructorHasNotPublishedAny')}
           </p>
         ) : (
           <ol className="bg-card border border-border rounded-xl divide-y divide-border">
@@ -174,7 +175,7 @@ const CourseDetail: React.FC = () => {
                   <div className="flex items-center gap-3">
                     {enrolled && !isInstructor ? (
                       <button type="button" onClick={() => toggleLesson(l)} disabled={busy === l.id}
-                        aria-label={done ? 'Marquer comme non terminée' : 'Marquer comme terminée'} className="shrink-0">
+                        aria-label={done ? tr('courseDetail.markAsNotCompleted') : tr('courseDetail.markAsCompleted')} className="shrink-0">
                         {busy === l.id ? <Loader2 className="h-5 w-5 animate-spin" />
                           : done ? <CheckCircle2 className="h-5 w-5 text-green-600" /> : <Circle className="h-5 w-5 text-muted-foreground" />}
                       </button>
@@ -186,7 +187,7 @@ const CourseDetail: React.FC = () => {
                     </button>
                     {l.video_url && <PlayCircle className="h-4 w-4 text-muted-foreground shrink-0" />}
                     {isInstructor && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteLesson(l)} disabled={busy === l.id} aria-label="Supprimer la leçon">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteLesson(l)} disabled={busy === l.id} aria-label={tr('courseDetail.deleteLesson')}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
@@ -196,11 +197,11 @@ const CourseDetail: React.FC = () => {
                       {l.content && <p className="whitespace-pre-line break-words">{l.content}</p>}
                       {l.video_url && (
                         <a href={l.video_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-primary hover:underline break-all">
-                          <PlayCircle className="h-4 w-4" />Voir la vidéo
+                          <PlayCircle className="h-4 w-4" />{tr('courseDetail.watchTheVideo')}
                         </a>
                       )}
                       {enrolled && !isInstructor && !done && (
-                        <div><Button size="sm" variant="outline" onClick={() => toggleLesson(l)} className="gap-1.5"><Check className="h-4 w-4" />J'ai terminé cette leçon</Button></div>
+                        <div><Button size="sm" variant="outline" onClick={() => toggleLesson(l)} className="gap-1.5"><Check className="h-4 w-4" />{tr('courseDetail.iHaveCompletedThisLesson')}</Button></div>
                       )}
                     </div>
                   )}
@@ -212,21 +213,21 @@ const CourseDetail: React.FC = () => {
 
         {isInstructor && (
           <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-            <h3 className="font-semibold flex items-center gap-2"><Plus className="h-4 w-4" />Ajouter une leçon</h3>
+            <h3 className="font-semibold flex items-center gap-2"><Plus className="h-4 w-4" />{tr('courseDetail.addALesson')}</h3>
             <div className="space-y-1.5">
-              <Label htmlFor="lesson-title">Titre *</Label>
-              <Input id="lesson-title" value={newLesson.title} onChange={e => setNewLesson({ ...newLesson, title: e.target.value })} placeholder="ex. Les bases du dribble" />
+              <Label htmlFor="lesson-title">{tr('events.eventName')}</Label>
+              <Input id="lesson-title" value={newLesson.title} onChange={e => setNewLesson({ ...newLesson, title: e.target.value })} placeholder={tr('courseDetail.eGDribblingBasics')} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lesson-content">Contenu</Label>
+              <Label htmlFor="lesson-content">{tr('courseDetail.content')}</Label>
               <Textarea id="lesson-content" rows={4} value={newLesson.content} onChange={e => setNewLesson({ ...newLesson, content: e.target.value })} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lesson-video">Lien vidéo (YouTube, Vimeo…)</Label>
+              <Label htmlFor="lesson-video">{tr('courseDetail.videoLinkYoutubeVimeo')}</Label>
               <Input id="lesson-video" type="url" value={newLesson.video_url} onChange={e => setNewLesson({ ...newLesson, video_url: e.target.value })} placeholder="https://" />
             </div>
             <Button onClick={addLesson} disabled={!newLesson.title.trim() || busy === 'add'}>
-              {busy === 'add' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Ajouter la leçon
+              {busy === 'add' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{tr('courseDetail.addLesson')}
             </Button>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 export interface UserLevel {
   level: number;
@@ -10,15 +11,15 @@ export interface UserLevel {
 }
 
 const LEVEL_BADGES: Record<number, { name: string; icon: string; color: string }> = {
-  1: { name: 'Newcomer', icon: '🌱', color: '#4ade80' },
-  2: { name: 'Explorer', icon: '🧭', color: '#60a5fa' },
-  3: { name: 'Creator', icon: '✨', color: '#a78bfa' },
-  5: { name: 'Rising Star', icon: '⭐', color: '#facc15' },
-  10: { name: 'Influencer', icon: '🔥', color: '#f97316' },
-  15: { name: 'Legend', icon: '👑', color: '#ef4444' },
-  20: { name: 'Master', icon: '💎', color: '#06b6d4' },
-  25: { name: 'Champion', icon: '🏆', color: '#eab308' },
-  50: { name: 'Icon', icon: '🌟', color: '#f59e0b' },
+  1: { name: tr('useUserLevel.newcomer'), icon: '🌱', color: '#4ade80' },
+  2: { name: tr('common.explore'), icon: '🧭', color: '#60a5fa' },
+  3: { name: tr('useUserLevel.creator'), icon: '✨', color: '#a78bfa' },
+  5: { name: tr('useUserLevel.risingStar'), icon: '⭐', color: '#facc15' },
+  10: { name: tr('useUserLevel.influencer'), icon: '🔥', color: '#f97316' },
+  15: { name: tr('useUserLevel.legend'), icon: '👑', color: '#ef4444' },
+  20: { name: tr('useUserLevel.master'), icon: '💎', color: '#06b6d4' },
+  25: { name: tr('useUserLevel.champion'), icon: '🏆', color: '#eab308' },
+  50: { name: tr('useUserLevel.icon'), icon: '🌟', color: '#f59e0b' },
 };
 
 export const getLevelBadge = (level: number) => {
@@ -55,8 +56,8 @@ export const useUserLevel = (userId?: string | null) => {
       const newLevel = d.level as number;
       if (prevLevelRef.current !== null && newLevel > prevLevelRef.current) {
         const badge = getLevelBadge(newLevel);
-        toast.success(`${badge.icon} Level Up! You reached Level ${newLevel}`, {
-          description: `Badge: ${badge.name} — Keep going!`,
+        toast.success(tr('useUserLevel.levelUpYouReachedLevel', { p0: badge.icon, p1: newLevel }), {
+          description: tr('useUserLevel.badgeKeepGoing', { p0: badge.name }),
           duration: 5000,
         });
       }

@@ -4,6 +4,8 @@ import { Calendar, Clock, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import KartaMap, { type KartaPoint } from './KartaMap';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface EventPoint { id: string; title: string; date: string; time: string; attendees: number }
 
@@ -27,8 +29,8 @@ const EventsMap = () => {
             lngLat: [Number(e.longitude), Number(e.latitude)],
             data: {
               id: e.id, title: e.title, attendees: e.attendees_count ?? 0,
-              date: start.toLocaleDateString(),
-              time: start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              date: start.toLocaleDateString(localeTag()),
+              time: start.toLocaleTimeString(localeTag(), { hour: '2-digit', minute: '2-digit' }),
             },
           };
         }));
@@ -40,7 +42,7 @@ const EventsMap = () => {
     <KartaMap
       points={points}
       loading={loading}
-      emptyLabel="Aucun événement localisé pour le moment"
+      emptyLabel={tr('eventsMap.noEventsLocatedYet')}
       renderSelected={({ data: ev }) => (
         <div className="flex items-start gap-4 pr-4">
           <div className="p-3 bg-primary/10 rounded-lg"><Calendar className="h-6 w-6 text-primary" /></div>
@@ -49,9 +51,9 @@ const EventsMap = () => {
             <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
               <span className="flex items-center gap-1"><Calendar className="h-4 w-4" />{ev.date}</span>
               <span className="flex items-center gap-1"><Clock className="h-4 w-4" />{ev.time}</span>
-              <span className="flex items-center gap-1"><Users className="h-4 w-4" />{ev.attendees} participants</span>
+              <span className="flex items-center gap-1"><Users className="h-4 w-4" />{ev.attendees} {tr('events.attendees')}</span>
             </div>
-            <Button size="sm" className="mt-3 w-full" onClick={() => navigate('/events')}>Voir les événements</Button>
+            <Button size="sm" className="mt-3 w-full" onClick={() => navigate('/events')}>{tr('eventsMap.viewEvents')}</Button>
           </div>
         </div>
       )}

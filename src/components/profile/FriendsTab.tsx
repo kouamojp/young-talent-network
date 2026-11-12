@@ -10,6 +10,7 @@ import { Search, UserPlus, Users, Loader2, UserCheck, UserX } from 'lucide-react
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { tr } from '@/i18n';
 
 interface Profile {
   id: string;
@@ -79,24 +80,24 @@ const FriendsTab: React.FC = () => {
 
   const acceptRequest = async (req: Connection) => {
     const { error } = await supabase.from('connections').update({ status: 'accepted' }).eq('id', req.id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setPendingRequests(prev => prev.filter(p => p.id !== req.id));
     setConnections(prev => [...prev, { ...req, status: 'accepted' }]);
-    toast({ title: 'Demande acceptée' });
+    toast({ title: tr('friendsTab.requestAccepted') });
   };
 
   const declineRequest = async (req: Connection) => {
     const { error } = await supabase.from('connections').delete().eq('id', req.id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setPendingRequests(prev => prev.filter(p => p.id !== req.id));
   };
 
   const sendFriendRequest = async (userId: string) => {
     if (!currentUserId) return;
     const { error } = await supabase.from('connections').insert({ user_id: currentUserId, connected_user_id: userId });
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' }); return; }
     setSuggested(prev => prev.filter(p => p.id !== userId));
-    toast({ title: 'Demande envoyée' });
+    toast({ title: tr('friends.requestSent') });
   };
 
   const acceptedFriends = connections
@@ -118,29 +119,29 @@ const FriendsTab: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          <h3 className="text-xl font-bold">Friends & Connections</h3>
+          <h3 className="text-xl font-bold">{tr('friendsTab.friendsConnections')}</h3>
           <span className="bg-blue-100 text-blue-800 text-xs rounded-full px-2 py-0.5">
             {acceptedFriends.length}
           </span>
         </div>
         <Button onClick={() => navigate('/friends')} className="flex items-center gap-2">
           <UserPlus className="h-4 w-4" />
-          Add Friend
+          {tr('friendsTab.addFriend')}
         </Button>
       </div>
 
       <Tabs defaultValue="friends">
         <TabsList className="mb-4">
-          <TabsTrigger value="friends">All Friends</TabsTrigger>
+          <TabsTrigger value="friends">{tr('friendsTab.allFriends')}</TabsTrigger>
           <TabsTrigger value="requests">
-            Friend Requests
+            {tr('friendsTab.friendRequests')}
             {incomingRequests.length > 0 && (
               <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
                 {incomingRequests.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="suggested">Suggested</TabsTrigger>
+          <TabsTrigger value="suggested">{tr('friendsTab.suggested')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="friends">
@@ -148,7 +149,7 @@ const FriendsTab: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Search friends..."
+                placeholder={tr('friends.searchFriends')}
                 className="pl-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -159,7 +160,7 @@ const FriendsTab: React.FC = () => {
           {acceptedFriends.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Users className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-              <p>No friends yet</p>
+              <p>{tr('friends.noFriends')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -182,8 +183,8 @@ const FriendsTab: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex justify-end mt-3 gap-2">
-                        <Button size="sm" variant="outline" onClick={() => navigate('/messages')}>Message</Button>
-                        <Button size="sm" variant="outline" onClick={() => goToProfile(friend)}>View Profile</Button>
+                        <Button size="sm" variant="outline" onClick={() => navigate('/messages')}>{tr('common.message')}</Button>
+                        <Button size="sm" variant="outline" onClick={() => goToProfile(friend)}>{tr('marketplace.viewProfile')}</Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -206,15 +207,15 @@ const FriendsTab: React.FC = () => {
                           <AvatarFallback>{other?.name?.[0] || 'U'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <h4 className="font-medium">{other?.name || 'Utilisateur'}</h4>
+                          <h4 className="font-medium">{other?.name || tr('admin.user')}</h4>
                           <p className="text-sm text-gray-600">{other?.sport_type || other?.user_type || ''}</p>
                         </div>
                         <div className="flex gap-2">
                           <Button size="sm" onClick={() => acceptRequest(request)}>
-                            <UserCheck className="h-4 w-4 mr-1" />Accept
+                            <UserCheck className="h-4 w-4 mr-1" />{tr('friends.accept')}
                           </Button>
                           <Button size="sm" variant="outline" onClick={() => declineRequest(request)}>
-                            <UserX className="h-4 w-4 mr-1" />Decline
+                            <UserX className="h-4 w-4 mr-1" />{tr('friends.decline')}
                           </Button>
                         </div>
                       </div>
@@ -226,7 +227,7 @@ const FriendsTab: React.FC = () => {
           ) : (
             <div className="text-center py-8 text-gray-500">
               <Users className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-              <p>No pending friend requests</p>
+              <p>{tr('friendsTab.noPendingFriendRequests')}</p>
             </div>
           )}
         </TabsContent>
@@ -235,7 +236,7 @@ const FriendsTab: React.FC = () => {
           {suggested.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <UserPlus className="h-10 w-10 mx-auto mb-3 text-gray-300" />
-              <p>No suggestions right now</p>
+              <p>{tr('friendsTab.noSuggestionsRightNow')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -255,7 +256,7 @@ const FriendsTab: React.FC = () => {
                         )}
                       </div>
                       <Button size="sm" onClick={() => sendFriendRequest(person.id)}>
-                        <UserPlus className="h-4 w-4 mr-1" />Add Friend
+                        <UserPlus className="h-4 w-4 mr-1" />{tr('friendsTab.addFriend')}
                       </Button>
                     </div>
                   </CardContent>

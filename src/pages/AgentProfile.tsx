@@ -17,6 +17,8 @@ import BlockUserButton from '@/components/safety/BlockUserButton';
 import { fetchPublicContact } from '@/lib/profiles';
 import { toast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface AgentData {
   id: string;
@@ -220,11 +222,11 @@ const AgentProfile: React.FC = () => {
   };
 
   const SECTION_LABELS: Record<string, { label: string; icon: any; path: string }> = {
-    events: { label: 'Événements', icon: Calendar, path: '/events' },
-    tv: { label: 'TV', icon: Tv, path: '/tv' },
-    live: { label: 'LIVE', icon: Radio, path: '/live' },
-    work: { label: 'Travail', icon: Briefcase, path: '/work' },
-    learning: { label: 'Formation', icon: GraduationCap, path: '/learning' },
+    events: { label: tr('landing.events'), icon: Calendar, path: '/events' },
+    tv: { label: tr('talent.tv'), icon: Tv, path: '/tv' },
+    live: { label: tr('common.live'), icon: Radio, path: '/live' },
+    work: { label: tr('talent.work'), icon: Briefcase, path: '/work' },
+    learning: { label: tr('profile.training'), icon: GraduationCap, path: '/learning' },
     'yat-coin': { label: 'YAT Coin', icon: Coins, path: '/yat-coin' },
     karta: { label: 'Karta', icon: MapIcon, path: '/karta' },
   };
@@ -241,13 +243,13 @@ const AgentProfile: React.FC = () => {
     return (
       <div className="min-h-screen bg-background p-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+          <ArrowLeft className="h-4 w-4 mr-2" /> {tr('common.back')}
         </Button>
         <Card>
           <CardContent className="p-12 text-center">
             <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-bold mb-2">Agent non trouvé</h2>
-            <p className="text-muted-foreground">Ce profil d'agent n'existe pas ou n'a pas encore été créé.</p>
+            <h2 className="text-xl font-bold mb-2">{tr('agentProfile.agentNotFound')}</h2>
+            <p className="text-muted-foreground">{tr('agentProfile.thisAgentProfileDoesNotExist')}</p>
           </CardContent>
         </Card>
       </div>
@@ -255,17 +257,17 @@ const AgentProfile: React.FC = () => {
   }
 
   const stats = [
-    { label: 'Talents', value: contracts.length, icon: Users },
-    { label: 'Organisations', value: memberships.length, icon: Building },
-    { label: 'Deals', value: agent.deals_completed || 0, icon: TrendingUp },
-    { label: 'Commission', value: `${agent.commission_rate || 0}%`, icon: Award },
+    { label: tr('org.talents'), value: contracts.length, icon: Users },
+    { label: tr('sidebar.organizations'), value: memberships.length, icon: Building },
+    { label: tr('agentProfile.deals'), value: agent.deals_completed || 0, icon: TrendingUp },
+    { label: tr('agentProfile.commission'), value: `${agent.commission_rate || 0}%`, icon: Award },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto p-4 space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> {tr('common.back')}
         </Button>
 
         {/* Agent Header */}
@@ -282,7 +284,7 @@ const AgentProfile: React.FC = () => {
               <div className="flex-1 mt-2">
                 <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-2xl font-bold text-foreground">{agent.agency_name}</h1>
-                  {agent.verified && <Badge className="bg-green-500 text-white">Vérifié</Badge>}
+                  {agent.verified && <Badge className="bg-green-500 text-white">{tr('orgDisc.verified')}</Badge>}
                 </div>
                 <p className="text-muted-foreground">{agent.profile?.name}</p>
                 {agent.category && <Badge variant="secondary" className="mt-1">{agent.category}</Badge>}
@@ -309,7 +311,7 @@ const AgentProfile: React.FC = () => {
                   <ContractCreationDialog agentId={id!} onContractCreated={fetchAgentData} />
                 )}
                 <Button variant="outline" className="gap-2" onClick={() => navigate(`/messages?to=${id}`)}>
-                  <Handshake className="h-4 w-4" /> Contacter
+                  <Handshake className="h-4 w-4" /> {tr('marketplace.contact')}
                 </Button>
                 {(agent?.user_id || id) && <BlockUserButton userId={agent?.user_id || id!} name={agent?.agency_name} size="default" />}
               </div>
@@ -336,11 +338,11 @@ const AgentProfile: React.FC = () => {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 text-center text-sm">
-            <TabsTrigger value="posts">Publications</TabsTrigger>
-            <TabsTrigger value="talent-posts">Pubs talents</TabsTrigger>
-            <TabsTrigger value="activity">Activités</TabsTrigger>
+            <TabsTrigger value="posts">{tr('sidebar.posts')}</TabsTrigger>
+            <TabsTrigger value="talent-posts">{tr('agentProfile.talentPosts')}</TabsTrigger>
+            <TabsTrigger value="activity">{tr('common.activity')}</TabsTrigger>
             <TabsTrigger value="overview">{t('agent.overview')}</TabsTrigger>
-            <TabsTrigger value="sections">Sections</TabsTrigger>
+            <TabsTrigger value="sections">{tr('agentProfile.sections')}</TabsTrigger>
             <TabsTrigger value="talents">{t('agent.talents')}</TabsTrigger>
             <TabsTrigger value="organizations">{t('agent.organizations')}</TabsTrigger>
             <TabsTrigger value="services">{t('agent.services')}</TabsTrigger>
@@ -349,13 +351,13 @@ const AgentProfile: React.FC = () => {
           <TabsContent value="overview" className="space-y-4">
             {agent.bio && (
               <Card>
-                <CardHeader><CardTitle className="text-lg">À propos</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-lg">{tr('footer.about')}</CardTitle></CardHeader>
                 <CardContent><p className="text-muted-foreground">{agent.bio}</p></CardContent>
               </Card>
             )}
             {agent.specialization && agent.specialization.length > 0 && (
               <Card>
-                <CardHeader><CardTitle className="text-lg">Spécialisations</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-lg">{tr('agentProfile.specializations')}</CardTitle></CardHeader>
                 <CardContent className="flex flex-wrap gap-2">
                   {agent.specialization.map((s, i) => (
                     <Badge key={i} variant="outline">{s}</Badge>
@@ -367,7 +369,7 @@ const AgentProfile: React.FC = () => {
               <Card>
                 <CardContent className="p-4 flex items-center gap-3">
                   <Award className="h-5 w-5 text-primary" />
-                  <span className="text-sm text-muted-foreground">Licence: {agent.license_number}</span>
+                  <span className="text-sm text-muted-foreground">{tr('agentProfile.licence')} {agent.license_number}</span>
                 </CardContent>
               </Card>
             )}
@@ -377,8 +379,8 @@ const AgentProfile: React.FC = () => {
             {posts.length === 0 ? (
               <Card><CardContent className="p-12 text-center">
                 <Newspaper className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <h3 className="font-semibold text-lg">Aucune publication</h3>
-                <p className="text-muted-foreground">Cet agent n'a pas encore publié.</p>
+                <h3 className="font-semibold text-lg">{tr('agentProfile.noPosts')}</h3>
+                <p className="text-muted-foreground">{tr('agentProfile.thisAgentHasNotPostedYet')}</p>
               </CardContent></Card>
             ) : (
               posts.map((p) => (
@@ -391,7 +393,7 @@ const AgentProfile: React.FC = () => {
                       </Avatar>
                       <div>
                         <div className="font-medium text-foreground text-sm">{agent.agency_name}</div>
-                        <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</div>
+                        <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString(localeTag())}</div>
                       </div>
                     </div>
                     {p.content && <p className="text-sm text-foreground whitespace-pre-wrap">{p.content.slice(0, 500)}</p>}
@@ -409,28 +411,28 @@ const AgentProfile: React.FC = () => {
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <button className="ml-auto flex items-center gap-1 text-destructive hover:underline text-xs">
-                              <Trash2 className="h-3.5 w-3.5" /> Supprimer
+                              <Trash2 className="h-3.5 w-3.5" /> {tr('common.delete')}
                             </button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Supprimer cette publication ?</AlertDialogTitle>
-                              <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+                              <AlertDialogTitle>{tr('common.deleteThisPost')}</AlertDialogTitle>
+                              <AlertDialogDescription>{tr('common.thisActionIsPermanent')}</AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogCancel>{tr('common.cancel')}</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={async () => {
                                   const { error } = await supabase.from('posts').delete().eq('id', p.id);
                                   if (error) {
-                                    toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+                                    toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
                                   } else {
-                                    toast({ title: 'Publication supprimée' });
+                                    toast({ title: tr('admin.postDeleted') });
                                     setPosts(prev => prev.filter((x: any) => x.id !== p.id));
                                   }
                                 }}
                               >
-                                Supprimer
+                                {tr('common.delete')}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -448,14 +450,14 @@ const AgentProfile: React.FC = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Newspaper className="h-5 w-5 text-primary" />
-                  Publications des talents ({contracts.length} talents)
+                  {tr('agentProfile.talentsPosts')}{contracts.length} {tr('agentProfile.talents')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <AggregatedPostsFeed
                   userIds={contracts.map(c => c.talent_id)}
                   labels={Object.fromEntries(contracts.map(c => [c.talent_id, 'Talent']))}
-                  emptyMessage="Aucune publication des talents sous contrat."
+                  emptyMessage={tr('agentProfile.noPostsFromTalentsUnderContract')}
                 />
               </CardContent>
             </Card>
@@ -466,7 +468,7 @@ const AgentProfile: React.FC = () => {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Activity className="h-5 w-5 text-primary" />
-                  Activités de l'agent
+                  {tr('agentProfile.agentSActivity')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -478,7 +480,7 @@ const AgentProfile: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Activity className="h-5 w-5 text-primary" />
-                    Activités des talents
+                    {tr('common.talentsActivity')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -493,8 +495,8 @@ const AgentProfile: React.FC = () => {
             {presence.length === 0 ? (
               <Card><CardContent className="p-12 text-center">
                 <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <h3 className="font-semibold text-lg">Aucune section active</h3>
-                <p className="text-muted-foreground">Cet agent n'est actif dans aucune section.</p>
+                <h3 className="font-semibold text-lg">{tr('agentProfile.noActiveSection')}</h3>
+                <p className="text-muted-foreground">{tr('agentProfile.thisAgentIsNotActiveIn')}</p>
               </CardContent></Card>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -511,7 +513,7 @@ const AgentProfile: React.FC = () => {
                     >
                       <Icon className="h-5 w-5" />
                       <span>{meta.label}</span>
-                      {s.featured && <Badge variant="secondary" className="text-xs">En vedette</Badge>}
+                      {s.featured && <Badge variant="secondary" className="text-xs">{tr('agentProfile.featured')}</Badge>}
                     </Button>
                   );
                 })}
@@ -524,8 +526,8 @@ const AgentProfile: React.FC = () => {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold text-lg">Aucun talent</h3>
-                  <p className="text-muted-foreground">Cet agent n'a pas encore de talents sous contrat.</p>
+                  <h3 className="font-semibold text-lg">{tr('common.noTalents')}</h3>
+                  <p className="text-muted-foreground">{tr('agentProfile.thisAgentHasNoTalentsUnder')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -541,7 +543,7 @@ const AgentProfile: React.FC = () => {
                         className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
                         onClick={() => navigate(`/talent/${contract.talent_id}`)}
                       >
-                        {contract.talent_profile?.name || 'Talent'}
+                        {contract.talent_profile?.name || tr('auth.talent')}
                       </h4>
                       <p className="text-sm text-muted-foreground">{contract.talent_profile?.sport_type}</p>
                       {contract.talent_profile?.location && (
@@ -552,7 +554,7 @@ const AgentProfile: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">
-                        {contract.status === 'active' ? 'Actif' : contract.status}
+                        {contract.status === 'active' ? tr('profile.active') : contract.status}
                       </Badge>
                       <Button variant="ghost" size="sm" onClick={() => navigate(`/talent/${contract.talent_id}`)}>
                         <Eye className="h-4 w-4" />
@@ -569,8 +571,8 @@ const AgentProfile: React.FC = () => {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Building className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold text-lg">Aucune organisation</h3>
-                  <p className="text-muted-foreground">Cet agent n'est membre d'aucune organisation.</p>
+                  <h3 className="font-semibold text-lg">{tr('agentProfile.noOrganizations')}</h3>
+                  <p className="text-muted-foreground">{tr('agentProfile.thisAgentIsNotAMember')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -591,7 +593,7 @@ const AgentProfile: React.FC = () => {
                       <p className="text-sm text-muted-foreground">{membership.organization?.industry}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline">{membership.role || 'Membre'}</Badge>
+                      <Badge variant="outline">{membership.role || tr('common.member')}</Badge>
                       <Button variant="ghost" size="sm" onClick={() => navigate(`/organization/${membership.organization?.id || membership.organization_id}`)}>
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -607,8 +609,8 @@ const AgentProfile: React.FC = () => {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold text-lg">Aucun service</h3>
-                  <p className="text-muted-foreground">Cet agent n'a pas encore listé ses services.</p>
+                  <h3 className="font-semibold text-lg">{tr('common.noServices')}</h3>
+                  <p className="text-muted-foreground">{tr('agentProfile.thisAgentHasNotListedTheir')}</p>
                 </CardContent>
               </Card>
             ) : (

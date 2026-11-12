@@ -13,6 +13,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import CategoryPicker from '@/components/categories/CategoryPicker';
 import VKLoginButton from '@/components/auth/VKLoginButton';
 import TelegramLoginButton from '@/components/auth/TelegramLoginButton';
+import { tr } from '@/i18n';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" className="mr-2 h-4 w-4" aria-hidden="true">
@@ -72,13 +73,13 @@ const Authentication: React.FC = () => {
       });
       if (error) throw error;
       toast({
-        title: t('auth.resetEmailSent') || 'Email envoyé',
-        description: t('auth.resetEmailSentDesc') || 'Vérifiez votre boîte mail pour réinitialiser votre mot de passe.',
+        title: t('auth.resetEmailSent') || tr('auth.resetEmailSent'),
+        description: t('auth.resetEmailSentDesc') || tr('authentication.checkYourInboxToResetYour'),
       });
       setShowReset(false);
       setResetEmail('');
     } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +168,7 @@ const Authentication: React.FC = () => {
       });
       if (error) throw error;
     } catch (error: any) {
-      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
+      toast({ title: tr('auth.loginFailed'), description: error.message, variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -295,7 +296,7 @@ const Authentication: React.FC = () => {
                       onClick={() => setShowReset(v => !v)}
                       className="text-xs text-primary hover:underline"
                     >
-                      {t('auth.forgotPassword') || 'Mot de passe oublié ?'}
+                      {t('auth.forgotPassword') || tr('auth.forgotPassword')}
                     </button>
                   </div>
                   <Button className="w-full" type="submit" disabled={isLoading}>
@@ -305,10 +306,10 @@ const Authentication: React.FC = () => {
                 {showReset && (
                   <form onSubmit={handlePasswordReset} className="mt-4 space-y-3 p-4 border rounded-lg bg-background">
                     <Label htmlFor="reset-email" className="text-sm font-medium">
-                      {t('auth.resetTitle') || 'Réinitialiser le mot de passe'}
+                      {t('auth.resetTitle') || tr('auth.resetTitle')}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      {t('auth.resetDesc') || 'Saisissez votre email pour recevoir un lien de réinitialisation.'}
+                      {t('auth.resetDesc') || tr('auth.resetDesc')}
                     </p>
                     <Input
                       id="reset-email"
@@ -320,7 +321,7 @@ const Authentication: React.FC = () => {
                     />
                     <div className="flex gap-2">
                       <Button type="submit" size="sm" disabled={isLoading} className="flex-1">
-                        {isLoading ? '…' : (t('auth.sendResetLink') || 'Envoyer le lien')}
+                        {isLoading ? '…' : (t('auth.sendResetLink') || tr('auth.sendResetLink'))}
                       </Button>
                       <Button type="button" variant="ghost" size="sm" onClick={() => setShowReset(false)}>
                         {t('common.cancel') || 'Annuler'}
@@ -395,7 +396,7 @@ const Authentication: React.FC = () => {
                       rows={2}
                       value={bioText}
                       onChange={(e) => setBioText(e.target.value)}
-                      placeholder={t('auth.skillsBioPlaceholder') || 'Describe your skills (e.g. football coach, web developer, jazz singer)'}
+                      placeholder={t('auth.skillsBioPlaceholder') || tr('auth.skillsBioPlaceholder')}
                       className="flex w-full rounded-lg border border-input bg-card px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
                   </div>

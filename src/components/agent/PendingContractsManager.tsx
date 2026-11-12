@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Check, X, Clock, FileText } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface PendingContract {
   id: string;
@@ -68,9 +69,9 @@ const PendingContractsManager: React.FC<PendingContractsManagerProps> = ({ userI
       .eq('id', contractId);
 
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: accept ? 'Contrat accepté' : 'Contrat refusé', description: accept ? 'Le partenariat est maintenant actif.' : 'L\'invitation a été déclinée.' });
+      toast({ title: accept ? tr('pendingContractsManager.contractAccepted') : tr('pendingContractsManager.contractDeclined'), description: accept ? tr('pendingContractsManager.thePartnershipIsNowActive') : tr('pendingContractsManager.theInvitationWasDeclined') });
       fetchPendingContracts();
       onUpdate?.();
     }
@@ -84,7 +85,7 @@ const PendingContractsManager: React.FC<PendingContractsManagerProps> = ({ userI
       <CardContent className="p-4 space-y-3">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />
-          Invitations en attente ({contracts.length})
+          {tr('pendingContractsManager.pendingInvitations')}{contracts.length})
         </h3>
         {contracts.map((contract) => (
           <div key={contract.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border">
@@ -95,8 +96,8 @@ const PendingContractsManager: React.FC<PendingContractsManagerProps> = ({ userI
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm text-foreground">{contract.agent_profile?.name}</p>
               <div className="flex gap-2 text-xs text-muted-foreground">
-                {contract.commission_rate && <span>Commission: {contract.commission_rate}%</span>}
-                {contract.contract_duration_months && <span>· {contract.contract_duration_months} mois</span>}
+                {contract.commission_rate && <span>{tr('pendingContractsManager.commission')} {contract.commission_rate}%</span>}
+                {contract.contract_duration_months && <span>· {contract.contract_duration_months} {tr('common.months')}</span>}
               </div>
               {contract.terms && (
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
@@ -107,15 +108,15 @@ const PendingContractsManager: React.FC<PendingContractsManagerProps> = ({ userI
             {userType === 'talent' && (
               <div className="flex gap-2 shrink-0">
                 <Button size="sm" variant="outline" onClick={() => handleResponse(contract.id, false)} className="gap-1">
-                  <X className="h-3 w-3" /> Refuser
+                  <X className="h-3 w-3" /> {tr('friends.decline')}
                 </Button>
                 <Button size="sm" onClick={() => handleResponse(contract.id, true)} className="gap-1">
-                  <Check className="h-3 w-3" /> Accepter
+                  <Check className="h-3 w-3" /> {tr('friends.accept')}
                 </Button>
               </div>
             )}
             {userType === 'agent' && (
-              <Badge variant="secondary">En attente</Badge>
+              <Badge variant="secondary">{tr('friends.pending')}</Badge>
             )}
           </div>
         ))}

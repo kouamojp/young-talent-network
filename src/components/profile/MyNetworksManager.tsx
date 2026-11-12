@@ -15,6 +15,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface MyNetworksManagerProps {
   userId: string;
@@ -33,15 +35,15 @@ interface NetworkSource {
 
 const PLATFORMS = [
   { value: 'youtube',   label: 'YouTube',   icon: <Youtube className="h-4 w-4 text-red-600" /> },
-  { value: 'tiktok',    label: 'TikTok',    icon: <Globe className="h-4 w-4" /> },
-  { value: 'instagram', label: 'Instagram', icon: <Instagram className="h-4 w-4 text-pink-500" /> },
-  { value: 'x',         label: 'X (Twitter)', icon: <Globe className="h-4 w-4" /> },
-  { value: 'facebook',  label: 'Facebook',  icon: <Facebook className="h-4 w-4 text-blue-600" /> },
+  { value: 'tiktok',    label: tr('sidebar.connectTikTok'),    icon: <Globe className="h-4 w-4" /> },
+  { value: 'instagram', label: tr('sidebar.connectInstagram'), icon: <Instagram className="h-4 w-4 text-pink-500" /> },
+  { value: 'x',         label: tr('sidebar.connectX'), icon: <Globe className="h-4 w-4" /> },
+  { value: 'facebook',  label: tr('sidebar.connectFacebook'),  icon: <Facebook className="h-4 w-4 text-blue-600" /> },
   { value: 'linkedin',  label: 'LinkedIn',  icon: <Linkedin className="h-4 w-4 text-blue-700" /> },
   { value: 'telegram',  label: 'Telegram',  icon: <Send className="h-4 w-4 text-sky-500" /> },
   { value: 'vk',        label: 'VK',        icon: <Globe className="h-4 w-4 text-blue-500" /> },
   { value: 'rss',       label: 'RSS / Atom', icon: <Rss className="h-4 w-4 text-orange-500" /> },
-  { value: 'web',       label: 'Autre site web', icon: <Globe className="h-4 w-4" /> },
+  { value: 'web',       label: tr('myNetworksManager.otherWebsite'), icon: <Globe className="h-4 w-4" /> },
 ];
 
 function detectPlatform(url: string): string {
@@ -89,7 +91,7 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
   const handleAdd = async () => {
     if (!newUrl.trim()) return;
     try { new URL(newUrl); } catch {
-      toast({ title: 'URL invalide', variant: 'destructive' }); return;
+      toast({ title: tr('myNetworksManager.invalidUrl'), variant: 'destructive' }); return;
     }
     setAdding(true);
     const platform = newPlatform || detectPlatform(newUrl);
@@ -103,10 +105,10 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
     });
     setAdding(false);
     if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+      toast({ title: tr('settings.error'), description: error.message, variant: 'destructive' });
     } else {
       setNewUrl(''); setNewLabel(''); setShowAdd(false);
-      toast({ title: 'Chaîne ajoutée' });
+      toast({ title: tr('myNetworksManager.channelAdded') });
       await load();
     }
   };
@@ -114,7 +116,7 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
   const handleDelete = async (id: string) => {
     await supabase.from('profile_sources').delete().eq('id', id);
     setSources(prev => prev.filter(s => s.id !== id));
-    toast({ title: 'Chaîne supprimée' });
+    toast({ title: tr('myNetworksManager.channelRemoved') });
   };
 
   const handleToggleAuto = async (id: string, value: boolean) => {
@@ -131,12 +133,12 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
       if (error) throw error;
       const result = data?.results?.[0];
       toast({
-        title: result?.imported ? `${result.imported} publication(s) importée(s)` : 'Aucune nouvelle publication',
-        description: result ? `${result.found} élément(s) détecté(s)` : undefined,
+        title: result?.imported ? tr('myNetworksManager.postSImported', { p0: result.imported }) : tr('myNetworksManager.noNewPosts'),
+        description: result ? tr('myNetworksManager.itemSDetected', { p0: result.found }) : undefined,
       });
       await load();
     } catch (e: any) {
-      toast({ title: 'Erreur d\'import', description: e?.message || 'Inconnue', variant: 'destructive' });
+      toast({ title: tr('myNetworksManager.importError'), description: e?.message || tr('myNetworksManager.unknown'), variant: 'destructive' });
     } finally {
       setImportingIds(prev => { const n = new Set(prev); n.delete(id); return n; });
     }
@@ -148,14 +150,14 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div>
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Rss className="h-4 w-4" /> Mes réseaux
+              <Rss className="h-4 w-4" /> {tr('common.myNetworks')}
             </CardTitle>
             <CardDescription className="text-xs mt-1">
-              Connectez vos chaînes externes. Les nouvelles publications seront automatiquement republiées dans votre fil.
+              {tr('myNetworksManager.connectYourExternalChannelsNewPosts')}
             </CardDescription>
           </div>
           <Button size="sm" onClick={() => setShowAdd(!showAdd)}>
-            <Plus className="h-3 w-3 mr-1" /> Ajouter une chaîne
+            <Plus className="h-3 w-3 mr-1" /> {tr('myNetworksManager.addAChannel')}
           </Button>
         </div>
       </CardHeader>
@@ -184,13 +186,13 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
               />
             </div>
             <Input
-              placeholder="Libellé (optionnel)"
+              placeholder={tr('myNetworksManager.labelOptional')}
               value={newLabel}
               onChange={e => setNewLabel(e.target.value)}
             />
             <Button onClick={handleAdd} disabled={adding || !newUrl.trim()} className="w-full">
               {adding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-              Ajouter
+              {tr('tv.addLink')}
             </Button>
           </div>
         )}
@@ -201,7 +203,7 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
           </div>
         ) : sources.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Aucune chaîne connectée. Ajoutez YouTube, TikTok, Instagram, X…
+            {tr('myNetworksManager.noChannelConnectedAddYoutubeTiktok')}
           </p>
         ) : (
           <div className="space-y-2">
@@ -230,7 +232,7 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7"
-                        title="Importer maintenant"
+                        title={tr('myNetworksManager.importNow')}
                         onClick={() => handleImportNow(s.id)}
                         disabled={isImporting}
                       >
@@ -246,18 +248,18 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Supprimer cette chaîne ?</AlertDialogTitle>
+                            <AlertDialogTitle>{tr('myNetworksManager.removeThisChannel')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Les publications déjà importées resteront dans votre fil.
+                              {tr('myNetworksManager.postsAlreadyImportedWillStayIn')}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogCancel>{tr('common.cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDelete(s.id)}
                               className="bg-destructive text-destructive-foreground"
                             >
-                              Supprimer
+                              {tr('common.delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -268,10 +270,10 @@ export const MyNetworksManager: React.FC<MyNetworksManagerProps> = ({ userId }) 
                     <span className="truncate">{s.url}</span>
                     <div className="flex items-center gap-3 shrink-0">
                       {s.last_import_at && (
-                        <span>Dernier import : {new Date(s.last_import_at).toLocaleDateString('fr-FR')}</span>
+                        <span>{tr('myNetworksManager.lastImport')} {new Date(s.last_import_at).toLocaleDateString(localeTag())}</span>
                       )}
                       <div className="flex items-center gap-1">
-                        <span>Auto</span>
+                        <span>{tr('myNetworksManager.auto')}</span>
                         <Switch
                           checked={s.auto_import_posts}
                           onCheckedChange={v => handleToggleAuto(s.id, v)}

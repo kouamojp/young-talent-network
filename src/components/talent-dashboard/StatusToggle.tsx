@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Briefcase, Edit3 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface StatusToggleProps {
   isOpenToWork: boolean;
@@ -84,7 +85,7 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
             <div className="flex items-center gap-3">
               <Briefcase className="h-5 w-5 text-purple-600" />
               <div className="flex items-center gap-2">
-                <span className="font-medium text-sm">Open to Work</span>
+                <span className="font-medium text-sm">{tr('statusToggle.openToWork')}</span>
                 <Switch
                   checked={isOpenToWork}
                   onCheckedChange={handleToggle}
@@ -99,9 +100,9 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Actively Looking">Actively Looking</SelectItem>
-                    <SelectItem value="Open to Offers">Open to Offers</SelectItem>
-                    <SelectItem value="Not Searching">Not Searching</SelectItem>
+                    <SelectItem value="Actively Looking">{tr('statusToggle.activelyLooking')}</SelectItem>
+                    <SelectItem value="Open to Offers">{tr('statusToggle.openToOffers')}</SelectItem>
+                    <SelectItem value="Not Searching">{tr('statusToggle.notSearching')}</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -120,18 +121,18 @@ const StatusToggle: React.FC<StatusToggleProps> = ({
                     value={tagline}
                     onChange={(e) => setTagline(e.target.value)}
                     className="w-full sm:w-64"
-                    placeholder="Enter your tagline..."
+                    placeholder={tr('statusToggle.enterYourTagline')}
                   />
                   <Button
                     size="sm"
                     onClick={() => setIsEditingTagline(false)}
                   >
-                    Save
+                    {tr('common.save')}
                   </Button>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground italic">{tagline ? `"${tagline}"` : 'Ajoutez une accroche'}</span>
+                  <span className="text-sm text-muted-foreground italic">{tagline ? `"${tagline}"` : tr('statusToggle.addATagline')}</span>
                   <Button
                     size="sm"
                     variant="ghost"

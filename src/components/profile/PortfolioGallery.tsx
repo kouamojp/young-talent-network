@@ -8,6 +8,8 @@ import { Image as ImgIcon, Video, FileText, Youtube, Instagram, Facebook, Music,
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import AddMediaDialog from './AddMediaDialog';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Props {
   userId: string;
@@ -52,10 +54,10 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
     : items.filter(i => i.media_type === filter);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer cet élément ?')) return;
+    if (!confirm(tr('portfolioGallery.deleteThisItem'))) return;
     const { error } = await supabase.from('talent_media').delete().eq('id', id);
     if (error) { toast.error(error.message); return; }
-    toast.success('Supprimé');
+    toast.success(tr('common.deleted'));
     onChanged?.();
   };
 
@@ -94,7 +96,7 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Folder className="h-4 w-4" /> Portfolio
+            <Folder className="h-4 w-4" /> {tr('common.portfolio')}
             <Badge variant="secondary">{items.length}</Badge>
           </CardTitle>
           {isOwner && <AddMediaDialog userId={userId} onAdded={() => onChanged?.()} />}
@@ -103,14 +105,14 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
       <CardContent className="space-y-3">
         <Tabs value={filter} onValueChange={setFilter}>
           <TabsList className="flex flex-wrap h-auto">
-            <TabsTrigger value="all">Tout</TabsTrigger>
-            <TabsTrigger value="image">Photos</TabsTrigger>
-            <TabsTrigger value="video">Vidéos</TabsTrigger>
+            <TabsTrigger value="all">{tr('marketplace.all')}</TabsTrigger>
+            <TabsTrigger value="image">{tr('common.photos')}</TabsTrigger>
+            <TabsTrigger value="video">{tr('sports.videos')}</TabsTrigger>
             <TabsTrigger value="pdf">PDF</TabsTrigger>
             <TabsTrigger value="youtube">YouTube</TabsTrigger>
-            <TabsTrigger value="instagram">Instagram</TabsTrigger>
-            <TabsTrigger value="tiktok">TikTok</TabsTrigger>
-            <TabsTrigger value="link">Liens</TabsTrigger>
+            <TabsTrigger value="instagram">{tr('sidebar.connectInstagram')}</TabsTrigger>
+            <TabsTrigger value="tiktok">{tr('sidebar.connectTikTok')}</TabsTrigger>
+            <TabsTrigger value="link">{tr('portfolioGallery.links')}</TabsTrigger>
             {categories.map(c => (
               <TabsTrigger key={c} value={`cat:${c}`}>{c}</TabsTrigger>
             ))}
@@ -119,7 +121,7 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
 
         {filtered.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-8">
-            {isOwner ? 'Aucun élément. Ajoute photos, vidéos, PDF ou liens.' : 'Aucun élément.'}
+            {isOwner ? tr('portfolioGallery.noItemsAddPhotosVideosPdfs') : tr('portfolioGallery.noItems')}
           </p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -136,7 +138,7 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
                     <div className="flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground">
                       {m.category && <Badge variant="outline" className="text-[9px] py-0 px-1.5">{m.category}</Badge>}
                       {m.item_date && (
-                        <span className="flex items-center gap-0.5"><Calendar className="h-2.5 w-2.5" />{new Date(m.item_date).toLocaleDateString('fr-FR')}</span>
+                        <span className="flex items-center gap-0.5"><Calendar className="h-2.5 w-2.5" />{new Date(m.item_date).toLocaleDateString(localeTag())}</span>
                       )}
                     </div>
                   </div>
@@ -178,9 +180,9 @@ const PortfolioGallery: React.FC<Props> = ({ userId, ownerId, items, onChanged }
               {preview.description && <p className="text-sm text-muted-foreground">{preview.description}</p>}
               <div className="flex flex-wrap gap-2">
                 {preview.category && <Badge variant="secondary">{preview.category}</Badge>}
-                {preview.item_date && <Badge variant="outline">{new Date(preview.item_date).toLocaleDateString('fr-FR')}</Badge>}
+                {preview.item_date && <Badge variant="outline">{new Date(preview.item_date).toLocaleDateString(localeTag())}</Badge>}
                 <Button size="sm" variant="outline" asChild>
-                  <a href={preview.url} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> Ouvrir</a>
+                  <a href={preview.url} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-3 w-3 mr-1" /> {tr('common.open')}</a>
                 </Button>
               </div>
             </div>

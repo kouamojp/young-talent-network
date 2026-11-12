@@ -10,6 +10,8 @@ import QuestionDisplay from '@/components/aptitude-test/QuestionDisplay';
 import ResultsDisplay from '@/components/aptitude-test/ResultsDisplay';
 import CategorySelector from '@/components/aptitude-test/CategorySelector';
 import { testCategories, questionsByCategory, getResultsByCategory } from '@/components/aptitude-test/testData';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 const AptitudeTest: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -34,7 +36,7 @@ const AptitudeTest: React.FC = () => {
   const saveResults = async (category: string, finalAnswers: Record<number, string>) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      toast({ title: 'Résultats non enregistrés', description: 'Connectez-vous pour conserver vos résultats.' });
+      toast({ title: tr('aptitudeTest.resultsNotSaved'), description: tr('aptitudeTest.logInToKeepYourResults') });
       return;
     }
     const results = getResultsByCategory(category, finalAnswers);
@@ -47,10 +49,10 @@ const AptitudeTest: React.FC = () => {
       top_score: top ? Math.round(top.score) : null,
     });
     if (error) {
-      toast({ title: "Échec de l'enregistrement", description: error.message, variant: 'destructive' });
+      toast({ title: tr('aptitudeTest.savingFailed'), description: error.message, variant: 'destructive' });
       return;
     }
-    toast({ title: 'Résultats enregistrés' });
+    toast({ title: tr('aptitudeTest.resultsSaved') });
     loadHistory();
   };
 
@@ -102,10 +104,10 @@ const AptitudeTest: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">YAT Test</h1>
-              <p className="text-white/80 text-sm">Découvrez vos aptitudes, capacités et connectez-vous avec ceux qui les recherchent</p>
+              <p className="text-white/80 text-sm">{tr('aptitudeTest.discoverYourAptitudesAndAbilitiesAnd')}</p>
             </div>
           </div>
-          <p className="mt-4 text-sm text-white/80">{testCategories.length} catégories de tests disponibles</p>
+          <p className="mt-4 text-sm text-white/80">{testCategories.length} {tr('aptitudeTest.testCategoriesAvailable')}</p>
         </div>
       </div>
 
@@ -114,9 +116,9 @@ const AptitudeTest: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-6 justify-center text-sm text-muted-foreground">
             {[
-              { step: '1', text: 'Choisissez une catégorie' },
-              { step: '2', text: 'Répondez aux questions' },
-              { step: '3', text: 'Découvrez vos aptitudes & contacts' },
+              { step: '1', text: tr('common.chooseACategory') },
+              { step: '2', text: tr('aptitudeTest.answerTheQuestions') },
+              { step: '3', text: tr('aptitudeTest.discoverYourAptitudesContacts') },
             ].map((s, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">{s.step}</span>
@@ -136,7 +138,7 @@ const AptitudeTest: React.FC = () => {
               <CategorySelector categories={testCategories} onSelect={handleSelectCategory} />
               {history.length > 0 && (
                 <div className="mt-6 border-t pt-4">
-                  <h3 className="text-sm font-semibold mb-2">Mes derniers résultats</h3>
+                  <h3 className="text-sm font-semibold mb-2">{tr('aptitudeTest.myLatestResults')}</h3>
                   <ul className="space-y-1.5">
                     {history.map(h => (
                       <li key={h.id} className="flex items-center justify-between text-sm gap-3">
@@ -145,7 +147,7 @@ const AptitudeTest: React.FC = () => {
                           {h.top_area && <span className="text-muted-foreground"> · {h.top_area}</span>}
                         </span>
                         <span className="shrink-0 text-muted-foreground tabular-nums">
-                          {h.top_score != null && <strong className="text-foreground">{h.top_score}%</strong>} · {new Date(h.created_at).toLocaleDateString()}
+                          {h.top_score != null && <strong className="text-foreground">{h.top_score}%</strong>} · {new Date(h.created_at).toLocaleDateString(localeTag())}
                         </span>
                       </li>
                     ))}
@@ -160,11 +162,11 @@ const AptitudeTest: React.FC = () => {
                   <span className="text-xl">{currentCat?.icon}</span>
                   <h2 className="font-semibold">{currentCat?.name}</h2>
                   <Badge variant="outline" className="ml-2">
-                    Question {currentStep + 1}/{questions.length}
+                    {tr('common.question')} {currentStep + 1}/{questions.length}
                   </Badge>
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleRetake}>
-                  Changer de catégorie
+                  {tr('aptitudeTest.changeCategory')}
                 </Button>
               </div>
 
@@ -180,13 +182,13 @@ const AptitudeTest: React.FC = () => {
               <div className="flex justify-between">
                 <Button variant="outline" onClick={handlePreviousStep} disabled={currentStep === 0}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Précédent
+                  {tr('common.previous')}
                 </Button>
                 <Button onClick={handleNextStep} disabled={!answers[currentStep]}>
                   {currentStep < questions.length - 1 ? (
-                    <>Suivant <ArrowRight className="h-4 w-4 ml-2" /></>
+                    <>{tr('common.next')} <ArrowRight className="h-4 w-4 ml-2" /></>
                   ) : (
-                    <><Sparkles className="h-4 w-4 mr-2" /> Voir mes résultats</>
+                    <><Sparkles className="h-4 w-4 mr-2" /> {tr('aptitudeTest.seeMyResults')}</>
                   )}
                 </Button>
               </div>

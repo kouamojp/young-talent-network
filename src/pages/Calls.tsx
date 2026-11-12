@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { useCall } from '@/contexts/CallContext';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Contact { id: string; name: string; avatar_url: string | null; user_type: string; country: string | null; }
 
@@ -68,9 +70,9 @@ const Calls: React.FC = () => {
           id: c.id,
           type: missed ? 'missed' : outgoing ? 'outgoing' : 'incoming',
           isVideo: c.is_video,
-          time: new Date(c.created_at).toLocaleString(),
+          time: new Date(c.created_at).toLocaleString(localeTag()),
           duration: fmtDuration(c.duration_seconds || 0),
-          peer: peers.get(peerId) || { id: peerId, name: 'Utilisateur', avatar_url: null },
+          peer: peers.get(peerId) || { id: peerId, name: tr('admin.user'), avatar_url: null },
         };
       });
       setHistory(records);

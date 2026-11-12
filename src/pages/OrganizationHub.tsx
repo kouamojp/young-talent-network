@@ -18,6 +18,7 @@ import { buildJobPostingRow } from '@/lib/jobs';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/use-toast';
 import { Plus } from 'lucide-react';
+import { tr } from '@/i18n';
 
 interface OrgData {
   id: string;
@@ -86,10 +87,10 @@ const OrganizationHub: React.FC = () => {
     setPublishingJob(true);
     const { data, error } = await supabase.from('job_postings').insert(buildJobPostingRow(v, org.user_id)).select('*').single();
     setPublishingJob(false);
-    if (error) { toast({ title: 'Publication impossible', description: error.message, variant: 'destructive' }); return; }
+    if (error) { toast({ title: tr('organizationHub.couldNotPublish'), description: error.message, variant: 'destructive' }); return; }
     setJobPostings(prev => [data, ...prev]);
     setJobFormOpen(false);
-    toast({ title: 'Offre publiée', description: v.title });
+    toast({ title: tr('organizationHub.jobOfferPublished'), description: v.title });
   };
 
   useEffect(() => {
@@ -217,12 +218,12 @@ const OrganizationHub: React.FC = () => {
     return (
       <div className="min-h-screen bg-background p-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+          <ArrowLeft className="h-4 w-4 mr-2" /> {tr('common.back')}
         </Button>
         <Card>
           <CardContent className="p-12 text-center">
             <Building className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-bold mb-2">Organisation non trouvée</h2>
+            <h2 className="text-xl font-bold mb-2">{tr('organizationHub.organizationNotFound')}</h2>
           </CardContent>
         </Card>
       </div>
@@ -230,17 +231,17 @@ const OrganizationHub: React.FC = () => {
   }
 
   const dashboardStats = [
-    { label: 'Agents', value: agents.length },
-    { label: 'Talents', value: talents.length },
-    { label: 'Offres', value: jobPostings.length },
-    { label: 'Fondée', value: org.founded_year || '-' },
+    { label: tr('org.agents'), value: agents.length },
+    { label: tr('org.talents'), value: talents.length },
+    { label: tr('feed.offers'), value: jobPostings.length },
+    { label: tr('organizationHub.founded'), value: org.founded_year || '-' },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto p-4 space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
-          <ArrowLeft className="h-4 w-4" /> Retour
+          <ArrowLeft className="h-4 w-4" /> {tr('common.back')}
         </Button>
 
         {/* Org Header */}
@@ -262,7 +263,7 @@ const OrganizationHub: React.FC = () => {
                   <h1 className="min-w-0 break-words text-2xl md:text-[34px] font-semibold text-white">{org.company_name}</h1>
                   {org.verified && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-white/25 px-2.5 py-0.5 text-xs font-medium text-white/85">
-                      <BadgeCheck className="h-3.5 w-3.5" /> Vérifiée
+                      <BadgeCheck className="h-3.5 w-3.5" /> {tr('organizationHub.verified')}
                     </span>
                   )}
                 </div>
@@ -302,8 +303,8 @@ const OrganizationHub: React.FC = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-2">
             <TabsTrigger value="dashboard">{t('org.dashboard')}</TabsTrigger>
-            <TabsTrigger value="posts">Publications</TabsTrigger>
-            <TabsTrigger value="activity">Activités</TabsTrigger>
+            <TabsTrigger value="posts">{tr('sidebar.posts')}</TabsTrigger>
+            <TabsTrigger value="activity">{tr('common.activity')}</TabsTrigger>
             <TabsTrigger value="agents">{t('org.agents')}</TabsTrigger>
             <TabsTrigger value="talents">{t('org.talents')}</TabsTrigger>
             <TabsTrigger value="services">{t('org.services')}</TabsTrigger>
@@ -315,7 +316,7 @@ const OrganizationHub: React.FC = () => {
           <TabsContent value="dashboard" className="space-y-6">
             {org.description && (
               <Card>
-                <CardHeader><CardTitle className="text-lg">À propos</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-lg">{tr('footer.about')}</CardTitle></CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground leading-relaxed max-w-prose break-words">{org.description}</p>
                 </CardContent>
@@ -339,7 +340,7 @@ const OrganizationHub: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Newspaper className="h-5 w-5 text-primary" />
-                      Publications (organisation, agents et talents)
+                      {tr('organizationHub.postsOrganizationAgentsAndTalents')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -347,7 +348,7 @@ const OrganizationHub: React.FC = () => {
                       userIds={allIds}
                       labels={labels}
                       limit={30}
-                      emptyMessage="Aucune publication de l'organisation, de ses agents ou de ses talents."
+                      emptyMessage={tr('organizationHub.noPostsFromTheOrganizationIts')}
                     />
                   </CardContent>
                 </Card>
@@ -360,7 +361,7 @@ const OrganizationHub: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" /> Activités de l'organisation
+                  <Activity className="h-5 w-5 text-primary" /> {tr('organizationHub.organizationSActivity')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -371,7 +372,7 @@ const OrganizationHub: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-primary" /> Activités des agents
+                    <Activity className="h-5 w-5 text-primary" /> {tr('organizationHub.agentsActivity')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -383,7 +384,7 @@ const OrganizationHub: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-primary" /> Activités des talents
+                    <Activity className="h-5 w-5 text-primary" /> {tr('common.talentsActivity')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -396,13 +397,13 @@ const OrganizationHub: React.FC = () => {
           {/* Agents & Agences */}
 
           <TabsContent value="agents" className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Agents & Agences ({agents.length})</h3>
+            <h3 className="text-lg font-semibold text-foreground">{tr('organizationHub.agentsAgencies')}{agents.length})</h3>
             {agents.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <UserCheck className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold">Aucun agent</h3>
-                  <p className="text-muted-foreground">Aucun agent inscrit dans cette organisation.</p>
+                  <h3 className="font-semibold">{tr('organizationHub.noAgents')}</h3>
+                  <p className="text-muted-foreground">{tr('organizationHub.noAgentRegisteredInThisOrganization')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -423,12 +424,12 @@ const OrganizationHub: React.FC = () => {
                       </h4>
                       <p className="truncate text-sm text-muted-foreground">{agent.agent_detail?.category}</p>
                       <p className="text-xs text-muted-foreground">
-                        {agent.agent_detail?.clients_represented || 0} talents représentés
+                        {agent.agent_detail?.clients_represented || 0} {tr('organizationHub.talentsRepresented')}
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <Badge variant="outline" className="hidden sm:inline-flex">{agent.role || 'Membre'}</Badge>
-                      <Button variant="ghost" size="icon" aria-label="Voir le profil" onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
+                      <Badge variant="outline" className="hidden sm:inline-flex">{agent.role || tr('common.member')}</Badge>
+                      <Button variant="ghost" size="icon" aria-label={tr('marketplace.viewProfile')} onClick={(e) => { e.stopPropagation(); navigate(`/agent/${agent.agent_id}`); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -440,13 +441,13 @@ const OrganizationHub: React.FC = () => {
 
           {/* Talents */}
           <TabsContent value="talents" className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Talents ({talents.length})</h3>
+            <h3 className="text-lg font-semibold text-foreground">{tr('common.talents')}{talents.length})</h3>
             {talents.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold">Aucun talent</h3>
-                  <p className="text-muted-foreground">Aucun talent inscrit via les agents de cette organisation.</p>
+                  <h3 className="font-semibold">{tr('common.noTalents')}</h3>
+                  <p className="text-muted-foreground">{tr('organizationHub.noTalentRegisteredThroughThisOrganization')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -473,8 +474,8 @@ const OrganizationHub: React.FC = () => {
                       )}
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <Badge variant="secondary" className="hidden sm:inline-flex max-w-[12rem] truncate">Agent : {talent.agent_name}</Badge>
-                      <Button variant="ghost" size="icon" aria-label="Voir le profil" onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
+                      <Badge variant="secondary" className="hidden sm:inline-flex max-w-[12rem] truncate">{tr('organizationHub.agent')} {talent.agent_name}</Badge>
+                      <Button variant="ghost" size="icon" aria-label={tr('marketplace.viewProfile')} onClick={(e) => { e.stopPropagation(); navigate(`/talent/${talent.talent_id}`); }}>
                         <Eye className="h-4 w-4" />
                       </Button>
                     </div>
@@ -492,8 +493,8 @@ const OrganizationHub: React.FC = () => {
           {/* Recruitment */}
           <TabsContent value="recruitment" className="space-y-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold text-foreground">Offres d'emploi ({jobPostings.length})</h3>
-              {isOwner && <Button size="sm" onClick={() => setJobFormOpen(true)}><Plus className="h-4 w-4 mr-1.5" />Publier une offre</Button>}
+              <h3 className="text-lg font-semibold text-foreground">{tr('organizationHub.jobOffers')}{jobPostings.length})</h3>
+              {isOwner && <Button size="sm" onClick={() => setJobFormOpen(true)}><Plus className="h-4 w-4 mr-1.5" />{tr('organizationHub.publishAJobOffer')}</Button>}
             </div>
             <Dialog open={jobFormOpen} onOpenChange={setJobFormOpen}>
               <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
@@ -509,8 +510,8 @@ const OrganizationHub: React.FC = () => {
               <Card>
                 <CardContent className="p-12 text-center">
                   <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <h3 className="font-semibold">Aucune offre</h3>
-                  <p className="text-muted-foreground">Cette organisation n'a pas d'offres actives.</p>
+                  <h3 className="font-semibold">{tr('organizationHub.noJobOffers')}</h3>
+                  <p className="text-muted-foreground">{tr('organizationHub.thisOrganizationHasNoActiveJob')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -543,19 +544,19 @@ const OrganizationHub: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader><CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-primary" /> Résumé
+                  <TrendingUp className="h-5 w-5 text-primary" /> {tr('organizationHub.summary')}
                 </CardTitle></CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Total agents</span>
+                    <span className="text-muted-foreground">{tr('organizationHub.totalAgents')}</span>
                     <span className="font-semibold text-foreground">{agents.length}</span>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Total talents</span>
+                    <span className="text-muted-foreground">{tr('organizationHub.totalTalents')}</span>
                     <span className="font-semibold text-foreground">{talents.length}</span>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Offres actives</span>
+                    <span className="text-muted-foreground">{tr('organizationHub.activeJobOffers')}</span>
                     <span className="font-semibold text-foreground">
                       {jobPostings.filter(j => j.status === 'open').length}
                     </span>
@@ -564,21 +565,21 @@ const OrganizationHub: React.FC = () => {
               </Card>
               <Card>
                 <CardHeader><CardTitle className="text-lg flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" /> Infos
+                  <BarChart3 className="h-5 w-5 text-primary" /> {tr('organizationHub.info')}
                 </CardTitle></CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Secteur</span>
+                    <span className="text-muted-foreground">{tr('common.sector')}</span>
                     <span className="font-semibold text-foreground text-right break-words min-w-0">{org.industry || '-'}</span>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Taille</span>
+                    <span className="text-muted-foreground">{tr('organizationHub.size')}</span>
                     <span className="font-semibold text-foreground">{org.company_size || '-'}</span>
                   </div>
                   <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">Statut</span>
+                    <span className="text-muted-foreground">{tr('admin.status')}</span>
                     <Badge variant={org.verified ? 'default' : 'secondary'}>
-                      {org.verified ? 'Vérifiée' : 'Non vérifiée'}
+                      {org.verified ? tr('organizationHub.verified') : tr('organizationHub.notVerified')}
                     </Badge>
                   </div>
                 </CardContent>

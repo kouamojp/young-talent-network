@@ -4,6 +4,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PostCreationDialog } from './PostCreationDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { tr } from '@/i18n';
 
 const FloatingCreateButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,9 +17,9 @@ const FloatingCreateButton: React.FC = () => {
   const actions = [
     { icon: FileText, label: t('create.post') || 'Publication', color: 'bg-blue-500', action: 'post' },
     { icon: Camera, label: t('create.story') || 'Story', color: 'bg-pink-500', action: 'story' },
-    { icon: Zap, label: 'Short', color: 'bg-purple-500', action: 'short' },
-    { icon: Film, label: t('create.clip') || 'Vidéo', color: 'bg-fuchsia-500', action: 'clip' },
-    { icon: Newspaper, label: 'Article', color: 'bg-amber-500', action: 'article' },
+    { icon: Zap, label: tr('common.short'), color: 'bg-purple-500', action: 'short' },
+    { icon: Film, label: t('create.clip') || tr('calls.video'), color: 'bg-fuchsia-500', action: 'clip' },
+    { icon: Newspaper, label: tr('post.tab.article'), color: 'bg-amber-500', action: 'article' },
     { icon: Radio, label: t('create.live') || 'Live', color: 'bg-red-500', action: 'live' },
   ];
 
@@ -74,7 +75,7 @@ const FloatingCreateButton: React.FC = () => {
       {/* Main FAB — bumped above bottom nav (z-60) and lifted on mobile so it never sits behind the tab bar */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Créer"
+        aria-label={tr('common.create')}
         className={`fixed bottom-20 md:bottom-8 right-4 z-[60] h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center transition-transform hover:scale-105 ${isOpen ? 'rotate-45' : ''}`}
       >
         {isOpen ? <X className="h-6 w-6" /> : <Plus className="h-6 w-6" />}

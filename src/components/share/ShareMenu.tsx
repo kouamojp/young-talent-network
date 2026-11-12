@@ -2,6 +2,7 @@ import React from 'react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Facebook, Send, MessageCircle, Link2, Twitter, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { tr } from '@/i18n';
 
 interface Props {
   url: string;
@@ -41,8 +42,8 @@ const ShareMenu: React.FC<Props> = ({ url, title = '', children }) => {
             </a>
           </DropdownMenuItem>
         ))}
-        <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(url); toast.success('Lien copié !'); }}>
-          <Link2 className="h-4 w-4 mr-2" /> Copier le lien
+        <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(url); toast.success(tr('common.linkCopied')); }}>
+          <Link2 className="h-4 w-4 mr-2" /> {tr('common.copyLink')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

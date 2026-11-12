@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import ShareToFriendsDialog from '@/components/share/ShareToFriendsDialog';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
+import { localeTag } from '@/i18n/format';
 
 interface Stream {
   id: string;
@@ -28,7 +30,7 @@ const StreamCard: React.FC<{ stream: Stream; live: boolean; onOpen: () => void; 
       {live && <span className="absolute top-2 left-2 rounded-full bg-destructive px-2 py-0.5 text-xs font-semibold text-white">{liveLabel}</span>}
       {live && (
         <span className="absolute bottom-2 right-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white tabular-nums">
-          {(stream.viewer_count ?? 0).toLocaleString()} {watching}
+          {(stream.viewer_count ?? 0).toLocaleString(localeTag())} {watching}
         </span>
       )}
     </div>
@@ -36,7 +38,7 @@ const StreamCard: React.FC<{ stream: Stream; live: boolean; onOpen: () => void; 
       <h3 className="font-semibold truncate">{stream.title}</h3>
       <p className="text-sm text-muted-foreground truncate">
         {stream.streamer?.name}
-        {!live && stream.ended_at && ` · ${new Date(stream.ended_at).toLocaleDateString()}`}
+        {!live && stream.ended_at && ` · ${new Date(stream.ended_at).toLocaleDateString(localeTag())}`}
       </p>
       {stream.category && <span className="mt-2 inline-block rounded-full bg-accent px-2 py-0.5 text-xs text-accent-foreground">{stream.category}</span>}
     </div>
@@ -115,8 +117,8 @@ const OnlineTV: React.FC = () => {
             <TabsTrigger value="live" className="gap-2"><Radio className="h-4 w-4" />{t('tv.liveNow')}</TabsTrigger>
             <TabsTrigger value="recordings" className="gap-2"><Video className="h-4 w-4" />{t('tv.recordings')}</TabsTrigger>
           </TabsList>
-          <TabsContent value="live">{renderList(liveStreams, true, 'Aucune diffusion en direct pour le moment.')}</TabsContent>
-          <TabsContent value="recordings">{renderList(recordings, false, 'Aucune diffusion terminée pour le moment.')}</TabsContent>
+          <TabsContent value="live">{renderList(liveStreams, true, tr('onlineTV.noLiveStreamsAtTheMoment'))}</TabsContent>
+          <TabsContent value="recordings">{renderList(recordings, false, tr('onlineTV.noFinishedStreamsYet'))}</TabsContent>
         </Tabs>
 
         {/* Ajouter un lien de flux TV */}
@@ -126,14 +128,14 @@ const OnlineTV: React.FC = () => {
             {t('tv.addStreamLink')}
           </h2>
           <div className="space-y-2">
-            <Input value={tvTitle} onChange={e => setTvTitle(e.target.value)} placeholder="Titre du flux (optionnel)" />
+            <Input value={tvTitle} onChange={e => setTvTitle(e.target.value)} placeholder={tr('onlineTV.streamTitleOptional')} />
             <Input
               value={tvLink}
               onChange={e => setTvLink(e.target.value)}
               placeholder={t('tv.streamLinkPlaceholder')}
               onKeyDown={e => e.key === 'Enter' && handleAddLink()}
             />
-            <Textarea value={tvDescription} onChange={e => setTvDescription(e.target.value)} placeholder="Description (optionnel)" className="min-h-[70px]" />
+            <Textarea value={tvDescription} onChange={e => setTvDescription(e.target.value)} placeholder={tr('onlineTV.descriptionOptional')} className="min-h-[70px]" />
             <Button onClick={handleAddLink} className="w-full sm:w-auto">
               <Plus className="h-4 w-4" />
               {t('tv.addLink')}
@@ -152,9 +154,9 @@ const OnlineTV: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <ShareToFriendsDialog url={link.url} title={link.title} description={link.description}>
-                      <Button size="sm" variant="outline"><Users className="h-3 w-3" />Amis</Button>
+                      <Button size="sm" variant="outline"><Users className="h-3 w-3" />{tr('sidebar.friends')}</Button>
                     </ShareToFriendsDialog>
-                    <Button size="icon" variant="ghost" onClick={() => removeLink(i)} aria-label="Supprimer">
+                    <Button size="icon" variant="ghost" onClick={() => removeLink(i)} aria-label={tr('common.delete')}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

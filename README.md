@@ -224,3 +224,15 @@ npm run preview    # Serve production build locally
 ## License
 
 Private — all rights reserved.
+
+## Traductions (i18n)
+
+L'interface existe en anglais, français et russe (`src/i18n/locales/{en,fr,ru}.json`, clés plates comme `settings.title`).
+
+- **Traduire un texte** : `import { tr } from '@/i18n'` puis `tr('ma.cle')`, ou `tr('ma.cle', { name })` avec `"Bonjour {name}"`. `tr` fonctionne partout : composants, hooks, constantes de module.
+- **Ajouter un texte** : ajoutez la clé dans les **trois** fichiers. Les clés sont typées, une clé inconnue est une erreur TypeScript.
+- **Dates et nombres** : `localeTag()` et `dateFnsLocale()` de `@/i18n/format`.
+- **Contrôle** : `npm run i18n:check` (lancé en CI) vérifie que les trois langues ont les mêmes clés et qu'il ne reste aucun texte en dur. `npm run i18n:scan` liste les textes en dur.
+- **Exclusions voulues** (marques, valeurs enregistrées en base) : `scripts/i18n-ignore.json`.
+
+Seule la langue active est téléchargée. Changer de langue recharge la page.

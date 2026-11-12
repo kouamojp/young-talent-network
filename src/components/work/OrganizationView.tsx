@@ -4,6 +4,7 @@ import { Loader2, MapPin, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/i18n';
 
 interface TalentProfile {
   id: string;
@@ -46,7 +47,7 @@ const OrganizationView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }
       <div className="rounded-xl border border-dashed border-border p-10 text-center">
         <Users className="mx-auto h-8 w-8 text-muted-foreground/50" />
         <p className="mt-3 text-sm text-muted-foreground">
-          {talents.length === 0 ? 'Aucun talent inscrit pour le moment.' : 'Aucun talent ne correspond à cette recherche.'}
+          {talents.length === 0 ? tr('organizationView.noTalentsRegisteredYet') : tr('organizationView.noTalentMatchesThisSearch')}
         </p>
       </div>
     );
@@ -65,7 +66,7 @@ const OrganizationView: React.FC<{ searchTerm?: string }> = ({ searchTerm = '' }
               </Avatar>
               <span className="min-w-0 flex-1">
                 <span className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold break-words">{talent.name || 'Sans nom'}</span>
+                  <span className="font-semibold break-words">{talent.name || tr('common.unnamed')}</span>
                   {talent.availability && <Badge variant="secondary">{talent.availability}</Badge>}
                 </span>
                 {(talent.professional_title || talent.sport_type) && (
