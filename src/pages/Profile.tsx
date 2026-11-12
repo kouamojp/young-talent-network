@@ -644,7 +644,7 @@ const Profile: React.FC = () => {
                 <TabsTrigger value="networks">{tr('common.myNetworks')}</TabsTrigger>
               </TabsList>
               <TabsContent value="sources" className="mt-2">
-                <ProfileSources userId={userId} />
+                <ProfileSources userId={userId} onApplied={fetchProfile} />
               </TabsContent>
               <TabsContent value="networks" className="mt-2">
                 <MyNetworksManager userId={userId} />

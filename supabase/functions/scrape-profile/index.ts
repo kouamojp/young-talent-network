@@ -1,6 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2/cors";
-import { aiCompleteJson, isAIConfigured } from "../_shared/ai.ts";
+import { isAIConfigured } from "../_shared/ai.ts";
+import { extractProfileData } from "../_shared/profileExtraction.ts";
+import { fetchPublicPage, UnsafeUrlError } from "../_shared/safeFetch.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -64,13 +66,9 @@ Deno.serve(async (req) => {
       .eq("id", source_id);
 
     try {
-      // Fetch the URL content
-      const pageResponse = await fetch(source.url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; YAT-Bot/1.0)",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        },
-      });
+      // Fetch the URL content. Only public http(s) addresses are allowed, and every
+      // redirect is re-checked: the URL comes from the user (see _shared/safeFetch.ts).
+      const pageResponse = await fetchPublicPage(source.url);
 
       if (!pageResponse.ok) {
         const msg = `Failed to fetch URL: ${pageResponse.status}`;
@@ -84,7 +82,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      const html = await pageResponse.text();
+      const html = pageResponse.text;
       // Extract text content (strip tags)
       const textContent = html
         .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
@@ -101,33 +99,8 @@ Deno.serve(async (req) => {
       // la synchronisation, on retombe sur le texte brut de la page.
       if (isAIConfigured()) {
         try {
-          extractedData = await aiCompleteJson<Record<string, unknown>>({
-            temperature: 0,
-            maxTokens: 3000,
-            messages: [
-              {
-                role: "system",
-                content: `You are a profile data extractor. Extract relevant information from a webpage for a talent/athlete profile. Return ONLY valid JSON with these fields (omit if not found):
-{
-  "name": "full name",
-  "bio": "biography or about text",
-  "achievements": [{"title": "...", "date": "...", "description": "..."}],
-  "stats": {"key": "value pairs of any stats/ratings found"},
-  "location": "city, country",
-  "sport_or_specialty": "main activity",
-  "skills": ["skill1", "skill2"],
-  "photos": ["url1", "url2"],
-  "social_links": [{"platform": "...", "url": "..."}],
-  "education": [{"institution": "...", "degree": "...", "year": "..."}],
-  "work_experience": [{"title": "...", "organization": "...", "period": "..."}]
-}`
-              },
-              {
-                role: "user",
-                content: `Extract profile data from this page (URL: ${source.url}):\n\n${textContent}`
-              }
-            ],
-          }, { raw_text: textContent.slice(0, 2000) });
+          extractedData = await extractProfileData(textContent, "webpage", source.url);
+          if (Object.keys(extractedData).length === 0) extractedData = { raw_text: textContent.slice(0, 2000) };
         } catch (aiErr) {
           console.error("scrape-profile AI extraction failed", aiErr);
           extractedData = { raw_text: textContent.slice(0, 2000) };
@@ -153,6 +126,7 @@ Deno.serve(async (req) => {
       });
 
     } catch (scrapeError: unknown) {
+      const refused = scrapeError instanceof UnsafeUrlError;
       const errorMessage = scrapeError instanceof Error ? scrapeError.message : "Unknown error";
       await adminClient
         .from("profile_sources")
@@ -163,7 +137,7 @@ Deno.serve(async (req) => {
         .eq("id", source_id);
 
       return new Response(JSON.stringify({ error: errorMessage }), {
-        status: 500,
+        status: refused ? 400 : 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

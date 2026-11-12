@@ -11,6 +11,10 @@ import { useLanguage } from '@/i18n/LanguageContext';
 import { Globe, Plus, RefreshCw, Trash2, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { SearchSelfOnlineDialog } from './SearchSelfOnlineDialog';
+import ProfileImportDialog from './ProfileImportDialog';
+import CvImportButton from './CvImportButton';
+import { normalizeExtracted, type ProfileImport } from '@/lib/profileImport';
+import { UserCheck } from 'lucide-react';
 import { tr } from '@/i18n';
 
 interface ProfileSource {
@@ -29,6 +33,8 @@ interface ProfileSource {
 interface ProfileSourcesProps {
   userId: string;
   onDataExtracted?: (sourceId: string, data: Record<string, unknown>) => void;
+  /** Called after extracted data was copied into the profile */
+  onApplied?: () => void;
 }
 
 const sourceTypeLabels: Record<string, Record<string, string>> = {
@@ -45,10 +51,12 @@ const statusConfig: Record<string, { icon: React.ReactNode; color: string }> = {
   error: { icon: <AlertCircle className="h-3 w-3" />, color: 'bg-red-500/20 text-red-600' },
 };
 
-export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataExtracted }) => {
+export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataExtracted, onApplied }) => {
   const { t, language } = useLanguage();
   const { toast } = useToast();
   const [sources, setSources] = useState<ProfileSource[]>([]);
+  // Extracted data being reviewed before it is copied into the profile
+  const [importing, setImporting] = useState<{ proposal: ProfileImport; label: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [newUrl, setNewUrl] = useState('');
   const [newType, setNewType] = useState('other');
@@ -227,6 +235,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
   }
 
   return (
+    <>
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -238,6 +247,7 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <SearchSelfOnlineDialog userId={userId} onAdded={fetchSources} />
+            <CvImportButton userId={userId} onApplied={onApplied} />
             {sources.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleSyncAll} disabled={syncingIds.size > 0}>
                 <RefreshCw className={`h-3 w-3 mr-1 ${syncingIds.size > 0 ? 'animate-spin' : ''}`} />
@@ -322,6 +332,15 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
                         </Button>
                       )}
                       {hasData && (
+                        <Button
+                          variant="ghost" size="icon" className="h-7 w-7 text-primary"
+                          title={tr('profileImport.applyToProfile')} aria-label={tr('profileImport.applyToProfile')}
+                          onClick={() => setImporting({ proposal: normalizeExtracted(source.extracted_data), label: source.label || new URL(source.url).hostname })}
+                        >
+                          <UserCheck className="h-3 w-3" />
+                        </Button>
+                      )}
+                      {hasData && (
                         <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setExpandedId(isExpanded ? null : source.id)}>
                           {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                         </Button>
@@ -378,6 +397,14 @@ export const ProfileSources: React.FC<ProfileSourcesProps> = ({ userId, onDataEx
         )}
       </CardContent>
     </Card>
+    <ProfileImportDialog
+      userId={userId}
+      proposal={importing?.proposal ?? null}
+      sourceLabel={importing?.label}
+      onClose={() => setImporting(null)}
+      onApplied={onApplied}
+    />
+    </>
   );
 };
 
