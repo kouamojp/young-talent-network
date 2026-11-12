@@ -3062,5 +3062,6 @@
   "calls.hangUp": "Raccrocher",
   "calls.turnCamOff": "Couper la caméra",
   "calls.turnCamOn": "Activer la caméra",
-  "notif.call_missed": "Appel manqué de {name}"
+  "notif.call_missed": "Appel manqué de {name}",
+  "calls.signalingUnavailable": "Le service d'appel est injoignable. Vérifiez votre connexion et réessayez."
 }

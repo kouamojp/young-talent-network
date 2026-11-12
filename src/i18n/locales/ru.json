@@ -3062,5 +3062,6 @@
   "calls.hangUp": "Завершить звонок",
   "calls.turnCamOff": "Выключить камеру",
   "calls.turnCamOn": "Включить камеру",
-  "notif.call_missed": "Пропущенный звонок от {name}"
+  "notif.call_missed": "Пропущенный звонок от {name}",
+  "calls.signalingUnavailable": "Сервис звонков недоступен. Проверьте соединение и повторите попытку."
 }

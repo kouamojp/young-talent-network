@@ -3062,5 +3062,6 @@
   "calls.hangUp": "Hang up",
   "calls.turnCamOff": "Turn camera off",
   "calls.turnCamOn": "Turn camera on",
-  "notif.call_missed": "Missed call from {name}"
+  "notif.call_missed": "Missed call from {name}",
+  "calls.signalingUnavailable": "The call service is unreachable. Check your connection and try again."
 }

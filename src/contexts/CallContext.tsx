@@ -125,10 +125,15 @@ const waitForIceGathering = (pc: RTCPeerConnection, timeoutMs = ICE_GATHERING_WA
     setTimeout(resolve, timeoutMs);
   });
 
-const whenSubscribed = (channel: RealtimeChannel): Promise<void> =>
-  new Promise((resolve) => {
+/** Resolves once the realtime channel is joined; rejects instead of waiting forever. */
+const whenSubscribed = (channel: RealtimeChannel, timeoutMs = 10000): Promise<void> =>
+  new Promise((resolve, reject) => {
     if (channel.state === 'joined') return resolve();
-    channel.subscribe((s) => { if (s === 'SUBSCRIBED') resolve(); });
+    const timer = setTimeout(() => reject(new Error(tr('calls.signalingUnavailable'))), timeoutMs);
+    channel.subscribe((s) => {
+      if (s === 'SUBSCRIBED') { clearTimeout(timer); resolve(); }
+      else if (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT' || s === 'CLOSED') { clearTimeout(timer); reject(new Error(tr('calls.signalingUnavailable'))); }
+    });
   });
 
 /** Human-readable reason why the microphone / camera could not be opened. */
@@ -201,7 +206,13 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data) selfRef.current = data as CallPeer;
     };
     supabase.auth.getUser().then(({ data }) => apply(data.user?.id || null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => apply(session?.user?.id || null));
+    // IMPORTANT: this callback must stay synchronous and must not await any Supabase
+    // call. supabase-js runs it while holding the auth lock; a query awaited here waits
+    // for that same lock and freezes every request of the app (in all tabs).
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      const id = session?.user?.id || null;
+      setTimeout(() => { apply(id); }, 0);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
