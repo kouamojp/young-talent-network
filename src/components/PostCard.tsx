@@ -12,6 +12,7 @@ import { toast } from './ui/use-toast';
 import ShareMenu from './share/ShareMenu';
 import ShareToFriendsDialog from './share/ShareToFriendsDialog';
 import LinkPreview from './LinkPreview';
+import PostMediaGallery from './PostMediaGallery';
 import { PostCreationDialog } from './PostCreationDialog';
 import { Users } from 'lucide-react';
 import TranslateButton from './TranslateButton';
@@ -363,11 +364,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
       {/* Post Media */}
       {post.media_urls && post.media_urls.length > 0 && (
-        <div className={`grid gap-1 px-1 pb-2 ${post.media_urls.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
-          {post.media_urls.map((url, i) => (
-            <img key={i} src={url} alt="" className="w-full max-h-[500px] object-cover rounded-md" />
-          ))}
-        </div>
+        <PostMediaGallery urls={post.media_urls} />
       )}
 
       {/* External source attribution */}

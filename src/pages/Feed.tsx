@@ -16,12 +16,12 @@ import ActivityHistoryWidget from '@/components/ActivityHistoryWidget';
 import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
 import { 
   Loader2, Users, Building2, Briefcase, TrendingUp, Star, 
-  UserPlus, Bell, Sparkles, ArrowRight, Users2, Check, Clock
+  UserPlus, Bell, Sparkles, ArrowRight, Users2, Check, Clock, ImagePlus
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 
 interface Post {
-  id: string; content: string; created_at: string; likes_count: number; comments_count: number; user_id: string;
+  id: string; content: string; created_at: string; likes_count: number; comments_count: number; user_id: string; media_urls?: string[] | null;
   profiles: { name: string; avatar_url: string | null; user_type?: string | null; };
 }
 
@@ -210,6 +210,10 @@ const FeedPage: React.FC = () => {
                         trigger={<Button variant="outline" className="w-full justify-start text-muted-foreground font-normal rounded-full h-10 hover:bg-muted">{t('feed.whatsNew', { name: currentUser?.name?.split(' ')[0] || '' })}</Button>}
                         onPostCreated={fetchPosts} userAvatar={currentUser?.avatar_url} userName={currentUser?.name}
                       />
+                      <PostCreationDialog
+                        trigger={<Button variant="ghost" size="icon" className="shrink-0 rounded-full text-primary" aria-label={t('feed.addPhotos')} title={t('feed.addPhotos')}><ImagePlus className="h-5 w-5" /></Button>}
+                        onPostCreated={fetchPosts} userAvatar={currentUser?.avatar_url} userName={currentUser?.name}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -225,7 +229,7 @@ const FeedPage: React.FC = () => {
                   </Card>
                 ) : (
                   posts.filter(post => !isBlocked(post.user_id)).map(post => (
-                    <PostCard key={post.id} post={{ id: post.id, author: { name: post.profiles.name, avatar: post.profiles.avatar_url || '/placeholder.svg', id: post.user_id, user_type: post.profiles.user_type || undefined }, user_id: post.user_id, content: post.content, timestamp: post.created_at, likes: post.likes_count, comments: post.comments_count, shares: 0 }} onUpdate={fetchPosts} />
+                    <PostCard key={post.id} post={{ id: post.id, author: { name: post.profiles.name, avatar: post.profiles.avatar_url || '/placeholder.svg', id: post.user_id, user_type: post.profiles.user_type || undefined }, user_id: post.user_id, content: post.content, timestamp: post.created_at, likes: post.likes_count, comments: post.comments_count, shares: 0, media_urls: post.media_urls }} onUpdate={fetchPosts} />
                   ))
                 )}
               </div>
