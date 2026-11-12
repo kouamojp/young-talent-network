@@ -5,7 +5,7 @@
 //
 //   POST { text: string, fileName?: string }  ->  { data: {...} }
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { isAIConfigured } from "../_shared/ai.ts";
+import { AIError, isAIConfigured } from "../_shared/ai.ts";
 import { extractProfileData } from "../_shared/profileExtraction.ts";
 
 const corsHeaders = {
@@ -43,6 +43,16 @@ Deno.serve(async (req) => {
     return json({ data });
   } catch (e) {
     console.error("parse-cv", e);
-    return json({ error: "L'analyse du CV a échoué. Réessayez dans un instant." }, 502);
+    if (e instanceof AIError) {
+      // Say what the AI provider answered: "it failed" alone cannot be acted upon.
+      const reason =
+        e.status === 401 || e.status === 403 ? "la clé du fournisseur d'IA est refusée (secret à vérifier)"
+        : e.status === 402 ? "les crédits du fournisseur d'IA sont épuisés"
+        : e.status === 429 ? "le fournisseur d'IA limite le débit, réessayez dans une minute"
+        : e.status === 503 ? "aucun fournisseur d'IA n'est configuré"
+        : `le fournisseur d'IA a répondu une erreur ${e.status}`;
+      return json({ error: `L'analyse du CV a échoué : ${reason}.`, ai_status: e.status, ai_detail: e.detail.slice(0, 300) }, 502);
+    }
+    return json({ error: `L'analyse du CV a échoué : ${e instanceof Error ? e.message : "erreur inconnue"}.` }, 502);
   }
 });

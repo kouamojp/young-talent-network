@@ -8,6 +8,12 @@
  * est absente, on retombe sur le premier fournisseur dont la clé est définie —
  * ce qui rend la migration réversible en changeant un seul secret.
  *
+ * Bascule automatique : si le fournisseur préféré est en panne (clé refusée,
+ * crédits épuisés, débit limité, erreur serveur), l'appel est rejoué sur les
+ * autres fournisseurs dont la clé est définie, dans l'ordre de PROVIDER_ORDER.
+ * La clé KIMI_API_KEY (assistant IA) sert de dernier recours : les autres
+ * fonctions ne la consomment que si tous les fournisseurs précédents ont échoué.
+ *
  * Secrets attendus (au moins un) :
  *   MOONSHOT_API_KEY   — https://platform.kimi.ai
  *   LOVABLE_API_KEY    — ancien gateway, conservé comme repli
@@ -40,8 +46,8 @@ const PROVIDERS: Record<ProviderName, Provider> = {
     // kimi-k2.5 et la série moonshot-v1 ferment le 31/08/2026 : ne pas les utiliser.
     models: { fast: "kimi-k2.6", default: "kimi-k2.6", reasoning: "kimi-k3" },
   },
-  // Même API que moonshot, avec une clé dédiée. Absent de PROVIDER_ORDER : seul un
-  // appel qui le demande explicitement consomme cette clé.
+  // Même API que moonshot, avec une clé dédiée. Absent de PROVIDER_ORDER : utilisé
+  // par les appels qui le demandent explicitement, et en dernier recours de la bascule.
   kimi: {
     baseUrl: "https://api.moonshot.ai/v1",
     keyEnv: "KIMI_API_KEY",
@@ -83,18 +89,31 @@ export interface ResolvedProvider {
   apiKey: string;
 }
 
-export function resolveProvider(requested?: ProviderName): ResolvedProvider | null {
+/**
+ * Fournisseurs utilisables, du préféré au dernier recours : celui demandé (ou
+ * AI_PROVIDER), puis les autres de PROVIDER_ORDER dont la clé est définie.
+ */
+export function resolveProviders(requested?: ProviderName): ResolvedProvider[] {
   const preferred = (requested || Deno.env.get("AI_PROVIDER") || "moonshot").toLowerCase() as ProviderName;
-  const order = preferred in PROVIDERS
+  const order: ProviderName[] = preferred in PROVIDERS
     ? [preferred, ...PROVIDER_ORDER.filter((p) => p !== preferred)]
-    : PROVIDER_ORDER;
+    : [...PROVIDER_ORDER];
 
+  // KIMI_API_KEY (clé de l'assistant) en dernier recours : elle n'est consommée
+  // par les autres fonctions que si tous les fournisseurs précédents ont échoué.
+  if (!order.includes("kimi")) order.push("kimi");
+
+  const resolved: ResolvedProvider[] = [];
   for (const name of order) {
     const provider = PROVIDERS[name];
     const apiKey = Deno.env.get(provider.keyEnv);
-    if (apiKey) return { name, provider, apiKey };
+    if (apiKey) resolved.push({ name, provider, apiKey });
   }
-  return null;
+  return resolved;
+}
+
+export function resolveProvider(requested?: ProviderName): ResolvedProvider | null {
+  return resolveProviders(requested)[0] ?? null;
 }
 
 /** Pour les fonctions où l'IA est un bonus optionnel (scraping, enrichissement). */
@@ -187,26 +206,52 @@ function errorMessage(status: number): string {
   return "AI provider error";
 }
 
-/** Appel bas niveau. Lève une AIError si le fournisseur répond une erreur. */
+/**
+ * Une panne propre au fournisseur (clé refusée, crédits épuisés, débit limité,
+ * erreur serveur, réseau) justifie d'essayer le suivant. Une requête invalide
+ * (400, 422…) échouerait partout de la même façon : on ne bascule pas.
+ */
+const isProviderOutage = (status: number) =>
+  status === 401 || status === 402 || status === 403 || status === 429 || status >= 500;
+
+/**
+ * Appel bas niveau. Essaie le fournisseur préféré, puis les autres fournisseurs
+ * configurés s'il est en panne. Lève une AIError si aucun ne répond.
+ */
 export async function aiFetch(req: AIRequest): Promise<Response> {
-  const resolved = resolveProvider(req.provider);
-  if (!resolved) throw new AIError("AI not configured", 503);
+  const candidates = resolveProviders(req.provider);
+  if (candidates.length === 0) throw new AIError("AI not configured", 503);
 
-  const res = await fetch(`${resolved.provider.baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resolved.apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(buildBody(req, resolved)),
-  });
+  let lastError: AIError | null = null;
+  for (const resolved of candidates) {
+    let res: Response;
+    try {
+      res = await fetch(`${resolved.provider.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resolved.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        // Un modèle forcé ne vaut que pour le fournisseur préféré : en repli, on prend le modèle du tier.
+        body: JSON.stringify(buildBody(resolved === candidates[0] ? req : { ...req, model: undefined }, resolved)),
+      });
+    } catch (e) {
+      console.error(`[ai] ${resolved.name} injoignable`, e);
+      lastError = new AIError("AI provider unreachable", 502, String(e));
+      continue;
+    }
 
-  if (!res.ok) {
+    if (res.ok) {
+      if (lastError) console.error(`[ai] bascule sur ${resolved.name} après ${lastError.status}`);
+      return res;
+    }
+
     const detail = await res.text().catch(() => "");
     console.error(`[ai] ${resolved.name} ${res.status}`, detail.slice(0, 500));
-    throw new AIError(errorMessage(res.status), res.status, detail);
+    lastError = new AIError(errorMessage(res.status), res.status, `${resolved.name}: ${detail}`);
+    if (!isProviderOutage(res.status)) break;
   }
-  return res;
+  throw lastError!;
 }
 
 /** Réponse texte complète. */
