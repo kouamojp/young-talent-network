@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -15,7 +16,7 @@ import ActivityHistoryWidget from '@/components/ActivityHistoryWidget';
 import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
 import { 
   Loader2, Users, Building2, Briefcase, TrendingUp, Star, 
-  UserPlus, Bell, Sparkles, ArrowRight, Users2
+  UserPlus, Bell, Sparkles, ArrowRight, Users2, Check, Clock
 } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
 
@@ -37,6 +38,55 @@ const FeedPage: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [suggestedTalents, setSuggestedTalents] = useState<SuggestedProfile[]>([]);
   const [suggestedOrgs, setSuggestedOrgs] = useState<any[]>([]);
+  // État de ma relation avec chaque profil suggéré : demande envoyée ou déjà ami.
+  const [connectionState, setConnectionState] = useState<Record<string, 'pending' | 'accepted'>>({});
+  const [connectingId, setConnectingId] = useState<string | null>(null);
+
+  const loadConnections = async (userId: string) => {
+    const { data } = await supabase
+      .from('connections')
+      .select('user_id, connected_user_id, status')
+      .or(`user_id.eq.${userId},connected_user_id.eq.${userId}`);
+    const state: Record<string, 'pending' | 'accepted'> = {};
+    for (const c of data || []) {
+      const other = c.user_id === userId ? c.connected_user_id : c.user_id;
+      state[other] = c.status === 'accepted' ? 'accepted' : 'pending';
+    }
+    setConnectionState(state);
+  };
+
+  const sendConnectionRequest = async (targetId: string) => {
+    if (!currentUser?.id) { navigate('/auth'); return; }
+    if (connectionState[targetId] || connectingId) return;
+    setConnectingId(targetId);
+    const { error } = await supabase.from('connections').insert({ user_id: currentUser.id, connected_user_id: targetId });
+    setConnectingId(null);
+    // 23505 : une demande existe déjà entre ces deux comptes.
+    if (error && error.code !== '23505') {
+      toast({ title: t('settings.error'), description: error.message, variant: 'destructive' });
+      return;
+    }
+    setConnectionState(prev => ({ ...prev, [targetId]: 'pending' }));
+    toast({ title: t('friends.requestSent') });
+  };
+
+  /** Bouton « ajouter » d'un profil suggéré, en icône seule ou avec libellé. */
+  const ConnectButton = ({ targetId, compact }: { targetId: string; compact?: boolean }) => {
+    const state = connectionState[targetId];
+    const busy = connectingId === targetId;
+    const Icon = busy ? Loader2 : state === 'accepted' ? Check : state === 'pending' ? Clock : UserPlus;
+    const label = state === 'accepted' ? t('friends.myFriends') : state === 'pending' ? t('friends.requestSent') : t('common.connect');
+    const onClick = (e: React.MouseEvent) => { e.stopPropagation(); sendConnectionRequest(targetId); };
+    return compact ? (
+      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClick} disabled={!!state || busy} aria-label={label} title={label}>
+        <Icon className={`h-3.5 w-3.5 ${busy ? 'animate-spin' : ''} ${state ? 'text-primary' : ''}`} />
+      </Button>
+    ) : (
+      <Button size="sm" variant={state ? 'secondary' : 'outline'} className="mt-3 w-full text-xs" onClick={onClick} disabled={!!state || busy}>
+        <Icon className={`h-3 w-3 mr-1 ${busy ? 'animate-spin' : ''}`} /> {label}
+      </Button>
+    );
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -44,6 +94,7 @@ const FeedPage: React.FC = () => {
       if (!user) { navigate('/auth'); return; }
       const { data: profile } = await supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', user.id).single();
       setCurrentUser(profile);
+      loadConnections(user.id);
 
       const [postsRes, talentsRes, orgsRes] = await Promise.all([
         supabase.from('posts').select('*, profiles (name, avatar_url, user_type)').order('created_at', { ascending: false }).limit(20),
@@ -199,7 +250,7 @@ const FeedPage: React.FC = () => {
                             {talent.country && <span className="text-[10px] text-muted-foreground">{talent.country}</span>}
                           </div>
                         </div>
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><UserPlus className="h-3.5 w-3.5" /></Button>
+                        <ConnectButton targetId={talent.id} compact />
                       </div>
                     ))}
                   </CardContent>
@@ -249,7 +300,7 @@ const FeedPage: React.FC = () => {
                     <Badge variant="secondary" className="mt-1 text-[10px]">{getUserTypeLabel(talent.user_type)}</Badge>
                     {talent.sport_type && <p className="text-xs text-muted-foreground mt-1">{talent.sport_type}</p>}
                     {talent.country && <p className="text-xs text-muted-foreground">{talent.country}</p>}
-                    <Button size="sm" variant="outline" className="mt-3 w-full text-xs"><UserPlus className="h-3 w-3 mr-1" /> {t('common.connect')}</Button>
+                    <ConnectButton targetId={talent.id} />
                   </CardContent>
                 </Card>
               ))}
