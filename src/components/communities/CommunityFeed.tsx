@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Globe, Clock, Heart, MessageSquare, Send, Loader2 } from 'lucide-react';
+import { Globe, Clock, Heart, MessageSquare, Send, Loader2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/i18n/LanguageContext';
@@ -35,11 +35,14 @@ interface Comment {
 interface CommunityFeedProps {
   joinedCommunities: JoinedCommunity[];
   currentUserId: string | null;
+  /** When set, only this community's posts are shown and it is preselected in the composer. */
+  focusCommunityId?: string | null;
+  onClearFocus?: () => void;
 }
 
 const timeAgo = (iso: string) => new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, currentUserId }) => {
+const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, currentUserId, focusCommunityId, onClearFocus }) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -94,6 +97,13 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
   useEffect(() => {
     if (!targetCommunity && joinedCommunities.length) setTargetCommunity(joinedCommunities[0].id);
   }, [joinedCommunities, targetCommunity]);
+
+  useEffect(() => {
+    if (focusCommunityId) setTargetCommunity(focusCommunityId);
+  }, [focusCommunityId]);
+
+  const focusedName = focusCommunityId ? joinedCommunities.find(c => c.id === focusCommunityId)?.name : null;
+  const visiblePosts = focusCommunityId ? posts.filter(p => p.community_id === focusCommunityId) : posts;
 
   const submitPost = async () => {
     if (!currentUserId || !content.trim() || !targetCommunity) return;
@@ -172,7 +182,17 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
 
   return (
     <GlassMorphism className="p-6">
-      <h2 className="text-xl font-semibold mb-4">{t('communities.communityPosts')}</h2>
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <h2 className="text-xl font-semibold">{t('communities.communityPosts')}</h2>
+        {focusedName && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary text-sm px-3 py-1">
+            {focusedName}
+            <button type="button" onClick={onClearFocus} aria-label="Afficher toutes les communautés" className="hover:text-foreground">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </span>
+        )}
+      </div>
 
       {/* Composer */}
       <div className="mb-6 space-y-2">
@@ -198,14 +218,14 @@ const CommunityFeed: React.FC<CommunityFeedProps> = ({ joinedCommunities, curren
 
       {loading ? (
         <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-      ) : posts.length === 0 ? (
+      ) : visiblePosts.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <MessageSquare className="h-10 w-10 mx-auto mb-2 opacity-40" />
           <p>Aucune publication pour le moment. Soyez le premier à publier !</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {posts.map((post) => (
+          {visiblePosts.map((post) => (
             <GlassMorphism key={post.id} className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Avatar>

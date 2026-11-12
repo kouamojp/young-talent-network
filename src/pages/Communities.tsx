@@ -37,6 +37,51 @@ const Communities: React.FC = () => {
   const [newDesc, setNewDesc] = useState('');
   const [creating, setCreating] = useState(false);
 
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Community | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const viewCommunity = (community: Community) => {
+    setFocusId(community.id);
+    requestAnimationFrame(() => document.getElementById('community-feed')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
+
+  const openSettings = (community: Community) => {
+    setEditing(community);
+    setEditName(community.name);
+    setEditDesc(community.description || '');
+    setConfirmDelete(false);
+  };
+
+  const saveCommunity = async () => {
+    if (!editing || !editName.trim()) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from('communities')
+      .update({ name: editName.trim(), description: editDesc.trim() || null })
+      .eq('id', editing.id);
+    setSaving(false);
+    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    setCommunities(prev => prev.map(c => c.id === editing.id ? { ...c, name: editName.trim(), description: editDesc.trim() || null } : c));
+    toast({ title: 'Communauté mise à jour' });
+    setEditing(null);
+  };
+
+  const deleteCommunity = async () => {
+    if (!editing) return;
+    setSaving(true);
+    const { error } = await supabase.from('communities').delete().eq('id', editing.id);
+    setSaving(false);
+    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return; }
+    setCommunities(prev => prev.filter(c => c.id !== editing.id));
+    if (focusId === editing.id) setFocusId(null);
+    toast({ title: 'Communauté supprimée', description: editing.name });
+    setEditing(null);
+  };
+
   const loadCommunities = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUserId(user?.id ?? null);
@@ -140,11 +185,11 @@ const Communities: React.FC = () => {
           )}
           {compact ? (
             <div className="flex gap-2 mt-2">
-              <Button size="sm" variant="outline" onClick={() => toast({ title: community.name, description: 'Fil de communauté à venir.' })}>
+              <Button size="sm" variant="outline" onClick={() => viewCommunity(community)}>
                 <MessageSquare className="h-3 w-3 mr-1" />{t('communities.view')}
               </Button>
               {community.creator_id === currentUserId && (
-                <Button size="sm" variant="outline" onClick={() => toast({ title: 'Paramètres', description: 'À venir.' })}>
+                <Button size="sm" variant="outline" onClick={() => openSettings(community)}>
                   <Settings className="h-3 w-3 mr-1" />{t('communities.settings')}
                 </Button>
               )}
@@ -232,10 +277,14 @@ const Communities: React.FC = () => {
           )}
         </GlassMorphism>
 
-        <CommunityFeed
-          joinedCommunities={joined.map((c) => ({ id: c.id, name: c.name }))}
-          currentUserId={currentUserId}
-        />
+        <div id="community-feed" className="scroll-mt-20">
+          <CommunityFeed
+            joinedCommunities={joined.map((c) => ({ id: c.id, name: c.name }))}
+            currentUserId={currentUserId}
+            focusCommunityId={focusId}
+            onClearFocus={() => setFocusId(null)}
+          />
+        </div>
       </main>
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -258,6 +307,44 @@ const Communities: React.FC = () => {
             <Button onClick={createCommunity} disabled={!newName.trim() || creating}>
               {creating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
               Créer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!editing} onOpenChange={(open) => { if (!open) setEditing(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Paramètres de la communauté</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-community-name">Nom</Label>
+              <Input id="edit-community-name" value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-community-desc">Description</Label>
+              <Textarea id="edit-community-desc" value={editDesc} onChange={(e) => setEditDesc(e.target.value)} rows={3} />
+            </div>
+            <div className="rounded-lg border border-destructive/30 p-3 space-y-2">
+              {confirmDelete ? (
+                <>
+                  <p className="text-sm">Supprimer « {editing?.name} » et toutes ses publications ? Cette action est irréversible.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" onClick={deleteCommunity} disabled={saving}>Oui, supprimer</Button>
+                    <Button size="sm" variant="outline" onClick={() => setConfirmDelete(false)} disabled={saving}>Annuler</Button>
+                  </div>
+                </>
+              ) : (
+                <Button size="sm" variant="outline" className="text-destructive" onClick={() => setConfirmDelete(true)}>Supprimer la communauté</Button>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Annuler</Button>
+            <Button onClick={saveCommunity} disabled={!editName.trim() || saving}>
+              {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Enregistrer
             </Button>
           </DialogFooter>
         </DialogContent>
