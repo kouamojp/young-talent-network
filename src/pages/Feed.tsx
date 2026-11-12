@@ -19,7 +19,7 @@ import { useLanguage } from '@/i18n/LanguageContext';
 
 interface Post {
   id: string; content: string; created_at: string; likes_count: number; comments_count: number; user_id: string;
-  profiles: { name: string; avatar_url: string | null; };
+  profiles: { name: string; avatar_url: string | null; user_type?: string | null; };
 }
 
 interface SuggestedProfile {
@@ -43,7 +43,7 @@ const FeedPage: React.FC = () => {
       setCurrentUser(profile);
 
       const [postsRes, talentsRes, orgsRes] = await Promise.all([
-        supabase.from('posts').select('*, profiles (name, avatar_url)').order('created_at', { ascending: false }).limit(20),
+        supabase.from('posts').select('*, profiles (name, avatar_url, user_type)').order('created_at', { ascending: false }).limit(20),
         supabase.from('profiles').select('id, name, avatar_url, user_type, sport_type, country').neq('id', user.id).limit(6),
         supabase.from('organization_profiles').select('id, company_name, logo_url, industry, headquarters').limit(4),
       ]);
@@ -57,7 +57,7 @@ const FeedPage: React.FC = () => {
   }, [navigate]);
 
   const fetchPosts = async () => {
-    const { data } = await supabase.from('posts').select('*, profiles (name, avatar_url)').order('created_at', { ascending: false }).limit(20);
+    const { data } = await supabase.from('posts').select('*, profiles (name, avatar_url, user_type)').order('created_at', { ascending: false }).limit(20);
     setPosts(data || []);
   };
 
@@ -171,7 +171,7 @@ const FeedPage: React.FC = () => {
                   </Card>
                 ) : (
                   posts.map(post => (
-                    <PostCard key={post.id} post={{ id: post.id, author: { name: post.profiles.name, avatar: post.profiles.avatar_url || '/placeholder.svg' }, content: post.content, timestamp: post.created_at, likes: post.likes_count, comments: post.comments_count, shares: 0 }} onUpdate={fetchPosts} />
+                    <PostCard key={post.id} post={{ id: post.id, author: { name: post.profiles.name, avatar: post.profiles.avatar_url || '/placeholder.svg', id: post.user_id, user_type: post.profiles.user_type || undefined }, user_id: post.user_id, content: post.content, timestamp: post.created_at, likes: post.likes_count, comments: post.comments_count, shares: 0 }} onUpdate={fetchPosts} />
                   ))
                 )}
               </div>

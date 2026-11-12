@@ -65,13 +65,13 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
   const navigate = useNavigate();
   const authorId = post.author.id || post.user_id;
-  const goToProfile = () => {
-    if (!authorId) return;
-    const type = post.author.user_type || 'talent';
-    if (type === 'organization') navigate(`/organization/${authorId}`);
-    else if (type === 'agent') navigate(`/agent/${authorId}`);
-    else navigate(`/talent/${authorId}`);
+  const goToUserProfile = (id?: string, type?: string | null) => {
+    if (!id) return;
+    if (type === 'organization') navigate(`/organization/${id}`);
+    else if (type === 'agent') navigate(`/agent/${id}`);
+    else navigate(`/talent/${id}`);
   };
+  const goToProfile = () => goToUserProfile(authorId, post.author.user_type);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes);
   const [commentsCount, setCommentsCount] = useState(post.comments);
@@ -209,7 +209,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
         *,
         profiles (
           name,
-          avatar_url
+          avatar_url,
+          user_type
         )
       `)
       .eq('post_id', post.id)
@@ -429,12 +430,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
         <div className="px-4 pb-4 space-y-3 border-t pt-3">
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={comment.profiles.avatar_url} />
-                <AvatarFallback>{comment.profiles.name[0]}</AvatarFallback>
-              </Avatar>
+              <button onClick={() => goToUserProfile(comment.user_id, comment.profiles?.user_type)} className="shrink-0" aria-label={`Voir le profil de ${comment.profiles.name}`}>
+                <Avatar className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-primary/40 transition">
+                  <AvatarImage src={comment.profiles.avatar_url} />
+                  <AvatarFallback>{comment.profiles.name[0]}</AvatarFallback>
+                </Avatar>
+              </button>
               <div className="flex-1 bg-muted rounded-lg p-2">
-                <p className="text-sm font-semibold">{comment.profiles.name}</p>
+                <button onClick={() => goToUserProfile(comment.user_id, comment.profiles?.user_type)} className="text-sm font-semibold hover:underline text-left">{comment.profiles.name}</button>
                 <p className="text-sm">{comment.content}</p>
               </div>
             </div>
