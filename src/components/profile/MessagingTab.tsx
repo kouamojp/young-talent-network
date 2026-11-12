@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, Search, Phone, Video, User, Image, Send, Loader2, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useConversations, type Conversation } from '@/hooks/useConversations';
+import MessageMedia from '@/components/messages/MessageMedia';
 import { useNavigate } from 'react-router-dom';
 import { tr } from '@/i18n';
 import { localeTag } from '@/i18n/format';
@@ -222,9 +223,7 @@ const MessagingTab: React.FC = () => {
                           : 'bg-gray-100 text-gray-800 rounded-bl-none'
                       } ${message.pending ? 'opacity-70' : ''}`}
                     >
-                      {message.media_url && (
-                        <img src={message.media_url} alt="" className="rounded mb-1 max-h-48" />
-                      )}
+                      <MessageMedia mediaUrl={message.media_url} mediaType={message.media_type} fileName={message.content} compact />
                       {message.content && <p>{message.content}</p>}
                       <p className={`text-xs mt-1 flex items-center gap-1 ${isSender ? 'text-blue-100' : 'text-gray-500'}`}>
                         {formatTime(message.created_at)}

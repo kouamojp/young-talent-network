@@ -16,6 +16,8 @@ import { toast } from '@/components/ui/use-toast';
 import TranslatableText from '@/components/TranslatableText';
 import { useSearchParams } from 'react-router-dom';
 import { useBlocks } from '@/hooks/useBlocks';
+import MessageMedia from '@/components/messages/MessageMedia';
+import { copyMessageFile, uploadMessageFile } from '@/lib/messageFiles';
 import { Ban } from 'lucide-react';
 import { tr } from '@/i18n';
 import { localeTag } from '@/i18n/format';
@@ -140,13 +142,10 @@ const Messages: React.FC = () => {
     }
     setUploading(true);
     try {
-      const ext = file.name.split('.').pop();
-      const path = `${currentUserId}/messages/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from('profile-files').upload(path, file);
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from('profile-files').getPublicUrl(path);
+      // Private bucket: only the members of this conversation can open the file.
+      const mediaRef = await uploadMessageFile(activeConversationId, currentUserId, file);
       const mediaType = file.type.startsWith('image/') ? 'image' : file.type.startsWith('video/') ? 'video' : file.type.startsWith('audio/') ? 'audio' : 'file';
-      await sendMessage(activeConversationId, file.name, { media_url: publicUrl, media_type: mediaType });
+      await sendMessage(activeConversationId, file.name, { media_url: mediaRef, media_type: mediaType });
     } catch (err: any) {
       toast({ title: tr('messages.uploadError'), description: err?.message, variant: 'destructive' });
     } finally {
@@ -156,9 +155,17 @@ const Messages: React.FC = () => {
   };
 
   const handleForward = async (targetConvId: string) => {
-    if (!forwardMessage) return;
+    if (!forwardMessage || !currentUserId) return;
+    let mediaUrl = forwardMessage.media_url || undefined;
+    try {
+      // A private attachment must be copied into the target conversation to be readable there.
+      if (mediaUrl) mediaUrl = await copyMessageFile(mediaUrl, targetConvId, currentUserId);
+    } catch (err: any) {
+      toast({ title: tr('messages.uploadError'), description: err?.message, variant: 'destructive' });
+      return;
+    }
     await sendMessage(targetConvId, forwardMessage.content, {
-      media_url: forwardMessage.media_url || undefined,
+      media_url: mediaUrl,
       media_type: forwardMessage.media_type || undefined,
       forwarded_from_id: forwardMessage.id,
     });
@@ -292,13 +299,9 @@ const Messages: React.FC = () => {
     </div>
   );
 
-  const renderMedia = (m: Message) => {
-    if (!m.media_url) return null;
-    if (m.media_type === 'image') return <img src={m.media_url} alt="" className="rounded-lg max-w-full max-h-64 mt-1" />;
-    if (m.media_type === 'video') return <video src={m.media_url} controls className="rounded-lg max-w-full max-h-64 mt-1" />;
-    if (m.media_type === 'audio') return <audio src={m.media_url} controls className="mt-1 w-full" />;
-    return <a href={m.media_url} target="_blank" rel="noreferrer" className="block underline mt-1 text-xs">📎 {m.content || tr('messages.file')}</a>;
-  };
+  const renderMedia = (m: Message) => (
+    <MessageMedia mediaUrl={m.media_url} mediaType={m.media_type} fileName={m.content} />
+  );
 
   const chatView = (
     <div className="flex-1 flex flex-col h-full">
