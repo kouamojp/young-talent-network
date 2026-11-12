@@ -67,6 +67,7 @@
   "footer.about": "О нас",
   "footer.privacy": "Конфиденциальность",
   "footer.terms": "Условия",
+  "footer.legal": "Правовая информация",
   "footer.cookies": "Куки",
   "footer.help": "Помощь",
   "footer.careers": "Карьера",
@@ -986,5 +987,15 @@
   "work.findCandidates": "Найти",
   "work.noJobsYet": "Сначала опубликуйте вакансию, чтобы получить кандидатов от ИИ.",
   "work.noSuggestions": "Пока нет предложений. Заполните профиль для лучших совпадений.",
-  "work.selectJob": "Выберите вакансию"
+  "work.selectJob": "Выберите вакансию",
+  "auth.birthday": "Дата рождения",
+  "auth.birthdayHelp": "Используется только для защиты юных участников. Не отображается в профиле.",
+  "auth.tooYoung": "YAT доступен только с 13 лет.",
+  "auth.parentEmail": "Email родителя",
+  "auth.parentEmailHelp": "До 15 лет аккаунт должен подтвердить родитель. Он получит письмо со ссылкой. До этого сообщения отключены.",
+  "auth.acceptTermsPrefix": "Я принимаю",
+  "auth.termsLink": "условия использования",
+  "auth.and": "и",
+  "auth.privacyLink": "политику конфиденциальности",
+  "auth.acceptTermsRequired": "Необходимо принять условия использования и политику конфиденциальности."
 }

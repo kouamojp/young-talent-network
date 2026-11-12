@@ -175,14 +175,22 @@ export const useConversations = () => {
       if (error) throw error;
       // The realtime subscription triggers a silent refetch that swaps the
       // optimistic message for the persisted one.
-    } catch (error) {
+    } catch (error: any) {
       // Roll back the optimistic message on failure.
       setConversations(prev => prev.map(c =>
         c.id === conversationId
           ? { ...c, messages: c.messages.filter(m => m.id !== tempId) }
           : c
       ));
-      toast({ title: "Failed to send message", variant: "destructive" });
+      // 42501 = refused by the "Messaging safety rules" policy.
+      const refused = error?.code === '42501';
+      toast({
+        title: refused ? 'Message non envoyé' : 'Failed to send message',
+        description: refused
+          ? "Vous ne pouvez pas écrire dans cette conversation : un membre est bloqué, un accord parental est en attente, ou un adulte et un mineur ne sont pas connectés (demande d'ami acceptée)."
+          : undefined,
+        variant: "destructive",
+      });
     }
   };
 

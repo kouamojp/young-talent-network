@@ -40,6 +40,9 @@ import SettingsPage from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
 import Notifications from "./pages/Notifications";
+import Legal from "./pages/Legal";
+import ParentalConsent from "./pages/ParentalConsent";
+import ComplianceGate from "./components/compliance/ComplianceGate";
 import Article from "./pages/Article";
 import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
@@ -87,6 +90,7 @@ const App = () => {
             
             {/* Main Content */}
             <main className="flex-1 min-w-0 bg-background overflow-x-hidden">
+              <ComplianceGate />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/feed" element={<Feed />} />
@@ -124,6 +128,9 @@ const App = () => {
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/notifications" element={<Notifications />} />
+                <Route path="/legal/:doc" element={<Legal />} />
+                <Route path="/legal" element={<Navigate to="/legal/cgu" replace />} />
+                <Route path="/accord-parental" element={<ParentalConsent />} />
                 <Route path="/article/:id" element={<Article />} />
                 <Route path="/articles" element={<Articles />} />
                <Route path="/assistant" element={<Assistant />} />

@@ -87,6 +87,18 @@ Dans @BotFather, déclarez aussi le domaine du site avec `/setdomain`. Sans cett
 de connexion Telegram refuse de s'afficher. Tant que ces deux secrets manquent, `telegram-auth`
 répond « Telegram bot not configured ».
 
+### Accord parental (e-mails)
+
+| Variable | Rôle |
+|---|---|
+| `RESEND_API_KEY` | Clé API [Resend](https://resend.com), utilisée pour envoyer l'e-mail d'accord au parent |
+| `CONSENT_EMAIL_FROM` | Expéditeur, sur un domaine vérifié dans Resend (ex. `YAT <noreply@votre-domaine.com>`) |
+| `APP_URL` | URL publique de l'application, sans `/` final : le lien de l'e-mail pointe vers `APP_URL/accord-parental` |
+
+Les comptes de 13 et 14 ans ne peuvent pas utiliser la messagerie tant que le parent n'a pas
+validé le lien. Sans ces trois secrets, `parental-consent` répond « L'envoi d'e-mails n'est pas
+configuré » et le bouton « Renvoyer l'e-mail » affiche cette erreur.
+
 ### Variables fournies automatiquement
 
 `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` et `SUPABASE_DB_URL` sont injectées

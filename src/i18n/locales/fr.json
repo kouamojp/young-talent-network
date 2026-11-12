@@ -67,6 +67,7 @@
   "footer.about": "À propos",
   "footer.privacy": "Confidentialité",
   "footer.terms": "Conditions",
+  "footer.legal": "Mentions légales",
   "footer.cookies": "Cookies",
   "footer.help": "Aide",
   "footer.careers": "Carrières",
@@ -986,5 +987,15 @@
   "work.findCandidates": "Rechercher",
   "work.noJobsYet": "Publiez d'abord une offre pour obtenir des candidats via l'IA.",
   "work.noSuggestions": "Aucune suggestion pour l'instant. Complétez votre profil pour de meilleures correspondances.",
-  "work.selectJob": "Sélectionner une offre"
+  "work.selectJob": "Sélectionner une offre",
+  "auth.birthday": "Date de naissance",
+  "auth.birthdayHelp": "Sert uniquement à protéger les jeunes membres. Elle n'est pas affichée sur votre profil.",
+  "auth.tooYoung": "YAT est réservé aux 13 ans et plus.",
+  "auth.parentEmail": "E-mail d'un parent",
+  "auth.parentEmailHelp": "Avant 15 ans, un parent doit valider ton compte. Il recevra un e-mail avec un lien. En attendant, la messagerie reste désactivée.",
+  "auth.acceptTermsPrefix": "J'accepte les",
+  "auth.termsLink": "conditions d'utilisation",
+  "auth.and": "et la",
+  "auth.privacyLink": "politique de confidentialité",
+  "auth.acceptTermsRequired": "Vous devez accepter les conditions d'utilisation et la politique de confidentialité."
 }

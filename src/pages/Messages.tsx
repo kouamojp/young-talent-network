@@ -14,6 +14,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/components/ui/use-toast';
 import TranslatableText from '@/components/TranslatableText';
+import { useSearchParams } from 'react-router-dom';
+import { useBlocks } from '@/hooks/useBlocks';
+import { Ban } from 'lucide-react';
 
 const Messages: React.FC = () => {
   const { t } = useLanguage();
@@ -67,6 +70,18 @@ const Messages: React.FC = () => {
     const { data } = await supabase.from('profiles').select('id, name, avatar_url').limit(100);
     if (data) setAllUsers(data.filter(u => u.id !== currentUserId));
   };
+
+  const { isBlocked, block, unblock } = useBlocks();
+
+  // Lien « Contacter » des profils : /messages?to=<id>
+  const [searchParams, setSearchParams] = useSearchParams();
+  const toParam = searchParams.get('to');
+  useEffect(() => {
+    if (!toParam || !currentUserId || toParam === currentUserId) return;
+    setSearchParams({}, { replace: true });
+    handleStartConversation(toParam);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toParam, currentUserId]);
 
   const handleStartConversation = async (userId: string) => {
     const convId = await createConversation(userId);
@@ -293,7 +308,30 @@ const Messages: React.FC = () => {
             <div className="flex gap-1">
               <Button variant="ghost" size="icon" onClick={() => handleCall(false)} disabled={activeConversation.is_group}><Phone className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" onClick={() => handleCall(true)} disabled={activeConversation.is_group}><Video className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
+              {!activeConversation.is_group && activeConversation.participants[0] ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Plus d'options"><MoreVertical className="h-4 w-4" /></Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {(() => {
+                      const other = activeConversation.participants[0];
+                      const otherName = other.profiles?.name;
+                      return isBlocked(other.user_id) ? (
+                        <DropdownMenuItem onClick={() => unblock(other.user_id, otherName)}>
+                          <Ban className="h-4 w-4 mr-2" /> Débloquer {otherName}
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => block(other.user_id, otherName)}>
+                          <Ban className="h-4 w-4 mr-2" /> Bloquer {otherName}
+                        </DropdownMenuItem>
+                      );
+                    })()}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button variant="ghost" size="icon" disabled aria-label="Plus d'options"><MoreVertical className="h-4 w-4" /></Button>
+              )}
             </div>
           </div>
           <ScrollArea className="flex-1 p-4">

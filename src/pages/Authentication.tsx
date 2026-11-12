@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ageFromBirthday, MIN_AGE, PARENTAL_CONSENT_AGE } from '@/lib/age';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,14 @@ const Authentication: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [bioText, setBioText] = useState('');
   const [suggestedCategoryIds, setSuggestedCategoryIds] = useState<string[]>([]);
+  const [birthday, setBirthday] = useState('');
+  const [parentEmail, setParentEmail] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  // Les organisations ne sont pas des personnes : pas de date de naissance.
+  const askBirthday = userType !== 'organization';
+  const age = askBirthday ? ageFromBirthday(birthday) : null;
+  const tooYoung = age !== null && age < MIN_AGE;
+  const needsParent = age !== null && age >= MIN_AGE && age < PARENTAL_CONSENT_AGE;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -103,12 +113,29 @@ const Authentication: React.FC = () => {
     const password = formData.get('password') as string;
     const name = formData.get('name') as string;
 
+    if (!acceptedTerms) {
+      toast({ title: t('auth.registerFailed'), description: t('auth.acceptTermsRequired'), variant: 'destructive' });
+      setIsLoading(false);
+      return;
+    }
+    if (tooYoung) {
+      toast({ title: t('auth.registerFailed'), description: t('auth.tooYoung'), variant: 'destructive' });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { user_type: userType, name },
+          data: {
+            user_type: userType,
+            name,
+            ...(askBirthday && birthday ? { birthday } : {}),
+            ...(needsParent ? { parent_email: parentEmail.trim() } : {}),
+            terms_accepted_at: new Date().toISOString(),
+          },
           emailRedirectTo: `${window.location.origin}/`,
         },
       });
@@ -330,6 +357,37 @@ const Authentication: React.FC = () => {
                     <Label htmlFor="reg-password">{t('auth.password')}</Label>
                     <Input id="reg-password" name="password" type="password" required autoComplete="new-password" />
                   </div>
+                  {askBirthday && (
+                    <div className="space-y-2">
+                      <Label htmlFor="reg-birthday">{t('auth.birthday')}</Label>
+                      <Input
+                        id="reg-birthday"
+                        type="date"
+                        required
+                        max={new Date().toISOString().slice(0, 10)}
+                        value={birthday}
+                        onChange={(e) => setBirthday(e.target.value)}
+                        aria-invalid={tooYoung}
+                      />
+                      <p className={`text-xs ${tooYoung ? 'text-destructive' : 'text-muted-foreground'}`}>
+                        {tooYoung ? t('auth.tooYoung') : t('auth.birthdayHelp')}
+                      </p>
+                    </div>
+                  )}
+                  {needsParent && (
+                    <div className="space-y-2">
+                      <Label htmlFor="reg-parent-email">{t('auth.parentEmail')}</Label>
+                      <Input
+                        id="reg-parent-email"
+                        type="email"
+                        required
+                        placeholder="parent@exemple.com"
+                        value={parentEmail}
+                        onChange={(e) => setParentEmail(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">{t('auth.parentEmailHelp')}</p>
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="reg-bio">{t('auth.skillsBio') || 'Your skills / bio'}</Label>
                     <textarea
@@ -350,7 +408,16 @@ const Authentication: React.FC = () => {
                       suggestions={suggestedCategoryIds}
                     />
                   </div>
-                  <Button className="w-full" type="submit" disabled={isLoading}>
+                  <div className="flex items-start gap-2">
+                    <Checkbox id="reg-terms" checked={acceptedTerms} onCheckedChange={(c) => setAcceptedTerms(c === true)} className="mt-0.5" />
+                    <Label htmlFor="reg-terms" className="text-xs font-normal leading-relaxed">
+                      {t('auth.acceptTermsPrefix')}{' '}
+                      <Link to="/legal/cgu" target="_blank" className="underline">{t('auth.termsLink')}</Link>{' '}
+                      {t('auth.and')}{' '}
+                      <Link to="/legal/confidentialite" target="_blank" className="underline">{t('auth.privacyLink')}</Link>.
+                    </Label>
+                  </div>
+                  <Button className="w-full" type="submit" disabled={isLoading || tooYoung || !acceptedTerms}>
                     {getCreateButtonText()}
                   </Button>
                 </form>

@@ -1,20 +1,20 @@
 import React from 'react';
 import { useLanguage } from '@/i18n/LanguageContext';
 import type { TranslationKey } from '@/i18n/types';
+import { Link } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const Footer: React.FC = () => {
   const { t } = useLanguage();
   const year = new Date().getFullYear().toString();
 
-  const links: TranslationKey[] = [
-    'footer.about',
-    'footer.privacy',
-    'footer.terms',
-    'footer.cookies',
-    'footer.help',
-    'footer.careers',
-    'footer.advertising',
+  // Les liens « À propos », « Aide », « Carrières » et « Publicité » n'avaient
+  // pas de page : ils sont retirés jusqu'à ce qu'elles existent.
+  const links: { key: TranslationKey; to: string }[] = [
+    { key: 'footer.terms', to: '/legal/cgu' },
+    { key: 'footer.privacy', to: '/legal/confidentialite' },
+    { key: 'footer.cookies', to: '/legal/cookies' },
+    { key: 'footer.legal', to: '/legal/mentions-legales' },
   ];
 
   return (
@@ -22,9 +22,9 @@ const Footer: React.FC = () => {
       <div className="max-w-[1400px] mx-auto">
         <div className="flex flex-wrap items-center gap-x-1 text-[11px] text-muted-foreground leading-relaxed">
           <LanguageSwitcher />
-          {links.map((key, i) => (
+          {links.map(({ key, to }, i) => (
             <span key={key} className="inline-flex items-center">
-              <a href="#" className="hover:underline">{t(key)}</a>
+              <Link to={to} className="hover:underline">{t(key)}</Link>
               {i < links.length - 1 && <span className="mx-0.5">·</span>}
             </span>
           ))}

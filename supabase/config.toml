@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.vk-auth]
 verify_jwt = false
+
+[functions.parental-consent]
+verify_jwt = false
