@@ -2,10 +2,12 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, Play, MessageSquare, User } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageContext';
+import { useUnreadCounts, formatBadge } from '@/hooks/useUnreadCounts';
 
 const MobileBottomNav: React.FC = () => {
   const location = useLocation();
   const { t } = useLanguage();
+  const unread = useUnreadCounts();
 
   // Hide bottom nav on the fullscreen Shorts experience
   if (location.pathname.startsWith('/shorts')) return null;
@@ -36,7 +38,12 @@ const MobileBottomNav: React.FC = () => {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={isActive ? 2.25 : 1.75} />
+              <span className="relative">
+                <Icon className="h-5 w-5" strokeWidth={isActive ? 2.25 : 1.75} />
+                {path === '/messages' && unread.messages > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full min-w-4 h-4 px-1 flex items-center justify-center tabular-nums ring-2 ring-card">{formatBadge(unread.messages)}</span>
+                )}
+              </span>
               <span className={`text-[10.5px] leading-none ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
             </Link>
           );

@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface Notification {
   id: string;
@@ -37,6 +38,12 @@ const NotificationsTab: React.FC = () => {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const openNotification = (n: Notification) => {
+    if (!n.read) markRead(n.id);
+    if (n.link) navigate(n.link);
+  };
 
   const fetchNotifications = async (uid: string) => {
     const { data, error } = await supabase
@@ -98,7 +105,7 @@ const NotificationsTab: React.FC = () => {
     return (
       <div className="space-y-2">
         {list.map(n => (
-          <Card key={n.id} className={n.read ? 'opacity-70' : 'border-primary/30'}>
+          <Card key={n.id} className={`${n.read ? 'opacity-70' : 'border-primary/30'} ${n.link ? 'cursor-pointer hover:bg-muted/50 transition-colors' : ''}`} onClick={() => openNotification(n)}>
             <CardContent className="p-3 flex items-start gap-3">
               <div className="mt-0.5">{getIcon(n.type)}</div>
               <div className="flex-1 min-w-0">
@@ -109,7 +116,7 @@ const NotificationsTab: React.FC = () => {
                 </p>
               </div>
               {!n.read && (
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => markRead(n.id)} title="Marquer comme lu">
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); markRead(n.id); }} title="Marquer comme lu">
                   <Check className="h-4 w-4" />
                 </Button>
               )}

@@ -11,12 +11,14 @@ import { useTheme } from '@/hooks/useTheme';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { PostCreationDialog } from './PostCreationDialog';
+import { useUnreadCounts, formatBadge } from '@/hooks/useUnreadCounts';
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
   const { t } = useLanguage();
+  const unread = useUnreadCounts();
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-card/95 backdrop-blur border-b border-border z-50">
@@ -112,8 +114,11 @@ const Navbar: React.FC = () => {
               className="rounded-full text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link to="/messages" aria-label="Messages">
+              <Link to="/messages" aria-label="Messages" className="relative">
                 <MessageSquare className="h-5 w-5" />
+                {unread.messages > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center tabular-nums ring-2 ring-card">{formatBadge(unread.messages)}</span>
+                )}
               </Link>
             </Button>
             <Button 
@@ -122,8 +127,11 @@ const Navbar: React.FC = () => {
               className="rounded-full text-muted-foreground hover:text-foreground"
               asChild
             >
-              <Link to="/messages" aria-label="Notifications">
+              <Link to="/notifications" aria-label="Notifications" className="relative">
                 <Bell className="h-5 w-5" />
+                {unread.notifications > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center tabular-nums ring-2 ring-card">{formatBadge(unread.notifications)}</span>
+                )}
               </Link>
             </Button>
           </div>

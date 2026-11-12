@@ -39,6 +39,7 @@ import Install from "./pages/Install";
 import SettingsPage from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
+import Notifications from "./pages/Notifications";
 import Article from "./pages/Article";
 import Articles from "./pages/Articles";
 import Assistant from "./pages/Assistant";
@@ -122,6 +123,7 @@ const App = () => {
                 <Route path="/install" element={<Install />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/friends" element={<Friends />} />
+                <Route path="/notifications" element={<Notifications />} />
                 <Route path="/article/:id" element={<Article />} />
                 <Route path="/articles" element={<Articles />} />
                <Route path="/assistant" element={<Assistant />} />
