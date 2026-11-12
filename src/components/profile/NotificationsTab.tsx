@@ -51,6 +51,7 @@ const getIcon = (type: string) => {
     case 'verification_approved':
     case 'verification_rejected':
     case 'verification_info': return <ShieldCheck className="h-5 w-5 text-emerald-500" />;
+    case 'call_missed':
     case 'call': return <Phone className="h-5 w-5 text-red-500" />;
     case 'event': return <Calendar className="h-5 w-5 text-purple-500" />;
     case 'achievement':

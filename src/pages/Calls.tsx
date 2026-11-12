@@ -48,6 +48,9 @@ const Calls: React.FC = () => {
       const contactList = contactsData || [];
       setContacts(contactList);
 
+      // Close calls left "ringing" by a closed tab or a network cut (best effort).
+      await (supabase.rpc as any)('close_stale_calls');
+
       const { data: callsData } = await supabase
         .from('calls')
         .select('*')
