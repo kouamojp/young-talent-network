@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { aiComplete, isAIConfigured } from "../_shared/ai.ts";
+import { fetchPublicPage } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,8 +26,9 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid URL' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 YAT-Bot' } });
-    const html = await res.text();
+    // User-supplied URL: public http(s) addresses only, redirects re-checked (see _shared/safeFetch.ts).
+    const res = await fetchPublicPage(url);
+    const html = res.text;
     const head = html.slice(0, 100000);
 
     const title = extractMeta(head, 'og:title') || extractMeta(head, 'twitter:title') || (head.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? '');

@@ -1,6 +1,7 @@
 // Imports recent posts from external social channels (YouTube, RSS, generic)
 // into the user's feed as posts marked with external_source_url/_platform.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { fetchPublicPage } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,9 +32,10 @@ function detectPlatform(url: string): string {
 
 async function fetchText(url: string): Promise<string | null> {
   try {
-    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; YAT-Bot/1.0)" } });
+    // User-supplied URL: public http(s) addresses only (see _shared/safeFetch.ts).
+    const r = await fetchPublicPage(url);
     if (!r.ok) return null;
-    return await r.text();
+    return r.text;
   } catch { return null; }
 }
 
