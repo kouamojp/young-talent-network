@@ -3098,5 +3098,13 @@
   "profileImport.cvFormat": "Choisissez un fichier PDF ou texte.",
   "profileImport.cvTooLarge": "Fichier trop volumineux (5 Mo max).",
   "profileImport.cvNoText": "Ce CV ne contient pas de texte lisible. S'il s'agit d'un scan (image), utilisez un PDF contenant du texte.",
-  "profileImport.cvError": "Le CV n'a pas pu être analysé"
+  "profileImport.cvError": "Le CV n'a pas pu être analysé",
+  "liveStudio.cameraOff": "Caméra coupée",
+  "liveStudio.switchCamera": "Changer de caméra",
+  "liveStudio.keepOpen": "Gardez cette page ouverte : la quitter met fin au direct.",
+  "liveStudio.endedRemotely": "Votre direct a été interrompu.",
+  "liveStudio.httpsRequired": "Les directs nécessitent une connexion sécurisée (HTTPS) et un navigateur compatible.",
+  "liveWatch.connecting": "Connexion au direct…",
+  "liveWatch.full": "Ce direct a atteint son nombre maximal de spectateurs. Nouvelle tentative automatique…",
+  "liveWatch.unmute": "Activer le son"
 }

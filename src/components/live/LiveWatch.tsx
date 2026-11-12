@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Radio, Eye, MapPin, ArrowLeft, Video, StopCircle, Loader2 } from 'lucide-react';
+import { Radio, Eye, MapPin, ArrowLeft, Video, StopCircle, Loader2, VolumeX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { tr } from '@/i18n';
+import { useLiveViewer } from '@/hooks/useLiveStream';
 
 export interface WatchStream {
   id: string;
@@ -30,46 +31,43 @@ interface LiveWatchProps {
 const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, onEnded }) => {
   const { toast } = useToast();
   const isStreamer = currentUserId === stream.streamerId;
-  const [viewers, setViewers] = useState(stream.viewers);
-  const [isLive, setIsLive] = useState(true);
+  const { status, remoteStream, viewers } = useLiveViewer(stream.id, stream.viewers);
+  const isLive = status !== 'ended';
   const [ending, setEnding] = useState(false);
-  const countedRef = useRef(false);
+  const [muted, setMuted] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const bumpViewers = async (delta: number) => {
-    const { data } = await supabase.from('live_streams').select('viewer_count').eq('id', stream.id).single();
-    const current = data?.viewer_count ?? 0;
-    await supabase.from('live_streams').update({ viewer_count: Math.max(0, current + delta) }).eq('id', stream.id);
+  // Browsers may refuse to start a video with sound without a click on the page:
+  // in that case it starts muted and the viewer turns the sound on.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.srcObject = remoteStream;
+    if (!remoteStream) return;
+    video.muted = false;
+    setMuted(false);
+    video.play().catch(() => {
+      video.muted = true;
+      setMuted(true);
+      video.play().catch(() => undefined);
+    });
+  }, [remoteStream]);
+
+  const unmute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = false;
+    setMuted(false);
+    video.play().catch(() => undefined);
   };
 
-  useEffect(() => {
-    // Count this viewer (skip the streamer watching their own stream).
-    if (!isStreamer && !countedRef.current) {
-      countedRef.current = true;
-      bumpViewers(1);
-    }
-
-    const channel = supabase
-      .channel(`live-stream-${stream.id}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'live_streams', filter: `id=eq.${stream.id}` },
-        (payload) => {
-          const row = payload.new as { viewer_count: number | null; is_live: boolean | null };
-          setViewers(row.viewer_count ?? 0);
-          setIsLive(!!row.is_live);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      if (!isStreamer && countedRef.current) {
-        countedRef.current = false;
-        bumpViewers(-1);
-      }
-      supabase.removeChannel(channel);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stream.id]);
+  const overlayText =
+    status === 'ended' ? tr('liveWatch.theStreamHasEnded')
+    : status === 'full' ? tr('liveWatch.full')
+    : status === 'unsupported' ? tr('liveStudio.httpsRequired')
+    : status === 'reconnecting' ? tr('calls.reconnecting')
+    : status === 'connecting' ? tr('liveWatch.connecting')
+    : null;
 
   const handleEndStream = async () => {
     if (ending) return;
@@ -96,13 +94,24 @@ const LiveWatch: React.FC<LiveWatchProps> = ({ stream, currentUserId, onBack, on
 
       {/* Video area */}
       <div className="relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center">
-        <img src={stream.thumbnail} alt={stream.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
-        <div className="relative z-10 text-center text-white">
-          <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />
-          <p className="text-sm opacity-80">
-            {isLive ? tr('liveWatch.liveVideoStream') : tr('liveWatch.theStreamHasEnded')}
-          </p>
-        </div>
+        <video ref={videoRef} autoPlay playsInline className="absolute inset-0 w-full h-full object-contain" />
+        {overlayText && (
+          <>
+            <img src={stream.thumbnail} alt={stream.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
+            <div className="relative z-10 text-center text-white px-4">
+              {status === 'connecting' || status === 'reconnecting'
+                ? <Loader2 className="h-10 w-10 mx-auto mb-2 animate-spin opacity-80" />
+                : <Video className="h-12 w-12 mx-auto mb-2 opacity-70" />}
+              <p className="text-sm opacity-80">{overlayText}</p>
+            </div>
+          </>
+        )}
+        {status === 'live' && muted && (
+          <Button size="sm" variant="secondary" onClick={unmute} className="absolute bottom-3 left-3 z-20 gap-1.5">
+            <VolumeX className="h-4 w-4" />
+            {tr('liveWatch.unmute')}
+          </Button>
+        )}
         {isLive && (
           <div className="absolute top-3 left-3 z-20">
             <Badge className="bg-destructive text-destructive-foreground text-xs px-2 py-1">

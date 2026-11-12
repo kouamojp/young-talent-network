@@ -3098,5 +3098,13 @@
   "profileImport.cvFormat": "Choose a PDF or text file.",
   "profileImport.cvTooLarge": "File too large (5 MB max).",
   "profileImport.cvNoText": "This CV has no readable text. If it is a scan (image), use a PDF that contains text.",
-  "profileImport.cvError": "The CV could not be analysed"
+  "profileImport.cvError": "The CV could not be analysed",
+  "liveStudio.cameraOff": "Camera off",
+  "liveStudio.switchCamera": "Switch camera",
+  "liveStudio.keepOpen": "Keep this page open: leaving it ends the live.",
+  "liveStudio.endedRemotely": "Your live was interrupted.",
+  "liveStudio.httpsRequired": "Lives require a secure connection (HTTPS) and a compatible browser.",
+  "liveWatch.connecting": "Connecting to the live…",
+  "liveWatch.full": "This live has reached its maximum number of viewers. Retrying automatically…",
+  "liveWatch.unmute": "Turn sound on"
 }

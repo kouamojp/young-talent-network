@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,16 @@ import { VideoIcon, MapPin, Sparkles, LightbulbIcon, Loader2 } from 'lucide-reac
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { tr } from '@/i18n';
+import { useLiveBroadcaster } from '@/hooks/useLiveStream';
+import { mediaErrorMessage } from '@/lib/webrtc';
+import LiveStudio from './LiveStudio';
 
 interface LiveBroadcastProps {
-  onWentLive?: (streamId: string) => void;
+  /** The live is over (ended by the streamer, or closed elsewhere). */
+  onEnded?: () => void;
 }
 
-const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
+const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onEnded }) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
@@ -24,6 +28,17 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
   const [description, setDescription] = useState('');
   const [detectedLocation, setDetectedLocation] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [ending, setEnding] = useState(false);
+  const live = useLiveBroadcaster();
+
+  // The live was closed from elsewhere (another device, or considered abandoned).
+  const endedByMeRef = useRef(false);
+  useEffect(() => {
+    if (live.status !== 'ended' || endedByMeRef.current) return;
+    toast({ title: tr('liveStudio.endedRemotely'), variant: 'destructive' });
+    onEnded?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live.status]);
 
   useEffect(() => {
     const loadCountry = async () => {
@@ -68,35 +83,52 @@ const LiveBroadcast: React.FC<LiveBroadcastProps> = ({ onWentLive }) => {
 
     const categoryName = streamCategories.find(c => c.id === category)?.name || category;
 
-    const { data, error } = await supabase
-      .from('live_streams')
-      .insert({
-        streamer_id: user.id,
-        title: title.trim(),
-        description: description.trim() || null,
-        category: categoryName,
-        is_live: true,
-        started_at: new Date().toISOString(),
-        viewer_count: 0,
-      })
-      .select('id')
-      .single();
-
-    setSubmitting(false);
-
-    if (error || !data) {
-      toast({ title: tr('liveBroadcast.couldNotStart'), description: error?.message, variant: "destructive" });
-      return;
+    try {
+      // Opens the camera first: nothing is published if it is refused.
+      const id = await live.start({ title: title.trim(), description: description.trim(), category: categoryName });
+      if (id) {
+        toast({
+          title: tr('liveBroadcast.youReLive'),
+          description: tr('liveBroadcast.yourStreamHasStartedShareIt'),
+          variant: "default",
+        });
+      }
+    } catch (err) {
+      toast({ title: tr('liveBroadcast.couldNotStart'), description: mediaErrorMessage(err), variant: "destructive" });
+    } finally {
+      setSubmitting(false);
     }
-
-    toast({
-      title: tr('liveBroadcast.youReLive'),
-      description: tr('liveBroadcast.yourStreamHasStartedShareIt'),
-      variant: "default",
-    });
-    onWentLive?.(data.id);
   };
-  
+
+  const handleEnd = async () => {
+    if (ending) return;
+    setEnding(true);
+    endedByMeRef.current = true;
+    await live.stop();
+    toast({ title: tr('liveWatch.streamEnded') });
+    onEnded?.();
+  };
+
+  if (live.status === 'live') {
+    return (
+      <LiveStudio
+        title={title.trim()}
+        localStream={live.localStream}
+        viewers={live.viewers}
+        startedAt={live.startedAt}
+        micOn={live.micOn}
+        camOn={live.camOn}
+        frontCamera={live.frontCamera}
+        canSwitchCamera={live.canSwitchCamera}
+        ending={ending}
+        onToggleMic={live.toggleMic}
+        onToggleCam={live.toggleCam}
+        onSwitchCamera={live.switchCamera}
+        onEnd={handleEnd}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-white/60 rounded-lg p-6">

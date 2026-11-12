@@ -3098,5 +3098,13 @@
   "profileImport.cvFormat": "Выберите PDF или текстовый файл.",
   "profileImport.cvTooLarge": "Файл слишком большой (до 5 МБ).",
   "profileImport.cvNoText": "В этом резюме нет читаемого текста. Если это скан (изображение), используйте PDF с текстом.",
-  "profileImport.cvError": "Не удалось проанализировать резюме"
+  "profileImport.cvError": "Не удалось проанализировать резюме",
+  "liveStudio.cameraOff": "Камера выключена",
+  "liveStudio.switchCamera": "Сменить камеру",
+  "liveStudio.keepOpen": "Не закрывайте эту страницу: при выходе эфир завершится.",
+  "liveStudio.endedRemotely": "Ваш эфир был прерван.",
+  "liveStudio.httpsRequired": "Для эфиров нужны защищённое соединение (HTTPS) и совместимый браузер.",
+  "liveWatch.connecting": "Подключение к эфиру…",
+  "liveWatch.full": "В этом эфире достигнуто максимальное число зрителей. Повторная попытка выполняется автоматически…",
+  "liveWatch.unmute": "Включить звук"
 }

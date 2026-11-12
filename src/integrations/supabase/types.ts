@@ -1340,6 +1340,8 @@ export type Database = {
           ended_at: string | null
           id: string
           is_live: boolean | null
+          last_heartbeat_at: string
+          signal_public_key: string | null
           started_at: string | null
           stream_key: string | null
           streamer_id: string
@@ -1354,6 +1356,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_live?: boolean | null
+          last_heartbeat_at?: string
+          signal_public_key?: string | null
           started_at?: string | null
           stream_key?: string | null
           streamer_id: string
@@ -1368,6 +1372,8 @@ export type Database = {
           ended_at?: string | null
           id?: string
           is_live?: boolean | null
+          last_heartbeat_at?: string
+          signal_public_key?: string | null
           started_at?: string | null
           stream_key?: string | null
           streamer_id?: string

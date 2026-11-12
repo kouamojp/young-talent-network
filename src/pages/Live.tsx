@@ -63,6 +63,9 @@ const Live: React.FC = () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUserId(user?.id || null);
 
+    // Lives whose streamer vanished (closed tab, lost network) are closed server-side first.
+    await (supabase.rpc as any)('close_stale_live_streams');
+
     const [streamsRes, connectionsRes] = await Promise.all([
       supabase
         .from('live_streams')
@@ -140,7 +143,7 @@ const Live: React.FC = () => {
 
   const filteredStreams = getFilteredStreams();
 
-  const handleWentLive = () => {
+  const handleBroadcastEnded = () => {
     setShowBroadcast(false);
     setActiveTab('live');
     fetchStreams(true);
@@ -179,7 +182,7 @@ const Live: React.FC = () => {
           </div>
         </div>
         <div className="container mx-auto px-4 py-4 max-w-2xl">
-          <LiveBroadcast onWentLive={handleWentLive} />
+          <LiveBroadcast onEnded={handleBroadcastEnded} />
         </div>
       </div>
     );
