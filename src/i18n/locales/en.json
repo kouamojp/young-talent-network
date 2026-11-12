@@ -3037,5 +3037,8 @@
   "notif.tabActivity": "Activity",
   "feed.addPhotos": "Add photos (5 max)",
   "postMediaGallery.openMedia": "Open media {n} of {total}",
-  "postMediaGallery.viewer": "Media viewer"
+  "postMediaGallery.viewer": "Media viewer",
+  "messageMedia.unavailable": "Attachment unavailable",
+  "shorts.newVideosRefresh": "{n} new video(s) — Refresh",
+  "shorts.commentsCount": "{n} comment(s)"
 }

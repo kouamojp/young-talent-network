@@ -3037,5 +3037,8 @@
   "notif.tabActivity": "Activité",
   "feed.addPhotos": "Ajouter des photos (5 max)",
   "postMediaGallery.openMedia": "Ouvrir le média {n} sur {total}",
-  "postMediaGallery.viewer": "Visionneuse de médias"
+  "postMediaGallery.viewer": "Visionneuse de médias",
+  "messageMedia.unavailable": "Pièce jointe indisponible",
+  "shorts.newVideosRefresh": "{n} nouvelle(s) vidéo(s) — Rafraîchir",
+  "shorts.commentsCount": "{n} commentaire(s)"
 }

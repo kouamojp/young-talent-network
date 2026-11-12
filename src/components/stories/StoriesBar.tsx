@@ -735,7 +735,7 @@ export const StoriesBar = () => {
                         ref={videoElRef}
                         key={currentMedia.url}
                         src={currentMedia.url}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                         autoPlay
                         playsInline
                         controls
@@ -747,13 +747,17 @@ export const StoriesBar = () => {
                     </>
                   )
                 ) : (
-                  <img
+                  <>
+                    {/* The whole image is shown; a blurred copy fills the bands around it. */}
+                    <img src={currentMedia.url} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40 pointer-events-none" />
+                    <img
                     src={currentMedia.url}
                     alt=""
-                    className="w-full h-full object-cover"
+                    className="relative w-full h-full object-contain"
                     loading="eager"
                     onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                   />
+                  </>
                 )
               )}
 
@@ -946,9 +950,9 @@ export const StoriesBar = () => {
             >
               {activePreview ? (
                 activePreview.kind === 'image' ? (
-                  <img src={activePreview.url} alt="" className="w-full h-full object-cover pointer-events-none" />
+                  <img src={activePreview.url} alt="" className="w-full h-full object-contain pointer-events-none" />
                 ) : (
-                  <video src={activePreview.url} className="w-full h-full object-cover pointer-events-none" autoPlay muted loop playsInline preload="metadata" />
+                  <video src={activePreview.url} className="w-full h-full object-contain pointer-events-none" autoPlay muted loop playsInline preload="metadata" />
                 )
               ) : null}
 

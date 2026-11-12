@@ -3037,5 +3037,8 @@
   "notif.tabActivity": "Активность",
   "feed.addPhotos": "Добавить фото (до 5)",
   "postMediaGallery.openMedia": "Открыть медиа {n} из {total}",
-  "postMediaGallery.viewer": "Просмотр медиа"
+  "postMediaGallery.viewer": "Просмотр медиа",
+  "messageMedia.unavailable": "Вложение недоступно",
+  "shorts.newVideosRefresh": "Новых видео: {n} — Обновить",
+  "shorts.commentsCount": "Комментариев: {n}"
 }
