@@ -1,8 +1,9 @@
 name: Sync depuis repo de Pascal
 
+# Synchronisation automatique désactivée le 13/11/2026 : la fusion nocturne de
+# upstream/main risquait des conflits ou d'écraser les changements locaux.
+# Lancement manuel encore possible (onglet Actions → Run workflow).
 on:
-  schedule:
-    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:

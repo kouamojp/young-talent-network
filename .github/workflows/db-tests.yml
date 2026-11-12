@@ -1,0 +1,23 @@
+name: Tests base de données
+
+# Lance une base Supabase locale, applique toutes les migrations et exécute les
+# tests pgTAP de supabase/tests. Déclenchement manuel tant que ces tests n'ont
+# pas été validés une première fois ; ensuite, ajouter `push` / `pull_request`.
+on:
+  workflow_dispatch:
+
+jobs:
+  pgtap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Démarrer Supabase en local
+        run: supabase start -x studio,imgproxy,inbucket,edge-runtime,logflare,vector,supavisor
+
+      - name: Tests pgTAP
+        run: supabase test db
