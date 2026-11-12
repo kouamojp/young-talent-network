@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PostCreationDialog } from '@/components/PostCreationDialog';
 import PostCard from '@/components/PostCard';
+import { useBlocks } from '@/hooks/useBlocks';
+import { PROFILE_PUBLIC_COLUMNS } from '@/lib/profiles';
 import RecentOrganizations from '@/components/RecentOrganizations';
 import ActivityHistoryWidget from '@/components/ActivityHistoryWidget';
 import { AgentSuggestionsWidget } from '@/components/ai/AgentSuggestionsWidget';
@@ -30,6 +32,7 @@ const FeedPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
+  const { isBlocked } = useBlocks();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [suggestedTalents, setSuggestedTalents] = useState<SuggestedProfile[]>([]);
@@ -39,7 +42,7 @@ const FeedPage: React.FC = () => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/auth'); return; }
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const { data: profile } = await supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', user.id).single();
       setCurrentUser(profile);
 
       const [postsRes, talentsRes, orgsRes] = await Promise.all([
@@ -170,7 +173,7 @@ const FeedPage: React.FC = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  posts.map(post => (
+                  posts.filter(post => !isBlocked(post.user_id)).map(post => (
                     <PostCard key={post.id} post={{ id: post.id, author: { name: post.profiles.name, avatar: post.profiles.avatar_url || '/placeholder.svg', id: post.user_id, user_type: post.profiles.user_type || undefined }, user_id: post.user_id, content: post.content, timestamp: post.created_at, likes: post.likes_count, comments: post.comments_count, shares: 0 }} onUpdate={fetchPosts} />
                   ))
                 )}

@@ -47,6 +47,7 @@ import MySocialLinksCard from "@/components/profile/MySocialLinksCard";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchOwnProfile } from '@/lib/profiles';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -100,7 +101,7 @@ const Profile: React.FC = () => {
         badgesRes,
         coinsRes,
       ] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", authUser.id).single(),
+        fetchOwnProfile(authUser.id),
         supabase.from("talent_presence").select("*").eq("user_id", authUser.id),
         supabase
           .from("talent_resumes")

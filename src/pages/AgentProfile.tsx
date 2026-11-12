@@ -13,6 +13,8 @@ import PendingContractsManager from '@/components/agent/PendingContractsManager'
 import { useLanguage } from '@/i18n/LanguageContext';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
+import BlockUserButton from '@/components/safety/BlockUserButton';
+import { fetchPublicContact } from '@/lib/profiles';
 import { toast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
@@ -112,10 +114,11 @@ const AgentProfile: React.FC = () => {
       if (!agentData) {
         const { data: pf } = await supabase
           .from('profiles')
-          .select('id, name, avatar_url, bio, city, country, location, cover_photo_url, website, phone, email, user_type, sport_type')
+          .select('id, name, avatar_url, bio, city, country, location, cover_photo_url, website, user_type, sport_type')
           .eq('id', id!)
           .maybeSingle();
         if (pf) {
+          const contact = await fetchPublicContact(pf.id);
           agentData = {
             id: pf.id,
             user_id: pf.id,
@@ -130,8 +133,8 @@ const AgentProfile: React.FC = () => {
             bio: pf.bio,
             avatar_url: pf.avatar_url,
             location: pf.location || [pf.city, pf.country].filter(Boolean).join(', '),
-            phone: pf.phone,
-            email: pf.email,
+            phone: contact.phone,
+            email: contact.email,
             website: pf.website,
             deals_completed: 0,
           } as any;
@@ -308,6 +311,7 @@ const AgentProfile: React.FC = () => {
                 <Button variant="outline" className="gap-2" onClick={() => navigate(`/messages?to=${id}`)}>
                   <Handshake className="h-4 w-4" /> Contacter
                 </Button>
+                {(agent?.user_id || id) && <BlockUserButton userId={agent?.user_id || id!} name={agent?.agency_name} size="default" />}
               </div>
             </div>
 

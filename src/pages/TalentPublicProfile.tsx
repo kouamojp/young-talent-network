@@ -9,6 +9,8 @@ import { MapPin, Globe, Star, Trophy, GraduationCap, Image, ArrowLeft, Briefcase
 import { useLanguage } from '@/i18n/LanguageContext';
 import { toast } from '@/hooks/use-toast';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
+import BlockUserButton from '@/components/safety/BlockUserButton';
+import { PROFILE_PUBLIC_COLUMNS, fetchProfileAges, fetchProfilePrivate, fetchPublicContact } from '@/lib/profiles';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const StarRating = ({ value, onChange, readonly = false }: { value: number; onChange?: (v: number) => void; readonly?: boolean }) => (
@@ -81,7 +83,7 @@ const TalentPublicProfile: React.FC = () => {
       setCurrentUserId(user?.id || null);
 
       const [profileRes, eduRes, achRes, mediaRes, linksRes, skillsRes, ratingsRes, catsRes, presenceRes, postsRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', id).single(),
+        supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', id).single(),
         supabase.from('talent_education').select('*').eq('user_id', id).order('start_year', { ascending: false }),
         supabase.from('talent_achievements').select('*').eq('user_id', id).order('date', { ascending: false }),
         supabase.from('talent_media').select('*').eq('user_id', id).order('created_at', { ascending: false }),
@@ -93,7 +95,23 @@ const TalentPublicProfile: React.FC = () => {
         supabase.from('posts').select('id, content, media_urls, created_at, likes_count, comments_count, visibility').eq('user_id', id).eq('is_published', true).eq('visibility', 'public').order('created_at', { ascending: false }).limit(10),
       ]);
 
-      if (profileRes.data) setProfile(profileRes.data);
+      if (profileRes.data) {
+        // Colonnes privées : date exacte pour soi seulement, âge pour les autres,
+        // coordonnées selon get_public_contact (jamais pour un mineur).
+        const isSelf = user?.id === id;
+        const [ages, contact, priv] = await Promise.all([
+          fetchProfileAges([id]),
+          fetchPublicContact(id),
+          isSelf ? fetchProfilePrivate([id]) : Promise.resolve({} as Awaited<ReturnType<typeof fetchProfilePrivate>>),
+        ]);
+        setProfile({
+          ...(profileRes.data as any),
+          birthday: isSelf ? priv[id]?.birthday ?? null : null,
+          age: ages[id] ?? null,
+          email: contact.email,
+          phone: contact.phone,
+        });
+      }
       if (eduRes.data) setEducation(eduRes.data);
       if (achRes.data) setAchievements(achRes.data);
       if (mediaRes.data) setMedia(mediaRes.data);
@@ -146,14 +164,11 @@ const TalentPublicProfile: React.FC = () => {
     return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
-  const calculateAge = (birthday: string | null) => {
-    if (!birthday) return null;
-    const birth = new Date(birthday);
-    const now = new Date();
-    let age = now.getFullYear() - birth.getFullYear();
-    if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
-    return `${age} ans`;
-  };
+  // Protection des mineurs : la date de naissance exacte n'est jamais affichée
+  // aux autres membres, et les coordonnées d'un mineur restent privées.
+  // Les coordonnées arrivent déjà filtrées par get_public_contact.
+  const isOwnProfile = !!currentUserId && currentUserId === id;
+  const showContact = true;
 
   if (loading) return <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
   if (!profile) return <div className="text-center py-20"><p className="text-muted-foreground">Profil introuvable</p></div>;
@@ -203,9 +218,10 @@ const TalentPublicProfile: React.FC = () => {
                   )}
                 </div>
                 {profile.bio && <p className="text-[15px] text-muted-foreground mt-3 max-w-prose leading-relaxed">{profile.bio}</p>}
-                <div className="flex flex-wrap gap-1.5 mt-3">
+                <div className="flex flex-wrap items-center gap-1.5 mt-3">
                   <Badge variant="outline">{profile.user_type === 'organization' ? 'Organisation' : profile.user_type === 'agent' ? 'Agent' : 'Talent'}</Badge>
                   {profile.sport_type && <Badge variant="secondary">{profile.sport_type}</Badge>}
+                  {id && <span className="ml-auto print:hidden"><BlockUserButton userId={id} name={profile.name} /></span>}
                 </div>
               </div>
             </div>
@@ -221,13 +237,13 @@ const TalentPublicProfile: React.FC = () => {
               <SectionHeader icon={User} title="Informations Personnelles" />
               <div className="px-4 pb-3 space-y-0">
                 <InfoRow label="Nom" value={profile.name} />
-                <InfoRow label="Date de naissance" value={formatDate(profile.birthday)} />
-                <InfoRow label="Âge" value={calculateAge(profile.birthday)} />
+                {isOwnProfile && <InfoRow label="Date de naissance" value={formatDate(profile.birthday)} />}
+                <InfoRow label="Âge" value={profile.age != null ? `${profile.age} ans` : null} />
                 <InfoRow label="Spécialité" value={profile.sport_type} />
                 <InfoRow label="Ville" value={profile.city} />
                 <InfoRow label="Pays" value={profile.country} />
-                {profile.phone && <InfoRow label="Téléphone" value={profile.phone} />}
-                {profile.email && <InfoRow label="Email" value={profile.email} />}
+                {showContact && profile.phone && <InfoRow label="Téléphone" value={profile.phone} />}
+                {showContact && profile.email && <InfoRow label="Email" value={profile.email} />}
                 {profile.website && <InfoRow label="Site web" value={profile.website} />}
               </div>
             </div>

@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Textarea } from '@/components/ui/textarea';
 import { Shield, ExternalLink, CheckCircle, XCircle, AlertCircle, FileText, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfilePrivate } from '@/lib/profiles';
 import { toast } from 'sonner';
 import { BADGE_META } from '@/components/VerificationBadges';
 
@@ -28,12 +29,16 @@ const VerificationRequestsPanel: React.FC = () => {
     const userIds = [...new Set((reqs || []).map((r: any) => r.user_id))];
     const { data: profs } = await supabase
       .from('profiles')
-      .select('id, name, avatar_url, email, user_type')
+      .select('id, name, avatar_url, user_type')
       .in('id', userIds);
+    const priv = await fetchProfilePrivate(userIds as string[]);
 
     const enriched = (reqs || []).map((r: any) => ({
       ...r,
-      profile: profs?.find((p: any) => p.id === r.user_id),
+      profile: (() => {
+        const p = profs?.find((x: any) => x.id === r.user_id);
+        return p ? { ...p, email: priv[r.user_id]?.email ?? null } : undefined;
+      })(),
     }));
     setRequests(enriched);
     setLoading(false);

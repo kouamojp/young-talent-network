@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchOwnProfile } from '@/lib/profiles';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { YatServicesManager } from '@/components/profile/YatServicesManager';
 import { LinkedAccountsManager } from '@/components/profile/LinkedAccountsManager';
+import PrivacyDataCard from '@/components/safety/PrivacyDataCard';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -44,7 +46,7 @@ const Settings: React.FC = () => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate('/auth'); return; }
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const { data: profile } = await fetchOwnProfile(user.id);
       setCurrentUser({ ...profile, email: user.email });
       setLoading(false);
     };
@@ -239,6 +241,7 @@ const Settings: React.FC = () => {
                 <div><h4 className="font-medium text-sm mb-2 flex items-center gap-2"><Lock className="h-4 w-4" /> {t('settings.accountSecurity')}</h4><Button variant="outline" size="sm">{t('settings.changePassword')}</Button></div>
               </CardContent>
             </Card>
+            <PrivacyDataCard />
           </TabsContent>
 
           <TabsContent value="appearance">

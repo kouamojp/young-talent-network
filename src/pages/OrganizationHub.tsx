@@ -93,7 +93,7 @@ const OrganizationHub: React.FC = () => {
       if (!orgData) {
         const { data: prof } = await supabase
           .from('profiles')
-          .select('id, name, bio, city, country, location, avatar_url, cover_photo_url, website, phone, email, user_type')
+          .select('id, name, bio, city, country, location, avatar_url, cover_photo_url, website, user_type')
           .eq('id', id!)
           .maybeSingle();
         if (prof && prof.user_type === 'organization') {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfilePrivate } from '@/lib/profiles';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,10 +55,12 @@ export const LinkedAccountsManager: React.FC = () => {
     setLinks(rows);
     const ids = Array.from(new Set(rows.flatMap(r => [r.owner_user_id, r.linked_user_id])));
     if (ids.length) {
-      const { data: profs } = await supabase.from('profiles')
-        .select('id, name, email, avatar_url, user_type').in('id', ids);
+      const [{ data: profs }, priv] = await Promise.all([
+        supabase.from('profiles').select('id, name, avatar_url, user_type').in('id', ids),
+        fetchProfilePrivate(ids),
+      ]);
       const map: Record<string, ProfileLite> = {};
-      (profs || []).forEach((p: any) => { map[p.id] = p; });
+      (profs || []).forEach((p: any) => { map[p.id] = { ...p, email: priv[p.id]?.email ?? '' }; });
       setProfiles(map);
     }
     setLoading(false);
@@ -68,11 +71,9 @@ export const LinkedAccountsManager: React.FC = () => {
   const handleSearch = async () => {
     if (!query.trim() || !me) return;
     setSearching(true);
-    const { data } = await supabase.from('profiles')
-      .select('id, name, email, avatar_url, user_type')
-      .or(`email.ilike.%${query}%,name.ilike.%${query}%`)
-      .neq('id', me).limit(8);
-    setSearchResults((data as ProfileLite[]) || []);
+    // Recherche par nom, ou par e-mail exact : les e-mails ne sont plus lisibles via l'API.
+    const { data } = await (supabase.rpc as any)('search_profiles_for_link', { _query: query.trim() });
+    setSearchResults(((data || []) as any[]).map(r => ({ id: r.id, name: r.name, avatar_url: r.avatar_url, user_type: r.user_type, email: r.email_hint || '' })));
     setSearching(false);
   };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS, fetchPublicContact } from '@/lib/profiles';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -24,15 +25,17 @@ const PublicCV: React.FC = () => {
 
     const uid = resume.user_id;
     const [p, ed, ac, sk, md, ex] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', uid).single(),
+      supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', uid).single(),
       (supabase.from('talent_education') as any).select('*').eq('user_id', uid).order('start_year', { ascending: false }),
       supabase.from('talent_achievements').select('*').eq('user_id', uid).order('date', { ascending: false }),
       supabase.from('user_skills').select('*, skills(name, category)').eq('user_id', uid),
       supabase.from('talent_media').select('*').eq('user_id', uid).order('created_at', { ascending: false }).limit(8),
       (supabase.from('talent_experiences') as any).select('*').eq('user_id', uid).order('start_date', { ascending: false }),
     ]);
+    // E-mail et téléphone : uniquement si get_public_contact l'autorise (jamais pour un mineur).
+    const contact = await fetchPublicContact(uid);
     setExtras({
-      profile: p.data, education: ed.data || [], achievements: ac.data || [],
+      profile: p.data ? { ...(p.data as any), email: contact.email, phone: contact.phone } : null, education: ed.data || [], achievements: ac.data || [],
       skills: sk.data || [], media: md.data || [], experiences: ex.data || [], languages: [],
     });
     setLoading(false);

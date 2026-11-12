@@ -14,6 +14,7 @@ import { Shield, Users, Search, FileText, Calendar, Building2, Trash2, CheckCirc
 import { Switch } from '@/components/ui/switch';
 import { useLanguage } from '@/i18n/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS, fetchProfilePrivate } from '@/lib/profiles';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import ModerationReportsPanel from '@/components/admin/ModerationReportsPanel';
@@ -212,7 +213,7 @@ const AdminPanel: React.FC = () => {
 
   const fetchData = async () => {
     const [usersRes, postsRes, eventsRes, communitiesRes, adsRes, listingsRes] = await Promise.all([
-      supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(100),
+      supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).order('created_at', { ascending: false }).limit(100),
       supabase.from('posts').select('*, profiles(name, avatar_url)').order('created_at', { ascending: false }).limit(50),
       supabase.from('events').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('communities').select('*').order('created_at', { ascending: false }).limit(50),
@@ -222,6 +223,9 @@ const AdminPanel: React.FC = () => {
     if (adsRes.data) setAds(adsRes.data);
     if (listingsRes.data) setMarketplaceListings(listingsRes.data);
     if (usersRes.data) {
+      // E-mail et téléphone : colonnes privées, lisibles par un admin via get_profile_private.
+      const priv = await fetchProfilePrivate((usersRes.data as any[]).map(u => u.id));
+      usersRes.data = (usersRes.data as any[]).map(u => ({ ...u, email: priv[u.id]?.email ?? null, phone: priv[u.id]?.phone ?? null })) as any;
       setUsers(usersRes.data);
       // Calculate stats from real data
       const now = new Date();

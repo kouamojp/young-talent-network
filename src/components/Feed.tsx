@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PostCard from './PostCard';
+import { useBlocks } from '@/hooks/useBlocks';
+import { PROFILE_PUBLIC_COLUMNS } from '@/lib/profiles';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import RecentOrganizations from './RecentOrganizations';
@@ -27,6 +29,7 @@ import AdBanner from './AdBanner';
 
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const { isBlocked } = useBlocks();
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -40,7 +43,7 @@ const Feed: React.FC = () => {
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('*')
+        .select(PROFILE_PUBLIC_COLUMNS)
         .eq('id', user.id)
         .single();
       setCurrentUser(profile);
@@ -109,7 +112,7 @@ const Feed: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-2">
-          {posts.map(post => (
+          {posts.filter(post => !isBlocked(post.user_id)).map(post => (
             <PostCard
               key={post.id}
               post={{

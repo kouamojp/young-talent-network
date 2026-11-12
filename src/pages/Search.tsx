@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search as SearchIcon, MapPin, Star, FileText, Filter, ChevronDown, Map, Users, Building2, UserCheck, Database } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfileAges } from '@/lib/profiles';
 import { useNavigate, Link } from 'react-router-dom';
 import { countries } from '@/data/countries';
 import { sportCategories } from '@/data/sportCategories';
@@ -23,7 +24,7 @@ interface UnifiedResult {
   country: string | null;
   sport_type: string | null;
   platform_rating: number;
-  birthday: string | null;
+  age: number | null;
   user_type: 'talent' | 'agent' | 'organization';
   sections: string[];
 }
@@ -68,7 +69,7 @@ const Search: React.FC = () => {
       }
 
       let q = supabase.from('profiles')
-        .select('id, name, avatar_url, bio, city, country, sport_type, platform_rating, birthday, user_type', { count: 'exact' });
+        .select('id, name, avatar_url, bio, city, country, sport_type, platform_rating, user_type', { count: 'exact' });
 
       if (searchType === 'all') q = q.in('user_type', ['talent', 'agent', 'organization']);
       else q = q.eq('user_type', searchType);
@@ -85,6 +86,7 @@ const Search: React.FC = () => {
       // Load presence sections (YAT Database parity)
       const ids = (profiles || []).map((p: any) => p.id);
       let presenceMap: Record<string, string[]> = {};
+      const ages = await fetchProfileAges(ids);
       if (ids.length) {
         const { data: presenceData } = await supabase
           .from('talent_presence')
@@ -100,7 +102,7 @@ const Search: React.FC = () => {
         id: p.id, name: p.name, avatar_url: p.avatar_url, bio: p.bio,
         city: p.city, country: p.country, sport_type: p.sport_type,
         platform_rating: Number(p.platform_rating) || 0,
-        birthday: p.birthday, user_type: p.user_type,
+        age: ages[p.id] ?? null, user_type: p.user_type,
         sections: presenceMap[p.id] || [],
       })));
     } catch (err) { console.error(err); }
@@ -113,13 +115,6 @@ const Search: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchType, categoryId, subcategoryId]);
 
-  const calculateAge = (birthday: string | null) => {
-    if (!birthday) return null;
-    const birth = new Date(birthday); const now = new Date();
-    let age = now.getFullYear() - birth.getFullYear();
-    if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) age--;
-    return age;
-  };
 
   const typeBadge = (type: string) => {
     if (type === 'agent') return 'bg-emerald-500/10 text-emerald-600 border-emerald-200';
@@ -261,8 +256,8 @@ const Search: React.FC = () => {
                           <Star className="h-3 w-3 fill-current" /> {r.platform_rating.toFixed(1)}
                         </span>
                       )}
-                      {calculateAge(r.birthday) && (
-                        <Badge variant="outline" className="text-[10px] shrink-0">{calculateAge(r.birthday)} {t('search.years')}</Badge>
+                      {r.age != null && (
+                        <Badge variant="outline" className="text-[10px] shrink-0">{r.age} {t('search.years')}</Badge>
                       )}
                     </div>
                     <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground flex-wrap">

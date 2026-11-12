@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Search as SearchIcon, MapPin, Star, Filter, BadgeCheck, MessageSquare, Eye, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS, fetchProfileAges } from '@/lib/profiles';
 import { useNavigate } from 'react-router-dom';
 import { countries } from '@/data/countries';
 import { toast } from 'sonner';
@@ -29,19 +30,12 @@ interface ResultCard {
   rating_count: number;
   user_type: string;
   languages: string[] | null;
-  birthday: string | null;
   yat_score: number;
 }
 
 const LEVELS = ['débutant', 'intermédiaire', 'avancé', 'professionnel'];
 const AVAILABILITY = ['disponible', 'non disponible', 'ouvert aux opportunités'];
 const LANGUAGES = ['English', 'Français', 'Русский', 'Español', 'العربية', 'Português', '中文', 'Deutsch'];
-
-const calcAge = (birthday: string | null): number | null => {
-  if (!birthday) return null;
-  const diff = Date.now() - new Date(birthday).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-};
 
 const AdvancedSearch: React.FC = () => {
   const navigate = useNavigate();
@@ -73,7 +67,7 @@ const AdvancedSearch: React.FC = () => {
     setLoading(true);
     setSearched(true);
     try {
-      let q = supabase.from('profiles').select('*').limit(60);
+      let q = supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).limit(60);
 
       if (profileType !== 'all') {
         q = q.eq('user_type', profileType);
@@ -111,9 +105,10 @@ const AdvancedSearch: React.FC = () => {
         rows = rows.filter(r => ids.has(r.id));
       }
 
-      // Age filter
+      // Age filter (ages come from get_profile_ages: the birth date itself is private)
+      const ages = await fetchProfileAges(rows.map(r => r.id));
       rows = rows.filter(r => {
-        const age = calcAge(r.birthday);
+        const age = ages[r.id] ?? null;
         if (age === null) return ageRange[0] === 14 && ageRange[1] === 65;
         return age >= ageRange[0] && age <= ageRange[1];
       });

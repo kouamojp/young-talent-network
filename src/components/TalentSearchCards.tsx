@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, Star, FileText, Filter, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchProfileAges } from '@/lib/profiles';
 import { useNavigate } from 'react-router-dom';
 import { countries } from '@/data/countries';
 
@@ -18,7 +19,7 @@ interface TalentResult {
   country: string | null;
   sport_type: string | null;
   platform_rating: number;
-  birthday: string | null;
+  age: number | null;
   skills: string[];
 }
 
@@ -39,7 +40,7 @@ const TalentSearchCards: React.FC = () => {
     try {
       let q = supabase
         .from('profiles')
-        .select('id, name, avatar_url, bio, city, country, sport_type, platform_rating, birthday', { count: 'exact' })
+        .select('id, name, avatar_url, bio, city, country, sport_type, platform_rating', { count: 'exact' })
         .eq('user_type', 'talent');
 
       if (query.trim()) {
@@ -61,7 +62,10 @@ const TalentSearchCards: React.FC = () => {
       }
 
       const ids = profiles.map(p => p.id);
-      const { data: skillsData } = await supabase.from('user_skills').select('user_id, skills(name)').in('user_id', ids);
+      const [{ data: skillsData }, ages] = await Promise.all([
+        supabase.from('user_skills').select('user_id, skills(name)').in('user_id', ids),
+        fetchProfileAges(ids),
+      ]);
 
       const skillsMap: Record<string, string[]> = {};
       (skillsData || []).forEach((s: any) => {
@@ -72,6 +76,7 @@ const TalentSearchCards: React.FC = () => {
       setResults(profiles.map(p => ({
         ...p,
         platform_rating: Number(p.platform_rating) || 0,
+        age: ages[p.id] ?? null,
         skills: skillsMap[p.id] || [],
       })));
     } catch (err) {
@@ -81,10 +86,6 @@ const TalentSearchCards: React.FC = () => {
     }
   };
 
-  const formatBirthday = (date: string | null) => {
-    if (!date) return null;
-    return new Date(date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
@@ -196,10 +197,10 @@ const TalentSearchCards: React.FC = () => {
               )}
 
               <div className="w-full mt-3 space-y-1.5 text-xs text-left">
-                {t.birthday && (
+                {t.age != null && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Date de naissance:</span>
-                    <span className="font-medium text-foreground">{formatBirthday(t.birthday)}</span>
+                    <span className="text-muted-foreground">Âge :</span>
+                    <span className="font-medium text-foreground">{t.age} ans</span>
                   </div>
                 )}
                 {(t.city || t.country) && (
