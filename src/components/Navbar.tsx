@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Search, MessageSquare, Bell, Menu, Sun, Moon, Users, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from './ui/button';
@@ -20,6 +20,11 @@ const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { t } = useLanguage();
   const unread = useUnreadCounts();
+  const location = useLocation();
+
+  // Shorts is a full-screen experience with its own controls at the top:
+  // the navbar would cover them (back, publish, sound).
+  if (location.pathname.startsWith('/shorts')) return null;
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-card/95 backdrop-blur border-b border-border z-50">

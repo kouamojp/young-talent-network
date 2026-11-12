@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight, Upload } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Music, Volume2, VolumeX, Play, ArrowLeft, AlertTriangle, Send, Plus, Check, RefreshCw, CornerDownRight, Upload, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import ShareMenu from '@/components/share/ShareMenu';
 import { tr } from '@/i18n';
@@ -56,6 +56,8 @@ const ShortsPage: React.FC = () => {
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [heartBurst, setHeartBurst] = useState<Record<string, number>>({});
   const [following, setFollowing] = useState<Set<string>>(new Set());
+  // Friend requests I sent that are still waiting for an answer
+  const [requested, setRequested] = useState<Set<string>>(new Set());
   const [activeIdx, setActiveIdx] = useState(0);
   const [commentsOpen, setCommentsOpen] = useState<Short | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -155,15 +157,18 @@ const ShortsPage: React.FC = () => {
       const { data: conns } = await supabase
         .from('connections')
         .select('user_id, connected_user_id, status')
-        .or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`)
-        .eq('status', 'accepted');
+        .or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`);
       const fset = new Set<string>();
+      const pending = new Set<string>();
       (conns || []).forEach(c => {
         const other = c.user_id === user.id ? c.connected_user_id : c.user_id;
-        if (other) fset.add(other);
+        if (!other) return;
+        if (c.status === 'accepted') fset.add(other);
+        else if (c.user_id === user.id) pending.add(other);
       });
       followedIds = Array.from(fset);
       setFollowing(fset);
+      setRequested(pending);
 
       // Restore persisted engagement → seed author/category scores so recos stay coherent
       const { data: eng } = await supabase
@@ -379,19 +384,22 @@ const ShortsPage: React.FC = () => {
   };
 
   const toggleLike = async (s: Short, idx: number, animate = false) => {
-    if (!currentUser) { toast.error('Connectez-vous'); return; }
+    if (!currentUser) { toast.error(tr('post.loginRequired')); return; }
     const was = s.liked;
     setShorts(prev => prev.map((x, i) => i === idx ? { ...x, liked: animate ? true : !was, likes: (x.likes || 0) + ((animate ? (was ? 0 : 1) : (was ? -1 : 1))) } : x));
     if (animate) setHeartBurst(p => ({ ...p, [s.id]: Date.now() }));
     if (animate && was) return;
     if (!was) recordEngagement(s, 'like', 5);
-    if (was) {
-      await supabase.from('media_likes').delete().eq('media_id', s.realId).eq('user_id', currentUser);
-      persistFlag(s.realId, { liked: false });
-    } else {
-      await supabase.from('media_likes').insert({ media_id: s.realId, user_id: currentUser });
-      persistFlag(s.realId, { liked: true });
+    const { error } = was
+      ? await supabase.from('media_likes').delete().eq('media_id', s.realId).eq('user_id', currentUser)
+      : await supabase.from('media_likes').insert({ media_id: s.realId, user_id: currentUser });
+    if (error && error.code !== '23505') {
+      // Roll back the optimistic update
+      setShorts(prev => prev.map((x, i) => i === idx ? { ...x, liked: was, likes: Math.max(0, (x.likes || 0) + (was ? 1 : -1)) } : x));
+      toast.error(error.message);
+      return;
     }
+    persistFlag(s.realId, { liked: !was });
   };
 
   const handleTap = (s: Short, idx: number) => {
@@ -409,17 +417,22 @@ const ShortsPage: React.FC = () => {
   };
 
   const toggleFollow = async (targetId: string) => {
-    if (!currentUser) { toast.error('Connectez-vous'); return; }
+    if (!currentUser) { toast.error(tr('post.loginRequired')); return; }
     if (currentUser === targetId) return;
-    const isFollowing = following.has(targetId);
-    if (isFollowing) {
-      await supabase.from('connections').delete()
+    const drop = (prev: Set<string>) => { const n = new Set(prev); n.delete(targetId); return n; };
+    if (following.has(targetId) || requested.has(targetId)) {
+      // Unfollow, or cancel a request that has not been answered yet.
+      const { error } = await supabase.from('connections').delete()
         .or(`and(user_id.eq.${currentUser},connected_user_id.eq.${targetId}),and(user_id.eq.${targetId},connected_user_id.eq.${currentUser})`);
-      setFollowing(prev => { const n = new Set(prev); n.delete(targetId); return n; });
+      if (error) { toast.error(error.message); return; }
+      setFollowing(drop);
+      setRequested(drop);
     } else {
-      await supabase.from('connections').insert({ user_id: currentUser, connected_user_id: targetId, status: 'accepted' });
-      setFollowing(prev => new Set(prev).add(targetId));
-      toast.success(tr('shorts.subscribed'));
+      // A connection is a friend request: the other member has to accept it.
+      const { error } = await supabase.from('connections').insert({ user_id: currentUser, connected_user_id: targetId });
+      if (error && error.code !== '23505') { toast.error(error.message); return; }
+      setRequested(prev => new Set(prev).add(targetId));
+      toast.success(tr('friends.requestSent'));
     }
   };
 
@@ -495,7 +508,7 @@ const ShortsPage: React.FC = () => {
   };
 
   const toggleCommentLike = async (c: Comment, parentId?: string) => {
-    if (!currentUser) { toast.error('Connectez-vous'); return; }
+    if (!currentUser) { toast.error(tr('post.loginRequired')); return; }
     const was = !!c.liked;
     const apply = (cm: Comment): Comment => cm.id === c.id
       ? { ...cm, liked: !was, likes: (cm.likes || 0) + (was ? -1 : 1) } : cm;
@@ -708,7 +721,7 @@ const ShortsPage: React.FC = () => {
           className="absolute top-14 left-1/2 -translate-x-1/2 z-30 bg-primary text-primary-foreground rounded-full shadow-lg px-4 py-2 text-xs font-semibold flex items-center gap-2 animate-fade-in hover:scale-105 transition"
         >
           <RefreshCw className="h-3.5 w-3.5" />
-          {newCount} {tr('shorts.new')}{newCount > 1 ? 's' : ''} {tr('common.video')}{newCount > 1 ? 's' : ''} {tr('shorts.refresh')}
+          {tr('shorts.newVideosRefresh', { n: newCount })}
         </button>
       )}
 
@@ -723,6 +736,7 @@ const ShortsPage: React.FC = () => {
         <div data-shorts-scroll className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
           {shorts.map((short, idx) => {
             const isFollowing = following.has(short.user_id);
+            const isRequested = requested.has(short.user_id);
             const isSelf = currentUser === short.user_id;
             const prog = progress[short.id] || 0;
             return (
@@ -737,7 +751,7 @@ const ShortsPage: React.FC = () => {
                     ref={el => (videoRefs.current[idx] = el)}
                     data-idx={idx}
                     src={short.url}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-contain bg-black"
                     loop
                     muted={muted}
                     playsInline
@@ -810,9 +824,11 @@ const ShortsPage: React.FC = () => {
                       {!isSelf && (
                         <button
                           onClick={(e) => { e.preventDefault(); toggleFollow(short.user_id); }}
-                          className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full h-5 w-5 flex items-center justify-center border-2 border-black ${isFollowing ? 'bg-emerald-500' : 'bg-red-500'}`}
+                          className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full h-5 w-5 flex items-center justify-center border-2 border-black ${isFollowing ? 'bg-emerald-500' : isRequested ? 'bg-amber-500' : 'bg-red-500'}`}
+                          aria-label={isFollowing ? tr('friends.myFriends') : isRequested ? tr('friends.requestSent') : tr('friends.addFriend')}
+                          title={isFollowing ? tr('friends.myFriends') : isRequested ? tr('friends.requestSent') : tr('friends.addFriend')}
                         >
-                          {isFollowing ? <Check className="h-3 w-3 text-white" /> : <Plus className="h-3 w-3 text-white" />}
+                          {isFollowing ? <Check className="h-3 w-3 text-white" /> : isRequested ? <Clock className="h-3 w-3 text-white" /> : <Plus className="h-3 w-3 text-white" />}
                         </button>
                       )}
                     </Link>
@@ -841,7 +857,7 @@ const ShortsPage: React.FC = () => {
       <Sheet open={!!commentsOpen} onOpenChange={(o) => { if (!o) { setCommentsOpen(null); setReplyTo(null); } }}>
         <SheetContent side="bottom" className="h-[70vh] flex flex-col p-0 rounded-t-2xl">
           <SheetHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
-            <SheetTitle>{comments.length} {tr('shorts.comment')}{comments.length > 1 ? 's' : ''}</SheetTitle>
+            <SheetTitle>{tr('shorts.commentsCount', { n: comments.length })}</SheetTitle>
             <Button
               size="icon" variant="ghost" className="h-8 w-8"
               onClick={() => commentsOpen && loadComments(commentsOpen)}

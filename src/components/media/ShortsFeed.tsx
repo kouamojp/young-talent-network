@@ -202,7 +202,7 @@ const ShortsFeed: React.FC = () => {
                   <video
                     ref={el => (videoRefs.current[idx] = el)}
                     src={short.url}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-contain bg-black"
                     loop
                     muted={muted}
                     playsInline
@@ -346,7 +346,7 @@ const UploadShortDialog: React.FC<{ onUploaded: () => void }> = ({ onUploaded })
     setUploading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('Connectez-vous'); return; }
+      if (!user) { toast.error(tr('post.loginRequired')); return; }
       const ext = file.name.split('.').pop();
       const path = `${user.id}/shorts/${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from('profile-files').upload(path, file, { contentType: file.type });

@@ -12,7 +12,8 @@ const FloatingCreateButton: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  if (location.pathname.startsWith('/messages')) return null;
+  // Hidden on full-screen experiences (messages, Shorts).
+  if (location.pathname.startsWith('/messages') || location.pathname.startsWith('/shorts')) return null;
 
   const actions = [
     { icon: FileText, label: t('create.post') || 'Publication', color: 'bg-blue-500', action: 'post' },

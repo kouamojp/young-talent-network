@@ -37,7 +37,7 @@ export const AIAssistantChat = ({ fullPage = false }: { fullPage?: boolean }) =>
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const location = useLocation();
-  const hideFloating = !fullPage && location.pathname.startsWith('/messages');
+  const hideFloating = !fullPage && (location.pathname.startsWith('/messages') || location.pathname.startsWith('/shorts'));
 
   useEffect(() => {
     // Pas de scrollIntoView : il ferait aussi défiler la page autour du chat.
