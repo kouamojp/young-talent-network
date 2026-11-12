@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { BrainCircuit, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -14,6 +16,43 @@ const AptitudeTest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [testCompleted, setTestCompleted] = useState(false);
+  const [history, setHistory] = useState<{ id: string; category: string; top_area: string | null; top_score: number | null; created_at: string }[]>([]);
+
+  const loadHistory = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await (supabase.from as any)('aptitude_test_results')
+      .select('id, category, top_area, top_score, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(5);
+    setHistory(data || []);
+  };
+
+  useEffect(() => { loadHistory(); }, []);
+
+  const saveResults = async (category: string, finalAnswers: Record<number, string>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: 'Résultats non enregistrés', description: 'Connectez-vous pour conserver vos résultats.' });
+      return;
+    }
+    const results = getResultsByCategory(category, finalAnswers);
+    const top = [...results].sort((a, b) => b.score - a.score)[0];
+    const { error } = await (supabase.from as any)('aptitude_test_results').insert({
+      user_id: user.id,
+      category,
+      results,
+      top_area: top?.area ?? null,
+      top_score: top ? Math.round(top.score) : null,
+    });
+    if (error) {
+      toast({ title: "Échec de l'enregistrement", description: error.message, variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Résultats enregistrés' });
+    loadHistory();
+  };
 
   const questions = selectedCategory ? questionsByCategory[selectedCategory] || [] : [];
   const currentCat = testCategories.find(c => c.id === selectedCategory);
@@ -30,6 +69,7 @@ const AptitudeTest: React.FC = () => {
       setCurrentStep(prev => prev + 1);
     } else {
       setTestCompleted(true);
+      if (selectedCategory) saveResults(selectedCategory, answers);
     }
   };
 
@@ -92,7 +132,27 @@ const AptitudeTest: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 py-6">
         <Card className="p-6">
           {!selectedCategory ? (
-            <CategorySelector categories={testCategories} onSelect={handleSelectCategory} />
+            <>
+              <CategorySelector categories={testCategories} onSelect={handleSelectCategory} />
+              {history.length > 0 && (
+                <div className="mt-6 border-t pt-4">
+                  <h3 className="text-sm font-semibold mb-2">Mes derniers résultats</h3>
+                  <ul className="space-y-1.5">
+                    {history.map(h => (
+                      <li key={h.id} className="flex items-center justify-between text-sm gap-3">
+                        <span className="truncate">
+                          {testCategories.find(c => c.id === h.category)?.icon} {testCategories.find(c => c.id === h.category)?.name || h.category}
+                          {h.top_area && <span className="text-muted-foreground"> · {h.top_area}</span>}
+                        </span>
+                        <span className="shrink-0 text-muted-foreground tabular-nums">
+                          {h.top_score != null && <strong className="text-foreground">{h.top_score}%</strong>} · {new Date(h.created_at).toLocaleDateString()}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
           ) : !testCompleted ? (
             <>
               <div className="flex items-center justify-between mb-4">
