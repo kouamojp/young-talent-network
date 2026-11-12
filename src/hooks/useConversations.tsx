@@ -196,7 +196,13 @@ export const useConversations = () => {
 
   const markMessageRead = async (messageId: string, read: boolean) => {
     try {
-      await supabase.from('messages').update({ read } as any).eq('id', messageId);
+      // RPC : la policy UPDATE de messages est réservée à l'expéditeur, alors
+      // qu'on marque comme lu / non lu un message *reçu*.
+      const { error } = await (supabase.rpc as any)('set_message_read', { _message_id: messageId, _read: read });
+      if (error) {
+        toast({ title: 'Mise à jour impossible', description: error.message, variant: 'destructive' });
+        return;
+      }
       await fetchConversations(true);
     } catch (e) {
       console.error(e);

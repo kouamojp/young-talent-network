@@ -1,128 +1,66 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Globe, MapPin } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, Phone, Mail, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { geocodePlaces } from '@/lib/mapbox';
+import KartaMap, { type KartaPoint } from './KartaMap';
 
+interface Org { id: string; name: string; industry: string | null; headquarters: string; logo: string | null; website: string | null }
+
+/** Organisations placées à partir de leur siège (texte géocodé). */
 const OrganisationsMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [selectedOrg, setSelectedOrg] = useState<any>(null);
-
-  // Les organisations (organization_profiles) n'ont pas de coordonnées en base :
-  // aucun marqueur tant que ce n'est pas le cas.
-  const organisations: { id: string; name: string; type: string; location: [number, number]; phone: string; email: string; website: string; logo: string }[] = [];
+  const navigate = useNavigate();
+  const [points, setPoints] = useState<KartaPoint<Org>[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [30.5234, 50.4501],
-      zoom: 12,
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add markers for organisations
-    organisations.forEach(org => {
-      const el = document.createElement('div');
-      el.className = 'custom-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = 'hsl(var(--primary))';
-      el.style.border = '3px solid white';
-      el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-
-      new mapboxgl.Marker(el)
-        .setLngLat(org.location as [number, number])
-        .addTo(map.current!);
-
-      el.addEventListener('click', () => {
-        setSelectedOrg(org);
-      });
-    });
-
-    return () => {
-      map.current?.remove();
-    };
-  }, [mapboxToken]);
-
-  if (!mapboxToken) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-5 w-5" />
-              <p>Enter your Mapbox token to view the interactive map</p>
-            </div>
-            <Input
-              type="text"
-              placeholder="pk.eyJ1IjoiZXhhbXBsZS..."
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Get your free token at{' '}
-              <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                mapbox.com
-              </a>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+    (async () => {
+      const { data } = await supabase
+        .from('organization_profiles')
+        .select('id, company_name, industry, headquarters, logo_url, website_url')
+        .not('headquarters', 'is', null)
+        .limit(200);
+      const orgs: Org[] = ((data || []) as any[]).filter(o => o.headquarters).map(o => ({
+        id: o.id, name: o.company_name, industry: o.industry, headquarters: o.headquarters, logo: o.logo_url, website: o.website_url,
+      }));
+      const coords = await geocodePlaces(orgs.map(o => o.headquarters));
+      setPoints(orgs.flatMap(o => {
+        const c = coords[o.headquarters.trim()];
+        return c ? [{ id: o.id, lngLat: c, data: o }] : [];
+      }));
+      setLoading(false);
+    })();
+  }, []);
 
   return (
-    <div className="relative">
-      <div ref={mapContainer} className="w-full h-[600px] rounded-lg shadow-lg" />
-      
-      {selectedOrg && (
-        <Card className="absolute bottom-4 left-4 right-4 max-w-md mx-auto shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary">
-                <AvatarImage src={selectedOrg.logo} />
-                <AvatarFallback>{selectedOrg.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{selectedOrg.name}</h3>
-                <p className="text-sm text-primary font-medium">{selectedOrg.type}</p>
-                <div className="space-y-1 mt-2">
-                  <a href={`tel:${selectedOrg.phone}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                    <Phone className="h-4 w-4" />
-                    {selectedOrg.phone}
-                  </a>
-                  <a href={`mailto:${selectedOrg.email}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                    <Mail className="h-4 w-4" />
-                    {selectedOrg.email}
-                  </a>
-                  <a href={`https://${selectedOrg.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
-                    <Globe className="h-4 w-4" />
-                    {selectedOrg.website}
-                  </a>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="flex-1">Visit Profile</Button>
-                  <Button size="sm" variant="outline">Directions</Button>
-                </div>
-              </div>
+    <KartaMap
+      points={points}
+      loading={loading}
+      emptyLabel="Aucune organisation localisée pour le moment"
+      renderSelected={({ data: org }) => (
+        <div className="flex items-start gap-4 pr-4">
+          <Avatar className="h-14 w-14 border-2 border-primary">
+            <AvatarImage src={org.logo || ''} />
+            <AvatarFallback>{org.name?.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-lg break-words">{org.name}</h3>
+            {org.industry && <p className="text-sm text-primary font-medium">{org.industry}</p>}
+            <div className="space-y-1 mt-2 text-sm text-muted-foreground">
+              <p className="flex items-center gap-2"><MapPin className="h-4 w-4" />{org.headquarters}</p>
+              {org.website && (
+                <a href={org.website.startsWith('http') ? org.website : `https://${org.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary">
+                  <Globe className="h-4 w-4" />{org.website}
+                </a>
+              )}
             </div>
-          </CardContent>
-        </Card>
+            <Button size="sm" className="mt-3 w-full" onClick={() => navigate(`/organization/${org.id}`)}>Voir le profil</Button>
+          </div>
+        </div>
       )}
-    </div>
+    />
   );
 };
 

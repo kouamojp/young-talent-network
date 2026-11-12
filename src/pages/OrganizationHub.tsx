@@ -12,6 +12,12 @@ import { OrganizationCrest } from '@/components/organizations/OrganizationRow';
 import { useLanguage } from '@/i18n/LanguageContext';
 import ProfileActivityFeed from '@/components/profile/ProfileActivityFeed';
 import AggregatedPostsFeed from '@/components/profile/AggregatedPostsFeed';
+import OrganizationServices from '@/components/organizations/OrganizationServices';
+import JobPostingForm, { type JobFormValues } from '@/components/work/JobPostingForm';
+import { buildJobPostingRow } from '@/lib/jobs';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { toast } from '@/components/ui/use-toast';
+import { Plus } from 'lucide-react';
 
 interface OrgData {
   id: string;
@@ -65,6 +71,26 @@ const OrganizationHub: React.FC = () => {
   const [jobPostings, setJobPostings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [jobFormOpen, setJobFormOpen] = useState(false);
+  const [publishingJob, setPublishingJob] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => setCurrentUserId(user?.id ?? null));
+  }, []);
+
+  const isOwner = !!org && !!currentUserId && currentUserId === org.user_id;
+
+  const publishJob = async (v: JobFormValues) => {
+    if (!org) return;
+    setPublishingJob(true);
+    const { data, error } = await supabase.from('job_postings').insert(buildJobPostingRow(v, org.user_id)).select('*').single();
+    setPublishingJob(false);
+    if (error) { toast({ title: 'Publication impossible', description: error.message, variant: 'destructive' }); return; }
+    setJobPostings(prev => [data, ...prev]);
+    setJobFormOpen(false);
+    toast({ title: 'Offre publiée', description: v.title });
+  };
 
   useEffect(() => {
     if (id) fetchOrgData();
@@ -460,18 +486,25 @@ const OrganizationHub: React.FC = () => {
 
           {/* Services */}
           <TabsContent value="services" className="space-y-4">
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <h3 className="font-semibold text-lg">Services</h3>
-                <p className="text-muted-foreground">Les services de l'organisation seront bientôt disponibles.</p>
-              </CardContent>
-            </Card>
+            <OrganizationServices ownerId={org.user_id} isOwner={isOwner} ownerName={org.company_name} />
           </TabsContent>
 
           {/* Recruitment */}
           <TabsContent value="recruitment" className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground">Offres d'emploi ({jobPostings.length})</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-lg font-semibold text-foreground">Offres d'emploi ({jobPostings.length})</h3>
+              {isOwner && <Button size="sm" onClick={() => setJobFormOpen(true)}><Plus className="h-4 w-4 mr-1.5" />Publier une offre</Button>}
+            </div>
+            <Dialog open={jobFormOpen} onOpenChange={setJobFormOpen}>
+              <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+                <JobPostingForm
+                  initialData={{ company: org.company_name, location: org.headquarters || '' }}
+                  onSubmit={publishJob}
+                  onCancel={() => setJobFormOpen(false)}
+                  isLoading={publishingJob}
+                />
+              </DialogContent>
+            </Dialog>
             {jobPostings.length === 0 ? (
               <Card>
                 <CardContent className="p-12 text-center">

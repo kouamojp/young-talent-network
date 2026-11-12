@@ -53,8 +53,10 @@ export const useCall = () => {
 };
 
 // STUN is free; a TURN server is required for reliable connectivity across strict NATs.
-// Configure your own via env vars; falls back to the public OpenRelay TURN for development.
-const ICE_SERVERS: RTCIceServer[] = [
+// Preferred: short-lived credentials from the `turn-credentials` Edge Function
+// (coturn or Metered, configured server-side). Fallback: VITE_TURN_* env vars,
+// then the public OpenRelay TURN, which is only fit for development.
+const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
   {
     urls: import.meta.env.VITE_TURN_URL || 'turn:openrelay.metered.ca:80',
@@ -62,6 +64,24 @@ const ICE_SERVERS: RTCIceServer[] = [
     credential: import.meta.env.VITE_TURN_CREDENTIAL || 'openrelayproject',
   },
 ];
+
+let iceCache: { servers: RTCIceServer[]; expiresAt: number } | null = null;
+
+/** Fetches (and caches until shortly before expiry) TURN credentials from the Edge Function. */
+const prefetchIceServers = async () => {
+  if (iceCache && iceCache.expiresAt > Date.now()) return;
+  try {
+    const { data, error } = await supabase.functions.invoke('turn-credentials', { body: {} });
+    if (error || !Array.isArray(data?.iceServers) || data.iceServers.length === 0) return;
+    const ttlMs = Math.max(60, Number(data.ttl) || 3600) * 1000;
+    iceCache = { servers: data.iceServers, expiresAt: Date.now() + ttlMs - 5 * 60 * 1000 };
+  } catch {
+    // keep the fallback servers
+  }
+};
+
+const currentIceServers = (): RTCIceServer[] =>
+  iceCache && iceCache.expiresAt > Date.now() ? iceCache.servers : FALLBACK_ICE_SERVERS;
 
 // Fire-and-forget broadcast to a user's personal call channel (invite / reject / cancel).
 const sendToUser = (uid: string, event: string, payload: Record<string, unknown>) => {
@@ -129,6 +149,7 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [userId]);
 
   const loadSelf = useCallback(async (id: string) => {
+    prefetchIceServers();
     const { data } = await supabase.from('profiles').select('id, name, avatar_url').eq('id', id).single();
     if (data) selfRef.current = data as CallPeer;
   }, []);
@@ -185,7 +206,8 @@ export const CallProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const dbIdRef = useRef<string | null>(null);
 
   const buildPeerConnection = useCallback((stream: MediaStream) => {
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const pc = new RTCPeerConnection({ iceServers: currentIceServers() });
+    prefetchIceServers(); // refresh for the next call if the cache is about to expire
     stream.getTracks().forEach((track) => pc.addTrack(track, stream));
     const remote = new MediaStream();
     pc.ontrack = (e) => {

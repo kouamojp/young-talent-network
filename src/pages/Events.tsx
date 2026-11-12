@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, MapPin, Clock, Users, Filter, Search, Plus, ChevronDown, Map, Eye } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
+import { MAPBOX_TOKEN } from '@/lib/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -405,7 +406,7 @@ const EventsMapbox: React.FC<{ events: EventItem[] }> = ({ events }) => {
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
-    mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHRpY3B2MG0wMXVjMmtwNjlzOHV5dGxzIn0.a_bGOwlDWjFEeSbQ1SInjQ';
+    mapboxgl.accessToken = MAPBOX_TOKEN;
     map.current = new mapboxgl.Map({
       container: mapContainer.current, style: 'mapbox://styles/mapbox/light-v11',
       center: [2.35, 46.85], zoom: 3,

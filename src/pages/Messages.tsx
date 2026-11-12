@@ -57,10 +57,24 @@ const Messages: React.FC = () => {
   // Mark received messages as read when a conversation is open on screen,
   // and again whenever a new incoming message lands in it.
   const chatVisible = !isMobile || showChat;
+  // Messages que l'utilisateur a remis en « non lu » à la main : on ne les
+  // relit pas automatiquement tant qu'aucun nouveau message n'arrive.
+  const [manualUnread, setManualUnread] = useState<Set<string>>(new Set());
   const latestIncomingUnreadId = activeConversation?.messages.find(m => m.sender_id !== currentUserId && !m.read && !m.pending)?.id;
   useEffect(() => {
-    if (activeConversationId && chatVisible && latestIncomingUnreadId) markConversationRead(activeConversationId);
-  }, [activeConversationId, chatVisible, latestIncomingUnreadId]);
+    if (!activeConversationId || !chatVisible || !latestIncomingUnreadId) return;
+    if (manualUnread.has(latestIncomingUnreadId)) return;
+    markConversationRead(activeConversationId);
+  }, [activeConversationId, chatVisible, latestIncomingUnreadId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const toggleMessageRead = (messageId: string, read: boolean) => {
+    setManualUnread(prev => {
+      const next = new Set(prev);
+      if (read) next.delete(messageId); else next.add(messageId);
+      return next;
+    });
+    markMessageRead(messageId, read);
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -362,7 +376,7 @@ const Messages: React.FC = () => {
                                 <Forward className="h-4 w-4 mr-2" /> Transférer
                               </DropdownMenuItem>
                               {!isOwn && (
-                                <DropdownMenuItem onClick={() => markMessageRead(message.id, !message.read)}>
+                                <DropdownMenuItem onClick={() => toggleMessageRead(message.id, !message.read)}>
                                   {message.read ? <Check className="h-4 w-4 mr-2" /> : <CheckCheck className="h-4 w-4 mr-2" />}
                                   Marquer comme {message.read ? 'non lu' : 'lu'}
                                 </DropdownMenuItem>

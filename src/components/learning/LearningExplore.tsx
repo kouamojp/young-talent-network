@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 
 interface LearningExploreProps {
   onBack: () => void;
@@ -101,7 +102,7 @@ const LearningExplore: React.FC<LearningExploreProps> = ({ onBack }) => {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-semibold break-words">{course.title}</h3>
+                  <Link to={`/course/${course.id}`} className="font-semibold break-words hover:text-primary hover:underline">{course.title}</Link>
                   {course.price !== null && (
                     <span className="shrink-0 font-semibold tabular-nums">{Number(course.price) === 0 ? 'Gratuit' : `${Number(course.price)} $`}</span>
                   )}

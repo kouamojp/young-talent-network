@@ -8,9 +8,10 @@ const Footer: React.FC = () => {
   const { t } = useLanguage();
   const year = new Date().getFullYear().toString();
 
-  // Les liens « À propos », « Aide », « Carrières » et « Publicité » n'avaient
-  // pas de page : ils sont retirés jusqu'à ce qu'elles existent.
+  // « Carrières » et « Publicité » n'ont pas de page : retirés jusqu'à ce qu'elles existent.
   const links: { key: TranslationKey; to: string }[] = [
+    { key: 'footer.about', to: '/a-propos' },
+    { key: 'footer.help', to: '/aide' },
     { key: 'footer.terms', to: '/legal/cgu' },
     { key: 'footer.privacy', to: '/legal/confidentialite' },
     { key: 'footer.cookies', to: '/legal/cookies' },

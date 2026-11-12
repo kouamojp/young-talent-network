@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, GraduationCap, Upload, Calendar, Clock, Globe, MapPin, DollarSign, Users, Loader2, X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,6 +71,7 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const buildDescription = (v: LearningFormValues) => {
     const details = [
@@ -107,7 +109,7 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
       const duration = parseFloat(values.durationHours.replace(',', '.'));
       const price = parseFloat(values.price.replace(',', '.'));
 
-      const { error } = await supabase.from('courses').insert({
+      const { data: created, error } = await supabase.from('courses').insert({
         instructor_id: user.id,
         title: values.title.trim(),
         description: buildDescription(values) || null,
@@ -116,13 +118,13 @@ const LearningCreate: React.FC<LearningCreateProps> = ({ onBack }) => {
         duration_hours: Number.isFinite(duration) ? Math.round(duration) : null,
         price: Number.isFinite(price) ? price : 0,
         thumbnail_url: thumbnailUrl,
-      });
+      }).select('id').single();
       if (error) throw error;
 
-      toast({ title: 'Cours publié', description: 'Votre cours est visible dans « Explorer ».' });
+      toast({ title: 'Cours publié', description: 'Ajoutez maintenant vos leçons.' });
       form.reset();
       setThumbnail(null);
-      onBack();
+      navigate(`/course/${created.id}`);
     } catch (error: any) {
       toast({ title: 'Échec de la publication', description: error?.message, variant: 'destructive' });
     } finally {

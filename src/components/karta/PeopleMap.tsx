@@ -1,22 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MessageCircle, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, MessageCircle, UserPlus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import KartaMap, { type KartaPoint } from './KartaMap';
 
+interface Person { id: string; name: string; role: string; sport: string; avatar: string }
+
+const profileLink = (p: Person) =>
+  p.role === 'organization' ? `/organization/${p.id}` : p.role === 'agent' ? `/agent/${p.id}` : `/talent/${p.id}`;
+
+/** Membres qui ont renseigné leur position. */
 const PeopleMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [selectedPerson, setSelectedPerson] = useState<any>(null);
+  const navigate = useNavigate();
+  const [points, setPoints] = useState<KartaPoint<Person>[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Profils qui ont renseigné leur position
-  const [people, setPeople] = useState<{ id: string; name: string; role: string; sport: string; location: [number, number]; avatar: string }[]>([]);
   useEffect(() => {
     supabase
       .from('profiles')
@@ -24,117 +25,45 @@ const PeopleMap = () => {
       .not('latitude', 'is', null)
       .not('longitude', 'is', null)
       .limit(500)
-      .then(({ data }) => setPeople((data ?? []).map((p) => ({
-        id: p.id,
-        name: p.name || '?',
-        role: p.user_type || '',
-        sport: p.sport_type || '',
-        location: [Number(p.longitude), Number(p.latitude)] as [number, number],
-        avatar: p.avatar_url || '',
-      }))));
+      .then(({ data }) => {
+        setPoints((data ?? []).map(p => ({
+          id: p.id,
+          lngLat: [Number(p.longitude), Number(p.latitude)],
+          data: { id: p.id, name: p.name || '?', role: p.user_type || '', sport: p.sport_type || '', avatar: p.avatar_url || '' },
+        })));
+        setLoading(false);
+      });
   }, []);
 
-  useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [30.5234, 50.4501],
-      zoom: 12,
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add markers for people
-    people.forEach(person => {
-      const el = document.createElement('div');
-      el.className = 'custom-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = 'hsl(var(--primary))';
-      el.style.border = '3px solid white';
-      el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-
-      new mapboxgl.Marker(el)
-        .setLngLat(person.location as [number, number])
-        .addTo(map.current!);
-
-      el.addEventListener('click', () => {
-        setSelectedPerson(person);
-      });
-    });
-
-    return () => {
-      map.current?.remove();
-    };
-  }, [mapboxToken, people]);
-
-  if (!mapboxToken) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-5 w-5" />
-              <p>Enter your Mapbox token to view the interactive map</p>
-            </div>
-            <Input
-              type="text"
-              placeholder="pk.eyJ1IjoiZXhhbXBsZS..."
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Get your free token at{' '}
-              <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                mapbox.com
-              </a>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <div className="relative">
-      <div ref={mapContainer} className="w-full h-[600px] rounded-lg shadow-lg" />
-      
-      {selectedPerson && (
-        <Card className="absolute bottom-4 left-4 right-4 max-w-md mx-auto shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              <Avatar className="h-16 w-16 border-2 border-primary">
-                <AvatarImage src={selectedPerson.avatar} />
-                <AvatarFallback>{selectedPerson.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{selectedPerson.name}</h3>
-                <div className="flex gap-2 mt-2">
-                  <Badge variant="secondary">{selectedPerson.role}</Badge>
-                  <Badge variant="outline">{selectedPerson.sport}</Badge>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="flex-1 gap-2">
-                    <MessageCircle className="h-4 w-4" />
-                    Message
-                  </Button>
-                  <Button size="sm" variant="outline" className="gap-2">
-                    <UserPlus className="h-4 w-4" />
-                    Connect
-                  </Button>
-                </div>
-              </div>
+    <KartaMap
+      points={points}
+      loading={loading}
+      emptyLabel="Aucun membre n'a encore partagé sa position"
+      renderSelected={({ data: person }) => (
+        <div className="flex items-start gap-4 pr-4">
+          <Avatar className="h-14 w-14 border-2 border-primary">
+            <AvatarImage src={person.avatar} />
+            <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-lg break-words">{person.name}</h3>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {person.role && <Badge variant="secondary">{person.role}</Badge>}
+              {person.sport && <Badge variant="outline">{person.sport}</Badge>}
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex gap-2 mt-3">
+              <Button size="sm" className="flex-1 gap-2" onClick={() => navigate(`/messages?to=${person.id}`)}>
+                <MessageCircle className="h-4 w-4" /> Message
+              </Button>
+              <Button size="sm" variant="outline" className="gap-2" onClick={() => navigate(profileLink(person))}>
+                <User className="h-4 w-4" /> Profil
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
-    </div>
+    />
   );
 };
 

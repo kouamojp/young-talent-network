@@ -1,121 +1,66 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Briefcase, DollarSign, MapPin } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { MapPin, Briefcase, DollarSign } from 'lucide-react';
+import { geocodePlaces } from '@/lib/mapbox';
+import KartaMap, { type KartaPoint } from './KartaMap';
 
+interface Job { id: string; title: string; company: string; organizationId: string; location: string; salary: string | null; type: string | null }
+
+/** Offres d'emploi ouvertes, placées sur la carte à partir de leur lieu (texte géocodé). */
 const WorkMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState('');
-  const [selectedJob, setSelectedJob] = useState<any>(null);
-
-  // Les offres (job_postings) n'ont pas de coordonnées en base : aucun marqueur
-  // tant que ce n'est pas le cas.
-  const jobs: { id: string; title: string; company: string; location: [number, number]; salary: string; type: string }[] = [];
+  const navigate = useNavigate();
+  const [points, setPoints] = useState<KartaPoint<Job>[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [30.5234, 50.4501],
-      zoom: 12,
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // Add markers for jobs
-    jobs.forEach(job => {
-      const el = document.createElement('div');
-      el.className = 'custom-marker';
-      el.style.width = '32px';
-      el.style.height = '32px';
-      el.style.borderRadius = '50%';
-      el.style.backgroundColor = 'hsl(var(--primary))';
-      el.style.border = '3px solid white';
-      el.style.cursor = 'pointer';
-      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-
-      new mapboxgl.Marker(el)
-        .setLngLat(job.location as [number, number])
-        .addTo(map.current!);
-
-      el.addEventListener('click', () => {
-        setSelectedJob(job);
-      });
-    });
-
-    return () => {
-      map.current?.remove();
-    };
-  }, [mapboxToken]);
-
-  if (!mapboxToken) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <MapPin className="h-5 w-5" />
-              <p>Enter your Mapbox token to view the interactive map</p>
-            </div>
-            <Input
-              type="text"
-              placeholder="pk.eyJ1IjoiZXhhbXBsZS..."
-              value={mapboxToken}
-              onChange={(e) => setMapboxToken(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Get your free token at{' '}
-              <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                mapbox.com
-              </a>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+    (async () => {
+      const { data } = await supabase
+        .from('job_postings')
+        .select('id, title, location, salary_range, job_type, organization_id, status, organization:profiles!job_postings_organization_id_fkey(name)')
+        .not('location', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      const jobs: Job[] = ((data || []) as any[])
+        .filter(j => j.location && (!j.status || j.status === 'open' || j.status === 'active'))
+        .map(j => ({
+          id: j.id, title: j.title, company: j.organization?.name || 'Organisation', organizationId: j.organization_id,
+          location: j.location, salary: j.salary_range, type: j.job_type,
+        }));
+      const coords = await geocodePlaces(jobs.map(j => j.location));
+      setPoints(jobs.flatMap(j => {
+        const c = coords[j.location.trim()];
+        return c ? [{ id: j.id, lngLat: c, data: j }] : [];
+      }));
+      setLoading(false);
+    })();
+  }, []);
 
   return (
-    <div className="relative">
-      <div ref={mapContainer} className="w-full h-[600px] rounded-lg shadow-lg" />
-      
-      {selectedJob && (
-        <Card className="absolute bottom-4 left-4 right-4 max-w-md mx-auto shadow-xl">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Briefcase className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{selectedJob.title}</h3>
-                <p className="text-sm text-muted-foreground">{selectedJob.company}</p>
-                <div className="flex items-center gap-4 mt-2">
-                  <span className="text-sm flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
-                    {selectedJob.salary}
-                  </span>
-                  <span className="text-sm px-2 py-1 bg-primary/10 rounded-full">
-                    {selectedJob.type}
-                  </span>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <Button size="sm" className="flex-1">Apply Now</Button>
-                  <Button size="sm" variant="outline">Details</Button>
-                </div>
-              </div>
+    <KartaMap
+      points={points}
+      loading={loading}
+      emptyLabel="Aucune offre localisée pour le moment"
+      renderSelected={({ data: job }) => (
+        <div className="flex items-start gap-4 pr-4">
+          <div className="p-3 bg-primary/10 rounded-lg"><Briefcase className="h-6 w-6 text-primary" /></div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-lg break-words">{job.title}</h3>
+            <p className="text-sm text-muted-foreground">{job.company}</p>
+            <div className="flex flex-wrap items-center gap-3 mt-2 text-sm">
+              <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{job.location}</span>
+              {job.salary && <span className="flex items-center gap-1"><DollarSign className="h-4 w-4" />{job.salary}</span>}
+              {job.type && <span className="px-2 py-0.5 bg-primary/10 rounded-full">{job.type}</span>}
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex gap-2 mt-3">
+              <Button size="sm" className="flex-1" onClick={() => navigate('/work')}>Voir les offres</Button>
+              <Button size="sm" variant="outline" onClick={() => navigate(`/organization/${job.organizationId}`)}>Organisation</Button>
+            </div>
+          </div>
+        </div>
       )}
-    </div>
+    />
   );
 };
 

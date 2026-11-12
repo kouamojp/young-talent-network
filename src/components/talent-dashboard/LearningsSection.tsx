@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, BookOpen, Clock, Users, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
 
 interface CourseRow {
   id: string;
@@ -17,10 +18,13 @@ interface CourseRow {
   students: number;
 }
 
+interface Enrollment { course_id: string; progress: number | null; completed: boolean | null; course: { title: string; category: string | null } | null }
+
 const LearningsSection: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -32,6 +36,13 @@ const LearningsSection: React.FC = () => {
         .select('id, title, description, category, level, price, duration_hours')
         .eq('instructor_id', user.id)
         .order('created_at', { ascending: false });
+
+      const { data: enr } = await supabase
+        .from('course_enrollments')
+        .select('course_id, progress, completed, course:courses(title, category)')
+        .eq('student_id', user.id)
+        .order('enrolled_at', { ascending: false });
+      setEnrollments((enr as unknown as Enrollment[]) || []);
 
       const list = coursesData || [];
       const counts = await Promise.all(
@@ -51,6 +62,26 @@ const LearningsSection: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {enrollments.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold">Mes cours suivis</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {enrollments.map(e => (
+              <Card key={e.course_id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/course/${e.course_id}`)}>
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-semibold break-words">{e.course?.title || 'Cours'}</h4>
+                    {e.completed && <Badge className="shrink-0">Terminé</Badge>}
+                  </div>
+                  <Progress value={e.progress || 0} />
+                  <p className="text-xs text-muted-foreground tabular-nums">{e.progress || 0} %</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Contenus pédagogiques</h3>
         <Button onClick={() => navigate('/learning')}>
@@ -101,8 +132,7 @@ const LearningsSection: React.FC = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => navigate('/learning')}>Modifier</Button>
-                  <Button size="sm" className="flex-1" onClick={() => navigate('/learning')}>Voir</Button>
+                  <Button size="sm" className="flex-1" onClick={() => navigate(`/course/${item.id}`)}>Gérer les leçons</Button>
                 </div>
               </CardContent>
             </Card>

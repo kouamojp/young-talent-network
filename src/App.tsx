@@ -40,6 +40,9 @@ import SettingsPage from "./pages/Settings";
 import AdminPanel from "./pages/AdminPanel";
 import Friends from "./pages/Friends";
 import Notifications from "./pages/Notifications";
+import CourseDetail from "./pages/CourseDetail";
+import About from "./pages/About";
+import Help from "./pages/Help";
 import Legal from "./pages/Legal";
 import ParentalConsent from "./pages/ParentalConsent";
 import ComplianceGate from "./components/compliance/ComplianceGate";
@@ -128,6 +131,9 @@ const App = () => {
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/friends" element={<Friends />} />
                 <Route path="/notifications" element={<Notifications />} />
+                <Route path="/course/:id" element={<CourseDetail />} />
+                <Route path="/a-propos" element={<About />} />
+                <Route path="/aide" element={<Help />} />
                 <Route path="/legal/:doc" element={<Legal />} />
                 <Route path="/legal" element={<Navigate to="/legal/cgu" replace />} />
                 <Route path="/accord-parental" element={<ParentalConsent />} />

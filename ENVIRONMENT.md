@@ -26,6 +26,7 @@ cp .env.example .env
 | `VITE_SUPABASE_URL` | Oui | URL du projet Supabase | Dashboard → Project Settings → API |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Oui | Clé publique (anon) du projet | Même page, « anon / publishable key » |
 | `VITE_SUPABASE_PROJECT_ID` | Non | Référence du projet, pour mémoire (le code ne la lit pas) | Dans l'URL : `https://<ref>.supabase.co` |
+| `VITE_MAPBOX_TOKEN` | Recommandé | Clé publique Mapbox (`pk.…`) des cartes YAT Karta et Événements. Restreignez-la à vos domaines. Sans elle, une clé de démonstration est utilisée. | [account.mapbox.com](https://account.mapbox.com) → Tokens |
 | `VITE_TURN_URL` | Non | Serveur TURN pour les appels audio/vidéo | Votre fournisseur TURN |
 | `VITE_TURN_USERNAME` | Non | Identifiant TURN | Votre fournisseur TURN |
 | `VITE_TURN_CREDENTIAL` | Non | Mot de passe TURN | Votre fournisseur TURN |
@@ -86,6 +87,21 @@ Points d'attention :
 Dans @BotFather, déclarez aussi le domaine du site avec `/setdomain`. Sans cette étape, le widget
 de connexion Telegram refuse de s'afficher. Tant que ces deux secrets manquent, `telegram-auth`
 répond « Telegram bot not configured ».
+
+### Serveur TURN des appels (recommandé en production)
+
+La fonction `turn-credentials` fournit au navigateur des identifiants TURN **temporaires** (6 h),
+ce qui évite d'exposer un mot de passe fixe dans le front-end. Configurez **un** des deux fournisseurs :
+
+| Variable | Rôle |
+|---|---|
+| `TURN_URLS` | coturn : URL(s) du serveur, séparées par des virgules (ex. `turn:turn.exemple.com:3478,turns:turn.exemple.com:5349`) |
+| `TURN_SHARED_SECRET` | coturn : la valeur `static-auth-secret` de `turnserver.conf` (avec `use-auth-secret`) |
+| `METERED_DOMAIN` | Metered.ca : domaine de l'application (ex. `monapp.metered.live`) |
+| `METERED_API_KEY` | Metered.ca : clé API TURN |
+
+Sans ces secrets, la fonction répond 404 et les appels utilisent `VITE_TURN_*`, puis le relais public.
+Déploiement : `supabase functions deploy turn-credentials`.
 
 ### Accord parental (e-mails)
 
